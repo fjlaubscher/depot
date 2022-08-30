@@ -1,0 +1,39 @@
+@use "../../styles/breakpoints";
+@use '../../styles/colors';
+
+.table {
+  width: 100%;
+  border-spacing: 0;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+
+  th {
+    text-align: left;
+    color: white;
+    background-color: colors.$accent;
+    padding: 0.25rem;
+    font-weight: 500;
+
+    @media (prefers-color-scheme: dark) {
+      color: colors.$accent;
+      background-color: transparent;
+    }
+  }
+
+  td {
+    text-align: left;
+    padding: 0.25rem;
+    vertical-align: middle;
+    background-color: colors.$light-surface;
+    border: 1px solid darken(colors.$light-background, 5%);
+
+    @media (prefers-color-scheme: dark) {
+      background-color: colors.$dark-surface;
+      border-color: lighten(colors.$dark-background, 15%);
+    }
+  }
+
+  @media (min-width: breakpoints.$tablet) {
+    font-size: 1rem;
+  }
+}

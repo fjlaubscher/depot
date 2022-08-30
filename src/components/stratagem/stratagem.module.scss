@@ -1,0 +1,45 @@
+@use '../../styles/breakpoints';
+@use '../../styles/colors';
+
+.stratagem {
+  position: relative;
+  background-color: colors.$light-surface;
+  color: colors.$light-text;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1);
+
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: colors.$primary;
+    color: colors.$accent;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    padding: 0 1rem;
+    margin: 0;
+    margin-bottom: 1rem;
+  }
+
+  .legend {
+    color: darken(colors.$light-text, 25%);
+    font-style: italic;
+
+    @media (prefers-color-scheme: dark) {
+      color: darken(colors.$dark-text, 25%);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: colors.$dark-surface;
+    color: colors.$dark-text;
+  }
+}

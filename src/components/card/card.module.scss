@@ -1,0 +1,68 @@
+@use "../../styles/breakpoints";
+@use "../../styles/colors";
+
+.card {
+  position: relative;
+  background-color: colors.$light-surface;
+  color: colors.$light-text;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1);
+
+  .title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: colors.$accent;
+  }
+
+  .delete {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: transparent;
+    outline: 0;
+    border: 0;
+    padding: 1rem;
+    margin: 0;
+    font-size: 1rem;
+    color: colors.$error-red;
+  }
+
+  p {
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: colors.$dark-surface;
+    color: colors.$dark-text;
+  }
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: colors.$light-surface;
+  color: colors.$light-text;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  transform: translateY(0);
+  transition: 0.2s ease-in-out transform;
+
+  &:hover {
+    transform: translateY(-0.125rem);
+  }
+
+  svg {
+    color: colors.$accent;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: colors.$dark-surface;
+    color: colors.$dark-text;
+  }
+}

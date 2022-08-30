@@ -1,0 +1,24 @@
+$info-blue: #1a98ff;
+$warning-yellow: #ffa600;
+$error-red: #fd2c2c;
+
+$gallery: #f0f0f0;
+$dark-grey: #121212;
+
+// https://coolors.co/e0bad7-61d095-48bf84-439775-2a4747
+$pink-lavender: #e0bad7;
+$aquamarine: #61d095;
+$ocean-green: #48bf84;
+$emerald: #439775;
+$dark-slate-gray: #2a4747;
+
+$primary: $dark-slate-gray;
+$accent: $ocean-green;
+
+$light-background: $gallery;
+$light-surface: lighten($gallery, 5%);
+$light-text: $dark-grey;
+
+$dark-background: $dark-grey;
+$dark-surface: lighten($dark-grey, 5%);
+$dark-text: $gallery;

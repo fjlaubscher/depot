@@ -1,0 +1,89 @@
+@use './_colors';
+
+* {
+  box-sizing: border-box;
+  text-rendering: optimizelegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Roboto', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: colors.$light-background;
+  color: colors.$light-text;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: colors.$dark-background;
+    color: colors.$dark-text;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+svg {
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+
+label {
+  font-size: 0.9rem;
+  color: colors.$light-text;
+
+  @media (prefers-color-scheme: dark) {
+    color: colors.$dark-text;
+  }
+}
+
+input,
+select,
+textarea {
+  outline: 0;
+  border: 0;
+  min-height: 2.75rem;
+  font-size: 1rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: colors.$light-text;
+  background: transparent;
+  background-color: colors.$light-surface;
+  padding: 0.75rem;
+  box-shadow: 0 0.125rem 0.125rem 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  width: 100%;
+  -webkit-appearance: none;
+  filter: none;
+
+  @media (prefers-color-scheme: dark) {
+    color: colors.$dark-text;
+    background-color: colors.$dark-surface;
+  }
+}
+
+textarea {
+  height: 10rem;
+  resize: none;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}

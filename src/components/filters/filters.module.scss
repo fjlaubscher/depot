@@ -1,0 +1,41 @@
+@use '../../styles/breakpoints';
+@use '../../styles/colors';
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 0.125rem solid colors.$light-surface;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+
+  .controls {
+    width: 100%;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 1fr;
+
+    select {
+      width: 100%;
+    }
+
+    @media (min-width: breakpoints.$tablet) {
+      grid-template-columns: 1fr 1fr 1fr;
+
+      select {
+        margin-top: 0;
+        grid-column: 3;
+      }
+    }
+  }
+
+  a {
+    margin-top: 1rem;
+    color: colors.$accent;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-bottom-color: colors.$dark-surface;
+  }
+}
