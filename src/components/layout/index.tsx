@@ -21,7 +21,7 @@ interface Props {
 const Layout = ({ backLink, children, title, action, isLoading }: Props) => {
   return (
     <div className={styles.container}>
-      <Helmet title={`${title} | Depot`} />
+      <Helmet title={`${title} | depot`} />
       <div className={styles.navbar}>
         <Link className={styles.home} to={backLink || '/'}>
           {backLink ? <FiArrowLeft /> : <GiBolterGun />}

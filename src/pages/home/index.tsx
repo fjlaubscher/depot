@@ -30,7 +30,7 @@ const Home = () => {
   return (
     <Layout title="Home" isLoading={loadingFactions}>
       <Alert title="Hey! 👋">
-        <p>Depot is a free and open-source Warhammer: 40,000 companion app powered by Wahapedia!</p>
+        <p>depot is a free and open-source Warhammer: 40,000 companion app powered by Wahapedia!</p>
         <a href="https://github.com/fjlaubscher/depot" target="_blank" rel="noopener">
           https://github.com/fjlaubscher/depot
         </a>
