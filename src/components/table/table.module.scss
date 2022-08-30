@@ -4,15 +4,15 @@
 .table {
   width: 100%;
   border-spacing: 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin-bottom: 1rem;
 
   th {
-    text-align: left;
+    text-align: center;
     color: white;
     background-color: colors.$accent;
-    padding: 0.25rem;
     font-weight: 500;
+    padding-bottom: 0.25rem;
 
     @media (prefers-color-scheme: dark) {
       color: colors.$accent;
@@ -21,11 +21,11 @@
   }
 
   td {
-    text-align: left;
+    text-align: center;
     padding: 0.25rem;
     vertical-align: middle;
     background-color: colors.$light-surface;
-    border: 1px solid darken(colors.$light-background, 5%);
+    border: 1px solid darken(colors.$light-background, 5%);    
 
     @media (prefers-color-scheme: dark) {
       background-color: colors.$dark-surface;

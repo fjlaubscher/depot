@@ -25,8 +25,6 @@ const Datasheet = () => {
     }
   }, [faction, id]);
 
-  console.log(datasheet);
-
   return (
     <Layout
       backLink={`/faction/${factionId}`}
