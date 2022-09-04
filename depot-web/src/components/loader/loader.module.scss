@@ -1,0 +1,47 @@
+@use "../../styles/colors";
+
+.page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  > div {
+    width: 1rem;
+    height: 1rem;
+    background-color: colors.$primary;
+    border-radius: 100%;
+    animation: bounce 1.4s infinite ease-in-out both;
+  }
+
+  &.white {
+    > div {
+      background-color: white;
+    }
+  }
+
+  div:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  div:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}

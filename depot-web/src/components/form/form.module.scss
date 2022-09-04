@@ -1,0 +1,30 @@
+@use "../../styles/breakpoints";
+@use "../../styles/colors";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: breakpoints.$max-form-width;
+  margin-left: auto;
+  margin-right: auto;
+
+  button {
+    max-width: none;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+
+  label {
+    margin-bottom: 0.25rem;
+  }
+
+  .error {
+    margin-top: 0.25rem;
+    color: colors.$error-red;
+  }
+}
