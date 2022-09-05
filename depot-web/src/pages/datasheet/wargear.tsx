@@ -9,6 +9,9 @@ import WargearProfile from '../../components/wargear-profile';
 // hooks
 import useDebounce from '../../hooks/use-debounce';
 
+// utils
+import { sortByName } from '../../utils/array';
+
 interface Props {
   wargear: depot.Wargear[];
 }
@@ -16,15 +19,17 @@ interface Props {
 const DatasheetWargear: React.FC<Props> = ({ wargear }) => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
-  console.log(wargear);
 
-  const filteredWargear = useMemo(
-    () =>
-      debouncedQuery
-        ? wargear.filter((w) => w.name.toLowerCase().includes(debouncedQuery.toLowerCase()))
-        : wargear,
-    [wargear, debouncedQuery]
-  );
+  const filteredWargear = useMemo(() => {
+    if (debouncedQuery) {
+      const filteredByName = wargear.filter((w) =>
+        w.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+      );
+      return sortByName(filteredByName) as depot.Wargear[];
+    }
+
+    return sortByName(wargear) as depot.Wargear[];
+  }, [wargear, debouncedQuery]);
 
   return (
     <>

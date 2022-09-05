@@ -12,6 +12,7 @@ const Stratagem: React.FC<Props> = ({ stratagem }) => (
       <span>{stratagem.name}</span>
       <span className={styles.cost}>{stratagem.cpCost}CP</span>
     </div>
+    <p className={styles.type}>{stratagem.type}</p>
     <p className={styles.legend}>{stratagem.legend}</p>
     <p>{stratagem.description}</p>
   </div>

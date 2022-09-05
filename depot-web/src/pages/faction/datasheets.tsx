@@ -25,18 +25,15 @@ const FactionDatasheets: React.FC<Props> = ({ datasheets }) => {
   const debouncedQuery = useDebounce(query, 100);
 
   const groupedDatasheets = useMemo(() => {
-    const filteredDatasheets =
-      role || debouncedQuery
-        ? datasheets.filter((ds) =>
-            role
-              ? ds.role === role
-              : true && debouncedQuery
-              ? ds.name.toLowerCase().includes(debouncedQuery.toLowerCase())
-              : true
-          )
-        : datasheets;
+    if (debouncedQuery || role) {
+      const filteredByRole = datasheets.filter((ds) => (role ? ds.role === role : true));
+      const filteredByName = filteredByRole.filter((ds) =>
+        debouncedQuery ? ds.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
+      );
+      return groupDatasheetsByRole(filteredByName);
+    }
 
-    return groupDatasheetsByRole(filteredDatasheets);
+    return groupDatasheetsByRole(datasheets);
   }, [datasheets, debouncedQuery, role]);
 
   return (

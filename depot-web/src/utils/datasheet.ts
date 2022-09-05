@@ -1,3 +1,5 @@
+import { sortByName } from './array';
+
 export const ROLES = [
   'HQ',
   'Troops',
@@ -28,6 +30,10 @@ export const groupDatasheetsByRole = (datasheets: depot.Datasheet[]) => {
     const datasheetsByRole = dictionary[datasheet.role];
     dictionary[datasheet.role] = datasheetsByRole ? [...datasheetsByRole, datasheet] : [datasheet];
   }
+
+  Object.keys(dictionary).forEach((key) => {
+    dictionary[key] = sortByName(dictionary[key]) as depot.Datasheet[];
+  });
 
   return dictionary;
 };

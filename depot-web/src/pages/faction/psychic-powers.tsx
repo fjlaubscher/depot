@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 
 // components
+import DataCard from '../../components/card/data-card';
 import Filters from '../../components/filters';
 import Grid from '../../components/grid';
 import Search from '../../components/search';
-import Stratagem from '../../components/stratagem';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
@@ -13,33 +13,33 @@ import useDebounce from '../../hooks/use-debounce';
 import { sortByName } from '../../utils/array';
 
 interface Props {
-  stratagems: depot.Stratagem[];
+  psychicPowers: depot.PsychicPower[];
 }
 
-const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
+const FactionPsychicPowers: React.FC<Props> = ({ psychicPowers }) => {
   const [type, setType] = useState('');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
-  const filteredStratagems = useMemo(() => {
+  const filteredPsychicPowers = useMemo(() => {
     if (type || debouncedQuery) {
-      const filteredByType = stratagems.filter((s) => (type ? s.type === type : true));
-      const filteredByName = filteredByType.filter((s) =>
-        debouncedQuery ? s.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
+      const filteredByType = psychicPowers.filter((p) => (type ? p.type === type : true));
+      const filteredByName = filteredByType.filter((p) =>
+        debouncedQuery ? p.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
       );
-      return sortByName(filteredByName) as depot.Stratagem[];
+      return sortByName(filteredByName) as depot.PsychicPower[];
     }
 
-    return sortByName(stratagems) as depot.Stratagem[];
-  }, [stratagems, debouncedQuery, type]);
+    return sortByName(psychicPowers) as depot.PsychicPower[];
+  }, [psychicPowers, debouncedQuery, type]);
 
-  const stratagemTypes = useMemo(
+  const psychicPowerTypes = useMemo(
     () =>
-      stratagems
-        .map((s) => s.type)
+      psychicPowers
+        .map((p) => p.type)
         .filter((type, index, self) => self.indexOf(type) === index)
         .sort(),
-    [stratagems]
+    [psychicPowers]
   );
 
   return (
@@ -53,7 +53,7 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
           onChange={(e) => setType(e.currentTarget.value)}
         >
           <option value="">All</option>
-          {stratagemTypes.map((type, i) => (
+          {psychicPowerTypes.map((type, i) => (
             <option key={`type-${i}`} value={type}>
               {type}
             </option>
@@ -61,12 +61,12 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
         </select>
       </Filters>
       <Grid>
-        {filteredStratagems.map((stratagem) => (
-          <Stratagem key={stratagem.id} stratagem={stratagem} />
+        {filteredPsychicPowers.map((p, i) => (
+          <DataCard key={`psychic-power-${i}`} data={p} />
         ))}
       </Grid>
     </>
   );
 };
 
-export default FactionStratagems;
+export default FactionPsychicPowers;

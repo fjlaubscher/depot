@@ -92,7 +92,7 @@ const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): d
   const wargearIds = data.datasheetWargear
     .filter((wargear) => wargear.datasheetId === datasheet.id)
     .map((wargear) => wargear.wargearId)
-    .filter((id, i , self) => self.indexOf(id) === i);
+    .filter((id, i, self) => self.indexOf(id) === i);
 
   const wargear: depot.Wargear[] = [];
   for (let i = 0; i < wargearIds.length; i++) {

@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 
 // components
+import DataCard from '../../components/card/data-card';
 import Filters from '../../components/filters';
 import Grid from '../../components/grid';
 import Search from '../../components/search';
-import Stratagem from '../../components/stratagem';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
@@ -13,33 +13,33 @@ import useDebounce from '../../hooks/use-debounce';
 import { sortByName } from '../../utils/array';
 
 interface Props {
-  stratagems: depot.Stratagem[];
+  warlordTraits: depot.WarlordTrait[];
 }
 
-const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
+const FactionWarlordTraits: React.FC<Props> = ({ warlordTraits }) => {
   const [type, setType] = useState('');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
-  const filteredStratagems = useMemo(() => {
+  const filteredWarlordTraits = useMemo(() => {
     if (type || debouncedQuery) {
-      const filteredByType = stratagems.filter((s) => (type ? s.type === type : true));
-      const filteredByName = filteredByType.filter((s) =>
-        debouncedQuery ? s.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
+      const filteredByType = warlordTraits.filter((wlt) => (type ? wlt.type === type : true));
+      const filteredByName = filteredByType.filter((wlt) =>
+        debouncedQuery ? wlt.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
       );
-      return sortByName(filteredByName) as depot.Stratagem[];
+      return sortByName(filteredByName) as depot.WarlordTrait[];
     }
 
-    return sortByName(stratagems) as depot.Stratagem[];
-  }, [stratagems, debouncedQuery, type]);
+    return sortByName(warlordTraits) as depot.WarlordTrait[];
+  }, [warlordTraits, debouncedQuery, type]);
 
-  const stratagemTypes = useMemo(
+  const warlordTraitTypes = useMemo(
     () =>
-      stratagems
-        .map((s) => s.type)
+      warlordTraits
+        .map((wlt) => wlt.type)
         .filter((type, index, self) => self.indexOf(type) === index)
         .sort(),
-    [stratagems]
+    [warlordTraits]
   );
 
   return (
@@ -53,7 +53,7 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
           onChange={(e) => setType(e.currentTarget.value)}
         >
           <option value="">All</option>
-          {stratagemTypes.map((type, i) => (
+          {warlordTraitTypes.map((type, i) => (
             <option key={`type-${i}`} value={type}>
               {type}
             </option>
@@ -61,12 +61,12 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
         </select>
       </Filters>
       <Grid>
-        {filteredStratagems.map((stratagem) => (
-          <Stratagem key={stratagem.id} stratagem={stratagem} />
+        {filteredWarlordTraits.map((wlt, i) => (
+          <DataCard key={`warlord-trait-${i}`} data={wlt} />
         ))}
       </Grid>
     </>
   );
 };
 
-export default FactionStratagems;
+export default FactionWarlordTraits;

@@ -10,9 +10,12 @@ import Tabs from '../../components/tabs';
 import useFaction from '../../hooks/use-faction';
 
 import FactionDatasheets from './datasheets';
+import FactionPsychicPowers from './psychic-powers';
+import FactionRelics from './relics';
 import FactionStratagems from './stratagems';
+import FactionWarlordTraits from './warlord-traits';
 
-const TABS = ['Datasheets', 'Stratagems'];
+const TABS = ['Datasheets', 'Psychic Powers', 'Relics', 'Stratagems', 'Warlord Traits'];
 
 const Faction = () => {
   const { id } = useParams();
@@ -27,7 +30,10 @@ const Faction = () => {
     >
       <Tabs tabs={TABS} onChange={setActiveTab} />
       {faction && activeTab === 0 && <FactionDatasheets datasheets={faction.datasheets} />}
-      {faction && activeTab === 1 && <FactionStratagems stratagems={faction.stratagems} />}
+      {faction && activeTab === 1 && <FactionPsychicPowers psychicPowers={faction.psychicPowers} />}
+      {faction && activeTab === 2 && <FactionRelics relics={faction.relics} />}
+      {faction && activeTab === 3 && <FactionStratagems stratagems={faction.stratagems} />}
+      {faction && activeTab === 4 && <FactionWarlordTraits warlordTraits={faction.warlordTraits} />}
     </Layout>
   );
 };

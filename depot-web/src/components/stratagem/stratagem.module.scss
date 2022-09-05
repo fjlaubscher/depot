@@ -29,6 +29,10 @@
     margin-bottom: 1rem;
   }
 
+  .type {
+    color: colors.$accent;
+  }
+
   .legend {
     color: darken(colors.$light-text, 25%);
     font-style: italic;
