@@ -8,11 +8,12 @@ interface Props {
 }
 
 const DatasheetProfileTable: React.FC<Props> = ({ profiles }) => (
-  <Table headings={['#', 'Name', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Sv', 'Cost']}>
+  <Table headings={['#', 'Name', 'M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Sv', 'Cost']}>
     {profiles.map((entry) => (
       <tr key={entry.line}>
         <td style={{ whiteSpace: 'nowrap' }}>{entry.modelsPerUnit}</td>
         <td>{entry.name}</td>
+        <td>{entry.m}</td>
         <td>{entry.ws}</td>
         <td>{entry.bs}</td>
         <td>{entry.s}</td>
