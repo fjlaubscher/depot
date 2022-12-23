@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
+import { Grid, SelectField } from '@fjlaubscher/matter';
 
 // components
 import Filters from '../../components/filters';
-import Grid from '../../components/grid';
 import LinkCard from '../../components/card/link';
 import Search from '../../components/search';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
+import useSelect from '../../hooks/use-select';
 
 // utils
 import { groupDatasheetsByRole, ROLES } from '../../utils/datasheet';
@@ -19,10 +20,10 @@ interface Props {
   datasheets: depot.Datasheet[];
 }
 
-const FactionDatasheets: React.FC<Props> = ({ datasheets }) => {
-  const [role, setRole] = useState('');
+const FactionDatasheets = ({ datasheets }: Props) => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
+  const { value, description: role, onChange, options } = useSelect(ROLES);
 
   const groupedDatasheets = useMemo(() => {
     if (debouncedQuery || role) {
@@ -42,29 +43,22 @@ const FactionDatasheets: React.FC<Props> = ({ datasheets }) => {
         showClear={!!role || !!query}
         onClear={() => {
           setQuery('');
-          setRole('');
+          onChange(0);
         }}
       >
-        <Search value={query} onChange={setQuery} />
-        <select
-          placeholder="Select an option"
+        <Search label="Search by name" value={query} onChange={setQuery} />
+        <SelectField
           name="role"
-          value={role}
-          onChange={(e) => setRole(e.currentTarget.value)}
-        >
-          <option>All</option>
-          {ROLES.map((role, i) => (
-            <option key={`role-${i}`} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+          value={value}
+          label="Filter by role"
+          onChange={onChange}
+          options={options}
+        />
       </Filters>
       {Object.keys(groupedDatasheets).map((key) =>
         groupedDatasheets[key].length ? (
           <div className={styles.datasheets} key={key}>
             <div className={styles.role}>
-              <img src={`/role/${slugify(key)}.png`} alt={role} />
               <h2>{key}</h2>
             </div>
             <Grid>

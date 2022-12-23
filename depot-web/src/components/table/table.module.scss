@@ -1,5 +1,11 @@
-@use "../../styles/breakpoints";
-@use '../../styles/colors';
+@use '@fjlaubscher/matter/src/styles/breakpoints';
+@use '@fjlaubscher/matter/src/styles/colors';
+
+.container {
+  display: flex;
+  width: 100%;
+  overflow-x: scroll;
+}
 
 .table {
   width: 100%;
@@ -8,7 +14,7 @@
   margin-bottom: 1rem;
 
   th {
-    text-align: center;
+    padding: 0.25rem;
     color: white;
     background-color: colors.$accent;
     font-weight: 500;
@@ -21,11 +27,10 @@
   }
 
   td {
-    text-align: center;
     padding: 0.25rem;
-    vertical-align: middle;
+    vertical-align: top;
     background-color: colors.$light-surface;
-    border: 1px solid darken(colors.$light-background, 5%);    
+    border: 1px solid darken(colors.$light-background, 5%);
 
     @media (prefers-color-scheme: dark) {
       background-color: colors.$dark-surface;

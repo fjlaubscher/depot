@@ -1,18 +1,25 @@
 import React, { useMemo, useState } from 'react';
+import { Alert, Grid, Tabs } from '@fjlaubscher/matter';
 
 // components
-import Alert from '../../components/alert';
-import Grid from '../../components/grid';
 import Filters from '../../components/filters';
 import Layout from '../../components/layout';
 import LinkCard from '../../components/card/link';
 import Search from '../../components/search';
-import Tabs from '../../components/tabs';
+
+// helpers
+import { getFactionAlliance } from '../../utils/faction';
 
 // hooks
 import useFactions from '../../hooks/use-factions';
 import useDebounce from '../../hooks/use-debounce';
 import useLocalStorage from '../../hooks/use-local-storage';
+
+import styles from './home.module.scss';
+
+interface GroupedFactions {
+  [key: string]: Option[];
+}
 
 const Home = () => {
   const { data: factions, loading: loadingFactions } = useFactions();
@@ -20,7 +27,7 @@ const Home = () => {
   const [myFactions] = useLocalStorage<Option[]>('my-factions');
   const hasMyFactions = myFactions ? myFactions.length > 0 : false;
 
-  const [activeTab, setActiveTab] = useState(hasMyFactions ? 0 : 1);
+  const [activeTab, setActiveTab] = useState(0);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
@@ -36,34 +43,56 @@ const Home = () => {
     return [];
   }, [factions, debouncedQuery]);
 
+  const groupedFactions = useMemo(
+    () =>
+      filteredFactions.reduce((acc, faction) => {
+        const allianceKey = getFactionAlliance(faction.id).toLowerCase();
+        const allianceFactions = acc[allianceKey] || [];
+
+        return {
+          ...acc,
+          [allianceKey]: [...allianceFactions, faction]
+        };
+      }, {} as GroupedFactions),
+    [filteredFactions]
+  );
+
   return (
     <Layout title="Home" isLoading={loadingFactions}>
-      <Alert title="Hey! 👋">
-        <p>depot is a free and open-source Warhammer: 40,000 companion app powered by Wahapedia!</p>
-        <a href="https://github.com/fjlaubscher/depot" target="_blank" rel="noopener">
-          https://github.com/fjlaubscher/depot
-        </a>
-      </Alert>
-      {hasMyFactions && <Tabs tabs={['My Factions', 'All Factions']} onChange={setActiveTab} />}
-      {activeTab === 0 && myFactions && myFactions.length > 0 && (
-        <Grid>
-          {myFactions.map((faction) => (
-            <LinkCard to={`/faction/${faction.id}`}>{faction.name}</LinkCard>
-          ))}
-        </Grid>
-      )}
-      {activeTab === 1 && (
-        <>
-          <Filters showClear={!!query} onClear={() => setQuery('')}>
-            <Search value={query} onChange={setQuery} />
-          </Filters>
+      <Tabs
+        tabs={[hasMyFactions ? 'Favourites' : '', 'All Factions']}
+        active={activeTab}
+        onChange={setActiveTab}
+      >
+        {hasMyFactions && (
           <Grid>
-            {filteredFactions.map((faction) => (
-              <LinkCard to={`/faction/${faction.id}`}>{faction.name}</LinkCard>
+            {myFactions?.map((faction) => (
+              <LinkCard key={`my-faction-${faction.id}`} to={`/faction/${faction.id}`}>
+                {faction.name}
+              </LinkCard>
             ))}
           </Grid>
+        )}
+        <>
+          <Filters showClear={!!query} onClear={() => setQuery('')}>
+            <Search label="Search by name" value={query} onChange={setQuery} />
+          </Filters>
+          {Object.keys(groupedFactions).map((key) => (
+            <div key={`alliance-${key}`} className={styles.faction}>
+              <div className={styles.heading}>
+                <h2>{key}</h2>
+              </div>
+              <Grid>
+                {groupedFactions[key].map((faction) => (
+                  <LinkCard key={`faction-${faction.id}`} to={`/faction/${faction.id}`}>
+                    {faction.name}
+                  </LinkCard>
+                ))}
+              </Grid>
+            </div>
+          ))}
         </>
-      )}
+      </Tabs>
     </Layout>
   );
 };

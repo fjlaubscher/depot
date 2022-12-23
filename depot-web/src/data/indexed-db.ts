@@ -23,6 +23,13 @@ export const init = async (factions: depot.Faction[]) => {
   connection.close();
 };
 
+export const destroy = () =>
+  new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(DB_NAME);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
 export const getFaction = (factionId: string): Promise<depot.Faction> =>
   new Promise(async (resolve, reject) => {
     const connection = await getDBConnection();

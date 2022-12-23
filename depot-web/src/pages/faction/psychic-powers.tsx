@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
+import { Grid, SelectField } from '@fjlaubscher/matter';
 
 // components
 import DataCard from '../../components/card/data-card';
 import Filters from '../../components/filters';
-import Grid from '../../components/grid';
 import Search from '../../components/search';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
+import useSelect from '../../hooks/use-select';
 
 // utils
 import { sortByName } from '../../utils/array';
@@ -17,9 +18,18 @@ interface Props {
 }
 
 const FactionPsychicPowers: React.FC<Props> = ({ psychicPowers }) => {
-  const [type, setType] = useState('');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
+
+  const psychicPowerTypes = useMemo(
+    () =>
+      psychicPowers
+        .map((p) => p.type)
+        .filter((type, index, self) => self.indexOf(type) === index)
+        .sort(),
+    [psychicPowers]
+  );
+  const { description: type, value, onChange, options } = useSelect(psychicPowerTypes);
 
   const filteredPsychicPowers = useMemo(() => {
     if (type || debouncedQuery) {
@@ -33,32 +43,23 @@ const FactionPsychicPowers: React.FC<Props> = ({ psychicPowers }) => {
     return sortByName(psychicPowers) as depot.PsychicPower[];
   }, [psychicPowers, debouncedQuery, type]);
 
-  const psychicPowerTypes = useMemo(
-    () =>
-      psychicPowers
-        .map((p) => p.type)
-        .filter((type, index, self) => self.indexOf(type) === index)
-        .sort(),
-    [psychicPowers]
-  );
-
   return (
     <>
-      <Filters showClear={!!query} onClear={() => setQuery('')}>
-        <Search value={query} onChange={setQuery} />
-        <select
-          placeholder="Select an option"
+      <Filters
+        showClear={!!type || !!query}
+        onClear={() => {
+          setQuery('');
+          onChange(0);
+        }}
+      >
+        <Search label="Search by name" value={query} onChange={setQuery} />
+        <SelectField
           name="type"
-          value={type}
-          onChange={(e) => setType(e.currentTarget.value)}
-        >
-          <option value="">All</option>
-          {psychicPowerTypes.map((type, i) => (
-            <option key={`type-${i}`} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
+          value={value}
+          label="Filter by type"
+          onChange={onChange}
+          options={options}
+        />
       </Filters>
       <Grid>
         {filteredPsychicPowers.map((p, i) => (

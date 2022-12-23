@@ -1,16 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import Filters from '../../components/filters';
 
 // components
-import Grid from '../../components/grid';
+import Filters from '../../components/filters';
 import Search from '../../components/search';
-import WargearProfile from '../../components/wargear-profile';
+import WargearProfileTable from '../../components/wargear-profile/table';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
 
 // utils
-import { sortByName } from '../../utils/array';
+import { sortByName, sortByType } from '../../utils/array';
 
 interface Props {
   wargear: depot.Wargear[];
@@ -31,16 +30,23 @@ const DatasheetWargear: React.FC<Props> = ({ wargear }) => {
     return sortByName(wargear) as depot.Wargear[];
   }, [wargear, debouncedQuery]);
 
+  const profiles = useMemo(() => {
+    return filteredWargear.reduce((acc, w) => {
+      const profiles =
+        w.profiles.length > 1
+          ? w.profiles.map((p) => ({ ...p, name: `${w.name} - ${p.name}` } as depot.WargearProfile))
+          : w.profiles;
+
+      return [...acc, ...profiles];
+    }, [] as depot.WargearProfile[]);
+  }, [filteredWargear]);
+
   return (
     <>
       <Filters showClear={!!query} onClear={() => setQuery('')}>
         <Search value={query} onChange={setQuery} />
       </Filters>
-      <Grid>
-        {filteredWargear.map((w) => (
-          <WargearProfile key={w.id} wargear={w} />
-        ))}
-      </Grid>
+      <WargearProfileTable profiles={profiles} />
     </>
   );
 };

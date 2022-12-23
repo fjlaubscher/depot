@@ -1,5 +1,5 @@
-@use '../../styles/breakpoints';
-@use '../../styles/colors';
+@use '@fjlaubscher/matter/src/styles/breakpoints';
+@use '@fjlaubscher/matter/src/styles/colors';
 
 .filters {
   display: flex;
@@ -11,20 +11,11 @@
   .controls {
     width: 100%;
     display: grid;
-    grid-gap: 1rem;
     grid-template-columns: 1fr;
 
-    select {
-      width: 100%;
-    }
-
     @media (min-width: breakpoints.$tablet) {
+      grid-gap: 1rem;
       grid-template-columns: 1fr 1fr 1fr;
-
-      select {
-        margin-top: 0;
-        grid-column: 3;
-      }
     }
   }
 

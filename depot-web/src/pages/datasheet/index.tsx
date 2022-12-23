@@ -1,51 +1,75 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Stat, Tabs } from '@fjlaubscher/matter';
 
 // components
+import BackButton from '../../components/button/back';
 import Layout from '../../components/layout';
-import Tabs from '../../components/tabs';
-import WahapediaLink from '../../components/wahapedia-link';
 
 // hooks
 import useFaction from '../../hooks/use-faction';
 
+// helpers
+import { parseDamageAndModels } from '../../utils/datasheet';
+
 import DatasheetProfile from './profile';
 import DatasheetWargear from './wargear';
-import DatasheetAbilities from './abilities';
 import DatasheetStratagems from './stratagems';
 
-const TABS = ['Datasheet', 'Wargear', 'Abilities', 'Stratagems'];
+import styles from './datasheet.module.scss';
+import ShareButton from '../../components/button/share';
+
+const TABS = ['Datasheet', 'Wargear', 'Stratagems'];
 
 const Datasheet = () => {
   const { factionId, id } = useParams();
   const [activeTab, setActiveTab] = useState(0);
   const { data: faction, loading } = useFaction(factionId);
+
   const datasheet = useMemo(() => {
     if (faction && id) {
-      return faction.datasheets.filter((ds) => ds.id === id)[0];
+      const ds = faction.datasheets.filter((ds) => ds.id === id)[0];
+      const hasDamageProfiles = ds.damage.length > 0;
+      const hasSingleModel = ds.costPerUnit === 'false' && ds.models.length === 1;
+
+      return {
+        ...ds,
+        cost: hasSingleModel ? ds.models[0].cost : ds.cost,
+        models: hasDamageProfiles ? parseDamageAndModels(ds) : ds.models
+      } as depot.Datasheet;
     }
   }, [faction, id]);
 
   return (
     <Layout
-      backLink={`/faction/${factionId}`}
-      title={datasheet?.name || 'Loading'}
+      title="Datasheet"
       isLoading={loading}
-      action={<WahapediaLink href={datasheet?.link} />}
+      action={<ShareButton title={datasheet?.name || 'Loading'} />}
     >
-      <Tabs tabs={TABS} onChange={setActiveTab} />
-      {datasheet && activeTab === 0 && (
-        <DatasheetProfile
-          composition={datasheet.unitComposition}
-          keywords={datasheet.keywords}
-          power={datasheet.powerPoints}
-          profiles={datasheet.models}
-          role={datasheet.role}
-        />
+      <BackButton to={`/faction/${factionId}`}>{faction?.name}</BackButton>
+      {datasheet && (
+        <>
+          <div className={styles.header}>
+            <Stat
+              title={datasheet.role}
+              value={datasheet.name}
+              description={datasheet?.models[0].baseSize}
+            />
+            <Stat
+              className={styles.cost}
+              title="Cost"
+              value={`${datasheet.powerPoints} PR`}
+              description={datasheet.cost ? `${datasheet.cost} points` : undefined}
+            />
+          </div>
+          <Tabs tabs={TABS} onChange={setActiveTab} active={activeTab}>
+            <DatasheetProfile datasheet={datasheet} showCost={!datasheet.cost} />
+
+            <DatasheetWargear wargear={datasheet.wargear} />
+            <DatasheetStratagems stratagems={datasheet.stratagems} />
+          </Tabs>
+        </>
       )}
-      {datasheet && activeTab === 1 && <DatasheetWargear wargear={datasheet.wargear} />}
-      {datasheet && activeTab === 2 && <DatasheetAbilities abilities={datasheet.abilities} />}
-      {datasheet && activeTab === 3 && <DatasheetStratagems stratagems={datasheet.stratagems} />}
     </Layout>
   );
 };

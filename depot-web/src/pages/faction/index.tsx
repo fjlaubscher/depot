@@ -1,11 +1,13 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { FiHeart } from 'react-icons/fi';
+import { IconButton, Stat, Tabs, useToast } from '@fjlaubscher/matter';
 
 // components
-import IconButton from '../../components/icon-button';
 import Layout from '../../components/layout';
-import Tabs from '../../components/tabs';
+
+// helpers
+import { getFactionAlliance } from '../../utils/faction';
 
 // hooks
 import useFaction from '../../hooks/use-faction';
@@ -19,11 +21,11 @@ import FactionWarlordTraits from './warlord-traits';
 
 import styles from './faction.module.scss';
 
-const TABS = ['Datasheets', 'Psychic Powers', 'Relics', 'Stratagems', 'Warlord Traits'];
-
 const Faction = () => {
   const { id } = useParams();
+  const toast = useToast();
   const { data: faction, loading } = useFaction(id);
+
   const [myFactions, setMyFactions] = useLocalStorage<Option[]>('my-factions');
   const [activeTab, setActiveTab] = useState(0);
 
@@ -38,15 +40,25 @@ const Faction = () => {
   const toggleMyFaction = useCallback(() => {
     if (myFactions && isMyFaction) {
       setMyFactions(myFactions.filter((f) => f.id !== id));
+      toast({
+        variant: 'success',
+        text: `${faction?.name} removed from favourites.`
+      });
     } else if (faction && !isMyFaction) {
       const myFaction: Option = { id: faction.id, name: faction.name };
       setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
+      toast({
+        variant: 'success',
+        text: `${faction.name} added to favourites.`
+      });
     }
-  }, [isMyFaction, faction, myFactions, setMyFactions]);
+  }, [isMyFaction, faction, myFactions, setMyFactions, toast]);
+
+  const alliance = faction ? getFactionAlliance(faction.id) : '';
 
   return (
     <Layout
-      title={faction?.name || 'Loading'}
+      title="Faction"
       isLoading={loading}
       action={
         <IconButton
@@ -57,12 +69,30 @@ const Faction = () => {
         </IconButton>
       }
     >
-      <Tabs tabs={TABS} onChange={setActiveTab} />
-      {faction && activeTab === 0 && <FactionDatasheets datasheets={faction.datasheets} />}
-      {faction && activeTab === 1 && <FactionPsychicPowers psychicPowers={faction.psychicPowers} />}
-      {faction && activeTab === 2 && <FactionRelics relics={faction.relics} />}
-      {faction && activeTab === 3 && <FactionStratagems stratagems={faction.stratagems} />}
-      {faction && activeTab === 4 && <FactionWarlordTraits warlordTraits={faction.warlordTraits} />}
+      {faction && (
+        <>
+          <Stat title={alliance} value={faction.name} />
+          <Tabs
+            tabs={[
+              'Datasheets',
+              faction.psychicPowers.length ? 'Psychic Powers' : '',
+              'Relics',
+              'Stratagems',
+              'Warlord Traits'
+            ]}
+            active={activeTab}
+            onChange={setActiveTab}
+          >
+            <FactionDatasheets datasheets={faction.datasheets} />
+            {faction.psychicPowers.length ? (
+              <FactionPsychicPowers psychicPowers={faction.psychicPowers} />
+            ) : undefined}
+            <FactionRelics relics={faction.relics} />
+            <FactionStratagems stratagems={faction.stratagems} />
+            <FactionWarlordTraits warlordTraits={faction.warlordTraits} />
+          </Tabs>
+        </>
+      )}
     </Layout>
   );
 };
