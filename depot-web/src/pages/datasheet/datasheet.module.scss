@@ -1,46 +1,52 @@
-@use '../../styles/breakpoints';
-@use '../../styles/colors';
+@use '@fjlaubscher/matter/src/styles/breakpoints';
+@use '@fjlaubscher/matter/src/styles/colors';
 
-.card {
-  margin-bottom: 1rem;
-}
+.profile {
 
-.composition {
-  font-size: 0.9rem;
-}
+  p {
+    font-size: 0.9rem;
+  }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-
-  span {
-    font-size: 1.5rem;
-    color: colors.$light-text;
-
-    @media (prefers-color-scheme: dark) {
-      color: colors.$dark-text;
-    }
+  ul {
+    font-size: 0.9rem;
+    padding-left: 1.5rem;
+  }
+  
+  .notes {
+    list-style: none;
+    font-style: italic;
   }
 }
 
-.role {
+.header {
+  width: 100%;
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 
-  img {
-    height: 2.5rem;
-    margin-right: 0.5rem;
+  > div {
+    width: auto;
+  }
+
+  .cost {
+    width: auto;
+    text-align: right;
   }
 }
 
 .tagSection {
-  margin-bottom: 0.5rem;
-  
+  border-top: 0.125rem solid colors.$light-surface;
+  padding-top: 1rem;
+  margin: 1rem 0;
+
   h4 {
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1rem;
+    color: colors.$accent;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-top-color: colors.$dark-surface;
   }
 }

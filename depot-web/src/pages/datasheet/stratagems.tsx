@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
+import { Grid, SelectField } from '@fjlaubscher/matter';
 
 // components
 import Filters from '../../components/filters';
-import Grid from '../../components/grid';
 import Search from '../../components/search';
 import Stratagem from '../../components/stratagem';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
+import useSelect from '../../hooks/use-select';
 
 // utils
 import { sortByName } from '../../utils/array';
@@ -16,10 +17,19 @@ interface Props {
   stratagems: depot.Stratagem[];
 }
 
-const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
-  const [type, setType] = useState('');
+const DatasheetStratagems = ({ stratagems }: Props) => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
+
+  const stratagemTypes = useMemo(
+    () =>
+      stratagems
+        .map((s) => s.type)
+        .filter((type, index, self) => self.indexOf(type) === index)
+        .sort(),
+    [stratagems]
+  );
+  const { description: type, value, onChange, options } = useSelect(stratagemTypes);
 
   const filteredStratagems = useMemo(() => {
     if (type || debouncedQuery) {
@@ -33,32 +43,23 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
     return sortByName(stratagems) as depot.Stratagem[];
   }, [stratagems, debouncedQuery, type]);
 
-  const stratagemTypes = useMemo(
-    () =>
-      stratagems
-        .map((s) => s.type)
-        .filter((type, index, self) => self.indexOf(type) === index)
-        .sort(),
-    [stratagems]
-  );
-
   return (
     <>
-      <Filters showClear={!!query} onClear={() => setQuery('')}>
-        <Search value={query} onChange={setQuery} />
-        <select
-          placeholder="Select an option"
+      <Filters
+        showClear={!!type || !!query}
+        onClear={() => {
+          setQuery('');
+          onChange(0);
+        }}
+      >
+        <Search label="Search by name" value={query} onChange={setQuery} />
+        <SelectField
           name="type"
-          value={type}
-          onChange={(e) => setType(e.currentTarget.value)}
-        >
-          <option value="">All</option>
-          {stratagemTypes.map((type, i) => (
-            <option key={`type-${i}`} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
+          value={value}
+          label="Filter by type"
+          onChange={onChange}
+          options={options}
+        />
       </Filters>
       <Grid>
         {filteredStratagems.map((stratagem) => (
@@ -69,4 +70,4 @@ const FactionStratagems: React.FC<Props> = ({ stratagems }) => {
   );
 };
 
-export default FactionStratagems;
+export default DatasheetStratagems;

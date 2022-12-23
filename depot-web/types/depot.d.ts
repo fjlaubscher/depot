@@ -76,6 +76,7 @@ declare namespace depot {
     factionId: string;
     factionName: string;
     legend: string;
+    profiles: WargearProfile[];
   }
 
   interface Stratagem {

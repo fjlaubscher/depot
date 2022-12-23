@@ -78,9 +78,7 @@ const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): d
       return data.abilities.filter((ability) => ability.id === a.abilityId)[0];
     });
 
-  const damage = data.datasheetDamage.filter(
-    (damage) => damage.datasheetId === datasheet.id && damage.line !== '0'
-  );
+  const damage = data.datasheetDamage.filter((damage) => damage.datasheetId === datasheet.id);
   const keywords = data.datasheetKeywords.filter((keyword) => keyword.datasheetId === datasheet.id);
   const models = data.datasheetModels.filter((model) => model.datasheetId === datasheet.id);
   const options = data.datasheetOptions.filter((option) => option.datasheetId === datasheet.id);
@@ -124,9 +122,15 @@ const buildFactionData = (data: Wahapedia.Data, faction: Wahapedia.Faction): dep
     (psychicPower) => psychicPower.factionId === faction.id
   );
 
-  const relics: depot.Relic[] = data.wargear.filter(
-    (w) => w.factionId === faction.id && w.isRelic === 'true'
-  );
+  const relics = data.wargear
+    .filter((w) => w.factionId === faction.id && w.isRelic === 'true')
+    .map(
+      (relic) =>
+        ({
+          ...relic,
+          profiles: data.wargearList.filter((item) => item.wargearId === relic.id)
+        } as depot.Relic)
+    );
 
   const stratagems = data.stratagems
     .filter((strat) => strat.factionId === faction.id)

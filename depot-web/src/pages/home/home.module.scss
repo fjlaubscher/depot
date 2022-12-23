@@ -1,2 +1,27 @@
-@use '../../styles/breakpoints';
-@use '../../styles/colors';
+@use "@fjlaubscher/matter/src/styles/breakpoints";
+@use "@fjlaubscher/matter/src/styles/colors";
+
+.faction {
+  border-bottom: 0.125rem solid colors.$light-surface;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+
+  .heading {
+    border-bottom: 0.125rem solid colors.$light-surface;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+  
+    @media (prefers-color-scheme: dark) {
+      border-bottom-color: colors.$dark-surface;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    text-transform: capitalize;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    border-bottom-color: colors.$dark-surface;
+  }
+}

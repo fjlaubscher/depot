@@ -37,3 +37,25 @@ export const groupDatasheetsByRole = (datasheets: depot.Datasheet[]) => {
 
   return dictionary;
 };
+
+export const parseDamageAndModels = (datasheet: depot.Datasheet): depot.Model[] => {
+  const { col2, col3, col4, col5 } = datasheet.damage[0];
+  const damage = datasheet.damage.slice(1);
+
+  return [
+    ...datasheet.models,
+    ...damage.map(
+      (d) =>
+        ({
+          ...datasheet.models[0],
+          name: `${d.col1} wounds`,
+          [col2.toLowerCase()]: d.col2,
+          [col3.toLowerCase()]: d.col3,
+          [col4.toLowerCase()]: d.col4,
+          [col5.toLowerCase()]: d.col5,
+          modelsPerUnit: '-',
+          cost: '-'
+        } as unknown as depot.Model)
+    )
+  ];
+};

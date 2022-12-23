@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react';
+import { Grid, SelectField } from '@fjlaubscher/matter';
 
 // components
 import DataCard from '../../components/card/data-card';
 import Filters from '../../components/filters';
-import Grid from '../../components/grid';
 import Search from '../../components/search';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
+import useSelect from '../../hooks/use-select';
 
 // utils
 import { sortByName } from '../../utils/array';
@@ -17,9 +18,18 @@ interface Props {
 }
 
 const FactionWarlordTraits: React.FC<Props> = ({ warlordTraits }) => {
-  const [type, setType] = useState('');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
+
+  const warlordTraitTypes = useMemo(
+    () =>
+      warlordTraits
+        .map((wlt) => wlt.type)
+        .filter((type, index, self) => self.indexOf(type) === index)
+        .sort(),
+    [warlordTraits]
+  );
+  const { description: type, value, onChange, options } = useSelect(warlordTraitTypes);
 
   const filteredWarlordTraits = useMemo(() => {
     if (type || debouncedQuery) {
@@ -33,32 +43,23 @@ const FactionWarlordTraits: React.FC<Props> = ({ warlordTraits }) => {
     return sortByName(warlordTraits) as depot.WarlordTrait[];
   }, [warlordTraits, debouncedQuery, type]);
 
-  const warlordTraitTypes = useMemo(
-    () =>
-      warlordTraits
-        .map((wlt) => wlt.type)
-        .filter((type, index, self) => self.indexOf(type) === index)
-        .sort(),
-    [warlordTraits]
-  );
-
   return (
     <>
-      <Filters showClear={!!query} onClear={() => setQuery('')}>
-        <Search value={query} onChange={setQuery} />
-        <select
-          placeholder="Select an option"
+      <Filters
+        showClear={!!type || !!query}
+        onClear={() => {
+          setQuery('');
+          onChange(0);
+        }}
+      >
+        <Search label="Search by name" value={query} onChange={setQuery} />
+        <SelectField
           name="type"
-          value={type}
-          onChange={(e) => setType(e.currentTarget.value)}
-        >
-          <option value="">All</option>
-          {warlordTraitTypes.map((type, i) => (
-            <option key={`type-${i}`} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
+          value={value}
+          label="Filter by type"
+          onChange={onChange}
+          options={options}
+        />
       </Filters>
       <Grid>
         {filteredWarlordTraits.map((wlt, i) => (

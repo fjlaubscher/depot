@@ -1,28 +1,45 @@
-import React from 'react';
+import classnames from 'classnames';
 
 // components
 import Table from '../table';
 
+import styles from './datasheet-profile.module.scss';
+
 interface Props {
   profiles: depot.Model[];
+  showCost: boolean;
 }
 
-const DatasheetProfileTable: React.FC<Props> = ({ profiles }) => (
-  <Table headings={['#', 'Name', 'M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Sv', 'Cost']}>
+const headings = [
+  { text: '#', className: styles.noWrap },
+  { text: 'Name', className: styles.noWrap },
+  { text: 'M', className: styles.center },
+  { text: 'WS', className: styles.center },
+  { text: 'BS', className: styles.center },
+  { text: 'S', className: styles.center },
+  { text: 'T', className: styles.center },
+  { text: 'W', className: styles.center },
+  { text: 'A', className: styles.center },
+  { text: 'Ld', className: styles.center },
+  { text: 'Sv', className: styles.center }
+];
+
+const DatasheetProfileTable = ({ profiles, showCost }: Props) => (
+  <Table headings={showCost ? [...headings, { text: 'Cost', className: styles.center }] : headings}>
     {profiles.map((entry) => (
       <tr key={entry.line}>
-        <td style={{ whiteSpace: 'nowrap' }}>{entry.modelsPerUnit}</td>
-        <td>{entry.name}</td>
-        <td>{entry.m}</td>
-        <td>{entry.ws}</td>
-        <td>{entry.bs}</td>
-        <td>{entry.s}</td>
-        <td>{entry.t}</td>
-        <td>{entry.w}</td>
-        <td>{entry.a}</td>
-        <td>{entry.ld}</td>
-        <td>{entry.sv}</td>
-        <td>{entry.cost}</td>
+        <td className={styles.noWrap}>{entry.modelsPerUnit}</td>
+        <td className={styles.noWrap}>{entry.name}</td>
+        <td className={styles.center}>{entry.m}</td>
+        <td className={styles.center}>{entry.ws}</td>
+        <td className={styles.center}>{entry.bs}</td>
+        <td className={styles.center}>{entry.s}</td>
+        <td className={styles.center}>{entry.t}</td>
+        <td className={styles.center}>{entry.w}</td>
+        <td className={styles.center}>{entry.a}</td>
+        <td className={styles.center}>{entry.ld}</td>
+        <td className={styles.center}>{entry.sv}</td>
+        {showCost && <td className={styles.center}>{entry.cost || '-'}</td>}
       </tr>
     ))}
   </Table>

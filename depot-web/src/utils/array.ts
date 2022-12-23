@@ -12,3 +12,18 @@ export const sortByName = (items: Required<{ name: string }>[]) => {
     }
   });
 };
+
+export const sortByType = (items: Required<{ type: string }>[]) => {
+  return items.sort((a, b) => {
+    const nameA = a.type.toLowerCase();
+    const nameB = b.type.toLowerCase();
+
+    if (nameA < nameB) {
+      return -1;
+    } else if (nameA > nameB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+};
