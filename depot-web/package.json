@@ -1,10 +1,11 @@
 {
   "name": "depot-web",
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
+    "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
+    "lint": "tsc && prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "preview": "vite preview",
     "test": "jest"
   },

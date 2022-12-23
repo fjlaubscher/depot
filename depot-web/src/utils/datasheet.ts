@@ -52,7 +52,7 @@ export const parseDamageAndModels = (datasheet: depot.Datasheet): depot.Model[] 
           [col2.toLowerCase()]: d.col2,
           [col3.toLowerCase()]: d.col3,
           [col4.toLowerCase()]: d.col4,
-          [col5.toLowerCase()]: d.col5,          
+          [col5.toLowerCase()]: d.col5,
           modelsPerUnit: '-',
           cost: '-'
         } as unknown as depot.Model)
