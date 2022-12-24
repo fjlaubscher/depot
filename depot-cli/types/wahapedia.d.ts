@@ -168,6 +168,16 @@ declare namespace Wahapedia {
     description: string;
   }
 
+  interface Source {
+    id: string;
+    name: string;
+    type: string;
+    edition: string;
+    version: string;
+    errataDate: string;
+    errataLink: string;
+  }
+
   interface Data {
     abilities: Ability[];
     datasheets: Datasheet[];
@@ -180,6 +190,7 @@ declare namespace Wahapedia {
     datasheetWargear: DatasheetWargear[];
     factions: Faction[];
     psychicPowers: PsychicPower[];
+    sources: Source[];
     stratagems: Stratagem[];
     stratagemPhases: StratagemPhase[];
     wargear: Wargear[];

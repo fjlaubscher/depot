@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Grid, Tabs } from '@fjlaubscher/matter';
+import { Grid, IconButton, Tabs } from '@fjlaubscher/matter';
 import { useRecoilValue } from 'recoil';
+import { useNavigate } from 'react-router-dom';
+import { FaCog } from 'react-icons/fa';
 
 // components
 import Filters from '../../components/filters';
@@ -25,6 +27,7 @@ interface GroupedFactions {
 }
 
 const Home = () => {
+  const navigate = useNavigate();
   const factions = useRecoilValue(DataIndexAtom);
 
   const [myFactions] = useLocalStorage<Option[]>('my-factions');
@@ -61,7 +64,14 @@ const Home = () => {
   );
 
   return (
-    <Layout title="Home">
+    <Layout
+      title="Home"
+      action={
+        <IconButton onClick={() => navigate('/settings')}>
+          <FaCog />
+        </IconButton>
+      }
+    >
       <Tabs
         tabs={[hasMyFactions ? 'Favourites' : '', 'All Factions']}
         active={activeTab}

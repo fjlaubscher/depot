@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { FiHeart } from 'react-icons/fi';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { IconButton, Stat, Tabs, useToast } from '@fjlaubscher/matter';
 
 // components
@@ -18,8 +18,6 @@ import FactionPsychicPowers from './psychic-powers';
 import FactionRelics from './relics';
 import FactionStratagems from './stratagems';
 import FactionWarlordTraits from './warlord-traits';
-
-import styles from './faction.module.scss';
 
 const Faction = () => {
   const { id } = useParams();
@@ -61,11 +59,8 @@ const Faction = () => {
       title="Faction"
       isLoading={loading}
       action={
-        <IconButton
-          className={isMyFaction ? styles.myFaction : undefined}
-          onClick={toggleMyFaction}
-        >
-          <FiHeart />
+        <IconButton onClick={toggleMyFaction}>
+          {isMyFaction ? <FaHeart /> : <FaRegHeart />}
         </IconButton>
       }
     >

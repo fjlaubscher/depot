@@ -151,6 +151,8 @@ declare namespace depot {
     options: DatasheetOption[];
     stratagems: Stratagem[];
     wargear: Wargear[];
+    isForgeWorld: boolean;
+    isLegends: boolean;
   }
 
   interface Faction {
@@ -170,5 +172,10 @@ declare namespace depot {
     id: string;
     name: string;
     path: string;
+  }
+
+  interface Settings {
+    showForgeWorld?: boolean;
+    showLegends?: boolean;
   }
 }

@@ -20,33 +20,24 @@ const DatasheetProfile = ({ datasheet, showCost }: Props) => {
   const sortedAbilities = useMemo(() => sortByName(abilities) as depot.Ability[], [abilities]);
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
 
-  const [options, notes] = useMemo(
-    () =>
-      datasheetOptions.reduce(
-        (acc, o) => {
-          const options = o.button ? [...acc[0], o] : acc[0];
-          const notes = !o.button && o.description ? [...acc[1], o] : acc[1];
+  const options = useMemo(() => datasheetOptions.filter((o) => o.description), [datasheetOptions]);
 
-          return [options, notes];
-        },
-        [[] as depot.DatasheetOption[], [] as depot.DatasheetOption[]]
-      ),
-    [datasheetOptions]
-  );
+  console.log(datasheet);
 
   return (
     <div className={styles.profile}>
       <DatasheetProfileTable profiles={models} showCost={showCost ?? true} />
       <p className={styles.composition}>{unitComposition}</p>
       <ul className={styles.options}>
-        {options.map((o, i) => (
-          <li key={`option-${i}`}>{o.description}</li>
-        ))}
-      </ul>
-      <ul className={styles.notes}>
-        {notes.map((n, i) => (
-          <li key={`note-${i}`}>{n.description}</li>
-        ))}
+        {options.map((o, i) =>
+          o.description === '&nbsp;' ? (
+            <br />
+          ) : (
+            <li key={`option-${i}`} className={o.button === '-' ? styles.subItem : styles.item}>
+              {o.button === '-' ? `- ${o.description}` : o.description}
+            </li>
+          )
+        )}
       </ul>
       <div className={styles.tagSection}>
         <h4>Abilities</h4>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Grid, SelectField } from '@fjlaubscher/matter';
 
 // components
@@ -8,11 +8,11 @@ import Search from '../../components/search';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
+import useLocalStorage from '../../hooks/use-local-storage';
 import useSelect from '../../hooks/use-select';
 
 // utils
 import { groupDatasheetsByRole, ROLES } from '../../utils/datasheet';
-import slugify from '../../utils/slugify';
 
 import styles from './faction.module.scss';
 
@@ -21,21 +21,33 @@ interface Props {
 }
 
 const FactionDatasheets = ({ datasheets }: Props) => {
+  const [settings] = useLocalStorage<depot.Settings>('settings');
+
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
   const { value, description: role, onChange, options } = useSelect(ROLES);
 
   const groupedDatasheets = useMemo(() => {
-    if (debouncedQuery || role) {
-      const filteredByRole = datasheets.filter((ds) => (role ? ds.role === role : true));
-      const filteredByName = filteredByRole.filter((ds) =>
-        debouncedQuery ? ds.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
-      );
-      return groupDatasheetsByRole(filteredByName);
-    }
+    let filteredDatasheets = settings?.showLegends
+      ? datasheets
+      : datasheets.filter((ds) => ds.isLegends === false);
 
-    return groupDatasheetsByRole(datasheets);
-  }, [datasheets, debouncedQuery, role]);
+    filteredDatasheets = settings?.showForgeWorld
+      ? filteredDatasheets
+      : filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
+
+    filteredDatasheets = role
+      ? filteredDatasheets.filter((ds) => ds.role === role)
+      : filteredDatasheets;
+
+    filteredDatasheets = debouncedQuery
+      ? filteredDatasheets.filter((ds) =>
+          ds.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+        )
+      : filteredDatasheets;
+
+    return groupDatasheetsByRole(filteredDatasheets);
+  }, [datasheets, debouncedQuery, role, settings]);
 
   return (
     <>

@@ -5,6 +5,7 @@ import { Stat, Tabs } from '@fjlaubscher/matter';
 // components
 import BackButton from '../../components/button/back';
 import Layout from '../../components/layout';
+import ShareButton from '../../components/button/share';
 
 // hooks
 import useFaction from '../../hooks/use-faction';
@@ -17,7 +18,6 @@ import DatasheetWargear from './wargear';
 import DatasheetStratagems from './stratagems';
 
 import styles from './datasheet.module.scss';
-import ShareButton from '../../components/button/share';
 
 const TABS = ['Datasheet', 'Wargear', 'Stratagems'];
 
@@ -29,6 +29,7 @@ const Datasheet = () => {
   const datasheet = useMemo(() => {
     if (faction && id) {
       const ds = faction.datasheets.filter((ds) => ds.id === id)[0];
+      console.log(ds);
       const hasDamageProfiles = ds.damage.length > 0;
       const hasSingleModel = ds.costPerUnit === 'false' && ds.models.length === 1;
 

@@ -8,13 +8,23 @@
   }
 
   ul {
+    margin: 0;
     font-size: 0.9rem;
     padding-left: 1.5rem;
-  }
-  
-  .notes {
-    list-style: none;
-    font-style: italic;
+
+    .item {
+      margin-top: 0.5rem;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    .subItem {
+      list-style: none;
+      padding-left: 0.25rem;
+      margin-bottom: 0;
+    }
   }
 }
 

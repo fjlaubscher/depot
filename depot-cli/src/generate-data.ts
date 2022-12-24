@@ -31,6 +31,8 @@ const consolidateFiles = (): Wahapedia.Data => {
 
   const psychicPowers = readFileAndParseToJSON<Wahapedia.PsychicPower>('psychicpowers.json');
 
+  const sources = readFileAndParseToJSON<Wahapedia.Source>('source.json');
+
   const stratagems = readFileAndParseToJSON<Wahapedia.Stratagem>('stratagems.json');
   const stratagemPhases = readFileAndParseToJSON<Wahapedia.StratagemPhase>('stratagemphases.json');
 
@@ -51,6 +53,7 @@ const consolidateFiles = (): Wahapedia.Data => {
     datasheetWargear,
     factions,
     psychicPowers,
+    sources,
     stratagems,
     stratagemPhases,
     wargear,
@@ -79,6 +82,17 @@ const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): d
     });
 
   const damage = data.datasheetDamage.filter((damage) => damage.datasheetId === datasheet.id);
+
+  const isForgeWorld = data.sources
+    .filter((s) => s.name.includes('Forge World:') || s.name.includes('Imperial Armour:'))
+    .map((s) => s.id)
+    .includes(datasheet.sourceId);
+
+  const isLegends = data.sources
+    .filter((s) => s.name.includes('Warhammer Legends:'))
+    .map((s) => s.id)
+    .includes(datasheet.sourceId);
+
   const keywords = data.datasheetKeywords.filter((keyword) => keyword.datasheetId === datasheet.id);
   const models = data.datasheetModels.filter((model) => model.datasheetId === datasheet.id);
   const options = data.datasheetOptions.filter((option) => option.datasheetId === datasheet.id);
@@ -109,7 +123,9 @@ const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): d
     models,
     options,
     stratagems,
-    wargear
+    wargear,
+    isForgeWorld,
+    isLegends
   };
 };
 
