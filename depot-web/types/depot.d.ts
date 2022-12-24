@@ -165,4 +165,10 @@ declare namespace depot {
     stratagems: Stratagem[];
     warlordTraits: WarlordTrait[];
   }
+
+  interface Index {
+    id: string;
+    name: string;
+    path: string;
+  }
 }

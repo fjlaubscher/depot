@@ -1,29 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSetRecoilState } from 'recoil';
 
 // components
 import Layout from '../layout';
 
 // data
-import { init } from '../../data/indexed-db';
+import DataIndexAtom from './index-atom';
 
 // hooks
-import useWahapedia from '../../hooks/use-wahapedia';
+import useFetch from '../../hooks/use-fetch';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const DataProvider: React.FC<Props> = ({ children }) => {
+const DataProvider = ({ children }: Props) => {
+  const setDataIndex = useSetRecoilState(DataIndexAtom);
+  const { data, loading: fetching } = useFetch<depot.Index[]>('/data/index.json');
   const [hasStored, setHasStored] = useState(false);
   const [isStoring, setIsStoring] = useState(false);
-  const { data, loading: fetching } = useWahapedia();
 
   const loading = fetching || (isStoring && !hasStored);
 
   useEffect(() => {
     if (!hasStored && data) {
       setIsStoring(true);
-      init(data).then(() => setHasStored(true));
+      setDataIndex(data);
+      setHasStored(true);
     }
   }, [data, hasStored, setHasStored]);
 

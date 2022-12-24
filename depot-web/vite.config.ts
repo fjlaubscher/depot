@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['wahapedia.json'],
+      includeAssets: ['/data/index.json'],
       manifest: {
         name: 'depot',
         short_name: 'depot',

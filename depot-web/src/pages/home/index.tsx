@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { Alert, Grid, Tabs } from '@fjlaubscher/matter';
+import { useMemo, useState } from 'react';
+import { Grid, Tabs } from '@fjlaubscher/matter';
+import { useRecoilValue } from 'recoil';
 
 // components
 import Filters from '../../components/filters';
@@ -7,11 +8,13 @@ import Layout from '../../components/layout';
 import LinkCard from '../../components/card/link';
 import Search from '../../components/search';
 
+// data
+import DataIndexAtom from '../../components/data-provider/index-atom';
+
 // helpers
 import { getFactionAlliance } from '../../utils/faction';
 
 // hooks
-import useFactions from '../../hooks/use-factions';
 import useDebounce from '../../hooks/use-debounce';
 import useLocalStorage from '../../hooks/use-local-storage';
 
@@ -22,7 +25,7 @@ interface GroupedFactions {
 }
 
 const Home = () => {
-  const { data: factions, loading: loadingFactions } = useFactions();
+  const factions = useRecoilValue(DataIndexAtom);
 
   const [myFactions] = useLocalStorage<Option[]>('my-factions');
   const hasMyFactions = myFactions ? myFactions.length > 0 : false;
@@ -58,7 +61,7 @@ const Home = () => {
   );
 
   return (
-    <Layout title="Home" isLoading={loadingFactions}>
+    <Layout title="Home">
       <Tabs
         tabs={[hasMyFactions ? 'Favourites' : '', 'All Factions']}
         active={activeTab}

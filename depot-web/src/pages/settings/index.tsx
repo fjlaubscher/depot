@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSWRConfig } from 'swr';
 import { Alert, Button } from '@fjlaubscher/matter';
 
 // components
@@ -9,12 +8,9 @@ import Layout from '../../components/layout';
 import { destroy } from '../../data/indexed-db';
 
 const Settings = () => {
-  const { mutate } = useSWRConfig();
-
   const handleReset = useCallback(async () => {
     await destroy();
-    mutate('/wahapedia.json');
-  }, [mutate]);
+  }, []);
 
   return (
     <Layout title="Settings">

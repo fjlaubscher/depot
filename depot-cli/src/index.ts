@@ -5,6 +5,7 @@ import convertToJSON from './convert-to-json';
 import generateData from './generate-data';
 
 const JSON_DIR = `${__dirname}/json`;
+const DATA_DIR = `${__dirname}/data`;
 
 const getFileName = (input: string) =>
   input
@@ -41,6 +42,10 @@ const init = async () => {
     rmSync(JSON_DIR, { recursive: true, force: true });
   }
 
+  if (existsSync(DATA_DIR)) {
+    rmSync(DATA_DIR, { recursive: true, force: true });
+  }
+
   console.log('Creating Directory');
   mkdirSync(JSON_DIR);
 
@@ -59,9 +64,21 @@ const init = async () => {
     writeFileSync(`${JSON_DIR}/${fileNames[i]}`, JSON.stringify(parsedData));
   }
 
-  console.log('Consolidating files');
+  console.log('Generating faction files');
+  mkdirSync(DATA_DIR);
+
+  const index: depot.Index[] = [];
   const data = generateData();
-  writeFileSync(`${__dirname}/wahapedia.json`, JSON.stringify(data));
+
+  data.forEach((faction) => {
+    const filePath = `${DATA_DIR}/${faction.id}.json`;
+    index.push({ id: faction.id, name: faction.name, path: `/data/${faction.id}.json` });
+    console.log(`Creating ${filePath}`);
+    writeFileSync(filePath, JSON.stringify(faction));
+  });
+
+  console.log('Generating index file');
+  writeFileSync(`${DATA_DIR}/index.json`, JSON.stringify(index));
 };
 
 init()

@@ -11,15 +11,11 @@ const getDBConnection = (): Promise<IDBDatabase> =>
     };
   });
 
-export const init = async (factions: depot.Faction[]) => {
+export const createFaction = async (faction: depot.Faction) => {
   const connection = await getDBConnection();
   const transaction = connection.transaction(OBJECT_STORE_NAME, 'readwrite');
   const objectStore = transaction.objectStore(OBJECT_STORE_NAME);
-
-  for (let i = 0; i < factions.length; i++) {
-    objectStore.add(factions[i], factions[i].id);
-  }
-
+  objectStore.add(faction, faction.id);
   connection.close();
 };
 
