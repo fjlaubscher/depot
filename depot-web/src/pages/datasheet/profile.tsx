@@ -3,6 +3,7 @@ import { TagGroup, Tag, Grid, Card } from '@fjlaubscher/matter';
 
 // components
 import DatasheetProfileTable from '../../components/datasheet-profile/table';
+import WargearProfileTable from '../../components/wargear-profile/table';
 
 // utils
 import { sortByName } from '../../utils/array';
@@ -16,13 +17,29 @@ interface Props {
 }
 
 const DatasheetProfile = ({ datasheet, showCost }: Props) => {
-  const { abilities, unitComposition, keywords, models, options: datasheetOptions } = datasheet;
+  const {
+    abilities,
+    unitComposition,
+    keywords,
+    models,
+    options: datasheetOptions,
+    wargear
+  } = datasheet;
   const sortedAbilities = useMemo(() => sortByName(abilities) as depot.Ability[], [abilities]);
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
 
   const options = useMemo(() => datasheetOptions.filter((o) => o.description), [datasheetOptions]);
 
-  console.log(datasheet);
+  const wargearProfiles = useMemo(() => {
+    return wargear.reduce((acc, w) => {
+      const profiles =
+        w.profiles.length > 1
+          ? w.profiles.map((p) => ({ ...p, name: `${w.name} - ${p.name}` } as depot.WargearProfile))
+          : w.profiles;
+
+      return [...acc, ...profiles];
+    }, [] as depot.WargearProfile[]);
+  }, [wargear]);
 
   return (
     <div className={styles.profile}>
@@ -39,6 +56,10 @@ const DatasheetProfile = ({ datasheet, showCost }: Props) => {
           )
         )}
       </ul>
+      <div className={styles.tagSection}>
+        <h4>Wargear</h4>
+        <WargearProfileTable profiles={wargearProfiles} />
+      </div>
       <div className={styles.tagSection}>
         <h4>Abilities</h4>
         <Grid>

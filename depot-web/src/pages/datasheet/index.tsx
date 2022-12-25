@@ -14,12 +14,9 @@ import useFaction from '../../hooks/use-faction';
 import { parseDamageAndModels } from '../../utils/datasheet';
 
 import DatasheetProfile from './profile';
-import DatasheetWargear from './wargear';
 import DatasheetStratagems from './stratagems';
 
 import styles from './datasheet.module.scss';
-
-const TABS = ['Datasheet', 'Wargear', 'Stratagems'];
 
 const Datasheet = () => {
   const { factionId, id } = useParams();
@@ -29,7 +26,6 @@ const Datasheet = () => {
   const datasheet = useMemo(() => {
     if (faction && id) {
       const ds = faction.datasheets.filter((ds) => ds.id === id)[0];
-      console.log(ds);
       const hasDamageProfiles = ds.damage.length > 0;
       const hasSingleModel = ds.costPerUnit === 'false' && ds.models.length === 1;
 
@@ -63,10 +59,8 @@ const Datasheet = () => {
               description={datasheet.cost ? `${datasheet.cost} points` : undefined}
             />
           </div>
-          <Tabs tabs={TABS} onChange={setActiveTab} active={activeTab}>
+          <Tabs tabs={['Datasheet', 'Stratagems']} onChange={setActiveTab} active={activeTab}>
             <DatasheetProfile datasheet={datasheet} showCost={!datasheet.cost} />
-
-            <DatasheetWargear wargear={datasheet.wargear} />
             <DatasheetStratagems stratagems={datasheet.stratagems} />
           </Tabs>
         </>
