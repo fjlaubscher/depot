@@ -26,8 +26,12 @@ export const destroy = () =>
     request.onerror = () => reject(request.error);
   });
 
-export const getFaction = (factionId: string): Promise<depot.Faction> =>
+export const getFaction = (factionId?: string): Promise<depot.Faction> =>
   new Promise(async (resolve, reject) => {
+    if (!factionId) {
+      return reject('Invalid factionId provided');
+    }
+
     const connection = await getDBConnection();
     const transaction = connection.transaction(OBJECT_STORE_NAME, 'readonly');
     transaction.onerror = () => {

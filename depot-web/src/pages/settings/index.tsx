@@ -1,11 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { Button, Loader, SelectField, Stat, useToast } from '@fjlaubscher/matter';
+import { useAsyncFn, useMount } from 'react-use';
 
 // components
 import Layout from '../../components/layout';
 
 // hooks
-import useAsync from '../../hooks/use-async';
 import useLocalStorage from '../../hooks/use-local-storage';
 
 // indexedDB
@@ -20,23 +20,16 @@ const YES_NO = [
 
 const Settings = () => {
   const toast = useToast();
-  const { value: offlineFactions, loading, error, trigger } = useAsync<Option[]>(getFactions);
+  const [{ value: offlineFactions, loading }, readData] = useAsyncFn(getFactions);
   const [settings, setSettings] = useLocalStorage<depot.Settings>('settings');
 
   const handleReset = useCallback(async () => {
     await destroy();
-    trigger();
+    readData();
     toast({ variant: 'success', text: 'Offline data deleted.' });
-  }, [toast, trigger]);
+  }, []);
 
-  useEffect(() => {
-    if (error) {
-      toast({
-        variant: 'error',
-        text: error
-      });
-    }
-  }, [toast, error]);
+  useMount(readData);
 
   return (
     <Layout title="Settings">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
+import { useAsync } from 'react-use';
 
 // components
 import Layout from '../layout';
@@ -8,7 +9,6 @@ import Layout from '../layout';
 import DataIndexAtom from './index-atom';
 
 // hooks
-import useFetch from '../../hooks/use-fetch';
 import useLocalStorage from '../../hooks/use-local-storage';
 
 interface Props {
@@ -19,7 +19,9 @@ const DataProvider = ({ children }: Props) => {
   const [settings, setSettings] = useLocalStorage<depot.Settings>('settings');
   const setDataIndex = useSetRecoilState(DataIndexAtom);
 
-  const { data, loading: fetching } = useFetch<depot.Index[]>('/data/index.json');
+  const { value: data, loading: fetching } = useAsync(() =>
+    fetch('/data/index.json').then((r) => r.json())
+  );
   const [hasStored, setHasStored] = useState(false);
   const [isStoring, setIsStoring] = useState(false);
 
