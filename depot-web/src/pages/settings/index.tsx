@@ -1,14 +1,15 @@
-import { useCallback } from 'react';
-import { Button, SelectField, Stat, useToast } from '@fjlaubscher/matter';
+import { useCallback, useEffect } from 'react';
+import { Button, Loader, SelectField, Stat, useToast } from '@fjlaubscher/matter';
 
 // components
 import Layout from '../../components/layout';
 
 // hooks
+import useAsync from '../../hooks/use-async';
 import useLocalStorage from '../../hooks/use-local-storage';
 
 // indexedDB
-import { destroy } from '../../data/indexed-db';
+import { destroy, getFactions } from '../../data/indexed-db';
 
 import styles from './settings.module.scss';
 
@@ -19,12 +20,23 @@ const YES_NO = [
 
 const Settings = () => {
   const toast = useToast();
+  const { value: offlineFactions, loading, error, trigger } = useAsync<Option[]>(getFactions);
   const [settings, setSettings] = useLocalStorage<depot.Settings>('settings');
 
   const handleReset = useCallback(async () => {
     await destroy();
+    trigger();
     toast({ variant: 'success', text: 'Offline data deleted.' });
-  }, [toast]);
+  }, [toast, trigger]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: 'error',
+        text: error
+      });
+    }
+  }, [toast, error]);
 
   return (
     <Layout title="Settings">
@@ -47,9 +59,19 @@ const Settings = () => {
       </div>
       <div className={styles.section}>
         <Stat className={styles.heading} title="Settings" value="Offline Data" />
-        <Button variant="error" onClick={handleReset}>
-          Delete Offline Data
-        </Button>
+        {loading && <Loader />}
+        {!loading && offlineFactions && (
+          <>
+            <ul className={styles.offline}>
+              {offlineFactions.map((f) => (
+                <li key={`faction-${f.id}`}>{f.name}</li>
+              ))}
+            </ul>
+            <Button variant="error" onClick={handleReset}>
+              Delete Offline Data
+            </Button>
+          </>
+        )}
       </div>
     </Layout>
   );
