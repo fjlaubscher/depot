@@ -20,6 +20,7 @@ export const getFactionAlliance = (factionId: string) => {
     case 'QT':
     case 'RaH':
     case 'TS':
+    case 'WE':
       return 'Chaos';
     case 'AE':
     case 'DRU':
