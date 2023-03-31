@@ -1,21 +1,20 @@
 @use '@fjlaubscher/matter/src/styles/global';
-@use '@fjlaubscher/matter/src/styles/colors';
 
-*::-webkit-scrollbar {
+table::-webkit-scrollbar {
   height: 0.5rem;
   border-radius: 0.5rem;
-  background-color: colors.$light-background;
+  background-color: var(--color-light-surface);
 
   @media (prefers-color-scheme: dark) {
-    background-color: colors.$dark-background;
+    background-color: var(--color-dark-surface);
   }
 }
 
-*::-webkit-scrollbar-thumb {
-  background-color: darken(colors.$light-text, 25%);
+table::-webkit-scrollbar-thumb {
+  background-color: var(--color-light-background);
   border-radius: 0.5rem;
 
   @media (prefers-color-scheme: dark) {
-    background-color: darken(colors.$dark-text, 25%);
+    background-color: var(--color-dark-background);
   }
 }

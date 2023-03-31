@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Grid, IconButton, Tabs } from '@fjlaubscher/matter';
+import { Grid, IconButton, Tabs, useLocalStorage } from '@fjlaubscher/matter';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { FaCog } from 'react-icons/fa';
@@ -18,10 +18,8 @@ import { getFactionAlliance } from '../../utils/faction';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
-import useLocalStorage from '../../hooks/use-local-storage';
 
 import styles from './home.module.scss';
-
 interface GroupedFactions {
   [key: string]: Option[];
 }
@@ -73,6 +71,7 @@ const Home = () => {
       }
     >
       <Tabs
+        className={styles.tabs}
         tabs={[hasMyFactions ? 'Favourites' : '', 'All Factions']}
         active={activeTab}
         onChange={setActiveTab}

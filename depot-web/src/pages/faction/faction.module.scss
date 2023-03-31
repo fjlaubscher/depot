@@ -1,6 +1,10 @@
 @use "@fjlaubscher/matter/src/styles/breakpoints";
 @use "@fjlaubscher/matter/src/styles/colors";
 
+.tabs {
+  margin-bottom: 0;
+}
+
 .datasheets {
   border-bottom: 0.125rem solid colors.$light-surface;
   padding-bottom: 1rem;

@@ -1,5 +1,4 @@
 @use "@fjlaubscher/matter/src/styles/breakpoints";
-@use "@fjlaubscher/matter/src/styles/colors";
 
 .stratagem {
   padding: 0;
@@ -9,8 +8,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: colors.$primary;
-    color: colors.$dark-text;
+    background-color: var(--color-primary);
+    color: var(--color-dark-text);
     font-size: 1rem;
     font-weight: 500;
     padding: 1rem;
@@ -23,20 +22,19 @@
   p {
     font-size: 0.9rem;
     padding: 0 1rem;
-    margin: 0;
-    margin-bottom: 1rem;
+    margin: 0 0 1rem;
   }
 
   .type {
-    color: colors.$accent;
+    color: var(--color-accent);
   }
 
   .legend {
-    color: darken(colors.$light-text, 25%);
+    color: darken(#202020, 25%);
     font-style: italic;
 
     @media (prefers-color-scheme: dark) {
-      color: darken(colors.$dark-text, 25%);
+      color: darken(#f0f0f0, 25%);
     }
   }
 }

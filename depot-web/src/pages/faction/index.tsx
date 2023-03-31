@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { IconButton, Stat, Tabs, useToast } from '@fjlaubscher/matter';
+import { IconButton, Stat, Tabs, useToast, useLocalStorage } from '@fjlaubscher/matter';
 
 // components
 import Layout from '../../components/layout';
@@ -11,13 +11,14 @@ import { getFactionAlliance } from '../../utils/faction';
 
 // hooks
 import useFaction from '../../hooks/use-faction';
-import useLocalStorage from '../../hooks/use-local-storage';
 
 import FactionDatasheets from './datasheets';
 import FactionPsychicPowers from './psychic-powers';
 import FactionRelics from './relics';
 import FactionStratagems from './stratagems';
 import FactionWarlordTraits from './warlord-traits';
+
+import styles from './faction.module.scss';
 
 const Faction = () => {
   const { id } = useParams();
@@ -68,6 +69,7 @@ const Faction = () => {
         <>
           <Stat title={alliance} value={faction.name} />
           <Tabs
+            className={styles.tabs}
             tabs={[
               'Datasheets',
               faction.psychicPowers.length ? 'Psychic Powers' : '',

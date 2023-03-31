@@ -1,5 +1,5 @@
 // components
-import Table from '../table';
+import { Table } from '@fjlaubscher/matter';
 
 import styles from './wargear-profile.module.scss';
 

@@ -1,7 +1,4 @@
-import classnames from 'classnames';
-
-// components
-import Table from '../table';
+import { Table } from '@fjlaubscher/matter';
 
 import styles from './datasheet-profile.module.scss';
 

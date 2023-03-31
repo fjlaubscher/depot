@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Grid, SelectField } from '@fjlaubscher/matter';
+import { Grid, SelectField, useLocalStorage } from '@fjlaubscher/matter';
 
 // components
 import Filters from '../../components/filters';
@@ -8,7 +8,6 @@ import Search from '../../components/search';
 
 // hooks
 import useDebounce from '../../hooks/use-debounce';
-import useLocalStorage from '../../hooks/use-local-storage';
 import useSelect from '../../hooks/use-select';
 
 // utils

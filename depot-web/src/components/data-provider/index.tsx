@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { useAsync } from 'react-use';
+import { useLocalStorage } from '@fjlaubscher/matter';
 
 // components
 import Layout from '../layout';
 
 // data
 import DataIndexAtom from './index-atom';
-
-// hooks
-import useLocalStorage from '../../hooks/use-local-storage';
 
 interface Props {
   children: React.ReactNode;
