@@ -1,12 +1,11 @@
-@use "@fjlaubscher/matter/src/styles/breakpoints";
-@use "@fjlaubscher/matter/src/styles/colors";
+@use '@fjlaubscher/matter/src/styles/breakpoints';
 
 .tabs {
   margin-bottom: 0;
 }
 
 .datasheets {
-  border-bottom: 0.125rem solid colors.$light-surface;
+  border-bottom: 0.125rem solid var(--color-light-surface);
   padding-bottom: 1rem;
   margin-bottom: 1rem;
 
@@ -17,16 +16,16 @@
   .role {
     display: flex;
     align-items: center;
-    border-bottom: 0.125rem solid colors.$light-surface;
+    border-bottom: 0.125rem solid var(--color-light-surface);
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-  
+
     @media (prefers-color-scheme: dark) {
-      border-bottom-color: colors.$dark-surface;
+      border-bottom-color: var(--color-dark-surface);
     }
   }
 
   @media (prefers-color-scheme: dark) {
-    border-bottom-color: colors.$dark-surface;
+    border-bottom-color: var(--color-dark-surface);
   }
 }

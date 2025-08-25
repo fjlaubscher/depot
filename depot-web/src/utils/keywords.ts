@@ -1,3 +1,5 @@
+import { depot } from 'depot-core';
+
 export const groupKeywords = (keywords: depot.Keyword[]) => {
   let datasheet: string[] = [];
   let faction: string[] = [];

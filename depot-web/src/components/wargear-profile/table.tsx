@@ -1,5 +1,6 @@
 // components
 import { Table } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 import styles from './wargear-profile.module.scss';
 

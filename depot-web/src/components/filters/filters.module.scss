@@ -1,11 +1,10 @@
 @use '@fjlaubscher/matter/src/styles/breakpoints';
-@use '@fjlaubscher/matter/src/styles/colors';
 
 .filters {
   display: flex;
   flex-direction: column;
-  background-color: colors.$light-background;
-  border-bottom: 0.125rem solid colors.$light-surface;
+  background-color: var(--color-light-background);
+  border-bottom: 0.125rem solid var(--color-light-surface);
   padding: 1rem 0;
   margin-bottom: 1rem;
   position: sticky;
@@ -25,13 +24,13 @@
 
   a {
     margin-top: 1rem;
-    color: colors.$accent;
+    color: var(--color-accent);
     text-decoration: underline;
     cursor: pointer;
   }
 
   @media (prefers-color-scheme: dark) {
-    background-color: colors.$dark-background;
-    border-bottom-color: colors.$dark-surface;
+    background-color: var(--color-dark-background);
+    border-bottom-color: var(--color-dark-surface);
   }
 }

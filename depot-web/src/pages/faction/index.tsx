@@ -1,7 +1,9 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { IconButton, Stat, Tabs, useToast, useLocalStorage } from '@fjlaubscher/matter';
+import { IconButton, Stat, Tabs, useToast } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
+import useLocalStorage from '@/hooks/use-local-storage';
 
 // components
 import Layout from '../../components/layout';
@@ -25,7 +27,7 @@ const Faction = () => {
   const toast = useToast();
   const { data: faction, loading } = useFaction(id);
 
-  const [myFactions, setMyFactions] = useLocalStorage<Option[]>('my-factions');
+  const [myFactions, setMyFactions] = useLocalStorage<depot.Option[]>('my-factions');
   const [activeTab, setActiveTab] = useState(0);
 
   const isMyFaction = useMemo(() => {
@@ -44,7 +46,7 @@ const Faction = () => {
         text: `${faction?.name} removed from favourites.`
       });
     } else if (faction && !isMyFaction) {
-      const myFaction: Option = { id: faction.id, name: faction.name };
+      const myFaction: depot.Option = { id: faction.id, name: faction.name };
       setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
       toast({
         variant: 'success',

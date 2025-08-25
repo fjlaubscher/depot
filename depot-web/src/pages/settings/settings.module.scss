@@ -1,8 +1,7 @@
 @use '@fjlaubscher/matter/src/styles/breakpoints';
-@use '@fjlaubscher/matter/src/styles/colors';
 
 .section {
-  border-bottom: 0.125rem solid colors.$light-surface;
+  border-bottom: 0.125rem solid var(--color-light-surface);
   padding-bottom: 1rem;
   margin-bottom: 1rem;
 
@@ -11,6 +10,6 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    border-bottom-color: colors.$dark-surface;
+    border-bottom-color: var(--color-dark-surface);
   }
 }

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Grid, SelectField } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 // components
 import Filters from '../../components/filters';

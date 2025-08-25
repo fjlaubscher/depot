@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 import styles from './stratagem.module.scss';
 

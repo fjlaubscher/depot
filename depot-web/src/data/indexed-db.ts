@@ -1,3 +1,5 @@
+import { depot } from 'depot-core';
+
 const DB_NAME = 'depot';
 const OBJECT_STORE_NAME = 'data';
 
@@ -51,7 +53,7 @@ export const getFaction = (factionId?: string): Promise<depot.Faction> =>
     };
   });
 
-export const getFactions = (): Promise<Option[]> =>
+export const getFactions = (): Promise<depot.Option[]> =>
   new Promise(async (resolve, reject) => {
     const connection = await getDBConnection();
     const transaction = connection.transaction(OBJECT_STORE_NAME, 'readonly');
@@ -60,7 +62,7 @@ export const getFactions = (): Promise<Option[]> =>
       return reject(transaction.error);
     };
 
-    const factions: Option[] = [];
+    const factions: depot.Option[] = [];
     const objectStore = transaction.objectStore(OBJECT_STORE_NAME);
     const cursor = objectStore.openCursor();
     cursor.onsuccess = () => {

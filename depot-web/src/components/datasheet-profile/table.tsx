@@ -1,4 +1,5 @@
 import { Table } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 import styles from './datasheet-profile.module.scss';
 

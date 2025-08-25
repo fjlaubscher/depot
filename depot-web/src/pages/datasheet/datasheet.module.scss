@@ -1,8 +1,6 @@
 @use '@fjlaubscher/matter/src/styles/breakpoints';
-@use '@fjlaubscher/matter/src/styles/colors';
 
 .profile {
-
   p {
     font-size: 0.9rem;
   }
@@ -45,7 +43,7 @@
 }
 
 .tagSection {
-  border-top: 0.125rem solid colors.$light-surface;
+  border-top: 0.125rem solid var(--color-light-surface);
   padding-top: 1rem;
   margin: 1rem 0;
 
@@ -53,10 +51,10 @@
     margin-top: 0;
     margin-bottom: 1rem;
     font-size: 1rem;
-    color: colors.$accent;
+    color: var(--color-accent);
   }
 
   @media (prefers-color-scheme: dark) {
-    border-top-color: colors.$dark-surface;
+    border-top-color: var(--color-dark-surface);
   }
 }

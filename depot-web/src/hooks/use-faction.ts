@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useAsync, useAsyncFn } from 'react-use';
+import { depot } from 'depot-core';
 
 // indexedDB
 import { createFaction, getFaction } from '../data/indexed-db';
 
-const useFaction = (factionId?: string) => {
+const useFaction = (factionId?: string): { data: depot.Faction | undefined; loading: boolean } => {
   const { value: offlineData, loading: reading } = useAsync(
     () => getFaction(factionId),
     [factionId]

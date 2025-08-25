@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Stat, Tabs } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 // components
 import BackButton from '../../components/button/back';
@@ -36,6 +37,8 @@ const Datasheet = () => {
       } as depot.Datasheet;
     }
   }, [faction, id]);
+
+  console.log(datasheet);
 
   return (
     <Layout

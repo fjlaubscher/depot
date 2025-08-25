@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { useAsync } from 'react-use';
-import { useLocalStorage } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
+import useLocalStorage from '@/hooks/use-local-storage';
 
 // components
 import Layout from '../layout';

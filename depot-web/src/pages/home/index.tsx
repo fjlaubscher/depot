@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Grid, IconButton, Tabs, useLocalStorage } from '@fjlaubscher/matter';
+import { Grid, IconButton, Tabs } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
+import useLocalStorage from '@/hooks/use-local-storage';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { FaCog } from 'react-icons/fa';
@@ -21,14 +23,14 @@ import useDebounce from '../../hooks/use-debounce';
 
 import styles from './home.module.scss';
 interface GroupedFactions {
-  [key: string]: Option[];
+  [key: string]: depot.Option[];
 }
 
 const Home = () => {
   const navigate = useNavigate();
   const factions = useRecoilValue(DataIndexAtom);
 
-  const [myFactions] = useLocalStorage<Option[]>('my-factions');
+  const [myFactions] = useLocalStorage<depot.Option[]>('my-factions');
   const hasMyFactions = myFactions ? myFactions.length > 0 : false;
 
   const [activeTab, setActiveTab] = useState(0);

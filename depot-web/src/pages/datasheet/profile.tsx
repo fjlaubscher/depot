@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { TagGroup, Tag, Grid, Card } from '@fjlaubscher/matter';
+import { depot } from 'depot-core';
 
 // components
 import DatasheetProfileTable from '../../components/datasheet-profile/table';

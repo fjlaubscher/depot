@@ -1,9 +1,9 @@
 {
+  "extends": "../depot-core/tsconfig.node.json",
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true
+    "target": "ESNext"
   },
   "include": ["vite.config.ts"]
 }

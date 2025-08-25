@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Grid, SelectField, useLocalStorage } from '@fjlaubscher/matter';
+import { Grid, SelectField } from '@fjlaubscher/matter';
+import useLocalStorage from '@/hooks/use-local-storage';
+import { depot } from 'depot-core';
 
 // components
 import Filters from '../../components/filters';

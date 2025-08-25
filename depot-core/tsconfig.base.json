@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // Shared strict settings
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    
+    // Module resolution
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    
+    // Output settings
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": false,
+    
+    // Language features (more lenient for now)
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/dist", 
+    "**/build",
+    "**/coverage",
+    "**/.git"
+  ]
+}

@@ -3,20 +3,31 @@
   "version": "1.0.0",
   "description": "depot CLI",
   "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "prestart": "tsc",
+    "clean": "rimraf dist",
+    "prestart": "pnpm run build",
     "start": "node ./dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "dev": "tsc --watch"
   },
   "author": "Francois Laubscher",
   "license": "MIT",
   "devDependencies": {
-    "@types/node-fetch": "^2.6.2",
-    "jest": "^29.0.1",
-    "typescript": "^5.0.3"
+    "@types/node": "^20.11.0",
+    "@types/node-fetch": "^2.6.9",
+    "jest": "^29.7.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "node-fetch": "2"
+    "depot-core": "workspace:*",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

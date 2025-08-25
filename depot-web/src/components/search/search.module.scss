@@ -1,5 +1,4 @@
-@use "@fjlaubscher/matter/src/styles/breakpoints";
-@use "@fjlaubscher/matter/src/styles/colors";
+@use '@fjlaubscher/matter/src/styles/breakpoints';
 
 .container {
   width: 100%;
@@ -10,7 +9,7 @@
   }
 
   .link {
-    background-color: colors.$primary;
+    background-color: var(--color-primary);
     border: 0;
     color: white;
   }

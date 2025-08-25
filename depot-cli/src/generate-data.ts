@@ -1,45 +1,46 @@
 import { readFileSync } from 'fs';
+import { depot, wahapedia } from 'depot-core';
 
 const JSON_DIR = `${__dirname}/json`;
 
 const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(`${JSON_DIR}/${fileName}`, { encoding: 'utf-8' }));
 
-const consolidateFiles = (): Wahapedia.Data => {
-  const abilities = readFileAndParseToJSON<Wahapedia.Ability>('abilities.json');
+const consolidateFiles = (): wahapedia.Data => {
+  const abilities = readFileAndParseToJSON<wahapedia.Ability>('abilities.json');
 
-  const datasheets = readFileAndParseToJSON<Wahapedia.Datasheet>('datasheets.json');
-  const datasheetAbilities = readFileAndParseToJSON<Wahapedia.DatasheetAbility>(
+  const datasheets = readFileAndParseToJSON<wahapedia.Datasheet>('datasheets.json');
+  const datasheetAbilities = readFileAndParseToJSON<wahapedia.DatasheetAbility>(
     'datasheets-abilities.json'
   );
   const datasheetDamage =
-    readFileAndParseToJSON<Wahapedia.DatasheetDamage>('datasheets-damage.json');
-  const datasheetKeywords = readFileAndParseToJSON<Wahapedia.DatasheetKeyword>(
+    readFileAndParseToJSON<wahapedia.DatasheetDamage>('datasheets-damage.json');
+  const datasheetKeywords = readFileAndParseToJSON<wahapedia.DatasheetKeyword>(
     'datasheets-keywords.json'
   );
   const datasheetModels =
-    readFileAndParseToJSON<Wahapedia.DatasheetModel>('datasheets-models.json');
+    readFileAndParseToJSON<wahapedia.DatasheetModel>('datasheets-models.json');
   const datasheetOptions =
-    readFileAndParseToJSON<Wahapedia.DatasheetOption>('datasheets-options.json');
-  const datasheetStratagems = readFileAndParseToJSON<Wahapedia.DatasheetStratagem>(
+    readFileAndParseToJSON<wahapedia.DatasheetOption>('datasheets-options.json');
+  const datasheetStratagems = readFileAndParseToJSON<wahapedia.DatasheetStratagem>(
     'datasheets-stratagems.json'
   );
   const datasheetWargear =
-    readFileAndParseToJSON<Wahapedia.DatasheetWargear>('datasheets-wargear.json');
+    readFileAndParseToJSON<wahapedia.DatasheetWargear>('datasheets-wargear.json');
 
-  const factions = readFileAndParseToJSON<Wahapedia.Faction>('factions.json');
+  const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');
 
-  const psychicPowers = readFileAndParseToJSON<Wahapedia.PsychicPower>('psychicpowers.json');
+  const psychicPowers = readFileAndParseToJSON<wahapedia.PsychicPower>('psychicpowers.json');
 
-  const sources = readFileAndParseToJSON<Wahapedia.Source>('source.json');
+  const sources = readFileAndParseToJSON<wahapedia.Source>('source.json');
 
-  const stratagems = readFileAndParseToJSON<Wahapedia.Stratagem>('stratagems.json');
-  const stratagemPhases = readFileAndParseToJSON<Wahapedia.StratagemPhase>('stratagemphases.json');
+  const stratagems = readFileAndParseToJSON<wahapedia.Stratagem>('stratagems.json');
+  const stratagemPhases = readFileAndParseToJSON<wahapedia.StratagemPhase>('stratagemphases.json');
 
-  const wargear = readFileAndParseToJSON<Wahapedia.Wargear>('wargear.json');
-  const wargearList = readFileAndParseToJSON<Wahapedia.WargearList>('wargear-list.json');
+  const wargear = readFileAndParseToJSON<wahapedia.Wargear>('wargear.json');
+  const wargearList = readFileAndParseToJSON<wahapedia.WargearList>('wargear-list.json');
 
-  const warlordTraits = readFileAndParseToJSON<Wahapedia.WarlordTrait>('warlord-traits.json');
+  const warlordTraits = readFileAndParseToJSON<wahapedia.WarlordTrait>('warlord-traits.json');
 
   return {
     abilities,
@@ -62,7 +63,7 @@ const consolidateFiles = (): Wahapedia.Data => {
   };
 };
 
-const buildStratagem = (data: Wahapedia.Data, stratagemId: string): depot.Stratagem => {
+const buildStratagem = (data: wahapedia.Data, stratagemId: string): depot.Stratagem => {
   const stratagem = data.stratagems.filter((s) => s.id === stratagemId)[0];
   const phases = data.stratagemPhases
     .filter((phase) => phase.stratagemId === stratagemId)
@@ -74,7 +75,7 @@ const buildStratagem = (data: Wahapedia.Data, stratagemId: string): depot.Strata
   };
 };
 
-const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): depot.Datasheet => {
+const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): depot.Datasheet => {
   const abilities = data.datasheetAbilities
     .filter((ability) => ability.datasheetId === datasheet.id)
     .map((a) => {
@@ -129,7 +130,7 @@ const buildDatasheet = (data: Wahapedia.Data, datasheet: Wahapedia.Datasheet): d
   };
 };
 
-const buildFactionData = (data: Wahapedia.Data, faction: Wahapedia.Faction): depot.Faction => {
+const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): depot.Faction => {
   const datasheets = data.datasheets
     .filter((datasheet) => datasheet.factionId === faction.id)
     .map((datasheet) => buildDatasheet(data, datasheet));
@@ -168,7 +169,6 @@ const generateData = () => {
   const data = consolidateFiles();
 
   return data.factions
-    .filter((f) => f.isSubfaction === 'false')
     .map((f) => buildFactionData(data, f));
 };
 

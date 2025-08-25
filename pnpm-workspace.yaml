@@ -1,0 +1,4 @@
+packages:
+  - 'depot-cli'
+  - 'depot-web' 
+  - 'depot-core'

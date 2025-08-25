@@ -1,3 +1,4 @@
+import { depot } from 'depot-core';
 import { sortByName } from './array';
 
 export const ROLES = [
