@@ -1,27 +1,28 @@
 import { useMemo, useState } from 'react';
 import { Grid, IconButton, Tabs } from '@fjlaubscher/matter';
 import { depot } from 'depot-core';
-import useLocalStorage from '@/hooks/use-local-storage';
 import { useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { FaCog } from 'react-icons/fa';
 
 // components
-import Filters from '../../components/filters';
-import Layout from '../../components/layout';
-import LinkCard from '../../components/card/link';
-import Search from '../../components/search';
+import Filters from '@/components/filters';
+import Layout from '@/components/layout';
+import LinkCard from '@/components/card/link';
+import Search from '@/components/search';
 
 // data
-import DataIndexAtom from '../../components/data-provider/index-atom';
+import DataIndexAtom from '@/components/data-provider/index-atom';
 
 // helpers
-import { getFactionAlliance } from '../../utils/faction';
+import { getFactionAlliance } from '@/utils/faction';
 
 // hooks
-import useDebounce from '../../hooks/use-debounce';
+import useDebounce from '@/hooks/use-debounce';
+import useLocalStorage from '@/hooks/use-local-storage';
 
 import styles from './home.module.scss';
+
 interface GroupedFactions {
   [key: string]: depot.Option[];
 }
@@ -29,6 +30,7 @@ interface GroupedFactions {
 const Home = () => {
   const navigate = useNavigate();
   const factions = useRecoilValue(DataIndexAtom);
+  console.log(factions);
 
   const [myFactions] = useLocalStorage<depot.Option[]>('my-factions');
   const hasMyFactions = myFactions ? myFactions.length > 0 : false;
@@ -57,7 +59,7 @@ const Home = () => {
 
         return {
           ...acc,
-          [allianceKey]: [...allianceFactions, faction]
+          [allianceKey]: [...allianceFactions, faction].sort((a, b) => a.name.localeCompare(b.name))
         };
       }, {} as GroupedFactions),
     [filteredFactions]

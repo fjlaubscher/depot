@@ -36,6 +36,8 @@ const Datasheet = () => {
         models: hasDamageProfiles ? parseDamageAndModels(ds) : ds.models
       } as depot.Datasheet;
     }
+
+    return undefined;
   }, [faction, id]);
 
   console.log(datasheet);

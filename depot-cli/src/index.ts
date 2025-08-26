@@ -10,37 +10,30 @@ const DATA_DIR = `${__dirname}/data`;
 const SOURCE_DATA_DIR = `${__dirname}/source_data`;
 
 const getFileName = (input: string) =>
-  input
-    .replace('http://wahapedia.ru/wh40k10ed/', '')
-    .toLowerCase()
-    .replace('_', '-')
-    .replace('.csv', '.json');
+  input.toLowerCase().replace(/_/g, '-').replace('.csv', '.json');
 
-const getCSVFileName = (input: string) =>
-  input
-    .replace('http://wahapedia.ru/wh40k10ed/', '')
-    .toLowerCase()
-    .replace('_', '-');
+const getCSVFileName = (input: string) => input.toLowerCase().replace(/_/g, '-');
 
 const WAHAPEDIA_CSV_FILES = [
-  'http://wahapedia.ru/wh40k10ed/Last_update.csv',
-  'http://wahapedia.ru/wh40k10ed/Abilities.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_abilities.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_damage.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_keywords.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_models.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_options.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_stratagems.csv',
-  'http://wahapedia.ru/wh40k10ed/Datasheets_wargear.csv',
-  'http://wahapedia.ru/wh40k10ed/Factions.csv',
-  'http://wahapedia.ru/wh40k10ed/PsychicPowers.csv',
-  'http://wahapedia.ru/wh40k10ed/Source.csv',
-  'http://wahapedia.ru/wh40k10ed/StratagemPhases.csv',
-  'http://wahapedia.ru/wh40k10ed/Stratagems.csv',
-  'http://wahapedia.ru/wh40k10ed/Wargear.csv',
-  'http://wahapedia.ru/wh40k10ed/Wargear_list.csv',
-  'http://wahapedia.ru/wh40k10ed/Warlord_traits.csv'
+  'Factions.csv',
+  'Source.csv',
+  'Datasheets.csv',
+  'Datasheets_abilities.csv',
+  'Datasheets_keywords.csv',
+  'Datasheets_models.csv',
+  'Datasheets_options.csv',
+  'Datasheets_wargear.csv',
+  'Datasheets_unit_composition.csv',
+  'Datasheets_models_cost.csv',
+  'Datasheets_stratagems.csv',
+  'Datasheets_enhancements.csv',
+  'Datasheets_detachment_abilities.csv',
+  'Datasheets_leader.csv',
+  'Stratagems.csv',
+  'Abilities.csv',
+  'Enhancements.csv',
+  'Detachment_abilities.csv',
+  'Last_update.csv'
 ];
 
 const fetchCSV = (url: string) => fetch(url).then((response) => response.text());
@@ -65,7 +58,9 @@ const init = async () => {
   console.log('Fetching CSV data from Wahapedia');
   const fileNames = WAHAPEDIA_CSV_FILES.map(getFileName);
   const csvFileNames = WAHAPEDIA_CSV_FILES.map(getCSVFileName);
-  const requests = WAHAPEDIA_CSV_FILES.map(fetchCSV);
+  const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
+    fetchCSV(`http://wahapedia.ru/wh40k10ed/${fileName}`)
+  );
   const results = await Promise.all(requests);
 
   console.log('Saving raw CSV files for debugging');

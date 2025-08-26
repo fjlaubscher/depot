@@ -7,59 +7,25 @@ const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(`${JSON_DIR}/${fileName}`, { encoding: 'utf-8' }));
 
 const consolidateFiles = (): wahapedia.Data => {
-  const abilities = readFileAndParseToJSON<wahapedia.Ability>('abilities.json');
-
-  const datasheets = readFileAndParseToJSON<wahapedia.Datasheet>('datasheets.json');
-  const datasheetAbilities = readFileAndParseToJSON<wahapedia.DatasheetAbility>(
-    'datasheets-abilities.json'
-  );
-  const datasheetDamage =
-    readFileAndParseToJSON<wahapedia.DatasheetDamage>('datasheets-damage.json');
-  const datasheetKeywords = readFileAndParseToJSON<wahapedia.DatasheetKeyword>(
-    'datasheets-keywords.json'
-  );
-  const datasheetModels =
-    readFileAndParseToJSON<wahapedia.DatasheetModel>('datasheets-models.json');
-  const datasheetOptions =
-    readFileAndParseToJSON<wahapedia.DatasheetOption>('datasheets-options.json');
-  const datasheetStratagems = readFileAndParseToJSON<wahapedia.DatasheetStratagem>(
-    'datasheets-stratagems.json'
-  );
-  const datasheetWargear =
-    readFileAndParseToJSON<wahapedia.DatasheetWargear>('datasheets-wargear.json');
-
-  const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');
-
-  const psychicPowers = readFileAndParseToJSON<wahapedia.PsychicPower>('psychicpowers.json');
-
-  const sources = readFileAndParseToJSON<wahapedia.Source>('source.json');
-
-  const stratagems = readFileAndParseToJSON<wahapedia.Stratagem>('stratagems.json');
-  const stratagemPhases = readFileAndParseToJSON<wahapedia.StratagemPhase>('stratagemphases.json');
-
-  const wargear = readFileAndParseToJSON<wahapedia.Wargear>('wargear.json');
-  const wargearList = readFileAndParseToJSON<wahapedia.WargearList>('wargear-list.json');
-
-  const warlordTraits = readFileAndParseToJSON<wahapedia.WarlordTrait>('warlord-traits.json');
-
   return {
-    abilities,
-    datasheets,
-    datasheetAbilities,
-    datasheetDamage,
-    datasheetKeywords,
-    datasheetModels,
-    datasheetOptions,
-    datasheetStratagems,
-    datasheetWargear,
-    factions,
-    psychicPowers,
-    sources,
-    stratagems,
-    stratagemPhases,
-    wargear,
-    wargearList,
-    warlordTraits
+    factions: [],
+    sources: [],
+    datasheets: [],
+    datasheetAbilities: [],
+    datasheetKeywords: [],
+    datasheetModels: [],
+    datasheetOptions: [],
+    datasheetWargear: [],
+    datasheetUnitComposition: [],
+    datasheetModelCosts: [],
+    datasheetStratagems: [],
+    datasheetEnhancements: [],
+    datasheetDetachmentAbilities: [],
+    datasheetLeaders: [],
+    stratagems: [],
+    abilities: [],
+    enhancements: [],
+    detachmentAbilities: []
   };
 };
 
@@ -168,8 +134,7 @@ const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): dep
 const generateData = () => {
   const data = consolidateFiles();
 
-  return data.factions
-    .map((f) => buildFactionData(data, f));
+  return data.factions.map((f) => buildFactionData(data, f));
 };
 
 export default generateData;

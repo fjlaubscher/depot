@@ -1,24 +1,20 @@
 export const getFactionAlliance = (factionId: string) => {
   switch (factionId) {
+    case 'AoI':
     case 'AC':
     case 'AM':
     case 'AS':
     case 'AdM':
-    case 'CA':
     case 'GK':
-    case 'INQ':
-    case 'OA':
     case 'QI':
-    case 'RT':
     case 'SM':
     case 'TL':
       return 'Imperium';
     case 'CD':
     case 'CSM':
     case 'DG':
-    case 'HTL':
+    case 'EC':
     case 'QT':
-    case 'RaH':
     case 'TS':
     case 'WE':
       return 'Chaos';

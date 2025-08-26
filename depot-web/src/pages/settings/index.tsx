@@ -5,10 +5,10 @@ import { useAsyncFn, useMount } from 'react-use';
 import { depot } from 'depot-core';
 
 // components
-import Layout from '../../components/layout';
+import Layout from '@/components/layout';
 
 // indexedDB
-import { destroy, getFactions } from '../../data/indexed-db';
+import { destroy, getFactions } from '@/data/indexed-db';
 
 import styles from './settings.module.scss';
 
