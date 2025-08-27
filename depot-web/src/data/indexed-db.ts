@@ -2,10 +2,11 @@ import { depot } from 'depot-core';
 
 const DB_NAME = 'depot';
 const OBJECT_STORE_NAME = 'data';
+const VERSION = 10; // 10th ed
 
 const getDBConnection = (): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, VERSION);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
     request.onupgradeneeded = () => {

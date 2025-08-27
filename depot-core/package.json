@@ -2,14 +2,15 @@
   "name": "depot-core",
   "version": "1.0.0",
   "description": "Shared core functionality and types for depot packages",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
+    "dev": "tsc --watch",
     "prepublishOnly": "pnpm run clean && pnpm run build"
   },
   "devDependencies": {

@@ -7,37 +7,63 @@ const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(`${JSON_DIR}/${fileName}`, { encoding: 'utf-8' }));
 
 const consolidateFiles = (): wahapedia.Data => {
-  return {
-    factions: [],
-    sources: [],
-    datasheets: [],
-    datasheetAbilities: [],
-    datasheetKeywords: [],
-    datasheetModels: [],
-    datasheetOptions: [],
-    datasheetWargear: [],
-    datasheetUnitComposition: [],
-    datasheetModelCosts: [],
-    datasheetStratagems: [],
-    datasheetEnhancements: [],
-    datasheetDetachmentAbilities: [],
-    datasheetLeaders: [],
-    stratagems: [],
-    abilities: [],
-    enhancements: [],
-    detachmentAbilities: []
-  };
-};
+  const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');
+  const sources = readFileAndParseToJSON<wahapedia.Source>('source.json');
 
-const buildStratagem = (data: wahapedia.Data, stratagemId: string): depot.Stratagem => {
-  const stratagem = data.stratagems.filter((s) => s.id === stratagemId)[0];
-  const phases = data.stratagemPhases
-    .filter((phase) => phase.stratagemId === stratagemId)
-    .map((phase) => phase.phase);
+  const datasheets = readFileAndParseToJSON<wahapedia.Datasheet>('datasheets.json');
+  const datasheetAbilities = readFileAndParseToJSON<wahapedia.DatasheetAbility>(
+    'datasheets-abilities.json'
+  );
+  const datasheetKeywords =
+    readFileAndParseToJSON<wahapedia.DatasheetKeyword>('datasheets-keywords.json');
+  const datasheetModels = readFileAndParseToJSON<wahapedia.DatasheetModel>('datasheets-models.json');
+  const datasheetOptions =
+    readFileAndParseToJSON<wahapedia.DatasheetOption>('datasheets-options.json');
+  const datasheetWargear =
+    readFileAndParseToJSON<wahapedia.DatasheetWargear>('datasheets-wargear.json');
+  const datasheetUnitComposition = readFileAndParseToJSON<wahapedia.DatasheetUnitComposition>(
+    'datasheets-unit-composition.json'
+  );
+  const datasheetModelCosts = readFileAndParseToJSON<wahapedia.DatasheetModelCost>(
+    'datasheets-models-cost.json'
+  );
+  const datasheetStratagems = readFileAndParseToJSON<wahapedia.DatasheetStratagem>(
+    'datasheets-stratagems.json'
+  );
+  const datasheetEnhancements = readFileAndParseToJSON<wahapedia.DatasheetEnhancement>(
+    'datasheets-enhancements.json'
+  );
+  const datasheetDetachmentAbilities = readFileAndParseToJSON<wahapedia.DatasheetDetachmentAbility>(
+    'datasheets-detachment-abilities.json'
+  );
+  const datasheetLeaders =
+    readFileAndParseToJSON<wahapedia.DatasheetLeader>('datasheets-leader.json');
+  const stratagems = readFileAndParseToJSON<wahapedia.Stratagem>('stratagems.json');
+  const abilities = readFileAndParseToJSON<wahapedia.Ability>('abilities.json');
+  const enhancements = readFileAndParseToJSON<wahapedia.Enhancement>('enhancements.json');
+  const detachmentAbilities = readFileAndParseToJSON<wahapedia.DetachmentAbility>(
+    'detachment-abilities.json'
+  );
 
   return {
-    ...stratagem,
-    phases
+    factions,
+    sources,
+    datasheets,
+    datasheetAbilities,
+    datasheetKeywords,
+    datasheetModels,
+    datasheetOptions,
+    datasheetWargear,
+    datasheetUnitComposition,
+    datasheetModelCosts,
+    datasheetStratagems,
+    datasheetEnhancements,
+    datasheetDetachmentAbilities,
+    datasheetLeaders,
+    stratagems,
+    abilities,
+    enhancements,
+    detachmentAbilities
   };
 };
 
@@ -47,8 +73,6 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
     .map((a) => {
       return data.abilities.filter((ability) => ability.id === a.abilityId)[0];
     });
-
-  const damage = data.datasheetDamage.filter((damage) => damage.datasheetId === datasheet.id);
 
   const isForgeWorld = data.sources
     .filter((s) => s.name.includes('Forge World:') || s.name.includes('Imperial Armour:'))
@@ -63,34 +87,41 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
   const keywords = data.datasheetKeywords.filter((keyword) => keyword.datasheetId === datasheet.id);
   const models = data.datasheetModels.filter((model) => model.datasheetId === datasheet.id);
   const options = data.datasheetOptions.filter((option) => option.datasheetId === datasheet.id);
+  const wargear = data.datasheetWargear.filter((wargear) => wargear.datasheetId === datasheet.id);
+  const unitComposition = data.datasheetUnitComposition.filter(
+    (uc) => uc.datasheetId === datasheet.id
+  );
+  const modelCosts = data.datasheetModelCosts.filter((mc) => mc.datasheetId === datasheet.id);
 
   const stratagems = data.datasheetStratagems
     .filter((ds) => ds.datasheetId === datasheet.id)
-    .map((ds) => buildStratagem(data, ds.stratagemId));
+    .map((ds) => data.stratagems.filter((s) => s.id === ds.stratagemId)[0]);
 
-  const wargearIds = data.datasheetWargear
-    .filter((wargear) => wargear.datasheetId === datasheet.id)
-    .map((wargear) => wargear.wargearId)
-    .filter((id, i, self) => self.indexOf(id) === i);
+  const enhancements = data.datasheetEnhancements
+    .filter((de) => de.datasheetId === datasheet.id)
+    .map((de) => data.enhancements.filter((e) => e.id === de.enhancementId)[0]);
 
-  const wargear: depot.Wargear[] = [];
-  for (let i = 0; i < wargearIds.length; i++) {
-    const wargearId = wargearIds[i];
-    const gear = data.wargear.filter((wg) => wg.id === wargearId)[0];
-    const profiles = data.wargearList.filter((item) => item.wargearId === wargearId);
+  const detachmentAbilities = data.datasheetDetachmentAbilities
+    .filter((dda) => dda.datasheetId === datasheet.id)
+    .map((dda) => data.detachmentAbilities.filter((da) => da.id === dda.detachmentAbilityId)[0]);
 
-    wargear.push({ ...gear, profiles });
-  }
+  const leaders = data.datasheetLeaders
+    .filter((dl) => dl.datasheetId === datasheet.id)
+    .map((dl) => dl.attachedDatasheetId);
 
   return {
     ...datasheet,
     abilities,
-    damage,
     keywords,
     models,
     options,
-    stratagems,
     wargear,
+    unitComposition,
+    modelCosts,
+    stratagems,
+    enhancements,
+    detachmentAbilities,
+    leaders,
     isForgeWorld,
     isLegends
   };
@@ -101,33 +132,18 @@ const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): dep
     .filter((datasheet) => datasheet.factionId === faction.id)
     .map((datasheet) => buildDatasheet(data, datasheet));
 
-  const psychicPowers = data.psychicPowers.filter(
-    (psychicPower) => psychicPower.factionId === faction.id
+  const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
+  const enhancements = data.enhancements.filter(
+    (enhancement) => enhancement.factionId === faction.id
   );
-
-  const relics = data.wargear
-    .filter((w) => w.factionId === faction.id && w.isRelic === 'true')
-    .map(
-      (relic) =>
-        ({
-          ...relic,
-          profiles: data.wargearList.filter((item) => item.wargearId === relic.id)
-        } as depot.Relic)
-    );
-
-  const stratagems = data.stratagems
-    .filter((strat) => strat.factionId === faction.id)
-    .map((strat) => buildStratagem(data, strat.id));
-
-  const warlordTraits = data.warlordTraits.filter((wlt) => wlt.factionId === faction.id);
+  const detachmentAbilities = data.detachmentAbilities.filter((da) => da.factionId === faction.id);
 
   return {
     ...faction,
     datasheets,
-    psychicPowers,
-    relics,
     stratagems,
-    warlordTraits
+    enhancements,
+    detachmentAbilities
   };
 };
 

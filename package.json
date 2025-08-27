@@ -2,7 +2,8 @@
   "name": "depot",
   "private": true,
   "scripts": {
-    "build": "pnpm --recursive run build",
+    "build": "tsc --build",
+    "build:packages": "pnpm --recursive run build",
     "start": "pnpm --filter depot-web start",
     "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",

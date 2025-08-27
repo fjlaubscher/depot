@@ -1,25 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    // Shared strict settings
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    
-    // Module resolution
+    "noEmit": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "Node",
+    "module": "esnext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
-    
-    // Output settings
-    "declaration": true,
-    "sourceMap": true,
-    "removeComments": false,
-    
-    // Language features (more lenient for now)
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true
+    "isolatedModules": true,
+    "incremental": true,
   },
   "exclude": [
     "**/node_modules",

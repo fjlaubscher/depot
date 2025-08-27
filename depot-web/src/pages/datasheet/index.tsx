@@ -27,14 +27,7 @@ const Datasheet = () => {
   const datasheet = useMemo(() => {
     if (faction && id) {
       const ds = faction.datasheets.filter((ds) => ds.id === id)[0];
-      const hasDamageProfiles = ds.damage.length > 0;
-      const hasSingleModel = ds.costPerUnit === 'false' && ds.models.length === 1;
-
-      return {
-        ...ds,
-        cost: hasSingleModel ? ds.models[0].cost : ds.cost,
-        models: hasDamageProfiles ? parseDamageAndModels(ds) : ds.models
-      } as depot.Datasheet;
+      return ds;
     }
 
     return undefined;
@@ -60,12 +53,12 @@ const Datasheet = () => {
             <Stat
               className={styles.cost}
               title="Cost"
-              value={`${datasheet.powerPoints} PR`}
-              description={datasheet.cost ? `${datasheet.cost} points` : undefined}
+              value={datasheet.modelCosts[0].cost || '0'}
+              description={datasheet.models[0].oc}
             />
           </div>
           <Tabs tabs={['Datasheet', 'Stratagems']} onChange={setActiveTab} active={activeTab}>
-            <DatasheetProfile datasheet={datasheet} showCost={!datasheet.cost} />
+            <DatasheetProfile datasheet={datasheet} />
             <DatasheetStratagems stratagems={datasheet.stratagems} />
           </Tabs>
         </>

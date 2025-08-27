@@ -31,21 +31,12 @@ const DatasheetProfile = ({ datasheet, showCost }: Props) => {
 
   const options = useMemo(() => datasheetOptions.filter((o) => o.description), [datasheetOptions]);
 
-  const wargearProfiles = useMemo(() => {
-    return wargear.reduce((acc, w) => {
-      const profiles =
-        w.profiles.length > 1
-          ? w.profiles.map((p) => ({ ...p, name: `${w.name} - ${p.name}` } as depot.WargearProfile))
-          : w.profiles;
-
-      return [...acc, ...profiles];
-    }, [] as depot.WargearProfile[]);
-  }, [wargear]);
+  console.log(datasheet);
 
   return (
     <div className={styles.profile}>
       <DatasheetProfileTable profiles={models} showCost={showCost ?? true} />
-      <p className={styles.composition}>{unitComposition}</p>
+      <p className={styles.composition}>{unitComposition[0].description}</p>
       <ul className={styles.options}>
         {options.map((o, i) =>
           o.description === '&nbsp;' ? (
@@ -59,7 +50,7 @@ const DatasheetProfile = ({ datasheet, showCost }: Props) => {
       </ul>
       <div className={styles.tagSection}>
         <h4>Wargear</h4>
-        <WargearProfileTable profiles={wargearProfiles} />
+        {/*<WargearProfileTable profiles={wargearProfiles} />*/}
       </div>
       <div className={styles.tagSection}>
         <h4>Abilities</h4>

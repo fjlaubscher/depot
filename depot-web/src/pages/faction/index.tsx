@@ -72,23 +72,14 @@ const Faction = () => {
           <Stat title={alliance} value={faction.name} />
           <Tabs
             className={styles.tabs}
-            tabs={[
-              'Datasheets',
-              faction.psychicPowers.length ? 'Psychic Powers' : '',
-              'Relics',
-              'Stratagems',
-              'Warlord Traits'
-            ]}
+            tabs={['Datasheets', 'Detachments', 'Enhancements', 'Stratagems']}
             active={activeTab}
             onChange={setActiveTab}
           >
             <FactionDatasheets datasheets={faction.datasheets} />
-            {faction.psychicPowers.length ? (
-              <FactionPsychicPowers psychicPowers={faction.psychicPowers} />
-            ) : undefined}
-            <FactionRelics relics={faction.relics} />
+            <div>Detachments</div>
+            <div>Enhancements</div>
             <FactionStratagems stratagems={faction.stratagems} />
-            <FactionWarlordTraits warlordTraits={faction.warlordTraits} />
           </Tabs>
         </>
       )}

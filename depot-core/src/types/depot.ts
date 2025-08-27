@@ -5,22 +5,10 @@ export interface Option {
 
 export interface Ability {
   id: string;
-  type: string;
   name: string;
   legend: string;
-  isOtherWargear: string;
   factionId: string;
   description: string;
-}
-
-export interface DatasheetDamage {
-  datasheetId: string;
-  line: string;
-  col1: string;
-  col2: string;
-  col3: string;
-  col4: string;
-  col5: string;
 }
 
 export interface Keyword {
@@ -35,18 +23,13 @@ export interface Model {
   line: string;
   name: string;
   m: string;
-  ws: string;
-  bs: string;
-  s: string;
   t: string;
-  w: string;
-  a: string;
-  ld: string;
   sv: string;
-  cost: string;
-  costDescription: string;
-  modelsPerUnit: string;
-  costIncludingWargear: string;
+  invSv: string;
+  invSvDescr: string;
+  w: string;
+  ld: string;
+  oc: string;
   baseSize: string;
   baseSizeDescr: string;
 }
@@ -56,105 +39,97 @@ export interface DatasheetOption {
   line: string;
   button: string;
   description: string;
-  isIndexWargear: string;
 }
 
-export interface PsychicPower {
-  roll: string;
-  name: string;
-  factionId: string;
-  factionName: string;
-  legend: string;
-  type: string;
-  description: string;
-  id: string;
-}
-
-export interface Relic {
-  id: string;
-  name: string;
-  type: string;
-  description: string;
-  sourceId: string;
-  isRelic: string;
-  factionId: string;
-  factionName: string;
-  legend: string;
-  profiles: WargearProfile[];
-}
 
 export interface Stratagem {
+  id: string;
   factionId: string;
   name: string;
   type: string;
   cpCost: string;
   legend: string;
-  sourceId: string;
-  subfactionId: string;
+  turn: string;
+  phase: string;
   description: string;
-  id: string;
-  phases: string[];
-}
-
-export interface WargearProfile {
-  wargearId: string;
-  line: string;
-  name: string;
-  range: string;
-  type: string;
-  s: string;
-  ap: string;
-  d: string;
-  abilities: string;
+  detachment: string;
 }
 
 export interface Wargear {
-  id: string;
+  datasheetId: string;
+  line: string;
+  lineInWargear: string;
+  dice: string;
   name: string;
-  type: string;
   description: string;
-  sourceId: string;
-  isRelic: string;
-  factionId: string;
-  factionName: string;
-  legend: string;
-  profiles: WargearProfile[];
+  range: string;
+  type: string;
+  a: string;
+  bsWs: string;
+  s: string;
+  ap: string;
+  d: string;
 }
 
-export interface WarlordTrait {
+export interface UnitComposition {
+  datasheetId: string;
+  line: string;
+  description: string;
+}
+
+export interface ModelCost {
+  datasheetId: string;
+  line: string;
+  description: string;
+  cost: string;
+}
+
+export interface Enhancement {
+  id: string;
   factionId: string;
-  factionName: string;
-  type: string;
-  roll: string;
   name: string;
   legend: string;
   description: string;
+  cost: string;
+  detachment: string;
 }
+
+export interface DetachmentAbility {
+  id: string;
+  factionId: string;
+  name: string;
+  legend: string;
+  description: string;
+  detachment: string;
+}
+
 
 export interface Datasheet {
   id: string;
   name: string;
-  link: string;
   factionId: string;
   sourceId: string;
+  legend: string;
   role: string;
-  unitComposition: string;
+  loadout: string;
   transport: string;
-  powerPoints: string;
-  priest: string;
-  psyker: string;
-  openPlayOnly: string;
-  crusadeOnly: string;
-  virtual: string;
-  cost: string;
-  costPerUnit: string;
+  virtual: boolean;
+  leaderHead: string;
+  leaderFooter: string;
+  damagedW: string;
+  damagedDescription: string;
+  link: string;
   abilities: Ability[];
-  damage: DatasheetDamage[];
   keywords: Keyword[];
   models: Model[];
   options: DatasheetOption[];
-  stratagems: Stratagem[];
   wargear: Wargear[];
+  unitComposition: UnitComposition[];
+  modelCosts: ModelCost[];
+  stratagems: Stratagem[];
+  enhancements: Enhancement[];
+  detachmentAbilities: DetachmentAbility[];
+  leaders: string[];
   isForgeWorld: boolean;
   isLegends: boolean;
 }
@@ -164,10 +139,9 @@ export interface Faction {
   name: string;
   link: string;
   datasheets: Datasheet[];
-  psychicPowers: PsychicPower[];
-  relics: Relic[];
   stratagems: Stratagem[];
-  warlordTraits: WarlordTrait[];
+  enhancements: Enhancement[];
+  detachmentAbilities: DetachmentAbility[];
 }
 
 export interface Index {
