@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`depot` is a Warhammer 40,000 companion app powered by Wahapedia data. It's built as a monorepo using Yarn workspaces with two main components:
+`depot` is a Warhammer 40,000 companion app powered by Wahapedia data. It's built as a monorepo using pnpm workspaces with two main components:
 
 - **depot-cli**: Node.js CLI that fetches and processes Wahapedia CSV data into JSON format
 - **depot-web**: React PWA that displays the processed Warhammer 40K game data
@@ -13,47 +13,52 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Installation
 ```bash
-yarn
+pnpm install
 ```
 
 ### Data Generation
 Generate data from Wahapedia (run before starting web app):
 ```bash
-yarn workspace depot-cli start
+pnpm --filter depot-cli start
 ```
 This creates `wahapedia.json` in `depot-cli/dist/` - copy this to `depot-web/public/` for the web app.
 
+To force re-download of source data (ignoring existing files):
+```bash
+pnpm --filter depot-cli start -- --force-download
+```
+
 ### Development Server
 ```bash
-yarn start
+pnpm start
 ```
 Starts the Vite dev server for the web app.
 
 ### Building
 ```bash
-yarn build
+pnpm build
 ```
 Builds both CLI and web components.
 
 ### Testing
 ```bash
 # Run tests for CLI
-yarn workspace depot-cli test
+pnpm --filter depot-cli test
 
 # Run tests for web
-yarn workspace depot-web test
+pnpm --filter depot-web test
 ```
 
 ### Code Quality
 ```bash
 # Format code
-yarn format
+pnpm format
 
 # Check formatting
-yarn lint
+pnpm lint
 
 # Lint web with TypeScript check
-yarn workspace depot-web run lint
+pnpm --filter depot-web run lint
 ```
 
 ## Architecture
@@ -87,6 +92,6 @@ Shared TypeScript definitions in `types/depot.d.ts` define the complete Warhamme
 - Settings and data index structures
 
 ## Workspace Structure
-- Root package.json manages workspaces and provides unified commands
+- Root package.json manages pnpm workspaces and provides unified commands
 - Each workspace (depot-cli, depot-web) has independent dependencies and build processes
 - Shared type definitions ensure consistency between CLI output and web app consumption

@@ -14,10 +14,9 @@ import styles from './datasheet.module.scss';
 
 interface Props {
   datasheet: depot.Datasheet;
-  showCost?: boolean;
 }
 
-const DatasheetProfile = ({ datasheet, showCost }: Props) => {
+const DatasheetProfile = ({ datasheet }: Props) => {
   const {
     abilities,
     unitComposition,
@@ -31,33 +30,44 @@ const DatasheetProfile = ({ datasheet, showCost }: Props) => {
 
   const options = useMemo(() => datasheetOptions.filter((o) => o.description), [datasheetOptions]);
 
-  console.log(datasheet);
+  const [meleeWargear, rangedWargear] = useMemo(() => {
+    const melee = wargear.filter((w) => w.type === 'Melee');
+    const ranged = wargear.filter((w) => w.type === 'Ranged');
+    return [melee, ranged];
+  }, [wargear]);
 
   return (
     <div className={styles.profile}>
-      <DatasheetProfileTable profiles={models} showCost={showCost ?? true} />
-      <p className={styles.composition}>{unitComposition[0].description}</p>
-      <ul className={styles.options}>
-        {options.map((o, i) =>
-          o.description === '&nbsp;' ? (
-            <br />
-          ) : (
-            <li key={`option-${i}`} className={o.button === '-' ? styles.subItem : styles.item}>
-              {o.button === '-' ? `- ${o.description}` : o.description}
-            </li>
-          )
-        )}
-      </ul>
+      <DatasheetProfileTable profiles={models} />
       <div className={styles.tagSection}>
         <h4>Wargear</h4>
-        {/*<WargearProfileTable profiles={wargearProfiles} />*/}
+        <WargearProfileTable type="Ranged" profiles={rangedWargear} />
+        <WargearProfileTable type="Melee" profiles={meleeWargear} />
+      </div>
+      <div className={styles.tagSection}>
+        <h4>Unit Composition</h4>
+        <ul className={styles.composition}>
+          {unitComposition.map((comp, i) => (
+            <li key={`composition-${comp.line}`}>
+              {comp.description} {models[i] ? `(${models[i].baseSize})` : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className={styles.tagSection}>
+        <h4>Unit Options</h4>
+        <ul className={styles.options}>
+          {options.map((o, i) => (
+            <li key={`unit-option-${o.line}`} dangerouslySetInnerHTML={{ __html: o.description }} />
+          ))}
+        </ul>
       </div>
       <div className={styles.tagSection}>
         <h4>Abilities</h4>
         <Grid>
           {sortedAbilities.map((ability) => (
             <Card key={ability.id} title={ability.name}>
-              <p>{ability.description}</p>
+              <p dangerouslySetInnerHTML={{ __html: ability.description }} />
             </Card>
           ))}
         </Grid>

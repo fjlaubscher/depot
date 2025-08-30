@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { existsSync, rmSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { depot } from 'depot-core';
 
 import convertToJSON from './convert-to-json';
@@ -38,6 +38,8 @@ const WAHAPEDIA_CSV_FILES = [
 
 const fetchCSV = (url: string) => fetch(url).then((response) => response.text());
 
+const forceDownload = process.argv.includes('--force-download');
+
 const init = async () => {
   if (existsSync(JSON_DIR)) {
     rmSync(JSON_DIR, { recursive: true, force: true });
@@ -47,35 +49,49 @@ const init = async () => {
     rmSync(DATA_DIR, { recursive: true, force: true });
   }
 
-  if (existsSync(SOURCE_DATA_DIR)) {
+  const sourceDataExists = existsSync(SOURCE_DATA_DIR);
+  const shouldDownload = forceDownload || !sourceDataExists;
+
+  if (forceDownload && sourceDataExists) {
+    console.log('Force download flag detected, removing existing source data');
     rmSync(SOURCE_DATA_DIR, { recursive: true, force: true });
   }
 
   console.log('Creating Directories');
   mkdirSync(JSON_DIR);
-  mkdirSync(SOURCE_DATA_DIR);
+  if (!existsSync(SOURCE_DATA_DIR)) {
+    mkdirSync(SOURCE_DATA_DIR);
+  }
 
-  console.log('Fetching CSV data from Wahapedia');
   const fileNames = WAHAPEDIA_CSV_FILES.map(getFileName);
   const csvFileNames = WAHAPEDIA_CSV_FILES.map(getCSVFileName);
-  const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
-    fetchCSV(`http://wahapedia.ru/wh40k10ed/${fileName}`)
-  );
-  const results = await Promise.all(requests);
+  let results: string[];
 
-  console.log('Saving raw CSV files for debugging');
-  for (let i = 0; i < results.length; i++) {
-    const csvPath = `${SOURCE_DATA_DIR}/${csvFileNames[i]}`;
-    console.log(`Saving ${csvPath}`);
-    writeFileSync(csvPath, results[i].toString());
+  if (shouldDownload) {
+    console.log('Fetching CSV data from Wahapedia');
+    const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
+      fetchCSV(`http://wahapedia.ru/wh40k10ed/${fileName}`)
+    );
+    results = await Promise.all(requests);
+
+    console.log('Saving raw CSV files for debugging');
+    for (let i = 0; i < results.length; i++) {
+      const csvPath = `${SOURCE_DATA_DIR}/${csvFileNames[i]}`;
+      console.log(`Saving ${csvPath}`);
+      writeFileSync(csvPath, results[i]);
+    }
+  } else {
+    console.log('Using existing source data files');
+    results = csvFileNames.map((fileName) => {
+      const csvPath = `${SOURCE_DATA_DIR}/${fileName}`;
+      console.log(`Reading ${csvPath}`);
+      return readFileSync(csvPath, 'utf-8');
+    });
   }
 
   console.log('Parsing data from CSV');
   for (let i = 0; i < results.length; i++) {
-    const parsedData = convertToJSON(
-      results[i].toString(),
-      fileNames[i] !== 'datasheets-keywords.json'
-    );
+    const parsedData = convertToJSON(results[i]);
     console.log(`Creating ${JSON_DIR}/${fileNames[i]}`);
     writeFileSync(`${JSON_DIR}/${fileNames[i]}`, JSON.stringify(parsedData));
   }

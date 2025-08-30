@@ -30,7 +30,6 @@ interface GroupedFactions {
 const Home = () => {
   const navigate = useNavigate();
   const factions = useRecoilValue(DataIndexAtom);
-  console.log(factions);
 
   const [myFactions] = useLocalStorage<depot.Option[]>('my-factions');
   const hasMyFactions = myFactions ? myFactions.length > 0 : false;

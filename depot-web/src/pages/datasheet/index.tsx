@@ -26,14 +26,14 @@ const Datasheet = () => {
 
   const datasheet = useMemo(() => {
     if (faction && id) {
-      const ds = faction.datasheets.filter((ds) => ds.id === id)[0];
-      return ds;
+      return faction.datasheets.find((ds) => ds.id === id);
     }
 
     return undefined;
   }, [faction, id]);
 
-  console.log(datasheet);
+  const datasheetCost = datasheet ? datasheet.modelCosts[0] : undefined;
+  const alternateCost = datasheet ? datasheet.modelCosts[1] : undefined;
 
   return (
     <Layout
@@ -48,13 +48,13 @@ const Datasheet = () => {
             <Stat
               title={datasheet.role}
               value={datasheet.name}
-              description={datasheet?.models[0].baseSize}
+              description={datasheetCost?.description}
             />
             <Stat
               className={styles.cost}
-              title="Cost"
-              value={datasheet.modelCosts[0].cost || '0'}
-              description={datasheet.models[0].oc}
+              title="Points"
+              value={datasheetCost?.cost || '-'}
+              description={alternateCost?.cost}
             />
           </div>
           <Tabs tabs={['Datasheet', 'Stratagems']} onChange={setActiveTab} active={activeTab}>
