@@ -14,9 +14,11 @@ const consolidateFiles = (): wahapedia.Data => {
   const datasheetAbilities = readFileAndParseToJSON<wahapedia.DatasheetAbility>(
     'datasheets-abilities.json'
   );
-  const datasheetKeywords =
-    readFileAndParseToJSON<wahapedia.DatasheetKeyword>('datasheets-keywords.json');
-  const datasheetModels = readFileAndParseToJSON<wahapedia.DatasheetModel>('datasheets-models.json');
+  const datasheetKeywords = readFileAndParseToJSON<wahapedia.DatasheetKeyword>(
+    'datasheets-keywords.json'
+  );
+  const datasheetModels =
+    readFileAndParseToJSON<wahapedia.DatasheetModel>('datasheets-models.json');
   const datasheetOptions =
     readFileAndParseToJSON<wahapedia.DatasheetOption>('datasheets-options.json');
   const datasheetWargear =

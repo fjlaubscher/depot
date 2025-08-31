@@ -35,11 +35,7 @@ export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
     closeSidebar
   };
 
-  return (
-    <LayoutContext.Provider value={contextValue}>
-      {children}
-    </LayoutContext.Provider>
-  );
+  return <LayoutContext.Provider value={contextValue}>{children}</LayoutContext.Provider>;
 };
 
 export default LayoutContext;

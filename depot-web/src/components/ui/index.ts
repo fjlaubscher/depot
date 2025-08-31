@@ -16,7 +16,7 @@ export { default as Filters } from './filters';
 export { default as Skeleton, SkeletonCard, SkeletonText } from './skeleton';
 
 // TODO: Create these components in Phase 2
-// export { default as Table } from './table';  
+// export { default as Table } from './table';
 // export { default as Stat } from './stat';
 // export { default as Tag } from './tag';
 // export { default as TagGroup } from './tag-group';

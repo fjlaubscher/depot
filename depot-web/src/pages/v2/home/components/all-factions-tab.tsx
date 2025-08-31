@@ -12,7 +12,7 @@ interface AllFactionsTabProps {
   debouncedQuery: string;
 }
 
-const AllFactionsTab: React.FC<AllFactionsTabProps> = ({ 
+const AllFactionsTab: React.FC<AllFactionsTabProps> = ({
   groupedFactions,
   query,
   onQueryChange,
@@ -20,15 +20,11 @@ const AllFactionsTab: React.FC<AllFactionsTabProps> = ({
   debouncedQuery
 }) => {
   const hasResults = Object.keys(groupedFactions).length > 0;
-  
+
   return (
     <div>
-      <SearchFilters 
-        query={query}
-        onQueryChange={onQueryChange}
-        onClear={onClear}
-      />
-      
+      <SearchFilters query={query} onQueryChange={onQueryChange} onClear={onClear} />
+
       {hasResults ? (
         Object.keys(groupedFactions).map((allianceKey) => (
           <AllianceSection

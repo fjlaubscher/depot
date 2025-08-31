@@ -20,23 +20,26 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   }, []);
 
   // Show toast with auto-dismiss
-  const showToast = useCallback((toastData: Omit<Toast, 'id'>) => {
-    const id = generateId();
-    const toast: Toast = {
-      id,
-      duration: 5000, // Default 5 second duration
-      ...toastData
-    };
+  const showToast = useCallback(
+    (toastData: Omit<Toast, 'id'>) => {
+      const id = generateId();
+      const toast: Toast = {
+        id,
+        duration: 5000, // Default 5 second duration
+        ...toastData
+      };
 
-    dispatch({ type: TOAST_ACTIONS.ADD_TOAST, payload: toast });
+      dispatch({ type: TOAST_ACTIONS.ADD_TOAST, payload: toast });
 
-    // Auto-dismiss toast if duration is set
-    if (toast.duration && toast.duration > 0) {
-      setTimeout(() => {
-        dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
-      }, toast.duration);
-    }
-  }, [generateId]);
+      // Auto-dismiss toast if duration is set
+      if (toast.duration && toast.duration > 0) {
+        setTimeout(() => {
+          dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
+        }, toast.duration);
+      }
+    },
+    [generateId]
+  );
 
   // Remove specific toast
   const removeToast = useCallback((id: string) => {
@@ -56,11 +59,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     clearAllToasts
   };
 
-  return (
-    <ToastContext.Provider value={contextValue}>
-      {children}
-    </ToastContext.Provider>
-  );
+  return <ToastContext.Provider value={contextValue}>{children}</ToastContext.Provider>;
 };
 
 export default ToastContext;

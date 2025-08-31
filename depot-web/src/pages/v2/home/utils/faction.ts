@@ -6,17 +6,15 @@ export interface GroupedFactions {
 }
 
 export const filterFactionsByQuery = (
-  factions: depot.Index[] | null, 
+  factions: depot.Index[] | null,
   query: string
 ): depot.Index[] => {
   if (!factions) return [];
-  
+
   if (query) {
-    return factions.filter((faction) =>
-      faction.name.toLowerCase().includes(query.toLowerCase())
-    );
+    return factions.filter((faction) => faction.name.toLowerCase().includes(query.toLowerCase()));
   }
-  
+
   return factions;
 };
 
@@ -27,18 +25,13 @@ export const groupFactionsByAlliance = (factions: depot.Index[]): GroupedFaction
 
     return {
       ...acc,
-      [allianceKey]: [...allianceFactions, faction].sort((a, b) => 
-        a.name.localeCompare(b.name)
-      )
+      [allianceKey]: [...allianceFactions, faction].sort((a, b) => a.name.localeCompare(b.name))
     };
   }, {} as GroupedFactions);
 };
 
 export const createTabLabels = (hasMyFactions: boolean): string[] => {
-  return [
-    ...(hasMyFactions ? ['Favourites'] : []),
-    'All Factions'
-  ];
+  return [...(hasMyFactions ? ['Favourites'] : []), 'All Factions'];
 };
 
 export const hasFavourites = (myFactions: depot.Index[] | undefined): boolean => {

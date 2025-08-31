@@ -41,18 +41,18 @@ const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       <Helmet title={`${title} | depot`} />
-      
+
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 z-40 lg:hidden"
           onClick={closeSidebar}
         />
       )}
-      
+
       {/* Sidebar */}
       {sidebar && (
-        <aside 
+        <aside
           className={`
             fixed top-0 left-0 z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-lg border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
             lg:relative lg:translate-x-0
@@ -62,22 +62,16 @@ const Layout: React.FC<LayoutProps> = ({
           {/* Mobile sidebar header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 lg:hidden">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
-            <IconButton 
-              onClick={closeSidebar}
-              variant="ghost"
-              aria-label="Close sidebar"
-            >
+            <IconButton onClick={closeSidebar} variant="ghost" aria-label="Close sidebar">
               <FaTimes />
             </IconButton>
           </div>
-          
+
           {/* Sidebar content */}
-          <div className="p-4 overflow-y-auto">
-            {sidebar}
-          </div>
+          <div className="p-4 overflow-y-auto">{sidebar}</div>
         </aside>
       )}
-      
+
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
@@ -87,7 +81,7 @@ const Layout: React.FC<LayoutProps> = ({
               {/* Left side - mobile menu + home */}
               <div className="flex items-center space-x-4">
                 {sidebar && (
-                  <IconButton 
+                  <IconButton
                     onClick={toggleSidebar}
                     variant="ghost"
                     className="lg:hidden"
@@ -96,27 +90,25 @@ const Layout: React.FC<LayoutProps> = ({
                     <FaBars />
                   </IconButton>
                 )}
-                
+
                 {home && (
                   <div className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
                     {home}
                   </div>
                 )}
               </div>
-              
+
               {/* Center - Title */}
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white mx-4 flex-1 text-center lg:text-left">
                 {title}
               </h1>
-              
+
               {/* Right side - Action */}
-              <div className="flex items-center">
-                {action}
-              </div>
+              <div className="flex items-center">{action}</div>
             </div>
           </div>
         </header>
-        
+
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

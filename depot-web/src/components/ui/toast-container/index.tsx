@@ -16,11 +16,7 @@ const ToastContainer: React.FC = () => {
       aria-live="assertive"
     >
       {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          toast={toast}
-          onRemove={removeToast}
-        />
+        <Toast key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
     </div>
   );

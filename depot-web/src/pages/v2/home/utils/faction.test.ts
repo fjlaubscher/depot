@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { 
-  filterFactionsByQuery, 
-  groupFactionsByAlliance, 
-  createTabLabels, 
-  hasFavourites 
+import {
+  filterFactionsByQuery,
+  groupFactionsByAlliance,
+  createTabLabels,
+  hasFavourites
 } from './faction';
 import { depot } from 'depot-core';
 
@@ -12,7 +12,7 @@ const mockFactions: depot.Index[] = [
   { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' },
   { id: 'ORK', name: 'Orks', path: '/data/orks.json' },
-  { id: 'TAU', name: 'T\'au Empire', path: '/data/tau.json' },
+  { id: 'TAU', name: "T'au Empire", path: '/data/tau.json' },
   { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' }
 ];
 
@@ -57,11 +57,11 @@ describe('faction utilities', () => {
   describe('groupFactionsByAlliance', () => {
     it('should group factions by their alliance', () => {
       const result = groupFactionsByAlliance(mockFactions);
-      
+
       expect(result).toHaveProperty('imperium');
       expect(result).toHaveProperty('chaos');
       expect(result).toHaveProperty('xenos');
-      
+
       expect(result.imperium).toHaveLength(2);
       expect(result.chaos).toHaveLength(1);
       expect(result.xenos).toHaveLength(2);
@@ -69,11 +69,11 @@ describe('faction utilities', () => {
 
     it('should sort factions alphabetically within each alliance', () => {
       const result = groupFactionsByAlliance(mockFactions);
-      
+
       // Check if Imperium factions are sorted alphabetically
       expect(result.imperium[0].name).toBe('Astra Militarum');
       expect(result.imperium[1].name).toBe('Space Marines');
-      
+
       // Check if Xenos factions are sorted alphabetically
       expect(result.xenos[0].name).toBe('Orks');
       expect(result.xenos[1].name).toBe("T'au Empire");
@@ -85,12 +85,12 @@ describe('faction utilities', () => {
     });
 
     it('should handle factions with unrecognized IDs', () => {
-      const unknownFaction: depot.Index = { 
-        id: 'UNKNOWN', 
-        name: 'Unknown Faction', 
-        path: '/data/unknown.json' 
+      const unknownFaction: depot.Index = {
+        id: 'UNKNOWN',
+        name: 'Unknown Faction',
+        path: '/data/unknown.json'
       };
-      
+
       const result = groupFactionsByAlliance([unknownFaction]);
       expect(result).toHaveProperty('unaligned');
       expect(result.unaligned).toHaveLength(1);

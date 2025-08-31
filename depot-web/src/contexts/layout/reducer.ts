@@ -11,13 +11,13 @@ export const layoutReducer = (state: LayoutState, action: LayoutAction): LayoutS
   switch (action.type) {
     case LAYOUT_ACTIONS.TOGGLE_SIDEBAR:
       return { ...state, sidebarOpen: !state.sidebarOpen };
-    
+
     case LAYOUT_ACTIONS.OPEN_SIDEBAR:
       return { ...state, sidebarOpen: true };
-    
+
     case LAYOUT_ACTIONS.CLOSE_SIDEBAR:
       return { ...state, sidebarOpen: false };
-    
+
     default:
       return state;
   }

@@ -16,8 +16,8 @@ const Grid: React.FC<GridProps> = ({
   ...props
 }) => {
   const baseClasses = 'grid';
-  
-  const colsClasses = responsive 
+
+  const colsClasses = responsive
     ? {
         1: 'grid-cols-1',
         2: 'grid-cols-1 md:grid-cols-2',
@@ -34,7 +34,7 @@ const Grid: React.FC<GridProps> = ({
         6: 'grid-cols-6',
         12: 'grid-cols-12'
       };
-  
+
   const gapClasses = {
     xs: 'gap-1',
     sm: 'gap-2',
@@ -45,12 +45,7 @@ const Grid: React.FC<GridProps> = ({
 
   return (
     <div
-      className={classNames(
-        baseClasses,
-        colsClasses[cols],
-        gapClasses[gap],
-        className
-      )}
+      className={classNames(baseClasses, colsClasses[cols], gapClasses[gap], className)}
       {...props}
     >
       {children}

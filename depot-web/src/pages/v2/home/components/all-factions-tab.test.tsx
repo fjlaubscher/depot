@@ -10,24 +10,36 @@ vi.mock('./alliance-section', () => ({
   default: ({ alliance, factions }: { alliance: string; factions: depot.Index[] }) => (
     <div data-testid={`alliance-${alliance}`}>
       <h2>{alliance}</h2>
-      {factions.map(f => <div key={f.id} data-testid={`faction-${f.id}`}>{f.name}</div>)}
+      {factions.map((f) => (
+        <div key={f.id} data-testid={`faction-${f.id}`}>
+          {f.name}
+        </div>
+      ))}
     </div>
   )
 }));
 
 vi.mock('./search-filters', () => ({
-  default: ({ query, onQueryChange, onClear }: { 
-    query: string; 
-    onQueryChange: (q: string) => void; 
-    onClear: () => void; 
+  default: ({
+    query,
+    onQueryChange,
+    onClear
+  }: {
+    query: string;
+    onQueryChange: (q: string) => void;
+    onClear: () => void;
   }) => (
     <div data-testid="search-filters">
-      <input 
+      <input
         data-testid="search-input"
-        value={query} 
-        onChange={(e) => onQueryChange(e.target.value)} 
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
       />
-      {query && <button data-testid="clear-button" onClick={onClear}>Clear</button>}
+      {query && (
+        <button data-testid="clear-button" onClick={onClear}>
+          Clear
+        </button>
+      )}
     </div>
   )
 }));
@@ -43,9 +55,7 @@ const mockGroupedFactions: GroupedFactions = {
     { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
     { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' }
   ],
-  chaos: [
-    { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
-  ],
+  chaos: [{ id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }],
   xenos: [
     { id: 'ORK', name: 'Orks', path: '/data/ork.json' },
     { id: 'TAU', name: "T'au Empire", path: '/data/tau.json' }
@@ -110,11 +120,7 @@ describe('AllFactionsTab', () => {
   it('should render NoResults when no results and query exists', () => {
     render(
       <TestWrapper>
-        <AllFactionsTab 
-          {...defaultProps} 
-          groupedFactions={{}} 
-          debouncedQuery="necrons" 
-        />
+        <AllFactionsTab {...defaultProps} groupedFactions={{}} debouncedQuery="necrons" />
       </TestWrapper>
     );
 
@@ -125,11 +131,7 @@ describe('AllFactionsTab', () => {
   it('should not render NoResults when no results and no query', () => {
     render(
       <TestWrapper>
-        <AllFactionsTab 
-          {...defaultProps} 
-          groupedFactions={{}} 
-          debouncedQuery="" 
-        />
+        <AllFactionsTab {...defaultProps} groupedFactions={{}} debouncedQuery="" />
       </TestWrapper>
     );
 
@@ -144,7 +146,7 @@ describe('AllFactionsTab', () => {
     );
 
     const alliances = screen.getAllByTestId(/^alliance-/);
-    const allianceNames = alliances.map(alliance => 
+    const allianceNames = alliances.map((alliance) =>
       alliance.getAttribute('data-testid')?.replace('alliance-', '')
     );
 
@@ -176,10 +178,7 @@ describe('AllFactionsTab', () => {
   it('should handle empty groupedFactions gracefully', () => {
     render(
       <TestWrapper>
-        <AllFactionsTab 
-          {...defaultProps} 
-          groupedFactions={{}} 
-        />
+        <AllFactionsTab {...defaultProps} groupedFactions={{}} />
       </TestWrapper>
     );
 

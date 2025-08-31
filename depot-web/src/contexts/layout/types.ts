@@ -4,7 +4,7 @@ export interface LayoutState {
 }
 
 // Layout action types
-export type LayoutAction = 
+export type LayoutAction =
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'OPEN_SIDEBAR' }
   | { type: 'CLOSE_SIDEBAR' };

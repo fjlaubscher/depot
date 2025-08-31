@@ -16,19 +16,19 @@ const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const baseClasses = 'bg-white rounded-lg border border-gray-200 transition-shadow duration-200';
-  
+
   const variantClasses = {
     default: 'shadow-sm',
     outlined: 'shadow-none'
   };
-  
+
   const paddingClasses = {
     none: '',
     sm: 'p-3',
     md: 'p-4',
     lg: 'p-6'
   };
-  
+
   const hoverClasses = hover ? 'hover:shadow-md cursor-pointer' : '';
 
   return (

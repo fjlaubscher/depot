@@ -21,7 +21,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     dispatch({ type: APP_ACTIONS.LOAD_FACTION_START, payload: id });
-    
+
     try {
       const response = await fetch(`/data/${id}.json`);
       if (!response.ok) {
@@ -30,8 +30,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const faction = await response.json();
       dispatch({ type: APP_ACTIONS.LOAD_FACTION_SUCCESS, payload: { id, faction } });
     } catch (error) {
-      dispatch({ 
-        type: APP_ACTIONS.LOAD_FACTION_ERROR, 
+      dispatch({
+        type: APP_ACTIONS.LOAD_FACTION_ERROR,
         payload: { id, error: error instanceof Error ? error.message : 'Unknown error' }
       });
     }
@@ -41,7 +41,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadIndex = async () => {
       dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
-      
+
       try {
         const response = await fetch('/data/index.json');
         if (!response.ok) {
@@ -50,8 +50,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         const index = await response.json();
         dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
       } catch (error) {
-        dispatch({ 
-          type: APP_ACTIONS.LOAD_INDEX_ERROR, 
+        dispatch({
+          type: APP_ACTIONS.LOAD_INDEX_ERROR,
           payload: error instanceof Error ? error.message : 'Unknown error'
         });
       }
@@ -66,11 +66,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     loadFaction
   };
 
-  return (
-    <AppContext.Provider value={contextValue}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
 };
 
 export default AppContext;

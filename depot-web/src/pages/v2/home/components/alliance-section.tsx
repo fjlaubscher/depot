@@ -8,10 +8,10 @@ interface AllianceSectionProps {
   loading?: boolean;
 }
 
-const AllianceSection: React.FC<AllianceSectionProps> = ({ 
-  alliance, 
-  factions, 
-  loading = false 
+const AllianceSection: React.FC<AllianceSectionProps> = ({
+  alliance,
+  factions,
+  loading = false
 }) => {
   return (
     <div className="mb-8">

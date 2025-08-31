@@ -7,9 +7,7 @@ interface NoResultsProps {
 const NoResults: React.FC<NoResultsProps> = ({ query }) => {
   return (
     <div className="text-center py-8">
-      <p className="text-gray-500 dark:text-gray-400">
-        No factions found matching "{query}"
-      </p>
+      <p className="text-gray-500 dark:text-gray-400">No factions found matching "{query}"</p>
     </div>
   );
 };

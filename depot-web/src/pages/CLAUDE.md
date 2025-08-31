@@ -52,77 +52,6 @@ pages/
 - **Pure Function Tests**: Test utility functions with various inputs and outputs
 - **Integration Tests**: Test component combinations and data flow between components
 
-## Example Implementation: Home Page
-
-The `home-new/` directory demonstrates these principles:
-
-### Main Component Structure
-```typescript
-// home-new/index.tsx
-const HomeNew: React.FC = () => {
-  const { state } = useAppContext();
-  const [query, setQuery] = useState('');
-  
-  // Extract complex logic to utils
-  const filteredFactions = useMemo(() => 
-    filterFactionsByQuery(state.factionIndex, debouncedQuery),
-    [state.factionIndex, debouncedQuery]
-  );
-
-  // Delegate UI concerns to child components
-  if (state.loading) return <LoadingSkeleton />;
-  if (state.error) return <ErrorState error={state.error} />;
-
-  return (
-    <Layout title="Home">
-      <Tabs>
-        <FavouritesTab favourites={myFactions} />
-        <AllFactionsTab {...tabProps} />
-      </Tabs>
-    </Layout>
-  );
-};
-```
-
-### Component Breakdown
-- **LoadingSkeleton**: Handles loading state UI with skeleton cards
-- **ErrorState**: Displays error messages with user-friendly formatting
-- **NoResults**: Shows empty state when search yields no results
-- **FavouritesTab**: Manages favourite factions display (conditional rendering)
-- **AllFactionsTab**: Handles search and faction browsing with conditional content
-- **FactionGrid**: Renders faction cards in responsive grid with loading skeletons
-- **FactionCard**: Individual faction link cards with consistent styling
-- **AllianceSection**: Groups factions by alliance with section headers
-- **SearchFilters**: Search input and clear functionality with conditional clear button
-
-### Utility Functions
-```typescript
-// home-new/utils/faction.ts
-export interface GroupedFactions {
-  [key: string]: depot.Index[];
-}
-
-export const filterFactionsByQuery = (
-  factions: depot.Index[] | null, 
-  query: string
-): depot.Index[] => {
-  // Pure function for search filtering with null safety
-};
-
-export const groupFactionsByAlliance = (
-  factions: depot.Index[]
-): GroupedFactions => {
-  // Groups factions by alliance and sorts alphabetically
-};
-
-export const createTabLabels = (hasMyFactions: boolean): string[] => {
-  // Dynamically creates tab labels based on user preferences
-};
-
-export const hasFavourites = (myFactions: depot.Index[] | undefined): boolean => {
-  // Safe check for favourites with null/undefined handling
-};
-```
 
 ## Development Guidelines
 
@@ -198,6 +127,68 @@ When rebuilding existing pages:
 5. **Testing Addition**: Add comprehensive tests for new component structure
 
 ## Advanced Patterns Discovered
+
+### Context Migration Pattern
+When migrating from Recoil to Context, create versioned hooks in organized directories:
+```typescript
+// Old Recoil-based hook
+hooks/use-faction.ts
+
+// New Context-based hook  
+hooks/v2/use-faction.ts
+
+// Benefits: Side-by-side comparison, gradual migration, clear versioning
+```
+
+### Utility Function Extraction for Complex Logic
+Extract filtering and grouping logic to testable utility functions:
+```typescript
+// ❌ Avoid complex logic directly in components
+const groupedData = useMemo(() => {
+  const filtered = data.filter(/* complex logic */);
+  const grouped = filtered.reduce(/* complex grouping */);
+  // ... more complex logic
+  return grouped;
+}, [dependencies]);
+
+// ✅ Extract to utility functions
+const groupedData = useMemo(() => {
+  const filtered = filterEnhancements(data, query, detachment);
+  return groupEnhancementsByDetachment(filtered);
+}, [data, query, detachment]);
+```
+
+### Memoized Empty State Checks
+Create specific utility functions for checking if grouped data is empty:
+```typescript
+// utils/enhancement.ts
+export const isEnhancementGroupedDataEmpty = (
+  grouped: Record<string, depot.Enhancement[]>
+): boolean => {
+  return Object.keys(grouped).every(key => grouped[key].length === 0);
+};
+
+// Component usage with memoization
+const isEmpty = useMemo(
+  () => isEnhancementGroupedDataEmpty(groupedEnhancements),
+  [groupedEnhancements]
+);
+```
+
+### Consistent Card Component Pattern
+Create domain-specific card components with consistent styling:
+```typescript
+// Pattern: [Domain]Card components
+- StratagemCard.tsx
+- DetachmentAbilityCard.tsx  
+- EnhancementCard.tsx
+
+// Each follows consistent structure:
+- Header with name and badges/costs
+- Legend text (if present)
+- Description with proper typography
+- Dark mode support throughout
+```
 
 ### Conditional Component Rendering
 Create dedicated components for different states instead of inline conditionals:

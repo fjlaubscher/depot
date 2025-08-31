@@ -10,7 +10,7 @@ export interface AppState {
 }
 
 // Action types
-export type AppAction = 
+export type AppAction =
   | { type: 'LOAD_INDEX_START' }
   | { type: 'LOAD_INDEX_SUCCESS'; payload: depot.Index[] }
   | { type: 'LOAD_INDEX_ERROR'; payload: string }

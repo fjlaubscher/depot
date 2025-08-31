@@ -9,13 +9,7 @@ interface TabsProps {
   children: React.ReactNode;
 }
 
-const Tabs: React.FC<TabsProps> = ({
-  tabs,
-  active = 0,
-  onChange,
-  className,
-  children
-}) => {
+const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, children }) => {
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
@@ -28,8 +22,10 @@ const Tabs: React.FC<TabsProps> = ({
   };
 
   // Filter out empty tab names
-  const validTabs = tabs.filter(tab => tab.trim() !== '');
-  const validChildren = React.Children.toArray(children).filter((_, index) => tabs[index]?.trim() !== '');
+  const validTabs = tabs.filter((tab) => tab.trim() !== '');
+  const validChildren = React.Children.toArray(children).filter(
+    (_, index) => tabs[index]?.trim() !== ''
+  );
 
   return (
     <div className={classNames('w-full', className)}>
@@ -42,8 +38,10 @@ const Tabs: React.FC<TabsProps> = ({
               className={classNames(
                 'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
                 {
-                  'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400': activeTab === index,
-                  'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600': activeTab !== index
+                  'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400':
+                    activeTab === index,
+                  'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600':
+                    activeTab !== index
                 }
               )}
               aria-current={activeTab === index ? 'page' : undefined}
@@ -53,9 +51,7 @@ const Tabs: React.FC<TabsProps> = ({
           ))}
         </nav>
       </div>
-      <div className="mt-4">
-        {validChildren[activeTab] || null}
-      </div>
+      <div className="mt-4">{validChildren[activeTab] || null}</div>
     </div>
   );
 };

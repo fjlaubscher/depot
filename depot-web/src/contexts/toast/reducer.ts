@@ -14,19 +14,19 @@ export const toastReducer = (state: ToastState, action: ToastAction): ToastState
         ...state,
         toasts: [...state.toasts, action.payload]
       };
-    
+
     case TOAST_ACTIONS.REMOVE_TOAST:
       return {
         ...state,
-        toasts: state.toasts.filter(toast => toast.id !== action.payload)
+        toasts: state.toasts.filter((toast) => toast.id !== action.payload)
       };
-    
+
     case TOAST_ACTIONS.CLEAR_ALL_TOASTS:
       return {
         ...state,
         toasts: []
       };
-    
+
     default:
       return state;
   }

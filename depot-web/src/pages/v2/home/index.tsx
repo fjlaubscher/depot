@@ -18,11 +18,11 @@ import FavouritesTab from './components/favourites-tab';
 import AllFactionsTab from './components/all-factions-tab';
 
 // Utilities
-import { 
-  filterFactionsByQuery, 
-  groupFactionsByAlliance, 
-  createTabLabels, 
-  hasFavourites 
+import {
+  filterFactionsByQuery,
+  groupFactionsByAlliance,
+  createTabLabels,
+  hasFavourites
 } from './utils/faction';
 
 // Custom hooks
@@ -32,7 +32,7 @@ import useLocalStorage from '@/hooks/use-local-storage';
 const HomeNew: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useAppContext();
-  
+
   const [myFactions] = useLocalStorage<depot.Index[]>('my-factions');
   const hasMyFactions = hasFavourites(myFactions);
 
@@ -40,13 +40,13 @@ const HomeNew: React.FC = () => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
-  const filteredFactions = useMemo(() => 
-    filterFactionsByQuery(state.factionIndex, debouncedQuery),
+  const filteredFactions = useMemo(
+    () => filterFactionsByQuery(state.factionIndex, debouncedQuery),
     [state.factionIndex, debouncedQuery]
   );
 
-  const groupedFactions = useMemo(() => 
-    groupFactionsByAlliance(filteredFactions),
+  const groupedFactions = useMemo(
+    () => groupFactionsByAlliance(filteredFactions),
     [filteredFactions]
   );
 
@@ -69,15 +69,9 @@ const HomeNew: React.FC = () => {
         </IconButton>
       }
     >
-      <Tabs
-        tabs={tabLabels}
-        active={activeTab}
-        onChange={setActiveTab}
-      >
-        {hasMyFactions && (
-          <FavouritesTab favourites={myFactions || []} />
-        )}
-        
+      <Tabs tabs={tabLabels} active={activeTab} onChange={setActiveTab}>
+        {hasMyFactions && <FavouritesTab favourites={myFactions || []} />}
+
         <AllFactionsTab
           groupedFactions={groupedFactions}
           query={query}

@@ -1,6 +1,12 @@
 import React from 'react';
 import classNames from 'classnames';
-import { FaTimes, FaCheck, FaExclamationTriangle, FaInfoCircle, FaExclamationCircle } from 'react-icons/fa';
+import {
+  FaTimes,
+  FaCheck,
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaExclamationCircle
+} from 'react-icons/fa';
 import { Toast as ToastType } from '@/contexts/toast/types';
 import IconButton from '../icon-button';
 
@@ -60,17 +66,11 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
     >
       <div className="p-4">
         <div className="flex items-start">
-          <div className={classNames('flex-shrink-0', config.iconColor)}>
-            {config.icon}
-          </div>
+          <div className={classNames('flex-shrink-0', config.iconColor)}>{config.icon}</div>
           <div className="ml-3 w-0 flex-1">
-            <p className={classNames('text-sm font-medium', config.titleColor)}>
-              {title}
-            </p>
+            <p className={classNames('text-sm font-medium', config.titleColor)}>{title}</p>
             {message && (
-              <p className={classNames('mt-1 text-sm', config.messageColor)}>
-                {message}
-              </p>
+              <p className={classNames('mt-1 text-sm', config.messageColor)}>{message}</p>
             )}
           </div>
           <div className="ml-4 flex-shrink-0 flex">

@@ -49,26 +49,23 @@ vi.mock('./components/loading-skeleton', () => ({
 }));
 
 vi.mock('./components/error-state', () => ({
-  default: ({ error }: { error: string }) => (
-    <div data-testid="error-state">Error: {error}</div>
-  )
+  default: ({ error }: { error: string }) => <div data-testid="error-state">Error: {error}</div>
 }));
 
 vi.mock('./components/favourites-tab', () => ({
   default: ({ favourites }: { favourites: depot.Index[] }) => (
     <div data-testid="favourites-tab">
-      {favourites.map(f => <div key={f.id}>{f.name}</div>)}
+      {favourites.map((f) => (
+        <div key={f.id}>{f.name}</div>
+      ))}
     </div>
   )
 }));
 
 vi.mock('./components/all-factions-tab', () => ({
-  default: ({ query, onQueryChange }: { 
-    query: string; 
-    onQueryChange: (q: string) => void; 
-  }) => (
+  default: ({ query, onQueryChange }: { query: string; onQueryChange: (q: string) => void }) => (
     <div data-testid="all-factions-tab">
-      <input 
+      <input
         data-testid="search-input"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
@@ -95,7 +92,7 @@ describe('HomeNew', () => {
   describe('Loading State', () => {
     it('should render LoadingSkeleton when loading', () => {
       mockAppContext.state.loading = true;
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -108,7 +105,7 @@ describe('HomeNew', () => {
 
     it('should not render main content when loading', () => {
       mockAppContext.state.loading = true;
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -230,7 +227,7 @@ describe('HomeNew', () => {
 
     it('should navigate to settings when settings button is clicked', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -245,7 +242,7 @@ describe('HomeNew', () => {
 
     it('should handle search query changes', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -261,7 +258,7 @@ describe('HomeNew', () => {
 
     it('should handle empty favourites array gracefully', () => {
       mockLocalStorage.mockReturnValue([[], vi.fn()]);
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -274,7 +271,7 @@ describe('HomeNew', () => {
 
     it('should handle null favourites gracefully', () => {
       mockLocalStorage.mockReturnValue([null, vi.fn()]);
-      
+
       render(
         <TestWrapper>
           <HomeNew />
@@ -290,7 +287,7 @@ describe('HomeNew', () => {
     it('should maintain tab state when switching between tabs', async () => {
       const user = userEvent.setup();
       mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
-      
+
       render(
         <TestWrapper>
           <HomeNew />

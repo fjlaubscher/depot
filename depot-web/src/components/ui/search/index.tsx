@@ -9,15 +9,22 @@ interface SearchProps {
   className?: string;
 }
 
-const Search: React.FC<SearchProps> = ({ 
-  label, 
-  value, 
-  placeholder = 'Search', 
+const Search: React.FC<SearchProps> = ({
+  label,
+  value,
+  placeholder = 'Search',
   onChange,
-  className 
+  className
 }) => (
   <Field className={className}>
-    {label && <label htmlFor="search" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{label}</label>}
+    {label && (
+      <label
+        htmlFor="search"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+      >
+        {label}
+      </label>
+    )}
     <input
       id="search"
       name="search"

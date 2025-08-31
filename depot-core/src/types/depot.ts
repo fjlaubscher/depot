@@ -41,7 +41,6 @@ export interface DatasheetOption {
   description: string;
 }
 
-
 export interface Stratagem {
   id: string;
   factionId: string;
@@ -102,7 +101,6 @@ export interface DetachmentAbility {
   description: string;
   detachment: string;
 }
-
 
 export interface Datasheet {
   id: string;
