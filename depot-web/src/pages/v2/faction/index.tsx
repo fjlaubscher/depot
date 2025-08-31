@@ -11,7 +11,7 @@ import Tabs from '@/components/ui/tabs';
 // Hooks
 import useFaction from '@/hooks/v2/use-faction';
 import useLocalStorage from '@/hooks/use-local-storage';
-import { useToastContext } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
 import { getFactionAlliance } from '@/utils/faction';
@@ -27,7 +27,7 @@ import { depot } from 'depot-core';
 
 const Faction: React.FC = () => {
   const { id } = useParams();
-  const { addToast } = useToastContext();
+  const { addToast } = useToast();
   const { data: faction, loading, error } = useFaction(id);
 
   const [myFactions, setMyFactions] = useLocalStorage<depot.Option[]>('my-factions');

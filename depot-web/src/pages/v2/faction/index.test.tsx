@@ -127,8 +127,8 @@ describe('Faction Page', () => {
     const useLocalStorageMock = await import('@/hooks/use-local-storage');
     vi.mocked(useLocalStorageMock.default).mockImplementation(mockUseLocalStorage);
 
-    const useToastContextMock = await import('@/contexts/toast/use-toast-context');
-    vi.mocked(useToastContextMock.useToastContext).mockImplementation(mockUseToastContext);
+    const useToastMock = await import('@/contexts/toast/use-toast-context');
+    vi.mocked(useToastMock.useToast).mockImplementation(mockUseToastContext);
   });
 
   it('renders faction name and alliance', () => {
