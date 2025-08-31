@@ -74,7 +74,9 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
         groupedDetachmentAbilities[key].length > 0 ? (
           <div key={key} className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">{key}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">
+                {key}
+              </h2>
             </div>
             <Grid>
               {groupedDetachmentAbilities[key].map((ability) => (

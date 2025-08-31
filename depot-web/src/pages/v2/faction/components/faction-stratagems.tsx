@@ -37,7 +37,7 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
   const filteredStratagems = useMemo(() => {
     // Only apply type filter if not "All" (value !== 0)
     const typeFilter = value !== 0 ? type : undefined;
-    
+
     if (typeFilter || debouncedQuery) {
       const filteredByType = stratagems.filter((s) => (typeFilter ? s.type === typeFilter : true));
       const filteredByName = filteredByType.filter((s) =>

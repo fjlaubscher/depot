@@ -48,11 +48,16 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
       {/* Unit Composition */}
       {unitComposition.length > 0 && (
         <div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Unit Composition</h4>
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            Unit Composition
+          </h4>
           <Card className="p-4">
             <ul className="space-y-2">
               {unitComposition.map((comp, i) => (
-                <li key={`composition-${comp.line}`} className="text-sm text-gray-700 dark:text-gray-300">
+                <li
+                  key={`composition-${comp.line}`}
+                  className="text-sm text-gray-700 dark:text-gray-300"
+                >
                   {comp.description} {models[i] ? `(${models[i].baseSize})` : null}
                 </li>
               ))}
@@ -86,9 +91,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
           <Grid>
             {sortedAbilities.map((ability) => (
               <Card key={ability.id} className="p-4 h-full">
-                <h5 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  {ability.name}
-                </h5>
+                <h5 className="font-semibold text-gray-900 dark:text-white mb-2">{ability.name}</h5>
                 <div
                   className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: ability.description }}
@@ -116,7 +119,9 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
       {/* Faction Keywords */}
       {groupedKeywords.faction.length > 0 && (
         <div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Faction Keywords</h4>
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            Faction Keywords
+          </h4>
           <TagGroup>
             {groupedKeywords.faction.map((keyword, i) => (
               <Tag key={`faction-keyword-${i}`} variant="primary" size="sm">

@@ -1,6 +1,14 @@
 import React from 'react';
 import { depot } from 'depot-core';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, tableStyles } from '@/components/ui/table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  tableStyles
+} from '@/components/ui/table';
 
 interface WargearTableProps {
   wargear: depot.Wargear[];
@@ -14,22 +22,14 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, type }) => {
 
   return (
     <div>
-      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-        {type} Wargear
-      </h4>
+      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{type} Wargear</h4>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className={tableStyles.noWrap}>
-              {type} Wargear
-            </TableHead>
-            {isRanged && (
-              <TableHead className={tableStyles.center}>Range</TableHead>
-            )}
+            <TableHead className={tableStyles.noWrap}>{type} Wargear</TableHead>
+            {isRanged && <TableHead className={tableStyles.center}>Range</TableHead>}
             <TableHead className={tableStyles.center}>A</TableHead>
-            <TableHead className={tableStyles.center}>
-              {isRanged ? 'BS' : 'WS'}
-            </TableHead>
+            <TableHead className={tableStyles.center}>{isRanged ? 'BS' : 'WS'}</TableHead>
             <TableHead className={tableStyles.center}>S</TableHead>
             <TableHead className={tableStyles.center}>AP</TableHead>
             <TableHead className={tableStyles.center}>D</TableHead>

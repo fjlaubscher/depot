@@ -99,9 +99,7 @@ const mockFaction: depot.Faction = {
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <BrowserRouter>
     <ToastProvider>
-      <LayoutProvider>
-        {children}
-      </LayoutProvider>
+      <LayoutProvider>{children}</LayoutProvider>
     </ToastProvider>
   </BrowserRouter>
 );

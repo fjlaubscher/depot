@@ -63,11 +63,17 @@ const Faction: React.FC = () => {
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
-
   // Error State Component
   if (error) {
     return (
-      <Layout title="Error" home={<Link to="/"><FaArrowLeft /></Link>}>
+      <Layout
+        title="Error"
+        home={
+          <Link to="/">
+            <FaArrowLeft />
+          </Link>
+        }
+      >
         <div className="text-center py-12">
           <p className="text-red-600 dark:text-red-400">Failed to load faction: {error}</p>
         </div>
@@ -80,7 +86,11 @@ const Faction: React.FC = () => {
     <Layout
       title="Faction"
       isLoading={loading}
-      home={<Link to="/"><FaArrowLeft /></Link>}
+      home={
+        <Link to="/">
+          <FaArrowLeft />
+        </Link>
+      }
       action={
         faction && (
           <IconButton

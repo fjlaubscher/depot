@@ -38,4 +38,3 @@ export const groupDatasheetsByRole = (datasheets: depot.Datasheet[]) => {
 
   return dictionary;
 };
-

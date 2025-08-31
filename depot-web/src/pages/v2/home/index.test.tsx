@@ -82,9 +82,7 @@ const mockFactions: depot.Index[] = [
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <BrowserRouter>
-    <LayoutProvider>
-      {children}
-    </LayoutProvider>
+    <LayoutProvider>{children}</LayoutProvider>
   </BrowserRouter>
 );
 

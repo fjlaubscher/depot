@@ -39,14 +39,16 @@ const DatasheetPage: React.FC = () => {
     // @ts-ignore - Web Share API types not available in TypeScript lib
     if (navigator.share) {
       // @ts-ignore - Web Share API types not available in TypeScript lib
-      navigator.share({
-        title: datasheet?.name || 'Datasheet',
-        url: url
-      }).catch(() => {
-        // Fallback to clipboard
-        navigator.clipboard.writeText(url);
-        showToast('Link copied to clipboard', 'info');
-      });
+      navigator
+        .share({
+          title: datasheet?.name || 'Datasheet',
+          url: url
+        })
+        .catch(() => {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(url);
+          showToast('Link copied to clipboard', 'info');
+        });
     } else {
       navigator.clipboard.writeText(url);
       showToast('Link copied to clipboard', 'info');
@@ -59,7 +61,7 @@ const DatasheetPage: React.FC = () => {
 
   if (error) {
     return (
-      <Layout 
+      <Layout
         title="Error"
         home={
           <IconButton onClick={handleBackClick} aria-label="Back to faction">
@@ -76,8 +78,8 @@ const DatasheetPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout 
-        title="Datasheet" 
+      <Layout
+        title="Datasheet"
         isLoading={true}
         home={
           <IconButton onClick={handleBackClick} aria-label="Back to faction">
@@ -99,7 +101,7 @@ const DatasheetPage: React.FC = () => {
 
   if (!datasheet) {
     return (
-      <Layout 
+      <Layout
         title="Not Found"
         home={
           <IconButton onClick={handleBackClick} aria-label="Back to faction">
@@ -115,7 +117,7 @@ const DatasheetPage: React.FC = () => {
   }
 
   return (
-    <Layout 
+    <Layout
       title="Datasheet"
       home={
         <IconButton onClick={handleBackClick} aria-label="Back to faction">
@@ -123,16 +125,11 @@ const DatasheetPage: React.FC = () => {
         </IconButton>
       }
       action={
-        <IconButton
-          onClick={handleShare}
-          aria-label="Share datasheet"
-          className="ml-2"
-        >
+        <IconButton onClick={handleShare} aria-label="Share datasheet" className="ml-2">
           <FaShare />
         </IconButton>
       }
     >
-
       {/* Header with Stats */}
       <div className="flex justify-between items-start mb-6" data-testid="datasheet-header">
         <Stat

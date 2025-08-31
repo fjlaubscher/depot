@@ -9,10 +9,7 @@ const Table: React.FC<React.TableHTMLAttributes<HTMLTableElement>> = ({
 }) => (
   <div className="overflow-x-auto">
     <table
-      className={classNames(
-        'min-w-full divide-y divide-gray-200 dark:divide-gray-700',
-        className
-      )}
+      className={classNames('min-w-full divide-y divide-gray-200 dark:divide-gray-700', className)}
       {...props}
     >
       {children}
@@ -25,10 +22,7 @@ const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
   children,
   ...props
 }) => (
-  <thead
-    className={classNames('bg-gray-50 dark:bg-gray-800', className)}
-    {...props}
-  >
+  <thead className={classNames('bg-gray-50 dark:bg-gray-800', className)} {...props}>
     {children}
   </thead>
 );
@@ -54,10 +48,7 @@ const TableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({
   children,
   ...props
 }) => (
-  <tr
-    className={classNames('hover:bg-gray-50 dark:hover:bg-gray-800', className)}
-    {...props}
-  >
+  <tr className={classNames('hover:bg-gray-50 dark:hover:bg-gray-800', className)} {...props}>
     {children}
   </tr>
 );
@@ -85,10 +76,7 @@ const TableCell: React.FC<React.TdHTMLAttributes<HTMLTableDataCellElement>> = ({
   ...props
 }) => (
   <td
-    className={classNames(
-      'px-3 py-4 text-sm text-gray-900 dark:text-gray-100',
-      className
-    )}
+    className={classNames('px-3 py-4 text-sm text-gray-900 dark:text-gray-100', className)}
     {...props}
   >
     {children}
@@ -104,13 +92,6 @@ export const tableStyles = {
   numeric: 'font-mono tabular-nums'
 };
 
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell
-};
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell };
 
 export default Table;

@@ -32,12 +32,7 @@ const Tag: React.FC<TagProps> = ({
 
   return (
     <span
-      className={classNames(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
+      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
       {...props}
     >
       {children}
@@ -49,12 +44,7 @@ interface TagGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   spacing?: 'sm' | 'md' | 'lg';
 }
 
-const TagGroup: React.FC<TagGroupProps> = ({
-  spacing = 'md',
-  className,
-  children,
-  ...props
-}) => {
+const TagGroup: React.FC<TagGroupProps> = ({ spacing = 'md', className, children, ...props }) => {
   const spacingClasses = {
     sm: 'gap-1',
     md: 'gap-2',
@@ -63,11 +53,7 @@ const TagGroup: React.FC<TagGroupProps> = ({
 
   return (
     <div
-      className={classNames(
-        'flex flex-wrap items-center',
-        spacingClasses[spacing],
-        className
-      )}
+      className={classNames('flex flex-wrap items-center', spacingClasses[spacing], className)}
       {...props}
     >
       {children}

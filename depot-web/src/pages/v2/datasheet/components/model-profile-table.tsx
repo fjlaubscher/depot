@@ -1,6 +1,14 @@
 import React from 'react';
 import { depot } from 'depot-core';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, tableStyles } from '@/components/ui/table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  tableStyles
+} from '@/components/ui/table';
 
 interface ModelProfileTableProps {
   models: depot.Model[];
@@ -27,9 +35,7 @@ const ModelProfileTable: React.FC<ModelProfileTableProps> = ({ models }) => {
         <TableBody>
           {models.map((model) => (
             <TableRow key={model.line}>
-              <TableCell className={`${tableStyles.noWrap} font-medium`}>
-                {model.name}
-              </TableCell>
+              <TableCell className={`${tableStyles.noWrap} font-medium`}>{model.name}</TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
                 {model.m}"
               </TableCell>

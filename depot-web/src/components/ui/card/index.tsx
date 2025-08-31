@@ -15,7 +15,8 @@ const Card: React.FC<CardProps> = ({
   children,
   ...props
 }) => {
-  const baseClasses = 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-shadow duration-200';
+  const baseClasses =
+    'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-shadow duration-200';
 
   const variantClasses = {
     default: 'shadow-sm',

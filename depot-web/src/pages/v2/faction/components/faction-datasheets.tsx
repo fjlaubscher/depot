@@ -24,13 +24,13 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   const [settings] = useLocalStorage<depot.Settings>('settings');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
-  
+
   // Generate role options from actual datasheets
   const roleOptions = useMemo(() => {
-    const roles = [...new Set(datasheets.map(ds => ds.role))].sort();
-    return roles.map(role => role.toUpperCase());
+    const roles = [...new Set(datasheets.map((ds) => ds.role))].sort();
+    return roles.map((role) => role.toUpperCase());
   }, [datasheets]);
-  
+
   const { value, description: role, onChange, options } = useSelect(roleOptions);
 
   const groupedDatasheets = useMemo(() => {
@@ -42,9 +42,10 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
       ? filteredDatasheets
       : filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
 
-    filteredDatasheets = role && value !== 0
-      ? filteredDatasheets.filter((ds) => ds.role.toUpperCase() === role)
-      : filteredDatasheets;
+    filteredDatasheets =
+      role && value !== 0
+        ? filteredDatasheets.filter((ds) => ds.role.toUpperCase() === role)
+        : filteredDatasheets;
 
     filteredDatasheets = debouncedQuery
       ? filteredDatasheets.filter((ds) =>
@@ -78,14 +79,13 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
         groupedDatasheets[key].length ? (
           <div key={key} className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">{key}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">
+                {key}
+              </h2>
             </div>
             <Grid>
               {groupedDatasheets[key].map((ds) => (
-                <LinkCard
-                  key={ds.id}
-                  to={`/v2/faction/${ds.factionId}/datasheet/${ds.id}`}
-                >
+                <LinkCard key={ds.id} to={`/v2/faction/${ds.factionId}/datasheet/${ds.id}`}>
                   {ds.name}
                 </LinkCard>
               ))}

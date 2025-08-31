@@ -29,7 +29,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
         </div>
       )}
 
-      <div 
+      <div
         className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
         dangerouslySetInnerHTML={{ __html: stratagem.description }}
       />
