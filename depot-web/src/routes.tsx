@@ -8,12 +8,22 @@ import Settings from './pages/settings';
 
 import NotFound from './pages/not-found';
 
+// v2 routes (Phase 2 rebuilt components)
+import HomeNew from './pages/home-new';
+
 const AppRoutes = () => (
   <Routes>
+    {/* Legacy routes */}
     <Route path="/" element={<Home />} />
     <Route path="/faction/:id" element={<Faction />} />
     <Route path="/faction/:factionId/datasheet/:id" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
+    
+    {/* V2 routes - Phase 2 rebuilt components */}
+    <Route path="/v2" element={<HomeNew />} />
+    <Route path="/v2/home" element={<HomeNew />} />
+    
+    {/* Catch all */}
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
