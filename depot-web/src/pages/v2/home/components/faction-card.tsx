@@ -7,7 +7,7 @@ interface FactionCardProps {
 }
 
 const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
-  return <LinkCard to={`/faction/${faction.id}`}>{faction.name}</LinkCard>;
+  return <LinkCard to={`/v2/faction/${faction.id}`}>{faction.name}</LinkCard>;
 };
 
 export default FactionCard;
