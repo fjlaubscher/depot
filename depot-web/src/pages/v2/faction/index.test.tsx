@@ -7,7 +7,7 @@ import { depot } from 'depot-core';
 import Faction from './index';
 
 // Mock dependencies
-vi.mock('@/hooks/v2/use-faction');
+vi.mock('@/hooks/use-faction');
 vi.mock('@/hooks/use-local-storage');
 vi.mock('@/contexts/toast/use-toast-context');
 vi.mock('@/utils/faction', () => ({
@@ -133,7 +133,7 @@ describe('Faction Page', () => {
     });
 
     // Apply mocks
-    const useFactionMock = await import('@/hooks/v2/use-faction');
+    const useFactionMock = await import('@/hooks/use-faction');
     vi.mocked(useFactionMock.default).mockImplementation(mockUseFaction);
 
     const useLocalStorageMock = await import('@/hooks/use-local-storage');

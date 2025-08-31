@@ -1,6 +1,7 @@
 import React from 'react';
 import { depot } from 'depot-core';
 import Card from '@/components/ui/card';
+import Tag from '@/components/ui/tag';
 
 interface EnhancementCardProps {
   enhancement: depot.Enhancement;
@@ -15,14 +16,14 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
         </h3>
         <div className="flex flex-col gap-1">
           {enhancement.cost && (
-            <span className="flex-shrink-0 inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            <Tag variant="success" size="sm">
               {enhancement.cost} pts
-            </span>
+            </Tag>
           )}
           {enhancement.detachment && (
-            <span className="flex-shrink-0 inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            <Tag variant="secondary" size="sm">
               {enhancement.detachment}
-            </span>
+            </Tag>
           )}
         </div>
       </div>

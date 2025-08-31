@@ -1,6 +1,7 @@
 import React from 'react';
 import { depot } from 'depot-core';
 import Card from '@/components/ui/card';
+import Tag from '@/components/ui/tag';
 
 interface DetachmentAbilityCardProps {
   ability: depot.DetachmentAbility;
@@ -14,9 +15,9 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
           {ability.name}
         </h3>
         {ability.detachment && (
-          <span className="flex-shrink-0 inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+          <Tag variant="secondary" size="sm">
             {ability.detachment}
-          </span>
+          </Tag>
         )}
       </div>
 

@@ -134,10 +134,10 @@ When migrating from Recoil to Context, create versioned hooks in organized direc
 // Old Recoil-based hook
 hooks/use-faction.ts
 
-// New Context-based hook  
-hooks/v2/use-faction.ts
+// Context-based hook (replaced legacy hook)
+hooks/use-faction.ts
 
-// Benefits: Side-by-side comparison, gradual migration, clear versioning
+// Benefits: Complete migration from Recoil, unified caching, consistent state handling
 ```
 
 ### Utility Function Extraction for Complex Logic

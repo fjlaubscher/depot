@@ -1,6 +1,7 @@
 import React from 'react';
 import { depot } from 'depot-core';
 import Card from '@/components/ui/card';
+import Tag from '@/components/ui/tag';
 
 interface StratagemCardProps {
   stratagem: depot.Stratagem;
@@ -13,9 +14,9 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
         <h3 className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight">
           {stratagem.name.toLowerCase()}
         </h3>
-        <span className="flex-shrink-0 inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+        <Tag variant="primary" size="sm">
           {stratagem.cpCost}CP
-        </span>
+        </Tag>
       </div>
 
       <div className="text-xs text-gray-600 dark:text-gray-300 font-medium uppercase tracking-wide">

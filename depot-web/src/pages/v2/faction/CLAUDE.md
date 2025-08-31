@@ -62,7 +62,7 @@ const Faction: React.FC = () => {
 
 ## Context Migration Pattern
 
-### V2 Hook Creation (`hooks/v2/use-faction.ts`)
+### Context-Based Hook (`hooks/use-faction.ts`)
 ```typescript
 const useFaction = (factionId?: string): UseFactionReturn => {
   const { state, loadFaction } = useAppContext();
@@ -81,10 +81,10 @@ const useFaction = (factionId?: string): UseFactionReturn => {
 };
 ```
 
-**Benefits of V2 Hook Pattern:**
-- Side-by-side comparison with legacy Recoil hook
-- Gradual migration path without breaking existing code
-- Clear versioning and organization
+**Benefits of Context-Based Hook Pattern:**
+- Complete migration from legacy Recoil state management
+- Unified faction data loading and caching
+- Consistent error and loading state handling
 - Easy rollback if issues arise
 
 ## Utility Function Extraction

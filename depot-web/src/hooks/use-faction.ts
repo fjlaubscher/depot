@@ -1,35 +1,34 @@
 import { useEffect } from 'react';
-import { useAsync, useAsyncFn } from 'react-use';
 import { depot } from 'depot-core';
+import { useAppContext } from '@/contexts/app/use-app-context';
 
-// indexedDB
-import { createFaction, getFaction } from '../data/indexed-db';
+interface UseFactionReturn {
+  data: depot.Faction | undefined;
+  loading: boolean;
+  error: string | null;
+}
 
-const useFaction = (factionId?: string): { data: depot.Faction | undefined; loading: boolean } => {
-  const { value: offlineData, loading: reading } = useAsync(
-    () => getFaction(factionId),
-    [factionId]
-  );
-  const [{ value: fetchedData, loading: fetching }, fetchFaction] = useAsyncFn(async () => {
-    const response = await fetch(`/data/${factionId}.json`);
-    const data = await response.json();
-
-    if (data) {
-      await createFaction(data);
-    }
-
-    return data as depot.Faction | undefined;
-  }, [factionId]);
+const useFaction = (factionId?: string): UseFactionReturn => {
+  const { state, loadFaction } = useAppContext();
 
   useEffect(() => {
-    if (!reading && !offlineData && !fetching && !fetchedData) {
-      fetchFaction();
+    if (factionId && !state.factionCache[factionId]) {
+      loadFaction(factionId);
     }
-  }, [reading, offlineData, fetching, fetchedData]);
+  }, [factionId, loadFaction, state.factionCache]);
+
+  if (!factionId) {
+    return {
+      data: undefined,
+      loading: false,
+      error: null
+    };
+  }
 
   return {
-    data: offlineData || fetchedData,
-    loading: reading || fetching
+    data: state.factionCache[factionId],
+    loading: state.loading,
+    error: state.error
   };
 };
 

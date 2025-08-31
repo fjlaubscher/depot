@@ -6,7 +6,7 @@ import Grid from '@/components/ui/grid';
 import SelectField from '@/components/ui/select-field';
 import Search from '@/components/ui/search';
 import Filters from '@/components/ui/filters';
-import StratagemCard from './stratagem-card';
+import StratagemCard from '@/components/shared/stratagem-card';
 
 // Hooks
 import useDebounce from '@/hooks/use-debounce';

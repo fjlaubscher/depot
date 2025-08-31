@@ -9,7 +9,7 @@ import Stat from '@/components/ui/stat';
 import Tabs from '@/components/ui/tabs';
 
 // Hooks
-import useFaction from '@/hooks/v2/use-faction';
+import useFaction from '@/hooks/use-faction';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
