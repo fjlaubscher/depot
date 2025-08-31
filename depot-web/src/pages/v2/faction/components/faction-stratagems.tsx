@@ -35,8 +35,11 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
   const { description: type, value, onChange, options } = useSelect(stratagemTypes);
 
   const filteredStratagems = useMemo(() => {
-    if (type || debouncedQuery) {
-      const filteredByType = stratagems.filter((s) => (type ? s.type === type : true));
+    // Only apply type filter if not "All" (value !== 0)
+    const typeFilter = value !== 0 ? type : undefined;
+    
+    if (typeFilter || debouncedQuery) {
+      const filteredByType = stratagems.filter((s) => (typeFilter ? s.type === typeFilter : true));
       const filteredByName = filteredByType.filter((s) =>
         debouncedQuery ? s.name.toLowerCase().includes(debouncedQuery.toLowerCase()) : true
       );
@@ -44,12 +47,12 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
     }
 
     return sortByName(stratagems) as depot.Stratagem[];
-  }, [stratagems, debouncedQuery, type]);
+  }, [stratagems, debouncedQuery, type, value]);
 
   return (
     <div className="space-y-6">
       <Filters
-        showClear={!!type || !!query}
+        showClear={value !== 0 || !!query}
         onClear={() => {
           setQuery('');
           onChange(0);

@@ -61,6 +61,7 @@ const Faction: React.FC = () => {
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
+
   // Error State Component
   if (error) {
     return (

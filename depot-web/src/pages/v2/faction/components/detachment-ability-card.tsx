@@ -21,14 +21,15 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
       </div>
 
       {ability.legend && (
-        <div className="text-sm text-gray-700 dark:text-gray-300 font-medium italic">
+        <div className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
           {ability.legend}
         </div>
       )}
 
-      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-        {ability.description}
-      </div>
+      <div 
+        className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: ability.description }}
+      />
     </Card>
   );
 };

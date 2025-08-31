@@ -30,13 +30,13 @@ const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, chil
   return (
     <div className={classNames('w-full', className)}>
       <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex space-x-8" aria-label="Tabs">
+        <nav className="flex space-x-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (
             <button
               key={`tab-${index}`}
               onClick={() => handleTabClick(index)}
               className={classNames(
-                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
+                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0',
                 {
                   'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400':
                     activeTab === index,

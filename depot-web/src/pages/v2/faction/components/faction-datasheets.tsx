@@ -14,7 +14,7 @@ import useSelect from '@/hooks/use-select';
 import useLocalStorage from '@/hooks/use-local-storage';
 
 // Utils
-import { groupDatasheetsByRole, ROLES } from '@/utils/datasheet';
+import { groupDatasheetsByRole } from '@/utils/datasheet';
 
 interface FactionDatasheetsProps {
   datasheets: depot.Datasheet[];
@@ -24,7 +24,14 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   const [settings] = useLocalStorage<depot.Settings>('settings');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
-  const { value, description: role, onChange, options } = useSelect(ROLES);
+  
+  // Generate role options from actual datasheets
+  const roleOptions = useMemo(() => {
+    const roles = [...new Set(datasheets.map(ds => ds.role))].sort();
+    return roles.map(role => role.toUpperCase());
+  }, [datasheets]);
+  
+  const { value, description: role, onChange, options } = useSelect(roleOptions);
 
   const groupedDatasheets = useMemo(() => {
     let filteredDatasheets = settings?.showLegends
@@ -35,8 +42,8 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
       ? filteredDatasheets
       : filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
 
-    filteredDatasheets = role
-      ? filteredDatasheets.filter((ds) => ds.role === role)
+    filteredDatasheets = role && value !== 0
+      ? filteredDatasheets.filter((ds) => ds.role.toUpperCase() === role)
       : filteredDatasheets;
 
     filteredDatasheets = debouncedQuery
@@ -46,12 +53,12 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
       : filteredDatasheets;
 
     return groupDatasheetsByRole(filteredDatasheets);
-  }, [datasheets, debouncedQuery, role, settings]);
+  }, [datasheets, debouncedQuery, role, value, settings]);
 
   return (
     <div className="space-y-6">
       <Filters
-        showClear={!!role || !!query}
+        showClear={value !== 0 || !!query}
         onClear={() => {
           setQuery('');
           onChange(0);
@@ -71,15 +78,16 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
         groupedDatasheets[key].length ? (
           <div key={key} className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{key}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">{key}</h2>
             </div>
             <Grid>
               {groupedDatasheets[key].map((ds) => (
                 <LinkCard
                   key={ds.id}
                   to={`/v2/faction/${ds.factionId}/datasheet/${ds.id}`}
-                  title={ds.name}
-                />
+                >
+                  {ds.name}
+                </LinkCard>
               ))}
             </Grid>
           </div>

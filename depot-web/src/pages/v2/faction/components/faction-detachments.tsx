@@ -36,13 +36,15 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
   const { description: detachment, value, onChange, options } = useSelect(detachmentTypes);
 
   const groupedDetachmentAbilities = useMemo(() => {
+    // Only pass detachment if it's not "All" (value !== 0)
+    const detachmentFilter = value !== 0 ? detachment : undefined;
     const filteredAbilities = filterDetachmentAbilities(
       detachmentAbilities,
       debouncedQuery,
-      detachment
+      detachmentFilter
     );
     return groupDetachmentAbilitiesByDetachment(filteredAbilities);
-  }, [detachmentAbilities, debouncedQuery, detachment]);
+  }, [detachmentAbilities, debouncedQuery, detachment, value]);
 
   const isEmpty = useMemo(
     () => isGroupedDataEmpty(groupedDetachmentAbilities),
@@ -52,7 +54,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
   return (
     <div className="space-y-6">
       <Filters
-        showClear={!!detachment || !!query}
+        showClear={value !== 0 || !!query}
         onClear={() => {
           setQuery('');
           onChange(0);
@@ -72,7 +74,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
         groupedDetachmentAbilities[key].length > 0 ? (
           <div key={key} className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{key}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">{key}</h2>
             </div>
             <Grid>
               {groupedDetachmentAbilities[key].map((ability) => (

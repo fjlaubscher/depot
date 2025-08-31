@@ -28,17 +28,20 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
-  const detachmentTypes = useMemo(
-    () => getUniqueEnhancementDetachmentTypes(enhancements),
-    [enhancements]
-  );
+  const detachmentTypes = useMemo(() => {
+    const types = getUniqueEnhancementDetachmentTypes(enhancements);
+    return types;
+  }, [enhancements]);
 
   const { description: detachment, value, onChange, options } = useSelect(detachmentTypes);
 
   const groupedEnhancements = useMemo(() => {
-    const filteredEnhancements = filterEnhancements(enhancements, debouncedQuery, detachment);
-    return groupEnhancementsByDetachment(filteredEnhancements);
-  }, [enhancements, debouncedQuery, detachment]);
+    // Only pass detachment if it's not "All" (value !== 0)
+    const detachmentFilter = value !== 0 ? detachment : undefined;
+    const filteredEnhancements = filterEnhancements(enhancements, debouncedQuery, detachmentFilter);
+    const grouped = groupEnhancementsByDetachment(filteredEnhancements);
+    return grouped;
+  }, [enhancements, debouncedQuery, detachment, value]);
 
   const isEmpty = useMemo(
     () => isEnhancementGroupedDataEmpty(groupedEnhancements),
@@ -48,7 +51,7 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
   return (
     <div className="space-y-6">
       <Filters
-        showClear={!!detachment || !!query}
+        showClear={value !== 0 || !!query}
         onClear={() => {
           setQuery('');
           onChange(0);
@@ -68,7 +71,7 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
         groupedEnhancements[key].length > 0 ? (
           <div key={key} className="space-y-4">
             <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{key}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">{key}</h2>
             </div>
             <Grid>
               {groupedEnhancements[key].map((enhancement) => (

@@ -8,3 +8,9 @@
 }
 
 /* Custom styles will go here */
+
+/* Keyword spans from Wahapedia data */
+span.kwb,
+span.kwbu {
+  @apply text-blue-600 dark:text-blue-400 font-semibold;
+}

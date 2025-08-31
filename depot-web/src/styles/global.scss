@@ -19,7 +19,7 @@ table::-webkit-scrollbar-thumb {
   }
 }
 
-span.kwb {
-  color: var(--color-accent);
-  font-weight: bold;
+span.kwb,
+span.kwbu {
+  @apply text-blue-600 dark:text-blue-400 font-semibold;
 }
