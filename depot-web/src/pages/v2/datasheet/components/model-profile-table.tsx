@@ -37,19 +37,19 @@ const ModelProfileTable: React.FC<ModelProfileTableProps> = ({ models }) => {
             <TableRow key={model.line}>
               <TableCell className={`${tableStyles.noWrap} font-medium`}>{model.name}</TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
-                {model.m}"
+                {model.m}
               </TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
                 {model.t}
               </TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
-                {model.sv}+
+                {model.sv}
               </TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
                 {model.w}
               </TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
-                {model.ld}+
+                {model.ld}
               </TableCell>
               <TableCell className={`${tableStyles.center} ${tableStyles.numeric}`}>
                 {model.oc}
