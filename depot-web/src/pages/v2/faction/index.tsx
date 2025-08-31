@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { Link, useParams } from 'react-router-dom';
+import { FaArrowLeft, FaHeart, FaRegHeart } from 'react-icons/fa';
 
 // UI Components
 import Layout from '@/components/ui/layout';
@@ -27,7 +27,7 @@ import { depot } from 'depot-core';
 
 const Faction: React.FC = () => {
   const { id } = useParams();
-  const { addToast } = useToast();
+  const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(id);
 
   const [myFactions, setMyFactions] = useLocalStorage<depot.Option[]>('my-factions');
@@ -45,19 +45,21 @@ const Faction: React.FC = () => {
 
     if (myFactions && isMyFaction) {
       setMyFactions(myFactions.filter((f) => f.id !== id));
-      addToast({
+      showToast({
         type: 'success',
+        title: 'Removed from favourites',
         message: `${faction.name} removed from favourites.`
       });
     } else {
       const myFaction: depot.Option = { id: faction.id, name: faction.name };
       setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
-      addToast({
+      showToast({
         type: 'success',
+        title: 'Added to favourites',
         message: `${faction.name} added to favourites.`
       });
     }
-  }, [isMyFaction, faction, myFactions, setMyFactions, addToast, id]);
+  }, [isMyFaction, faction, myFactions, setMyFactions, showToast, id]);
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
@@ -65,7 +67,7 @@ const Faction: React.FC = () => {
   // Error State Component
   if (error) {
     return (
-      <Layout title="Error" showBackButton>
+      <Layout title="Error" home={<Link to="/"><FaArrowLeft /></Link>}>
         <div className="text-center py-12">
           <p className="text-red-600 dark:text-red-400">Failed to load faction: {error}</p>
         </div>
@@ -78,7 +80,7 @@ const Faction: React.FC = () => {
     <Layout
       title="Faction"
       isLoading={loading}
-      showBackButton
+      home={<Link to="/"><FaArrowLeft /></Link>}
       action={
         faction && (
           <IconButton

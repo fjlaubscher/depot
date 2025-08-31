@@ -12,7 +12,6 @@ import ShareButton from '../../components/button/share';
 import useFaction from '../../hooks/use-faction';
 
 // helpers
-import { parseDamageAndModels } from '../../utils/datasheet';
 
 import DatasheetProfile from './profile';
 import DatasheetStratagems from './stratagems';

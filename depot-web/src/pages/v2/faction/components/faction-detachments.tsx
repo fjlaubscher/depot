@@ -52,7 +52,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="faction-detachments">
       <Filters
         showClear={value !== 0 || !!query}
         onClear={() => {

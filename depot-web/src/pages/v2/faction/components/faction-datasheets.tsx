@@ -56,7 +56,7 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   }, [datasheets, debouncedQuery, role, value, settings]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="faction-datasheets">
       <Filters
         showClear={value !== 0 || !!query}
         onClear={() => {

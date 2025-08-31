@@ -50,7 +50,7 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
   }, [stratagems, debouncedQuery, type, value]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="faction-stratagems">
       <Filters
         showClear={value !== 0 || !!query}
         onClear={() => {

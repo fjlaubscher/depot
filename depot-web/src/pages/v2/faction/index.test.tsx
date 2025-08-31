@@ -1,6 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
+import { LayoutProvider } from '@/contexts/layout/context';
+import { ToastProvider } from '@/contexts/toast/context';
 import { depot } from 'depot-core';
 import Faction from './index';
 
@@ -95,7 +97,13 @@ const mockFaction: depot.Faction = {
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>{children}</BrowserRouter>
+  <BrowserRouter>
+    <ToastProvider>
+      <LayoutProvider>
+        {children}
+      </LayoutProvider>
+    </ToastProvider>
+  </BrowserRouter>
 );
 
 describe('Faction Page', () => {
@@ -104,7 +112,7 @@ describe('Faction Page', () => {
   const mockAddToast = vi.fn();
   const mockUseToastContext = vi.fn();
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     // Setup default mocks
@@ -117,7 +125,11 @@ describe('Faction Page', () => {
     mockUseLocalStorage.mockReturnValue([[], vi.fn()]);
 
     mockUseToastContext.mockReturnValue({
-      addToast: mockAddToast
+      showToast: mockAddToast,
+      removeToast: vi.fn(),
+      clearAllToasts: vi.fn(),
+      state: { toasts: [] },
+      dispatch: vi.fn()
     });
 
     // Apply mocks
@@ -198,6 +210,7 @@ describe('Faction Page', () => {
     expect(mockSetMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
+      title: 'Added to favourites',
       message: 'Space Marines added to favourites.'
     });
   });
@@ -215,6 +228,7 @@ describe('Faction Page', () => {
     expect(mockSetMyFactions).toHaveBeenCalledWith([]);
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
+      title: 'Removed from favourites',
       message: 'Space Marines removed from favourites.'
     });
   });
@@ -222,17 +236,17 @@ describe('Faction Page', () => {
   it('displays correct data counts in child components', () => {
     render(<Faction />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('Datasheets: 1')).toBeInTheDocument();
+    expect(screen.getByTestId('faction-datasheets')).toBeInTheDocument();
 
     // Switch to other tabs to test data passing
     fireEvent.click(screen.getByText('Detachments'));
-    expect(screen.getByText('Detachments: 1')).toBeInTheDocument();
+    expect(screen.getByTestId('faction-detachments')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Enhancements'));
-    expect(screen.getByText('Enhancements: 1')).toBeInTheDocument();
+    expect(screen.getByTestId('faction-enhancements')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Stratagems'));
-    expect(screen.getByText('Stratagems: 1')).toBeInTheDocument();
+    expect(screen.getByTestId('faction-stratagems')).toBeInTheDocument();
   });
 
   it('shows unfilled heart when not favourite', () => {

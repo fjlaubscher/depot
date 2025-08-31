@@ -49,7 +49,7 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="faction-enhancements">
       <Filters
         showClear={value !== 0 || !!query}
         onClear={() => {

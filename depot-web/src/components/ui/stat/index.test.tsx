@@ -42,7 +42,7 @@ describe('Stat Component', () => {
   it('applies custom className', () => {
     render(<Stat value="Test" className="custom-class" />);
 
-    const stat = screen.getByText('Test').closest('div');
+    const stat = screen.getByText('Test').parentElement;
     expect(stat).toHaveClass('custom-class');
   });
 
