@@ -13,9 +13,9 @@ The home page follows a comprehensive component breakdown strategy with focused,
 const HomeNew: React.FC = () => {
   const { state } = useAppContext();
   const [query, setQuery] = useState('');
-  
+
   // Extract complex logic to utils
-  const filteredFactions = useMemo(() => 
+  const filteredFactions = useMemo(() =>
     filterFactionsByQuery(state.factionIndex, debouncedQuery),
     [state.factionIndex, debouncedQuery]
   );
@@ -42,7 +42,7 @@ const HomeNew: React.FC = () => {
 - **ErrorState**: Displays error messages with user-friendly formatting
 - **NoResults**: Shows empty state when search yields no results
 
-### Content Components  
+### Content Components
 - **FavouritesTab**: Manages favourite factions display (conditional rendering)
 - **AllFactionsTab**: Handles search and faction browsing with conditional content
 - **FactionGrid**: Renders faction cards in responsive grid with loading skeletons
@@ -64,13 +64,13 @@ export interface GroupedFactions {
 ### Core Functions
 ```typescript
 export const filterFactionsByQuery = (
-  factions: depot.Index[] | null, 
+  factions: depot.Index[] | null,
   query: string
 ): depot.Index[] => {
   // Pure function for search filtering with null safety
   if (!factions) return [];
   if (!query) return factions;
-  
+
   return factions.filter(faction =>
     faction.name.toLowerCase().includes(query.toLowerCase())
   );
@@ -132,7 +132,7 @@ const LoadingSkeleton = () => (
 Tabs are dynamically created based on user state:
 
 ```typescript
-const tabLabels = useMemo(() => 
+const tabLabels = useMemo(() =>
   createTabLabels(hasFavourites(myFactions)),
   [myFactions]
 );
@@ -149,7 +149,7 @@ const validTabs = tabLabels.filter(tab => tab.trim() !== '');
    - Tab rendering and switching
    - Search functionality integration
 
-2. **Utility Function Tests** (`utils/faction.test.ts`)  
+2. **Utility Function Tests** (`utils/faction.test.ts`)
    - Pure function testing with various inputs
    - Edge cases (null, empty arrays)
    - Business logic validation
@@ -177,7 +177,7 @@ const debouncedQuery = useDebounce(query, 300);
 All expensive operations are memoized:
 
 ```typescript
-const filteredFactions = useMemo(() => 
+const filteredFactions = useMemo(() =>
   filterFactionsByQuery(state.factionIndex, debouncedQuery),
   [state.factionIndex, debouncedQuery]
 );
@@ -191,8 +191,8 @@ const groupedFactions = useMemo(() =>
 ## V2 Routing Integration
 
 The home page is accessible through multiple V2 routes for gradual migration:
-- `/v2` - Default V2 entry point
-- `/v2/home` - Explicit home page route
+- `/` - Default V2 entry point
+- `/home` - Explicit home page route
 
 This allows for safe rollout alongside the legacy home page at `/`.
 

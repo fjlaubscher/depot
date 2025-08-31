@@ -85,7 +85,7 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
             </div>
             <Grid>
               {groupedDatasheets[key].map((ds) => (
-                <LinkCard key={ds.id} to={`/v2/faction/${ds.factionId}/datasheet/${ds.id}`}>
+                <LinkCard key={ds.id} to={`/faction/${ds.factionId}/datasheet/${ds.id}`}>
                   {ds.name}
                 </LinkCard>
               ))}

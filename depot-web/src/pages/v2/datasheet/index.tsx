@@ -56,7 +56,7 @@ const DatasheetPage: React.FC = () => {
   };
 
   const handleBackClick = () => {
-    navigate(`/v2/faction/${factionId}`);
+    navigate(`/faction/${factionId}`);
   };
 
   if (error) {
