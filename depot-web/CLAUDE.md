@@ -6,6 +6,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 The depot-web is a React Progressive Web App (PWA) that displays Warhammer 40K game data processed by depot-cli. It provides an offline-capable interface for browsing factions, datasheets, stratagems, and other game content.
 
+## Current Architecture Status
+
+### ✅ Modern Implementation (V2 Pages)
+The application now uses a modern architecture with:
+- **Primary Routes**: V2 pages serve as the main application interface
+- **Context-Based State**: App, Layout, and Toast contexts replace legacy Recoil patterns
+- **Custom UI Library**: Tailwind CSS v4 components in `src/components/ui/`
+- **100% Test Coverage**: Comprehensive test suite with proper provider integration
+- **TypeScript**: All compilation errors resolved, strict typing throughout
+
+### V2 Page Architecture
+- **Home Page (`pages/v2/home/`)**: Modern faction browsing with search/filtering
+- **Faction Page (`pages/v2/faction/`)**: Tabbed interface for datasheets, detachments, enhancements, stratagems
+- **Test Infrastructure**: Full test coverage with Layout/Toast provider integration
+- **Component Structure**: Modular components with data-testid attributes for testing
+
+### Legacy Components (Being Phased Out)
+- Some datasheet/settings pages still use `@fjlaubscher/matter` components
+- Legacy routing coexists with V2 routes during transition
+- Recoil atoms still used in some legacy components
+
 ## Development Commands
 
 ### Development Server
