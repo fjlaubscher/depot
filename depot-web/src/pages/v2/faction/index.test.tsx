@@ -1,10 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
-import { LayoutProvider } from '@/contexts/layout/context';
-import { ToastProvider } from '@/contexts/toast/context';
 import { depot } from 'depot-core';
 import Faction from './index';
+import { TestWrapper } from '@/test/test-utils';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -95,14 +93,6 @@ const mockFaction: depot.Faction = {
   ]
 };
 
-// Test wrapper component
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>
-    <ToastProvider>
-      <LayoutProvider>{children}</LayoutProvider>
-    </ToastProvider>
-  </BrowserRouter>
-);
 
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();

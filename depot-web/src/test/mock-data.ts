@@ -52,6 +52,21 @@ export const mockDatasheet: depot.Datasheet = {
       oc: '1',
       baseSize: '32mm',
       baseSizeDescr: ''
+    },
+    {
+      datasheetId: 'SM_CAPTAIN',
+      line: '2',
+      name: 'Lieutenant',
+      m: '5"',
+      t: '4',
+      sv: '3+',
+      invSv: '',
+      invSvDescr: '',
+      w: '3',
+      ld: '7+',
+      oc: '1',
+      baseSize: '32mm',
+      baseSizeDescr: ''
     }
   ],
   wargear: [
@@ -73,7 +88,22 @@ export const mockDatasheet: depot.Datasheet = {
     {
       datasheetId: 'SM_CAPTAIN',
       line: '2',
-      lineInWargear: '1',
+      lineInWargear: '2',
+      dice: '',
+      name: 'Plasma gun',
+      type: 'Ranged',
+      range: '24',
+      a: '1',
+      bsWs: '3',
+      s: '7',
+      ap: '-2',
+      d: '1',
+      description: '[RAPID FIRE 1] When targeting this unit, weapons with this ability make 1 additional attack. You can re-roll one or more failed wound rolls when targeting this unit, but this weapon gets Hot on unmodified hit rolls of 1, after supercharge.'
+    },
+    {
+      datasheetId: 'SM_CAPTAIN',
+      line: '3',
+      lineInWargear: '3',
       dice: '',
       name: 'Power sword',
       type: 'Melee',
@@ -84,6 +114,21 @@ export const mockDatasheet: depot.Datasheet = {
       ap: '-2',
       d: '2',
       description: ''
+    },
+    {
+      datasheetId: 'SM_CAPTAIN',
+      line: '4',
+      lineInWargear: '4',
+      dice: '',
+      name: 'Thunder hammer',
+      type: 'Melee',
+      range: '',
+      a: '3',
+      bsWs: 'N/A',
+      s: '8',
+      ap: '-2',
+      d: '3',
+      description: '[DEVASTATING WOUNDS] Critical wounds from this weapon cannot be negated by saves or abilities.'
     }
   ],
   abilities: [

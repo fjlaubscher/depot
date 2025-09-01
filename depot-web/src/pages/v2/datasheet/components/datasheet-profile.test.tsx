@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { depot } from 'depot-core';
 import DatasheetProfile from './datasheet-profile';
 import { mockDatasheet, createMockDatasheet } from '@/test/mock-data';
+import { TestWrapper } from '@/test/test-utils';
 
 // Mock child components to focus on DatasheetProfile logic
 vi.mock('./model-profile-table', () => ({
@@ -22,23 +24,23 @@ vi.mock('@/utils/array', () => ({
 }));
 
 vi.mock('@/utils/keywords', () => ({
-  groupKeywords: (keywords: string[]) => ({
-    datasheet: keywords.filter((k) => !k.includes('IMPERIUM') && !k.includes('ADEPTUS ASTARTES')),
-    faction: keywords.filter((k) => k.includes('IMPERIUM') || k.includes('ADEPTUS ASTARTES'))
+  groupKeywords: (keywords: depot.Keyword[]) => ({
+    datasheet: keywords.filter((k) => k.isFactionKeyword !== 'true').map((k) => k.keyword),
+    faction: keywords.filter((k) => k.isFactionKeyword === 'true').map((k) => k.keyword)
   })
 }));
 
 describe('DatasheetProfile', () => {
   it('renders all sections with mock datasheet', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('datasheet-profile')).toBeInTheDocument();
     expect(screen.getByTestId('model-profile-table')).toBeInTheDocument();
-    expect(screen.getByText('Models: 1')).toBeInTheDocument();
+    expect(screen.getByText('Models: 2')).toBeInTheDocument();
   });
 
   it('renders wargear tables for ranged and melee weapons', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('wargear-table-ranged')).toBeInTheDocument();
     expect(screen.getByText('Ranged Wargear Table')).toBeInTheDocument();
@@ -48,7 +50,7 @@ describe('DatasheetProfile', () => {
   });
 
   it('renders unit composition section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     const unitComposition = screen.getByTestId('unit-composition');
     expect(unitComposition).toBeInTheDocument();
@@ -57,7 +59,7 @@ describe('DatasheetProfile', () => {
   });
 
   it('renders unit options section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     const unitOptions = screen.getByTestId('unit-options');
     expect(unitOptions).toBeInTheDocument();
@@ -66,7 +68,7 @@ describe('DatasheetProfile', () => {
   });
 
   it('renders abilities section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     const abilities = screen.getByTestId('abilities');
     expect(abilities).toBeInTheDocument();
@@ -76,7 +78,7 @@ describe('DatasheetProfile', () => {
   });
 
   it('renders keywords sections', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />);
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     const keywords = screen.getByTestId('keywords');
     expect(keywords).toBeInTheDocument();
@@ -92,7 +94,7 @@ describe('DatasheetProfile', () => {
       unitComposition: []
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutComposition} />);
+    render(<DatasheetProfile datasheet={datasheetWithoutComposition} />, { wrapper: TestWrapper });
 
     expect(screen.queryByTestId('unit-composition')).not.toBeInTheDocument();
   });
@@ -102,7 +104,7 @@ describe('DatasheetProfile', () => {
       options: []
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutOptions} />);
+    render(<DatasheetProfile datasheet={datasheetWithoutOptions} />, { wrapper: TestWrapper });
 
     expect(screen.queryByTestId('unit-options')).not.toBeInTheDocument();
   });
@@ -112,7 +114,7 @@ describe('DatasheetProfile', () => {
       abilities: []
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutAbilities} />);
+    render(<DatasheetProfile datasheet={datasheetWithoutAbilities} />, { wrapper: TestWrapper });
 
     expect(screen.queryByTestId('abilities')).not.toBeInTheDocument();
   });
@@ -126,7 +128,7 @@ describe('DatasheetProfile', () => {
       ]
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithEmptyOptions} />);
+    render(<DatasheetProfile datasheet={datasheetWithEmptyOptions} />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Valid option')).toBeInTheDocument();
     expect(screen.getByText('Another valid option')).toBeInTheDocument();
@@ -169,7 +171,7 @@ describe('DatasheetProfile', () => {
       ]
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithMixedWargear} />);
+    render(<DatasheetProfile datasheet={datasheetWithMixedWargear} />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('wargear-table-ranged')).toBeInTheDocument();
     expect(screen.getByTestId('wargear-table-melee')).toBeInTheDocument();

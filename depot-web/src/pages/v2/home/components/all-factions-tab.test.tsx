@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import AllFactionsTab from './all-factions-tab';
 import { GroupedFactions } from '../utils/faction';
 import { depot } from 'depot-core';
+import { TestWrapper } from '@/test/test-utils';
 
 // Mock child components
 vi.mock('./alliance-section', () => ({
@@ -70,10 +70,6 @@ const defaultProps = {
   debouncedQuery: ''
 };
 
-// Wrapper component to provide router context
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>{children}</BrowserRouter>
-);
 
 describe('AllFactionsTab', () => {
   afterEach(() => {

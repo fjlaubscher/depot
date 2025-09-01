@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { LayoutProvider } from '@/contexts/layout/context';
 import HomeNew from './index';
 import { depot } from 'depot-core';
 import { AppContextType } from '@/contexts/app/types';
+import { TestWrapper } from '@/test/test-utils';
 
 // Mock the context with proper typing
 const mockAppContext: AppContextType = {
@@ -81,11 +80,6 @@ const mockFactions: depot.Index[] = [
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
 ];
 
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>
-    <LayoutProvider>{children}</LayoutProvider>
-  </BrowserRouter>
-);
 
 describe('HomeNew', () => {
   beforeEach(() => {
