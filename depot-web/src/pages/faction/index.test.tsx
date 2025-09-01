@@ -13,25 +13,25 @@ vi.mock('@/utils/faction', () => ({
 }));
 
 // Mock child components
-vi.mock('./components/FactionDatasheets', () => ({
+vi.mock('./components/faction-datasheets', () => ({
   default: ({ datasheets }: { datasheets: depot.Datasheet[] }) => (
     <div data-testid="faction-datasheets">Datasheets: {datasheets.length}</div>
   )
 }));
 
-vi.mock('./components/FactionStratagems', () => ({
+vi.mock('./components/faction-stratagems', () => ({
   default: ({ stratagems }: { stratagems: depot.Stratagem[] }) => (
     <div data-testid="faction-stratagems">Stratagems: {stratagems.length}</div>
   )
 }));
 
-vi.mock('./components/FactionDetachments', () => ({
+vi.mock('./components/faction-detachments', () => ({
   default: ({ detachmentAbilities }: { detachmentAbilities: depot.DetachmentAbility[] }) => (
     <div data-testid="faction-detachments">Detachments: {detachmentAbilities.length}</div>
   )
 }));
 
-vi.mock('./components/FactionEnhancements', () => ({
+vi.mock('./components/faction-enhancements', () => ({
   default: ({ enhancements }: { enhancements: depot.Enhancement[] }) => (
     <div data-testid="faction-enhancements">Enhancements: {enhancements.length}</div>
   )
