@@ -260,55 +260,9 @@ Structure tests by interaction patterns:
 - **Vitest Config**: Update `vite.config.ts` setupFiles to point to `./src/test-setup.ts`
 - **TypeScript**: Add test types to `tsconfig.json` types array: `["vitest/globals", "@testing-library/jest-dom"]`
 
-### Provider Integration in Tests
-All page components require proper provider setup in test wrappers:
-```typescript
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>
-    <ToastProvider>      {/* Required for pages using useToast */}
-      <LayoutProvider>   {/* Required for pages using Layout component */}
-        {children}
-      </LayoutProvider>
-    </ToastProvider>
-  </BrowserRouter>
-);
-```
-
-### Data-TestId Pattern  
-Add `data-testid` attributes to components for reliable testing:
-```typescript
-return (
-  <div className="space-y-6" data-testid="faction-datasheets">
-    {/* Component content */}
-  </div>
-);
-```
-
-### UserEvent Testing
-When testing user interactions with `@testing-library/user-event`:
-- `userEvent.type()` triggers onChange for each character individually
-- Test expectations should match actual behavior (individual characters, not full strings)
-- Use proper async/await patterns: `await user.type(input, 'text')`
-
-### Toast Context Testing
-Toast context requires complete mock implementation:
-```typescript
-mockUseToastContext.mockReturnValue({
-  showToast: mockShowToast,  // Not addToast!
-  removeToast: vi.fn(),
-  clearAllToasts: vi.fn(),
-  state: { toasts: [] },
-  dispatch: vi.fn()
-});
-```
-
-### Async Test Setup
-BeforeEach blocks that use `await` must be marked as async:
-```typescript
-beforeEach(async () => {  // async required for await
-  const hookMock = await import('@/hooks/use-something');
-  // ... setup
-});
-```
+### Testing
+- Use centralized utilities from `src/test/` for consistent test setup
+- Add `data-testid` attributes to components for reliable testing
+- See `src/test/CLAUDE.md` for comprehensive testing guidelines
 
 This pattern promotes maintainable, testable, and scalable page components that are easy to understand and modify.

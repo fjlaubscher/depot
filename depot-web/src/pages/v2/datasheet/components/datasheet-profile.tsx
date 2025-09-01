@@ -47,7 +47,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
 
       {/* Unit Composition */}
       {unitComposition.length > 0 && (
-        <div>
+        <div data-testid="unit-composition">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
             Unit Composition
           </h4>
@@ -68,7 +68,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
 
       {/* Unit Options */}
       {options.length > 0 && (
-        <div>
+        <div data-testid="unit-options">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Unit Options</h4>
           <Card className="p-4">
             <ul className="space-y-2">
@@ -86,7 +86,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
 
       {/* Abilities */}
       {sortedAbilities.length > 0 && (
-        <div>
+        <div data-testid="abilities">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Abilities</h4>
           <Grid>
             {sortedAbilities.map((ability) => (
@@ -104,7 +104,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
 
       {/* Keywords */}
       {groupedKeywords.datasheet.length > 0 && (
-        <div>
+        <div data-testid="keywords">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Keywords</h4>
           <TagGroup>
             {groupedKeywords.datasheet.map((keyword, i) => (
@@ -118,7 +118,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
 
       {/* Faction Keywords */}
       {groupedKeywords.faction.length > 0 && (
-        <div>
+        <div data-testid="faction-keywords">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
             Faction Keywords
           </h4>
