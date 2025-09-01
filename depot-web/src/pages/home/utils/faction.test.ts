@@ -3,7 +3,7 @@ import {
   filterFactionsByQuery,
   groupFactionsByAlliance,
   createTabLabels,
-  hasFavourites
+  hasMyFactions
 } from './faction';
 import { depot } from 'depot-core';
 
@@ -99,35 +99,35 @@ describe('faction utilities', () => {
   });
 
   describe('createTabLabels', () => {
-    it('should include Favourites when user has favourites', () => {
+    it('should include My Factions when user has factions', () => {
       const result = createTabLabels(true);
-      expect(result).toEqual(['Favourites', 'All Factions']);
+      expect(result).toEqual(['My Factions', 'All Factions']);
     });
 
-    it('should only show All Factions when user has no favourites', () => {
+    it('should only show All Factions when user has no factions', () => {
       const result = createTabLabels(false);
       expect(result).toEqual(['All Factions']);
     });
   });
 
-  describe('hasFavourites', () => {
-    it('should return true when favourites array has items', () => {
-      const result = hasFavourites([mockFactions[0]]);
+  describe('hasMyFactions', () => {
+    it('should return true when factions array has items', () => {
+      const result = hasMyFactions([mockFactions[0]]);
       expect(result).toBe(true);
     });
 
-    it('should return false when favourites array is empty', () => {
-      const result = hasFavourites([]);
+    it('should return false when factions array is empty', () => {
+      const result = hasMyFactions([]);
       expect(result).toBe(false);
     });
 
-    it('should return false when favourites is undefined', () => {
-      const result = hasFavourites(undefined);
+    it('should return false when factions is undefined', () => {
+      const result = hasMyFactions(undefined);
       expect(result).toBe(false);
     });
 
-    it('should return false when favourites is null', () => {
-      const result = hasFavourites(null as any);
+    it('should return false when factions is null', () => {
+      const result = hasMyFactions(null as any);
       expect(result).toBe(false);
     });
   });

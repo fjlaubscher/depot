@@ -53,10 +53,10 @@ vi.mock('./components/error-state', () => ({
   default: ({ error }: { error: string }) => <div data-testid="error-state">Error: {error}</div>
 }));
 
-vi.mock('./components/favourites-tab', () => ({
-  default: ({ favourites }: { favourites: depot.Index[] }) => (
-    <div data-testid="favourites-tab">
-      {favourites.map((f) => (
+vi.mock('./components/my-factions-tab', () => ({
+  default: ({ factions }: { factions: depot.Index[] }) => (
+    <div data-testid="my-factions-tab">
+      {factions.map((f) => (
         <div key={f.id}>{f.name}</div>
       ))}
     </div>
@@ -143,7 +143,7 @@ describe('HomeNew', () => {
     });
   });
 
-  describe('Success State - No Favourites', () => {
+  describe('Success State - No My Factions', () => {
     beforeEach(() => {
       mockAppContext.state.loading = false;
       mockAppContext.state.error = null;
@@ -151,7 +151,7 @@ describe('HomeNew', () => {
       mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
     });
 
-    it('should render only All Factions tab when no favourites', () => {
+    it('should render only All Factions tab when no my factions', () => {
       render(
         <TestWrapper>
           <HomeNew />
@@ -159,7 +159,7 @@ describe('HomeNew', () => {
       );
 
       expect(screen.getByText('All Factions')).toBeInTheDocument();
-      expect(screen.queryByText('Favourites')).not.toBeInTheDocument();
+      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
     });
 
     it('should render AllFactionsTab', () => {
@@ -184,7 +184,7 @@ describe('HomeNew', () => {
     });
   });
 
-  describe('Success State - With Favourites', () => {
+  describe('Success State - With My Factions', () => {
     beforeEach(() => {
       mockAppContext.state.loading = false;
       mockAppContext.state.error = null;
@@ -192,25 +192,25 @@ describe('HomeNew', () => {
       mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
     });
 
-    it('should render both Favourites and All Factions tabs when favourites exist', () => {
+    it('should render both My Factions and All Factions tabs when my factions exist', () => {
       render(
         <TestWrapper>
           <HomeNew />
         </TestWrapper>
       );
 
-      expect(screen.getByText('Favourites')).toBeInTheDocument();
+      expect(screen.getByText('My Factions')).toBeInTheDocument();
       expect(screen.getByText('All Factions')).toBeInTheDocument();
     });
 
-    it('should render FavouritesTab when favourites exist', () => {
+    it('should render MyFactionsTab when favourites exist', () => {
       render(
         <TestWrapper>
           <HomeNew />
         </TestWrapper>
       );
 
-      expect(screen.getByTestId('favourites-tab')).toBeInTheDocument();
+      expect(screen.getByTestId('my-factions-tab')).toBeInTheDocument();
     });
   });
 
@@ -253,7 +253,7 @@ describe('HomeNew', () => {
       expect(searchInput).toHaveValue('space');
     });
 
-    it('should handle empty favourites array gracefully', () => {
+    it('should handle empty my factions array gracefully', () => {
       mockLocalStorage.mockReturnValue([[], vi.fn()]);
 
       render(
@@ -262,11 +262,11 @@ describe('HomeNew', () => {
         </TestWrapper>
       );
 
-      expect(screen.queryByText('Favourites')).not.toBeInTheDocument();
+      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
       expect(screen.getByText('All Factions')).toBeInTheDocument();
     });
 
-    it('should handle null favourites gracefully', () => {
+    it('should handle null my factions gracefully', () => {
       mockLocalStorage.mockReturnValue([null, vi.fn()]);
 
       render(
@@ -275,7 +275,7 @@ describe('HomeNew', () => {
         </TestWrapper>
       );
 
-      expect(screen.queryByText('Favourites')).not.toBeInTheDocument();
+      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
       expect(screen.getByText('All Factions')).toBeInTheDocument();
     });
   });
@@ -291,8 +291,8 @@ describe('HomeNew', () => {
         </TestWrapper>
       );
 
-      // Should start with Favourites tab (index 0)
-      expect(screen.getByTestId('favourites-tab')).toBeInTheDocument();
+      // Should start with My Factions tab (index 0)
+      expect(screen.getByTestId('my-factions-tab')).toBeInTheDocument();
 
       // Click on All Factions tab
       const allFactionsTab = screen.getByText('All Factions');

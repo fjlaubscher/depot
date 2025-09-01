@@ -14,7 +14,7 @@ import Tabs from '@/components/ui/tabs';
 // Page components
 import LoadingSkeleton from './components/loading-skeleton';
 import ErrorState from './components/error-state';
-import FavouritesTab from './components/favourites-tab';
+import MyFactionsTab from './components/my-factions-tab';
 import AllFactionsTab from './components/all-factions-tab';
 
 // Utilities
@@ -22,19 +22,19 @@ import {
   filterFactionsByQuery,
   groupFactionsByAlliance,
   createTabLabels,
-  hasFavourites
+  hasMyFactions
 } from './utils/faction';
 
 // Custom hooks
 import useDebounce from '@/hooks/use-debounce';
 import useLocalStorage from '@/hooks/use-local-storage';
 
-const HomeNew: React.FC = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useAppContext();
 
   const [myFactions] = useLocalStorage<depot.Index[]>('my-factions');
-  const hasMyFactions = hasFavourites(myFactions);
+  const hasFactions = hasMyFactions(myFactions);
 
   const [activeTab, setActiveTab] = useState(0);
   const [query, setQuery] = useState('');
@@ -58,7 +58,7 @@ const HomeNew: React.FC = () => {
     return <ErrorState error={state.error} />;
   }
 
-  const tabLabels = createTabLabels(hasMyFactions);
+  const tabLabels = createTabLabels(hasFactions);
 
   return (
     <Layout
@@ -70,7 +70,7 @@ const HomeNew: React.FC = () => {
       }
     >
       <Tabs tabs={tabLabels} active={activeTab} onChange={setActiveTab}>
-        {hasMyFactions && <FavouritesTab favourites={myFactions || []} />}
+        {hasFactions && <MyFactionsTab factions={myFactions || []} />}
 
         <AllFactionsTab
           groupedFactions={groupedFactions}
@@ -84,4 +84,4 @@ const HomeNew: React.FC = () => {
   );
 };
 
-export default HomeNew;
+export default Home;

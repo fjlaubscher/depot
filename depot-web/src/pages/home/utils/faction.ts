@@ -31,9 +31,9 @@ export const groupFactionsByAlliance = (factions: depot.Index[]): GroupedFaction
 };
 
 export const createTabLabels = (hasMyFactions: boolean): string[] => {
-  return [...(hasMyFactions ? ['Favourites'] : []), 'All Factions'];
+  return [...(hasMyFactions ? ['My Factions'] : []), 'All Factions'];
 };
 
-export const hasFavourites = (myFactions: depot.Index[] | undefined): boolean => {
+export const hasMyFactions = (myFactions: depot.Index[] | undefined): boolean => {
   return myFactions ? myFactions.length > 0 : false;
 };

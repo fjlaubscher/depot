@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FaArrowLeft, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaArrowLeft, FaStar, FaRegHeart } from 'react-icons/fa';
 
 // UI Components
 import Layout from '@/components/ui/layout';
@@ -47,16 +47,16 @@ const Faction: React.FC = () => {
       setMyFactions(myFactions.filter((f) => f.id !== id));
       showToast({
         type: 'success',
-        title: 'Removed from favourites',
-        message: `${faction.name} removed from favourites.`
+        title: 'Success',
+        message: `${faction.name} removed from My Factions.`
       });
     } else {
       const myFaction: depot.Option = { id: faction.id, name: faction.name };
       setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
       showToast({
         type: 'success',
-        title: 'Added to favourites',
-        message: `${faction.name} added to favourites.`
+        title: 'Success',
+        message: `${faction.name} added to My Factions.`
       });
     }
   }, [isMyFaction, faction, myFactions, setMyFactions, showToast, id]);
@@ -95,9 +95,9 @@ const Faction: React.FC = () => {
         faction && (
           <IconButton
             onClick={toggleMyFaction}
-            aria-label={isMyFaction ? 'Remove from favourites' : 'Add to favourites'}
+            aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
           >
-            {isMyFaction ? <FaHeart className="text-red-500" /> : <FaRegHeart />}
+            {isMyFaction ? <FaStar className="text-blue-500" /> : <FaStar />}
           </IconButton>
         )
       }

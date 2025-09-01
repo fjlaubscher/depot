@@ -191,14 +191,14 @@ describe('Faction Page', () => {
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const favouriteButton = screen.getByRole('button', { name: /add to favourites/i });
+    const favouriteButton = screen.getByRole('button', { name: /add to my factions/i });
     fireEvent.click(favouriteButton);
 
     expect(mockSetMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
-      title: 'Added to favourites',
-      message: 'Space Marines added to favourites.'
+      title: 'Success',
+      message: 'Space Marines added to My Factions.'
     });
   });
 
@@ -209,14 +209,14 @@ describe('Faction Page', () => {
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const favouriteButton = screen.getByRole('button', { name: /remove from favourites/i });
+    const favouriteButton = screen.getByRole('button', { name: /remove from my factions/i });
     fireEvent.click(favouriteButton);
 
     expect(mockSetMyFactions).toHaveBeenCalledWith([]);
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
-      title: 'Removed from favourites',
-      message: 'Space Marines removed from favourites.'
+      title: 'Success',
+      message: 'Space Marines removed from My Factions.'
     });
   });
 
@@ -236,21 +236,21 @@ describe('Faction Page', () => {
     expect(screen.getByTestId('faction-stratagems')).toBeInTheDocument();
   });
 
-  it('shows unfilled heart when not favourite', () => {
+  it('shows unfilled star when not my faction', () => {
     mockUseLocalStorage.mockReturnValue([[], vi.fn()]);
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const button = screen.getByRole('button', { name: /add to favourites/i });
+    const button = screen.getByRole('button', { name: /add to my factions/i });
     expect(button).toBeInTheDocument();
   });
 
-  it('shows filled heart when is favourite', () => {
+  it('shows filled star when is my faction', () => {
     mockUseLocalStorage.mockReturnValue([[{ id: 'SM', name: 'Space Marines' }], vi.fn()]);
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const button = screen.getByRole('button', { name: /remove from favourites/i });
+    const button = screen.getByRole('button', { name: /remove from my factions/i });
     expect(button).toBeInTheDocument();
   });
 });
