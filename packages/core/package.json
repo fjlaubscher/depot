@@ -1,0 +1,22 @@
+{
+  "name": "@depot/core",
+  "version": "1.0.0",
+  "description": "Shared core functionality and types for depot packages",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm run clean && pnpm run build"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "author": "Francois Laubscher",
+  "license": "MIT"
+}

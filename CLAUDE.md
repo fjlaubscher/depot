@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`depot` is a Warhammer 40,000 companion app powered by Wahapedia data. It's built as a monorepo using pnpm workspaces with two main components:
+`depot` is a Warhammer 40,000 companion app powered by Wahapedia data. It's built as a monorepo using pnpm workspaces with packages located in `packages/`:
 
-- **depot-cli**: Node.js CLI that fetches and processes Wahapedia CSV data into JSON format
-- **depot-web**: React PWA that displays the processed Warhammer 40K game data
+- **@depot/cli**: Node.js CLI that fetches and processes Wahapedia CSV data into JSON format
+- **@depot/core**: Shared types and utilities for the depot ecosystem  
+- **@depot/web**: React PWA that displays the processed Warhammer 40K game data
 
 ## Development Commands
 
@@ -19,13 +20,15 @@ pnpm install
 ### Data Generation
 Generate data from Wahapedia (run before starting web app):
 ```bash
-pnpm --filter depot-cli start
+pnpm --filter @depot/cli start
+# or shorthand
+pnpm cli
 ```
-This creates `wahapedia.json` in `depot-cli/dist/` - copy this to `depot-web/public/` for the web app.
+This creates `wahapedia.json` in `packages/cli/dist/` - copy this to `packages/web/public/` for the web app.
 
 To force re-download of source data (ignoring existing files):
 ```bash
-pnpm --filter depot-cli start -- --force-download
+pnpm --filter @depot/cli start -- --force-download
 ```
 
 ### Development Server
@@ -43,10 +46,10 @@ Builds both CLI and web components.
 ### Testing
 ```bash
 # Run tests for CLI
-pnpm --filter depot-cli test
+pnpm --filter @depot/cli test
 
 # Run tests for web
-pnpm --filter depot-web test
+pnpm --filter @depot/web test
 ```
 
 ### Code Quality
@@ -58,19 +61,19 @@ pnpm format
 pnpm lint
 
 # Lint web with TypeScript check
-pnpm --filter depot-web run lint
+pnpm --filter @depot/web run lint
 ```
 
 ## Architecture
 
-### depot-cli Architecture
-The CLI (`depot-cli/src/index.ts`) orchestrates data processing:
+### @depot/cli Architecture
+The CLI (`packages/cli/src/index.ts`) orchestrates data processing:
 1. Fetches CSV files from Wahapedia URLs
 2. Converts CSV to JSON using `convert-to-json.ts`
 3. Generates faction-specific data files using `generate-data.ts`
 4. Outputs structured JSON files for web consumption
 
-### depot-web Architecture
+### @depot/web Architecture
 The web app is a React SPA currently undergoing modernization (Phase 1 complete):
 
 #### Current Stack (Phase 1 - COMPLETE)
@@ -127,8 +130,9 @@ Shared TypeScript definitions in `types/depot.d.ts` define the complete Warhamme
 
 ## Workspace Structure
 - Root package.json manages pnpm workspaces and provides unified commands
-- Each workspace (depot-cli, depot-web) has independent dependencies and build processes
-- Shared type definitions ensure consistency between CLI output and web app consumption
+- Each package in `packages/` has independent dependencies and build processes
+- **@depot/core** provides shared type definitions ensuring consistency between CLI output and web app consumption
+- Modern scoped package naming (`@depot/cli`, `@depot/core`, `@depot/web`)
 
 ## Development Patterns & Best Practices
 
@@ -180,7 +184,7 @@ Custom components built with Tailwind CSS:
 - **Component Spacing**: Use Tailwind spacing scale (`space-y-4`, `p-4`, etc.)
 
 ### Testing & Quality
-- **Linting**: Run `pnpm --filter depot-web run lint` for TypeScript + Prettier checks
+- **Linting**: Run `pnpm --filter @depot/web run lint` for TypeScript + Prettier checks
 - **Building**: Ensure `pnpm build` passes before committing
 - **Dev Server**: Use `pnpm start` for hot-reload development
 

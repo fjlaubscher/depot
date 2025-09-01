@@ -4,11 +4,12 @@
   "scripts": {
     "build": "tsc --build",
     "build:packages": "pnpm --recursive run build",
-    "start": "pnpm --filter depot-web start",
+    "start": "pnpm --filter @depot/web start",
+    "cli": "pnpm --filter @depot/cli start",
     "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "clean": "pnpm --recursive run clean && rimraf node_modules",
-    "dev": "pnpm --filter depot-web start"
+    "dev": "pnpm --filter @depot/web start"
   },
   "devDependencies": {
     "prettier": "^2.8.8",
