@@ -70,7 +70,6 @@ const defaultProps = {
   debouncedQuery: ''
 };
 
-
 describe('AllFactionsTab', () => {
   afterEach(() => {
     vi.clearAllMocks();

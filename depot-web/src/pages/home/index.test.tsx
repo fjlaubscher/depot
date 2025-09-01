@@ -80,7 +80,6 @@ const mockFactions: depot.Index[] = [
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
 ];
 
-
 describe('HomeNew', () => {
   beforeEach(() => {
     vi.clearAllMocks();

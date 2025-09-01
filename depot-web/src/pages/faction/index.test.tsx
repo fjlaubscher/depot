@@ -93,7 +93,6 @@ const mockFaction: depot.Faction = {
   ]
 };
 
-
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
   const mockUseLocalStorage = vi.fn();

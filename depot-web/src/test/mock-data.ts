@@ -98,7 +98,8 @@ export const mockDatasheet: depot.Datasheet = {
       s: '7',
       ap: '-2',
       d: '1',
-      description: '[RAPID FIRE 1] When targeting this unit, weapons with this ability make 1 additional attack. You can re-roll one or more failed wound rolls when targeting this unit, but this weapon gets Hot on unmodified hit rolls of 1, after supercharge.'
+      description:
+        '[RAPID FIRE 1] When targeting this unit, weapons with this ability make 1 additional attack. You can re-roll one or more failed wound rolls when targeting this unit, but this weapon gets Hot on unmodified hit rolls of 1, after supercharge.'
     },
     {
       datasheetId: 'SM_CAPTAIN',
@@ -128,7 +129,8 @@ export const mockDatasheet: depot.Datasheet = {
       s: '8',
       ap: '-2',
       d: '3',
-      description: '[DEVASTATING WOUNDS] Critical wounds from this weapon cannot be negated by saves or abilities.'
+      description:
+        '[DEVASTATING WOUNDS] Critical wounds from this weapon cannot be negated by saves or abilities.'
     }
   ],
   abilities: [

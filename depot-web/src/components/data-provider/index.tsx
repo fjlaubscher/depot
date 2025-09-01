@@ -1,38 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { useAsync } from 'react-use';
+import { useEffect } from 'react';
 import { depot } from 'depot-core';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import useLocalStorage from '@/hooks/use-local-storage';
 
 // components
 import Layout from '../layout';
-
-// data
-import DataIndexAtom from './index-atom';
 
 interface Props {
   children: React.ReactNode;
 }
 
 const DataProvider = ({ children }: Props) => {
+  const { state } = useAppContext();
   const [settings, setSettings] = useLocalStorage<depot.Settings>('settings');
-  const setDataIndex = useSetRecoilState(DataIndexAtom);
-
-  const { value: data, loading: fetching } = useAsync(() =>
-    fetch('/data/index.json').then((r) => r.json())
-  );
-  const [hasStored, setHasStored] = useState(false);
-  const [isStoring, setIsStoring] = useState(false);
-
-  const loading = fetching || (isStoring && !hasStored);
-
-  useEffect(() => {
-    if (!hasStored && data) {
-      setIsStoring(true);
-      setDataIndex(data);
-      setHasStored(true);
-    }
-  }, [data, hasStored, setHasStored]);
 
   useEffect(() => {
     if (!settings) {
@@ -40,7 +20,7 @@ const DataProvider = ({ children }: Props) => {
     }
   }, [settings, setSettings]);
 
-  return loading ? (
+  return state.loading ? (
     <Layout title="Loading" isLoading>
       {children}
     </Layout>

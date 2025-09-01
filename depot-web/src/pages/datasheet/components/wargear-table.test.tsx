@@ -73,7 +73,9 @@ describe('WargearTable', () => {
 
   describe('Common behavior', () => {
     it('renders nothing when no wargear provided', () => {
-      const { container } = render(<WargearTable wargear={[]} type="Ranged" />, { wrapper: TestWrapper });
+      const { container } = render(<WargearTable wargear={[]} type="Ranged" />, {
+        wrapper: TestWrapper
+      });
 
       expect(container.firstChild).toBeNull();
     });
@@ -111,7 +113,9 @@ describe('WargearTable', () => {
         }
       ];
 
-      render(<WargearTable wargear={weaponWithoutDescription} type="Ranged" />, { wrapper: TestWrapper });
+      render(<WargearTable wargear={weaponWithoutDescription} type="Ranged" />, {
+        wrapper: TestWrapper
+      });
 
       expect(screen.getByText('Bolt pistol')).toBeInTheDocument();
       expect(screen.queryByText(/\[.*\]/)).not.toBeInTheDocument(); // No brackets
