@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaShare, FaArrowLeft } from 'react-icons/fa';
+import { FaShareAlt, FaArrowLeft } from 'react-icons/fa';
 import { depot } from 'depot-core';
 
 // components
@@ -47,11 +47,11 @@ const DatasheetPage: React.FC = () => {
         .catch(() => {
           // Fallback to clipboard
           navigator.clipboard.writeText(url);
-          showToast('Link copied to clipboard', 'info');
+          showToast({ type: 'info', title: 'Success', message: 'Link copied to clipboard' });
         });
     } else {
       navigator.clipboard.writeText(url);
-      showToast('Link copied to clipboard', 'info');
+      showToast({ type: 'info', title: 'Success', message: 'Link copied to clipboard' });
     }
   };
 
@@ -126,7 +126,7 @@ const DatasheetPage: React.FC = () => {
       }
       action={
         <IconButton onClick={handleShare} aria-label="Share datasheet" className="ml-2">
-          <FaShare />
+          <FaShareAlt />
         </IconButton>
       }
     >

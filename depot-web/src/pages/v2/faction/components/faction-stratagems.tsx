@@ -63,7 +63,7 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
           name="type"
           value={value}
           label="Filter by type"
-          onChange={onChange}
+          onChange={(e) => onChange(Number(e.target.value))}
           options={options}
         />
       </Filters>

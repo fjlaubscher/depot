@@ -113,7 +113,7 @@ describe('DatasheetStratagems', () => {
     // Set filters
     const searchInput = screen.getByPlaceholderText('Search stratagems...');
     const typeSelect = screen.getByLabelText('Filter by type');
-    
+
     await user.type(searchInput, 'test');
     await user.selectOptions(typeSelect, 'Strategic Ploy');
 
@@ -133,7 +133,9 @@ describe('DatasheetStratagems', () => {
     const searchInput = screen.getByPlaceholderText('Search stratagems...');
     await user.type(searchInput, 'nonexistent');
 
-    expect(screen.getByText('No stratagems found matching your search criteria.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No stratagems found matching your search criteria.')
+    ).toBeInTheDocument();
   });
 
   it('generates correct type options from stratagems', () => {
@@ -141,11 +143,11 @@ describe('DatasheetStratagems', () => {
 
     const typeSelect = screen.getByLabelText('Filter by type');
     const options = Array.from(typeSelect.querySelectorAll('option'));
-    
+
     expect(options).toHaveLength(3); // "All Types" + 2 unique types
     expect(options[0]).toHaveTextContent('All Types');
-    expect(options.some(option => option.textContent === 'Battle Tactic')).toBe(true);
-    expect(options.some(option => option.textContent === 'Strategic Ploy')).toBe(true);
+    expect(options.some((option) => option.textContent === 'Battle Tactic')).toBe(true);
+    expect(options.some((option) => option.textContent === 'Strategic Ploy')).toBe(true);
   });
 
   it('handles case insensitive search', async () => {

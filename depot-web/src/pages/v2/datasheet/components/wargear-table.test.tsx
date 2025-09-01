@@ -1,62 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import WargearTable from './wargear-table';
-import { depot } from 'depot-core';
+import { mockDatasheet } from '@/test/mock-data';
 
 describe('WargearTable', () => {
-  const mockRangedWargear: depot.Wargear[] = [
-    {
-      line: 1,
-      name: 'Bolt pistol',
-      type: 'Ranged',
-      range: '12',
-      a: '1',
-      bsWs: '2',
-      s: '4',
-      ap: '0',
-      d: '1',
-      description: ''
-    },
-    {
-      line: 2,
-      name: 'Plasma gun',
-      type: 'Ranged',
-      range: '24',
-      a: '1',
-      bsWs: '3',
-      s: '7',
-      ap: '-2',
-      d: '1',
-      description: 'supercharge'
-    }
-  ];
+  const mockRangedWargear = mockDatasheet.wargear.filter((w) => w.type === 'Ranged');
 
-  const mockMeleeWargear: depot.Wargear[] = [
-    {
-      line: 1,
-      name: 'Power sword',
-      type: 'Melee',
-      range: '',
-      a: '4',
-      bsWs: '2',
-      s: '5',
-      ap: '-2',
-      d: '2',
-      description: ''
-    },
-    {
-      line: 2,
-      name: 'Thunder hammer',
-      type: 'Melee',
-      range: '',
-      a: '3',
-      bsWs: 'N/A',
-      s: '8',
-      ap: '-2',
-      d: '3',
-      description: 'devastating wounds'
-    }
-  ];
+  const mockMeleeWargear = mockDatasheet.wargear.filter((w) => w.type === 'Melee');
 
   describe('Ranged Wargear', () => {
     it('renders ranged wargear table with correct headers', () => {
@@ -77,7 +27,7 @@ describe('WargearTable', () => {
       expect(screen.getByText('Bolt pistol')).toBeInTheDocument();
       expect(screen.getByText('12"')).toBeInTheDocument(); // Range with quotes
       expect(screen.getByText('2+')).toBeInTheDocument(); // Bolt pistol BS
-      
+
       expect(screen.getByText('Plasma gun')).toBeInTheDocument();
       expect(screen.getByText('24"')).toBeInTheDocument();
       expect(screen.getByText('3+')).toBeInTheDocument(); // Plasma gun BS
@@ -153,10 +103,12 @@ describe('WargearTable', () => {
     });
 
     it('handles weapons without descriptions', () => {
-      const weaponWithoutDescription = [{
-        ...mockRangedWargear[0],
-        description: ''
-      }];
+      const weaponWithoutDescription = [
+        {
+          ...mockRangedWargear[0],
+          description: ''
+        }
+      ];
 
       render(<WargearTable wargear={weaponWithoutDescription} type="Ranged" />);
 

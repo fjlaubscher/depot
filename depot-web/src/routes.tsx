@@ -1,20 +1,20 @@
 import { Routes, Route } from 'react-router-dom';
 
 // routes
-import Settings from './pages/settings';
 import NotFound from './pages/not-found';
 
 // v2 routes (Phase 2 rebuilt components)
-import HomeNew from './pages/v2/home';
-import FactionNew from './pages/v2/faction';
-import DatasheetNew from './pages/v2/datasheet';
+import Home from './pages/v2/home';
+import Faction from './pages/v2/faction';
+import Datasheet from './pages/v2/datasheet';
+import Settings from './pages/v2/settings';
 
 const AppRoutes = () => (
   <Routes>
     {/* V2 routes - now primary routes */}
-    <Route path="/" element={<HomeNew />} />
-    <Route path="/faction/:id" element={<FactionNew />} />
-    <Route path="/faction/:factionId/datasheet/:id" element={<DatasheetNew />} />
+    <Route path="/" element={<Home />} />
+    <Route path="/faction/:id" element={<Faction />} />
+    <Route path="/faction/:factionId/datasheet/:id" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
 
     {/* Catch all */}

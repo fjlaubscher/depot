@@ -65,7 +65,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachmentAbili
           name="detachment"
           value={value}
           label="Filter by detachment"
-          onChange={onChange}
+          onChange={(e) => onChange(Number(e.target.value))}
           options={options}
         />
       </Filters>

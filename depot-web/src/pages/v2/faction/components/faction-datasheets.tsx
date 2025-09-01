@@ -70,7 +70,7 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
           name="role"
           value={value}
           label="Filter by role"
-          onChange={onChange}
+          onChange={(e) => onChange(Number(e.target.value))}
           options={options}
         />
       </Filters>

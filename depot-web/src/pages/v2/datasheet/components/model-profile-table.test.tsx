@@ -1,36 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import ModelProfileTable from './model-profile-table';
+import { mockDatasheet } from '@/test/mock-data';
 import { depot } from 'depot-core';
+import ModelProfileTable from './model-profile-table';
 
 describe('ModelProfileTable', () => {
-  const mockModels: depot.Model[] = [
-    {
-      line: 1,
-      name: 'Captain',
-      m: '6"',
-      t: '4',
-      sv: '3+',
-      w: '4',
-      ld: '6+',
-      oc: '1',
-      baseSize: '32mm'
-    },
-    {
-      line: 2,
-      name: 'Lieutenant',
-      m: '5"',
-      t: '4',
-      sv: '3+',
-      w: '3',
-      ld: '7+',
-      oc: '1',
-      baseSize: '32mm'
-    }
-  ];
-
   it('renders table with correct headers', () => {
-    render(<ModelProfileTable models={mockModels} />);
+    render(<ModelProfileTable models={mockDatasheet.models} />);
 
     expect(screen.getByText('Unit Profile')).toBeInTheDocument();
     expect(screen.getByText('Name')).toBeInTheDocument();
@@ -43,12 +19,12 @@ describe('ModelProfileTable', () => {
   });
 
   it('renders model data correctly', () => {
-    render(<ModelProfileTable models={mockModels} />);
+    render(<ModelProfileTable models={mockDatasheet.models} />);
 
     // Check that both model names are present
     expect(screen.getByText('Captain')).toBeInTheDocument();
     expect(screen.getByText('Lieutenant')).toBeInTheDocument();
-    
+
     // Check unique values to avoid duplicates
     expect(screen.getByText('6"')).toBeInTheDocument(); // Captain's movement
     expect(screen.getByText('5"')).toBeInTheDocument(); // Lieutenant's movement
@@ -57,7 +33,7 @@ describe('ModelProfileTable', () => {
   });
 
   it('renders multiple models in separate rows', () => {
-    render(<ModelProfileTable models={mockModels} />);
+    render(<ModelProfileTable models={mockDatasheet.models} />);
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3); // Header + 2 data rows
@@ -70,7 +46,7 @@ describe('ModelProfileTable', () => {
   });
 
   it('applies correct styling classes', () => {
-    render(<ModelProfileTable models={mockModels} />);
+    render(<ModelProfileTable models={mockDatasheet.models} />);
 
     // Check that name column has font-medium class
     const nameCell = screen.getByText('Captain');
@@ -78,12 +54,12 @@ describe('ModelProfileTable', () => {
   });
 
   it('renders single model correctly', () => {
-    const singleModel = [mockModels[0]];
+    const singleModel = [mockDatasheet.models[0]];
     render(<ModelProfileTable models={singleModel} />);
 
     expect(screen.getByText('Captain')).toBeInTheDocument();
     expect(screen.queryByText('Lieutenant')).not.toBeInTheDocument();
-    
+
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(2); // Header + 1 data row
   });
@@ -91,7 +67,8 @@ describe('ModelProfileTable', () => {
   it('handles models with different stat values', () => {
     const modelWithDifferentStats: depot.Model[] = [
       {
-        line: 1,
+        datasheetId: 'SM_DREADNOUGHT',
+        line: '1',
         name: 'Dreadnought',
         m: '8"',
         t: '9',
@@ -99,7 +76,10 @@ describe('ModelProfileTable', () => {
         w: '12',
         ld: '6+',
         oc: '3',
-        baseSize: '90mm oval'
+        baseSize: '90mm oval',
+        baseSizeDescr: '',
+        invSv: '',
+        invSvDescr: ''
       }
     ];
 

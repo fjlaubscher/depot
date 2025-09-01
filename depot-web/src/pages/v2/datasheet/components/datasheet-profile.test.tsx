@@ -12,9 +12,7 @@ vi.mock('./model-profile-table', () => ({
 
 vi.mock('./wargear-table', () => ({
   default: ({ wargear, type }: { wargear: any[]; type: string }) => (
-    <div data-testid={`wargear-table-${type.toLowerCase()}`}>
-      {type} Wargear Table
-    </div>
+    <div data-testid={`wargear-table-${type.toLowerCase()}`}>{type} Wargear Table</div>
   )
 }));
 
@@ -25,8 +23,8 @@ vi.mock('@/utils/array', () => ({
 
 vi.mock('@/utils/keywords', () => ({
   groupKeywords: (keywords: string[]) => ({
-    datasheet: keywords.filter(k => !k.includes('IMPERIUM') && !k.includes('ADEPTUS ASTARTES')),
-    faction: keywords.filter(k => k.includes('IMPERIUM') || k.includes('ADEPTUS ASTARTES'))
+    datasheet: keywords.filter((k) => !k.includes('IMPERIUM') && !k.includes('ADEPTUS ASTARTES')),
+    faction: keywords.filter((k) => k.includes('IMPERIUM') || k.includes('ADEPTUS ASTARTES'))
   })
 }));
 
@@ -44,7 +42,7 @@ describe('DatasheetProfile', () => {
 
     expect(screen.getByTestId('wargear-table-ranged')).toBeInTheDocument();
     expect(screen.getByText('Ranged Wargear Table')).toBeInTheDocument();
-    
+
     expect(screen.getByTestId('wargear-table-melee')).toBeInTheDocument();
     expect(screen.getByText('Melee Wargear Table')).toBeInTheDocument();
   });
@@ -122,9 +120,9 @@ describe('DatasheetProfile', () => {
   it('filters options with descriptions', () => {
     const datasheetWithEmptyOptions = createMockDatasheet({
       options: [
-        { line: 1, description: 'Valid option' },
-        { line: 2, description: '' }, // Should be filtered out
-        { line: 3, description: 'Another valid option' }
+        { line: '1', description: 'Valid option', button: '-', datasheetId: 'SM_CAPTAIN' },
+        { line: '2', description: '', button: '-', datasheetId: 'SM_CAPTAIN' }, // Should be filtered out
+        { line: '3', description: 'Another valid option', button: '-', datasheetId: 'SM_CAPTAIN' }
       ]
     });
 
@@ -139,7 +137,7 @@ describe('DatasheetProfile', () => {
     const datasheetWithMixedWargear = createMockDatasheet({
       wargear: [
         {
-          line: 1,
+          line: '1',
           name: 'Bolt pistol',
           type: 'Ranged',
           range: '12',
@@ -148,10 +146,13 @@ describe('DatasheetProfile', () => {
           s: '4',
           ap: '0',
           d: '1',
-          description: ''
+          description: '',
+          datasheetId: 'SM_CAPTAIN',
+          dice: '',
+          lineInWargear: ''
         },
         {
-          line: 2,
+          line: '2',
           name: 'Power sword',
           type: 'Melee',
           range: '',
@@ -160,7 +161,10 @@ describe('DatasheetProfile', () => {
           s: '5',
           ap: '-2',
           d: '2',
-          description: ''
+          description: '',
+          datasheetId: 'SM_CAPTAIN',
+          dice: '',
+          lineInWargear: ''
         }
       ]
     });

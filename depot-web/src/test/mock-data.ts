@@ -9,35 +9,57 @@ export const mockDatasheet: depot.Datasheet = {
   id: 'captain',
   name: 'Captain',
   factionId: 'SM',
+  sourceId: 'core',
+  legend: '',
   role: 'CHARACTER', // Updated for 10th edition
+  loadout: '',
+  transport: '',
+  virtual: false,
+  leaderHead: '',
+  leaderFooter: '',
+  damagedW: '',
+  damagedDescription: '',
+  link: '/datasheet/captain',
   isForgeWorld: false,
   isLegends: false,
+  leaders: [],
   modelCosts: [
     {
+      datasheetId: 'SM_CAPTAIN',
+      line: '1',
       description: 'Captain',
       cost: '80'
     },
     {
+      datasheetId: 'SM_CAPTAIN',
+      line: '2',
       description: 'Captain with Jump Pack',
       cost: '90'
     }
   ],
   models: [
     {
-      line: 1,
+      datasheetId: 'SM_CAPTAIN',
+      line: '1',
       name: 'Captain',
       m: '6"',
       t: '4',
       sv: '3+',
+      invSv: '4++',
+      invSvDescr: 'Iron Halo',
       w: '4',
       ld: '6+',
       oc: '1',
-      baseSize: '32mm'
+      baseSize: '32mm',
+      baseSizeDescr: ''
     }
   ],
   wargear: [
     {
-      line: 1,
+      datasheetId: 'SM_CAPTAIN',
+      line: '1',
+      lineInWargear: '1',
+      dice: '',
       name: 'Bolt pistol',
       type: 'Ranged',
       range: '12',
@@ -49,7 +71,10 @@ export const mockDatasheet: depot.Datasheet = {
       description: ''
     },
     {
-      line: 2,
+      datasheetId: 'SM_CAPTAIN',
+      line: '2',
+      lineInWargear: '1',
+      dice: '',
       name: 'Power sword',
       type: 'Melee',
       range: '',
@@ -65,19 +90,29 @@ export const mockDatasheet: depot.Datasheet = {
     {
       id: 'leader',
       name: 'Leader',
+      legend: '',
+      factionId: 'SM',
       description: 'This model can be attached to a unit.'
     }
   ],
-  keywords: ['INFANTRY', 'CHARACTER', 'IMPERIUM', 'ADEPTUS ASTARTES'],
+  keywords: [
+    { datasheetId: 'SM_CAPTAIN', keyword: 'INFANTRY', model: '', isFactionKeyword: 'false' },
+    { datasheetId: 'SM_CAPTAIN', keyword: 'CHARACTER', model: '', isFactionKeyword: 'false' },
+    { datasheetId: 'SM_CAPTAIN', keyword: 'IMPERIUM', model: '', isFactionKeyword: 'true' },
+    { datasheetId: 'SM_CAPTAIN', keyword: 'ADEPTUS ASTARTES', model: '', isFactionKeyword: 'true' }
+  ],
   unitComposition: [
     {
-      line: 1,
+      datasheetId: 'SM_CAPTAIN',
+      line: '1',
       description: '1 Captain'
     }
   ],
   options: [
     {
-      line: 1,
+      datasheetId: 'SM_CAPTAIN',
+      line: '1',
+      button: '',
       description: 'This model may be equipped with a jump pack.'
     }
   ],
@@ -88,9 +123,15 @@ export const mockDatasheet: depot.Datasheet = {
       factionId: 'SM',
       type: 'Battle Tactic',
       cpCost: '1',
+      turn: 'Any',
+      detachment: 'Any',
+      legend: '',
+      phase: 'Any',
       description: 'Test stratagem description'
     }
-  ]
+  ],
+  enhancements: [],
+  detachmentAbilities: []
 };
 
 export const mockStratagem: depot.Stratagem = {
@@ -99,6 +140,10 @@ export const mockStratagem: depot.Stratagem = {
   factionId: 'SM',
   type: 'Battle Tactic',
   cpCost: '1',
+  turn: 'Any',
+  detachment: 'Any',
+  legend: '',
+  phase: 'Any',
   description: 'Test stratagem description'
 };
 
@@ -165,7 +210,7 @@ export const mockDatasheetWithoutCosts = createMockDatasheet({
 });
 
 export const mockDatasheetWithSingleCost = createMockDatasheet({
-  modelCosts: [{ description: 'Captain', cost: '80' }]
+  modelCosts: [{ description: 'Captain', cost: '80', datasheetId: 'SM_CAPTAIN', line: '1' }]
 });
 
 export const mockDatasheetWithMultipleStratagems = createMockDatasheet({

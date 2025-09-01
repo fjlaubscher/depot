@@ -1,13 +1,18 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DatasheetPage from './index';
-import { 
-  mockDatasheet, 
-  mockFaction, 
+import {
+  mockDatasheet,
+  mockFaction,
   mockFactionWithoutDatasheets,
-  mockDatasheetWithoutCosts 
+  mockDatasheetWithoutCosts
 } from '@/test/mock-data';
-import { TestWrapper, createMockFunctions, setupCommonMocks, setupBrowserMocks } from '@/test/test-utils';
+import {
+  TestWrapper,
+  createMockFunctions,
+  setupCommonMocks,
+  setupBrowserMocks
+} from '@/test/test-utils';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -145,7 +150,7 @@ describe('DatasheetPage', () => {
       ...mockFaction,
       datasheets: [mockDatasheetWithoutCosts]
     };
-    
+
     mocks.mockUseFaction.mockReturnValue({
       data: factionWithoutCosts,
       loading: false,

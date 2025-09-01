@@ -5,14 +5,15 @@ import { BrowserRouter } from 'react-router-dom';
 import { LayoutProvider } from '@/contexts/layout/context';
 import HomeNew from './index';
 import { depot } from 'depot-core';
+import { AppContextType } from '@/contexts/app/types';
 
-// Mock the context
-const mockAppContext = {
+// Mock the context with proper typing
+const mockAppContext: AppContextType = {
   state: {
-    factionIndex: null,
+    factionIndex: null as depot.Index[] | null,
     factionCache: {},
     loading: false,
-    error: null,
+    error: null as string | null,
     settings: null
   },
   dispatch: vi.fn(),
