@@ -4,6 +4,7 @@ import { depot } from 'depot-core';
 export interface AppState {
   factionIndex: depot.Index[] | null;
   factionCache: Record<string, depot.Faction>;
+  offlineFactions: depot.Option[];
   loading: boolean;
   error: string | null;
   settings: depot.Settings | null;
@@ -17,6 +18,9 @@ export type AppAction =
   | { type: 'LOAD_FACTION_START'; payload: string }
   | { type: 'LOAD_FACTION_SUCCESS'; payload: { id: string; faction: depot.Faction } }
   | { type: 'LOAD_FACTION_ERROR'; payload: { id: string; error: string } }
+  | { type: 'CACHE_FACTION_SUCCESS'; payload: { id: string; faction: depot.Faction } }
+  | { type: 'CACHE_FACTION_ERROR'; payload: string }
+  | { type: 'LOAD_SETTINGS_SUCCESS'; payload: depot.Settings }
   | { type: 'UPDATE_SETTINGS'; payload: depot.Settings }
   | { type: 'CLEAR_ERROR' };
 
@@ -25,4 +29,6 @@ export interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   loadFaction: (id: string) => Promise<void>;
+  clearOfflineData: () => Promise<void>;
+  updateSettings: (settings: depot.Settings) => Promise<void>;
 }

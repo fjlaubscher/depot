@@ -12,6 +12,7 @@ The depot-web is a React Progressive Web App (PWA) that displays Warhammer 40K g
 The application now uses a modern architecture with:
 - **Primary Routes**: V2 pages serve as the main application interface
 - **Context-Based State**: App, Layout, and Toast contexts replace legacy Recoil patterns
+- **Offline-First Data**: IndexedDB integration with automatic caching and offline support
 - **Custom UI Library**: Tailwind CSS v4 components in `src/components/ui/`
 - **100% Test Coverage**: Comprehensive test suite with proper provider integration
 - **TypeScript**: All compilation errors resolved, strict typing throughout
@@ -63,10 +64,11 @@ yarn format
 
 ### Technology Stack
 - **React 18** with React Router DOM for navigation
-- **Recoil** for global state management
+- **Context + useReducer** for global state management (replaced Recoil)
+- **IndexedDB** for offline-first data storage and caching
+- **Tailwind CSS v4** for utility-first styling (replaced SCSS modules)
+- **Custom UI Library** in `src/components/ui/` (replaced @fjlaubscher/matter)
 - **Vite** for build tooling and development server
-- **SCSS Modules** for component styling
-- **@fjlaubscher/matter** for UI components and utilities
 - **Vite PWA Plugin** for offline functionality
 
 ### Application Structure
@@ -78,16 +80,16 @@ yarn format
 - `/settings` - User preferences (show Forge World, Legends content)
 
 #### State Management Pattern
-- **Recoil Atoms**: Global state for data index and faction data
-- **Data Provider**: Wraps app to load initial data from `/data/index.json`
-- **Local Storage**: Persists user settings via `@fjlaubscher/matter` hook
-- **IndexedDB**: Client-side caching for faction data (optional offline storage)
+- **App Context**: Global state for data index, faction cache, and settings using useReducer
+- **Layout Context**: UI state management (sidebar, responsive behavior)
+- **Toast Context**: Notification system with auto-dismiss functionality
+- **IndexedDB Storage**: Primary storage for faction data, index, and settings (offline-first)
 
 #### Component Architecture
 - **Page Components**: Route-specific containers (`pages/`)
-- **Reusable Components**: Cards, tables, filters, buttons (`components/`)
-- **SCSS Modules**: Component-scoped styling with `.module.scss` files
-- **Layout Component**: Consistent app shell with navigation
+- **Custom UI Components**: Tailwind-based component library (`components/ui/`)
+- **Modular Pages**: Component breakdown pattern with focused child components
+- **Layout Component**: Responsive app shell with desktop sidebar and mobile slide-out
 
 ### Key Components
 
@@ -109,12 +111,16 @@ yarn format
 - Associated stratagems and abilities
 - Mobile-optimized responsive design
 
-### Data Flow
+### Data Flow (Offline-First)
 
 ```
-Static JSON Files → Data Provider → Recoil State → React Components
-                                           ↓
-                   IndexedDB (optional caching) ← User Interactions
+IndexedDB ──→ App Context ──→ React Components
+   ↑               ↓
+   └─ Static JSON Files (network fallback)
+   
+Settings: IndexedDB ←→ App Context ←→ Settings Page
+Faction Data: IndexedDB → App Context → Faction Pages
+             (Auto-cached from network when visited)
 ```
 
 ### PWA Features

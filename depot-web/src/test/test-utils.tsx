@@ -27,12 +27,15 @@ export const createMockFunctions = () => ({
     state: {
       factionIndex: null,
       factionCache: {},
+      offlineFactions: [],
       loading: false,
       error: null,
       settings: null
     },
     dispatch: vi.fn(),
-    loadFaction: vi.fn()
+    loadFaction: vi.fn(),
+    clearOfflineData: vi.fn(),
+    updateSettings: vi.fn()
   }
 });
 

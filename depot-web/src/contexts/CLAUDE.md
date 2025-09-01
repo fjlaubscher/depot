@@ -62,17 +62,26 @@ Custom hook for consuming the context:
 ## Context Types
 
 ### App Context (`contexts/app/`)
-Manages global application data and business logic:
-- Faction index loading and caching
-- User settings
-- Error states
-- Loading states
+Manages global application data and business logic with offline-first approach:
+- Faction index loading and caching (IndexedDB first, network fallback)
+- Individual faction data with automatic IndexedDB caching
+- User settings persistence in IndexedDB
+- Offline faction list for settings page management
+- Error states and loading states
+- Methods: `loadFaction()`, `updateSettings()`, `clearOfflineData()`
 
 ### Layout Context (`contexts/layout/`)
 Manages UI layout state:
 - Sidebar open/closed state
 - Responsive behavior helpers
 - Layout-specific UI interactions
+
+### Toast Context (`contexts/toast/`)
+Manages notification system:
+- Toast display with auto-dismiss
+- Multiple toast types (success, error, warning, info)
+- Toast queue management
+- Integration with offline operations
 
 ## Usage Pattern
 
@@ -107,12 +116,49 @@ function MyComponent() {
 }
 ```
 
+## Offline Storage Integration
+
+### IndexedDB Integration (`data/offline-storage.ts`)
+The App Context integrates with a modern IndexedDB wrapper for offline-first data management:
+
+```typescript
+// Automatic faction caching when loading
+const cachedFaction = await offlineStorage.getFaction(id);
+if (cachedFaction) {
+  // Use cached data immediately
+  dispatch({ type: APP_ACTIONS.LOAD_FACTION_SUCCESS, payload: { id, faction: cachedFaction } });
+  return;
+}
+
+// Network fallback with automatic caching
+const response = await fetch(`/data/${id}.json`);
+const faction = await response.json();
+await offlineStorage.setFaction(id, faction); // Auto-cache for offline use
+```
+
+### Key Features
+- **Offline-First**: Always check IndexedDB before network requests
+- **Automatic Caching**: Network-loaded data is automatically cached
+- **Settings Persistence**: User preferences saved to IndexedDB
+- **Error Recovery**: Network failures don't break app if data is cached
+- **Cache Management**: Settings page can view and clear cached data
+
+### Storage Structure
+- **Faction Index**: `/data/index.json` cached for offline navigation
+- **Individual Factions**: Cached as visited for detailed browsing
+- **User Settings**: Forge World/Legends preferences persist across sessions
+
 ## Benefits of This Pattern
 
 ### Modularity
 - Each context is self-contained
 - Easy to add, remove, or modify contexts
 - Clear separation of concerns
+
+### Offline Capability
+- True offline-first data loading
+- Automatic caching without user intervention
+- Graceful fallback between IndexedDB and network
 
 ### Type Safety
 - Full TypeScript support

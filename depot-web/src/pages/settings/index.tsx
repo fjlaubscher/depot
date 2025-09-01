@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { depot } from 'depot-core';
 
 // UI Components
@@ -9,11 +9,8 @@ import SelectField from '@/components/ui/select-field';
 import Stat from '@/components/ui/stat';
 
 // Hooks and Context
-import useLocalStorage from '@/hooks/use-local-storage';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
-
-// Data
-import { destroy, getFactions } from '@/data/indexed-db';
 
 const YES_NO = [
   { label: 'Yes', value: 'true' },
@@ -22,38 +19,30 @@ const YES_NO = [
 
 const Settings = () => {
   const { showToast } = useToast();
-  const [offlineFactions, setOfflineFactions] = useState<depot.Option[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [settings, setSettings] = useLocalStorage<depot.Settings>('settings');
+  const { state, updateSettings, clearOfflineData } = useAppContext();
 
-  const loadOfflineData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const factions = await getFactions();
-      setOfflineFactions(factions);
-    } catch (error) {
-      console.error('Failed to load offline factions:', error);
-      setOfflineFactions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const handleSettingsChange = useCallback(
+    async (field: keyof depot.Settings, value: boolean) => {
+      const newSettings = { ...state.settings, [field]: value };
+      try {
+        await updateSettings(newSettings);
+      } catch (error) {
+        console.error('Failed to update settings:', error);
+        showToast({ type: 'error', title: 'Error', message: 'Failed to save settings.' });
+      }
+    },
+    [state.settings, updateSettings, showToast]
+  );
 
   const handleReset = useCallback(async () => {
     try {
-      await destroy();
-      await loadOfflineData();
+      await clearOfflineData();
       showToast({ type: 'success', title: 'Success', message: 'Offline data deleted.' });
     } catch (error) {
       console.error('Failed to delete offline data:', error);
       showToast({ type: 'error', title: 'Error', message: 'Failed to delete offline data.' });
     }
-  }, [loadOfflineData, showToast]);
-
-  // Load offline data on mount
-  useEffect(() => {
-    loadOfflineData();
-  }, [loadOfflineData]);
+  }, [clearOfflineData, showToast]);
 
   return (
     <Layout title="Settings">
@@ -66,17 +55,15 @@ const Settings = () => {
               label="Show Forge World"
               name="showForgeWorld"
               options={YES_NO}
-              value={settings?.showForgeWorld ? 'true' : 'false'}
-              onChange={(e) =>
-                setSettings({ ...settings, showForgeWorld: e.target.value === 'true' })
-              }
+              value={state.settings?.showForgeWorld ? 'true' : 'false'}
+              onChange={(e) => handleSettingsChange('showForgeWorld', e.target.value === 'true')}
             />
             <SelectField
               label="Show Legends"
               name="showLegends"
               options={YES_NO}
-              value={settings?.showLegends ? 'true' : 'false'}
-              onChange={(e) => setSettings({ ...settings, showLegends: e.target.value === 'true' })}
+              value={state.settings?.showLegends ? 'true' : 'false'}
+              onChange={(e) => handleSettingsChange('showLegends', e.target.value === 'true')}
             />
           </div>
         </div>
@@ -84,19 +71,19 @@ const Settings = () => {
         {/* Offline Data Section */}
         <div className="space-y-4">
           <Stat title="Settings" value="Offline Data" variant="large" />
-          {loading && (
+          {state.loading && (
             <div className="flex justify-center py-8">
               <Loader size="lg" />
             </div>
           )}
-          {!loading && offlineFactions && offlineFactions.length > 0 && (
+          {!state.loading && state.offlineFactions && state.offlineFactions.length > 0 && (
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                   Cached factions for offline use:
                 </p>
                 <ul className="space-y-2">
-                  {offlineFactions.map((f) => (
+                  {state.offlineFactions.map((f) => (
                     <li
                       key={`faction-${f.id}`}
                       className="text-sm text-gray-700 dark:text-gray-300"
@@ -111,7 +98,7 @@ const Settings = () => {
               </Button>
             </div>
           )}
-          {!loading && (!offlineFactions || offlineFactions.length === 0) && (
+          {!state.loading && (!state.offlineFactions || state.offlineFactions.length === 0) && (
             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 No offline data cached. Visit faction pages to cache data for offline use.
