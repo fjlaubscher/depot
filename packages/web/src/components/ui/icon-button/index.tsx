@@ -1,0 +1,50 @@
+import React from 'react';
+import classNames from 'classnames';
+
+interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  'aria-label': string; // Required for accessibility
+}
+
+const IconButton: React.FC<IconButtonProps> = ({
+  variant = 'default',
+  size = 'md',
+  loading = false,
+  className,
+  disabled,
+  children,
+  ...props
+}) => {
+  const baseClasses =
+    'inline-flex items-center justify-center rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+
+  const variantClasses = {
+    default:
+      'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600',
+    ghost: 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400'
+  };
+
+  const sizeClasses = {
+    sm: 'w-8 h-8 text-sm',
+    md: 'w-10 h-10 text-base',
+    lg: 'w-12 h-12 text-lg'
+  };
+
+  return (
+    <button
+      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      disabled={disabled || loading}
+      {...props}
+    >
+      {loading ? (
+        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+      ) : (
+        children
+      )}
+    </button>
+  );
+};
+
+export default IconButton;
