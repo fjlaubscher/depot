@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-depot-web/public/data/
+packages/web/public/data/
 *.tsbuildinfo
 docs

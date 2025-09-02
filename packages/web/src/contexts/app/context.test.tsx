@@ -4,8 +4,8 @@ import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
 import { depot } from "@depot/core";
 
-// Mock offline storage
-const mockOfflineStorage = {
+// Mock offline storage using vi.hoisted for proper scoping
+const mockOfflineStorage = vi.hoisted(() => ({
   getFactionIndex: vi.fn(),
   setFactionIndex: vi.fn(),
   getFaction: vi.fn(),
@@ -16,7 +16,7 @@ const mockOfflineStorage = {
   clearAllData: vi.fn(),
   destroy: vi.fn(),
   isDataStale: vi.fn()
-};
+}));
 
 vi.mock('../../data/offline-storage', () => ({
   offlineStorage: mockOfflineStorage
@@ -358,7 +358,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('error')).toHaveTextContent('Network error');
+        expect(screen.getByTestId('error')).toHaveTextContent('IndexedDB error');
       });
 
       expect(screen.getByTestId('loading')).toHaveTextContent('false');

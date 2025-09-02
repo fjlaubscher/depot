@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { LayoutProvider } from '@/contexts/layout/context';
 import { ToastProvider } from '@/contexts/toast/context';
@@ -8,13 +8,13 @@ import { ToastProvider } from '@/contexts/toast/context';
  * Test utilities for consistent testing setup
  */
 
-// Common test wrapper with all required providers - suppresses React Router future flag warnings
+// Common test wrapper with all required providers - uses MemoryRouter for isolated testing
 export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+  <MemoryRouter>
     <ToastProvider>
       <LayoutProvider>{children}</LayoutProvider>
     </ToastProvider>
-  </BrowserRouter>
+  </MemoryRouter>
 );
 
 // Mock functions factory

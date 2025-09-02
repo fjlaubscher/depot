@@ -29,7 +29,7 @@ jobs:
         run: pnpm install
         
       - name: Build web app
-        run: pnpm --filter depot-web run build
+        run: pnpm --filter @depot/web run build
         
       - name: Build CLI
-        run: pnpm --filter depot-cli run build
+        run: pnpm --filter @depot/cli run build
