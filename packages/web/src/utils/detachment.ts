@@ -4,14 +4,17 @@ import { sortByName } from './array';
 export const groupDetachmentAbilitiesByDetachment = (
   abilities: depot.DetachmentAbility[]
 ): Record<string, depot.DetachmentAbility[]> => {
-  const grouped = abilities.reduce((acc, ability) => {
-    const key = ability.detachment || 'General';
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(ability);
-    return acc;
-  }, {} as Record<string, depot.DetachmentAbility[]>);
+  const grouped = abilities.reduce(
+    (acc, ability) => {
+      const key = ability.detachment || 'General';
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(ability);
+      return acc;
+    },
+    {} as Record<string, depot.DetachmentAbility[]>
+  );
 
   // Sort abilities within each detachment
   Object.keys(grouped).forEach((key) => {

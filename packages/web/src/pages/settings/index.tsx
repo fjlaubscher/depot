@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
+import { FaArrowLeft } from 'react-icons/fa';
 import { depot } from '@depot/core';
 
 // UI Components
 import Layout from '@/components/ui/layout';
 import Button from '@/components/ui/button';
 import Loader from '@/components/ui/loader';
+import NavigationButton from '@/components/ui/navigation-button';
 import SelectField from '@/components/ui/select-field';
 import Stat from '@/components/ui/stat';
 
@@ -45,7 +47,14 @@ const Settings = () => {
   }, [clearOfflineData, showToast]);
 
   return (
-    <Layout title="Settings">
+    <Layout
+      title="Settings"
+      home={
+        <NavigationButton to="/">
+          <FaArrowLeft />
+        </NavigationButton>
+      }
+    >
       <div className="space-y-8">
         {/* Datasheet Settings Section */}
         <div className="space-y-4">

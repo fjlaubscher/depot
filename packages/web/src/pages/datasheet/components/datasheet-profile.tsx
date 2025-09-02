@@ -52,7 +52,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
             Unit Composition
           </h4>
           <Card className="p-4">
-            <ul className="space-y-2">
+            <ul className="space-y-2 list-disc pl-5">
               {unitComposition.map((comp, i) => (
                 <li
                   key={`composition-${comp.line}`}
@@ -71,11 +71,11 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
         <div data-testid="unit-options">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Unit Options</h4>
           <Card className="p-4">
-            <ul className="space-y-2">
+            <ul className="space-y-2 list-disc pl-5">
               {options.map((option) => (
                 <li
                   key={`unit-option-${option.line}`}
-                  className="text-sm text-gray-700 dark:text-gray-300"
+                  className="text-sm text-gray-700 dark:text-gray-300 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mt-1"
                   dangerouslySetInnerHTML={{ __html: option.description }}
                 />
               ))}

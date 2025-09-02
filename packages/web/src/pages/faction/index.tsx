@@ -1,10 +1,11 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FaArrowLeft, FaStar, FaRegHeart } from 'react-icons/fa';
+import { FaArrowLeft, FaStar } from 'react-icons/fa';
 
 // UI Components
 import Layout from '@/components/ui/layout';
 import IconButton from '@/components/ui/icon-button';
+import NavigationButton from '@/components/ui/navigation-button';
 import Stat from '@/components/ui/stat';
 import Tabs from '@/components/ui/tabs';
 
@@ -69,9 +70,9 @@ const Faction: React.FC = () => {
       <Layout
         title="Error"
         home={
-          <Link to="/">
+          <NavigationButton to="/">
             <FaArrowLeft />
-          </Link>
+          </NavigationButton>
         }
       >
         <div className="text-center py-12">
@@ -87,9 +88,9 @@ const Faction: React.FC = () => {
       title="Faction"
       isLoading={loading}
       home={
-        <Link to="/">
+        <NavigationButton to="/">
           <FaArrowLeft />
-        </Link>
+        </NavigationButton>
       }
       action={
         faction && (

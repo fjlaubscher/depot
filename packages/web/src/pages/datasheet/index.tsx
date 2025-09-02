@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { FaShareAlt, FaArrowLeft } from 'react-icons/fa';
 import { depot } from '@depot/core';
 
@@ -8,6 +8,7 @@ import Layout from '@/components/ui/layout';
 import Stat from '@/components/ui/stat';
 import Tabs from '@/components/ui/tabs';
 import IconButton from '@/components/ui/icon-button';
+import NavigationButton from '@/components/ui/navigation-button';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -19,7 +20,6 @@ import DatasheetStratagems from './components/datasheet-stratagems';
 
 const DatasheetPage: React.FC = () => {
   const { factionId, id } = useParams<{ factionId: string; id: string }>();
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const { data: faction, loading, error } = useFaction(factionId);
@@ -55,18 +55,14 @@ const DatasheetPage: React.FC = () => {
     }
   };
 
-  const handleBackClick = () => {
-    navigate(`/faction/${factionId}`);
-  };
-
   if (error) {
     return (
       <Layout
         title="Error"
         home={
-          <IconButton onClick={handleBackClick} aria-label="Back to faction">
+          <NavigationButton to={`/faction/${factionId}`}>
             <FaArrowLeft />
-          </IconButton>
+          </NavigationButton>
         }
       >
         <div className="text-center py-8">
@@ -82,9 +78,9 @@ const DatasheetPage: React.FC = () => {
         title="Datasheet"
         isLoading={true}
         home={
-          <IconButton onClick={handleBackClick} aria-label="Back to faction">
+          <NavigationButton to={`/faction/${factionId}`}>
             <FaArrowLeft />
-          </IconButton>
+          </NavigationButton>
         }
       >
         <div className="animate-pulse space-y-4">
@@ -104,9 +100,9 @@ const DatasheetPage: React.FC = () => {
       <Layout
         title="Not Found"
         home={
-          <IconButton onClick={handleBackClick} aria-label="Back to faction">
+          <NavigationButton to={`/faction/${factionId}`}>
             <FaArrowLeft />
-          </IconButton>
+          </NavigationButton>
         }
       >
         <div className="text-center py-8">
@@ -120,9 +116,9 @@ const DatasheetPage: React.FC = () => {
     <Layout
       title="Datasheet"
       home={
-        <IconButton onClick={handleBackClick} aria-label="Back to faction">
+        <NavigationButton to={`/faction/${factionId}`}>
           <FaArrowLeft />
-        </IconButton>
+        </NavigationButton>
       }
       action={
         <IconButton onClick={handleShare} aria-label="Share datasheet" className="ml-2">

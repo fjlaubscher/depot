@@ -4,14 +4,17 @@ import { sortByName } from './array';
 export const groupEnhancementsByDetachment = (
   enhancements: depot.Enhancement[]
 ): Record<string, depot.Enhancement[]> => {
-  const grouped = enhancements.reduce((acc, enhancement) => {
-    const key = enhancement.detachment || 'General';
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(enhancement);
-    return acc;
-  }, {} as Record<string, depot.Enhancement[]>);
+  const grouped = enhancements.reduce(
+    (acc, enhancement) => {
+      const key = enhancement.detachment || 'General';
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(enhancement);
+      return acc;
+    },
+    {} as Record<string, depot.Enhancement[]>
+  );
 
   // Sort enhancements within each detachment
   Object.keys(grouped).forEach((key) => {
