@@ -4,7 +4,6 @@ import { APP_ACTIONS } from './constants';
 // Initial state
 export const initialState: AppState = {
   factionIndex: null,
-  factionCache: {},
   offlineFactions: [],
   loading: false,
   error: null,
@@ -26,34 +25,11 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     case APP_ACTIONS.LOAD_FACTION_START:
       return { ...state, loading: true };
 
-    case APP_ACTIONS.LOAD_FACTION_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        factionCache: {
-          ...state.factionCache,
-          [action.payload.id]: action.payload.faction
-        }
-      };
-
     case APP_ACTIONS.LOAD_FACTION_ERROR:
       return { ...state, loading: false, error: action.payload.error };
 
-    case APP_ACTIONS.CACHE_FACTION_SUCCESS:
-      return {
-        ...state,
-        factionCache: {
-          ...state.factionCache,
-          [action.payload.id]: action.payload.faction
-        },
-        offlineFactions: [
-          ...state.offlineFactions.filter((f) => f.id !== action.payload.id),
-          { id: action.payload.id, name: action.payload.faction.name }
-        ]
-      };
-
-    case APP_ACTIONS.CACHE_FACTION_ERROR:
-      return { ...state, error: action.payload };
+    case APP_ACTIONS.UPDATE_OFFLINE_FACTIONS:
+      return { ...state, offlineFactions: action.payload };
 
     case APP_ACTIONS.LOAD_SETTINGS_SUCCESS:
       return { ...state, settings: action.payload };

@@ -23,7 +23,7 @@ import FactionDetachments from './components/faction-detachments';
 import FactionEnhancements from './components/faction-enhancements';
 
 // Types
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 const Faction: React.FC = () => {
   const { id } = useParams();

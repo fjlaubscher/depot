@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { offlineStorage } from './offline-storage';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // Mock IndexedDB
 const mockIndexedDB = {

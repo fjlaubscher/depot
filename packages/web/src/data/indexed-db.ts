@@ -1,4 +1,4 @@
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 const DB_NAME = 'depot';
 const OBJECT_STORE_NAME = 'data';

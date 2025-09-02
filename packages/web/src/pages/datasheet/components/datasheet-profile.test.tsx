@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import DatasheetProfile from './datasheet-profile';
 import { mockDatasheet, createMockDatasheet } from '@/test/mock-data';
 import { TestWrapper } from '@/test/test-utils';

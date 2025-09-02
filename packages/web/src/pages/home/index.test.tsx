@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import HomeNew from './index';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import { AppContextType } from '@/contexts/app/types';
 import { TestWrapper } from '@/test/test-utils';
 
@@ -10,14 +10,13 @@ import { TestWrapper } from '@/test/test-utils';
 const mockAppContext: AppContextType = {
   state: {
     factionIndex: null as depot.Index[] | null,
-    factionCache: {},
     offlineFactions: [],
     loading: false,
     error: null as string | null,
     settings: null
   },
   dispatch: vi.fn(),
-  loadFaction: vi.fn(),
+  getFaction: vi.fn(),
   clearOfflineData: vi.fn(),
   updateSettings: vi.fn()
 };

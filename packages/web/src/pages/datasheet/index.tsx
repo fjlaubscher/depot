@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaShareAlt, FaArrowLeft } from 'react-icons/fa';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // components
 import Layout from '@/components/ui/layout';

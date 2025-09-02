@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -27,7 +27,7 @@ global.fetch = vi.fn();
 
 // Test component to consume the context
 const TestComponent = () => {
-  const { state, loadFaction, updateSettings, clearOfflineData } = useAppContext();
+  const { state, getFaction, updateSettings, clearOfflineData } = useAppContext();
 
   return (
     <div>
@@ -36,7 +36,7 @@ const TestComponent = () => {
       <div data-testid="faction-count">{state.factionIndex?.length || 0}</div>
       <div data-testid="offline-count">{state.offlineFactions.length}</div>
       <div data-testid="settings">{JSON.stringify(state.settings)}</div>
-      <button onClick={() => loadFaction('test-faction')} data-testid="load-faction">
+      <button onClick={() => getFaction('test-faction')} data-testid="load-faction">
         Load Faction
       </button>
       <button
@@ -75,7 +75,7 @@ const mockSettings: depot.Settings = {
 describe('AppProvider with IndexedDB Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Suppress console.error and console.warn during tests to avoid stderr noise
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -238,38 +238,6 @@ describe('AppProvider with IndexedDB Integration', () => {
         expect(screen.getByTestId('error')).toHaveTextContent('Network error');
       });
     });
-
-    it('should skip network request if faction is already cached in memory', async () => {
-      render(
-        <AppProvider>
-          <TestComponent />
-        </AppProvider>
-      );
-
-      const loadButton = screen.getByTestId('load-faction');
-
-      // First load
-      mockOfflineStorage.getFaction.mockResolvedValue(mockFaction);
-      await act(async () => {
-        loadButton.click();
-      });
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.getFaction).toHaveBeenCalledWith('test-faction');
-      });
-
-      vi.clearAllMocks();
-
-      // Second load should not call IndexedDB or network
-      await act(async () => {
-        loadButton.click();
-      });
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.getFaction).not.toHaveBeenCalled();
-        expect(global.fetch).not.toHaveBeenCalled();
-      });
-    });
   });
 
   describe('updateSettings', () => {
@@ -296,7 +264,6 @@ describe('AppProvider with IndexedDB Integration', () => {
         JSON.stringify({ showForgeWorld: true, showLegends: false })
       );
     });
-
   });
 
   describe('clearOfflineData', () => {
@@ -309,26 +276,18 @@ describe('AppProvider with IndexedDB Integration', () => {
 
       const clearButton = screen.getByTestId('clear-data');
 
-      // Mock window.location.reload
-      const mockReload = vi.fn();
-      Object.defineProperty(window, 'location', {
-        value: { ...window.location, reload: mockReload },
-        writable: true
-      });
-
       await act(async () => {
         clearButton.click();
       });
 
       await waitFor(() => {
         expect(mockOfflineStorage.clearAllData).toHaveBeenCalled();
+        expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
+        expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
       });
 
-      expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
-      expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
-      expect(mockReload).toHaveBeenCalled();
+      // Check that the offline factions list is reset
+      expect(screen.getByTestId('offline-count')).toHaveTextContent('0');
     });
-
   });
-
 });

@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   const { state, closeSidebar, toggleSidebar } = useLayoutContext();
   const { sidebarOpen } = state;
-  
+
   // Set document title
   useDocumentTitle(`${title} | depot`);
 
@@ -43,7 +43,6 @@ const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div

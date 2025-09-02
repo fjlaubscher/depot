@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import useLocalStorage from '@/hooks/use-local-storage';
 

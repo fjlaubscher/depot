@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 import convertToJSON from './convert-to-json';
 import generateData from './generate-data';

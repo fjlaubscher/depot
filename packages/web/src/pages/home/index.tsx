@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCog } from 'react-icons/fa';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // Context hooks
 import { useAppContext } from '@/contexts/app/use-app-context';

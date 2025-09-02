@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { depot, wahapedia } from "@depot/core";
+import { depot, wahapedia } from '@depot/core';
 
 const JSON_DIR = `${__dirname}/json`;
 

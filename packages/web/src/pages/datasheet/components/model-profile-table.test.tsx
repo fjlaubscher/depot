@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { mockDatasheet } from '@/test/mock-data';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import ModelProfileTable from './model-profile-table';
 
 describe('ModelProfileTable', () => {

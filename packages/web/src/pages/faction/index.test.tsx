@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import Faction from './index';
 import { TestWrapper } from '@/test/test-utils';
 

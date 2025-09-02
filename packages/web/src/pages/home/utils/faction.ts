@@ -1,4 +1,4 @@
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import { getFactionAlliance } from '@/utils/faction';
 
 export interface GroupedFactions {

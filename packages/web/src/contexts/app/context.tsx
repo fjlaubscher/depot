@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useEffect } from 'react';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 import { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
@@ -16,23 +16,13 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  // Load faction data with offline-first approach
-  const loadFaction = async (id: string) => {
-    if (state.factionCache[id]) {
-      return; // Already cached in memory
-    }
-
-    dispatch({ type: APP_ACTIONS.LOAD_FACTION_START, payload: id });
-
+  // Get faction data directly from IndexedDB with network fallback
+  const getFaction = async (id: string): Promise<depot.Faction | null> => {
     try {
       // First, try to load from IndexedDB
       const cachedFaction = await offlineStorage.getFaction(id);
       if (cachedFaction) {
-        dispatch({
-          type: APP_ACTIONS.LOAD_FACTION_SUCCESS,
-          payload: { id, faction: cachedFaction }
-        });
-        return;
+        return cachedFaction;
       }
 
       // If not cached, fetch from network
@@ -45,23 +35,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // Cache the faction in IndexedDB for offline use
       try {
         await offlineStorage.setFaction(id, faction);
-        dispatch({
-          type: APP_ACTIONS.CACHE_FACTION_SUCCESS,
-          payload: { id, faction }
-        });
+        // Update offline factions list
+        const offlineFactions = await offlineStorage.getAllCachedFactions();
+        dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
       } catch (cacheError) {
-        // Still dispatch success for network load, but log cache error
         console.warn('Failed to cache faction in IndexedDB:', cacheError);
-        dispatch({
-          type: APP_ACTIONS.LOAD_FACTION_SUCCESS,
-          payload: { id, faction }
-        });
       }
+
+      return faction;
     } catch (error) {
-      dispatch({
-        type: APP_ACTIONS.LOAD_FACTION_ERROR,
-        payload: { id, error: error instanceof Error ? error.message : 'Unknown error' }
-      });
+      console.error(`Failed to load faction ${id}:`, error);
+      return null;
     }
   };
 
@@ -85,11 +69,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
       }
 
-      // Reset the in-memory cache and offline factions list
-      window.location.reload(); // Simplest way to ensure complete state reset
+      // Reset the offline factions list
+      dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
     } catch (error) {
       dispatch({
-        type: APP_ACTIONS.CACHE_FACTION_ERROR,
+        type: APP_ACTIONS.LOAD_INDEX_ERROR,
         payload: error instanceof Error ? error.message : 'Failed to clear offline data'
       });
       throw error;
@@ -159,13 +143,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       // Load list of cached factions for settings page
       try {
         const offlineFactions = await offlineStorage.getAllCachedFactions();
-        // Update state with current offline factions
-        offlineFactions.forEach((faction) => {
-          dispatch({
-            type: APP_ACTIONS.CACHE_FACTION_SUCCESS,
-            payload: { id: faction.id, faction: { ...faction } as any }
-          });
-        });
+        dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
       } catch (error) {
         console.warn('Failed to load offline factions list:', error);
       }
@@ -177,7 +155,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const contextValue: AppContextType = {
     state,
     dispatch,
-    loadFaction,
+    getFaction,
     clearOfflineData,
     updateSettings
   };

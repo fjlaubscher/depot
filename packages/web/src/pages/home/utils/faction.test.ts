@@ -5,7 +5,7 @@ import {
   createTabLabels,
   hasMyFactions
 } from './faction';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // Mock data for testing
 const mockFactions: depot.Index[] = [

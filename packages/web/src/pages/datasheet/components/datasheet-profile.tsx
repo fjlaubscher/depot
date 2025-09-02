@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { depot } from "@depot/core";
+import { depot } from '@depot/core';
 
 // components
 import Card from '@/components/ui/card';

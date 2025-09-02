@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { depot } from "@depot/core";
+import { useEffect, useState } from 'react';
+import { depot } from '@depot/core';
 import { useAppContext } from '@/contexts/app/use-app-context';
 
 interface UseFactionReturn {
@@ -9,26 +9,44 @@ interface UseFactionReturn {
 }
 
 const useFaction = (factionId?: string): UseFactionReturn => {
-  const { state, loadFaction } = useAppContext();
+  const { getFaction } = useAppContext();
+  const [data, setData] = useState<depot.Faction | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (factionId && !state.factionCache[factionId]) {
-      loadFaction(factionId);
+    if (!factionId) {
+      setData(undefined);
+      setLoading(false);
+      setError(null);
+      return;
     }
-  }, [factionId, loadFaction, state.factionCache]);
 
-  if (!factionId) {
-    return {
-      data: undefined,
-      loading: false,
-      error: null
+    const loadFactionData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const faction = await getFaction(factionId);
+        if (faction) {
+          setData(faction);
+        } else {
+          setError(`Failed to load faction ${factionId}`);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
     };
-  }
+
+    loadFactionData();
+  }, [factionId, getFaction]);
 
   return {
-    data: state.factionCache[factionId],
-    loading: state.loading,
-    error: state.error
+    data,
+    loading,
+    error
   };
 };
 
