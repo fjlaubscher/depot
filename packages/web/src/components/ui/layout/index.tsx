@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 import { BREAKPOINTS } from '@/constants/breakpoints';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import IconButton from '../icon-button';
 import Loader from '../loader';
 
@@ -25,6 +25,9 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   const { state, closeSidebar, toggleSidebar } = useLayoutContext();
   const { sidebarOpen } = state;
+  
+  // Set document title
+  useDocumentTitle(`${title} | depot`);
 
   // Close sidebar when resizing to desktop on mobile
   useEffect(() => {
@@ -40,7 +43,6 @@ const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      <Helmet title={`${title} | depot`} />
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (

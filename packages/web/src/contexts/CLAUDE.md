@@ -85,68 +85,26 @@ Manages notification system:
 
 ## Usage Pattern
 
-### 1. Provider Setup
-Wrap your app with the context providers:
-```tsx
-import { AppProvider } from './contexts/app/context';
-import { LayoutProvider } from './contexts/layout/context';
+### Provider Setup
+Wrap your app with the context providers. See `src/app.tsx` for the complete provider hierarchy.
 
-function App() {
-  return (
-    <AppProvider>
-      <LayoutProvider>
-        <YourAppComponents />
-      </LayoutProvider>
-    </AppProvider>
-  );
-}
-```
-
-### 2. Consuming Context
-Use the custom hooks in components:
-```tsx
-import { useAppContext } from '@/contexts/app/use-app-context';
-import { useLayoutContext } from '@/contexts/layout/use-layout-context';
-
-function MyComponent() {
-  const { state, dispatch, loadFaction } = useAppContext();
-  const { toggleSidebar, closeSidebar } = useLayoutContext();
-  
-  // Use state and actions...
-}
-```
+### Consuming Context
+Use the custom hooks in components. Import directly from specific context files:
+- `useAppContext()` for global data and business logic
+- `useLayoutContext()` for UI state management
+- `useToastContext()` for notifications
 
 ## Offline Storage Integration
 
-### IndexedDB Integration (`data/offline-storage.ts`)
-The App Context integrates with a modern IndexedDB wrapper for offline-first data management:
+### IndexedDB Integration
+The App Context integrates with `data/offline-storage.ts` for offline-first data management:
 
-```typescript
-// Automatic faction caching when loading
-const cachedFaction = await offlineStorage.getFaction(id);
-if (cachedFaction) {
-  // Use cached data immediately
-  dispatch({ type: APP_ACTIONS.LOAD_FACTION_SUCCESS, payload: { id, faction: cachedFaction } });
-  return;
-}
-
-// Network fallback with automatic caching
-const response = await fetch(`/data/${id}.json`);
-const faction = await response.json();
-await offlineStorage.setFaction(id, faction); // Auto-cache for offline use
-```
-
-### Key Features
 - **Offline-First**: Always check IndexedDB before network requests
 - **Automatic Caching**: Network-loaded data is automatically cached
 - **Settings Persistence**: User preferences saved to IndexedDB
 - **Error Recovery**: Network failures don't break app if data is cached
-- **Cache Management**: Settings page can view and clear cached data
 
-### Storage Structure
-- **Faction Index**: `/data/index.json` cached for offline navigation
-- **Individual Factions**: Cached as visited for detailed browsing
-- **User Settings**: Forge World/Legends preferences persist across sessions
+See `app/context.tsx` for complete implementation examples.
 
 ## Benefits of This Pattern
 
@@ -201,42 +159,14 @@ await offlineStorage.setFaction(id, faction); // Auto-cache for offline use
 
 ## Testing Patterns
 
-### Test Wrapper Setup
-When testing components that use contexts, create comprehensive test wrappers:
+See `../test/CLAUDE.md` for comprehensive testing guidelines.
 
-```tsx
-const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <BrowserRouter>
-    <ToastProvider>
-      <LayoutProvider>
-        {children}
-      </LayoutProvider>
-    </ToastProvider>
-  </BrowserRouter>
-);
-```
+### Key Testing Rules
+- **Always use TestWrapper**: Required for all component tests (includes all providers)
+- **Complete Mocks**: Provide full context interfaces when mocking
+- **Provider Order**: Router → Data contexts → UI contexts
 
-### Provider Order
-- **Router providers** (BrowserRouter) should be outermost
-- **Data contexts** (ToastProvider) should wrap UI contexts
-- **UI contexts** (LayoutProvider) should be innermost
-- This ensures proper context availability and prevents provider conflicts
-
-### Mock Context Values
-When mocking contexts, provide complete context shape:
-
-```tsx
-mockUseToastContext.mockReturnValue({
-  showToast: mockShowToast,
-  removeToast: vi.fn(),
-  clearAllToasts: vi.fn(),
-  state: { toasts: [] },
-  dispatch: vi.fn()
-});
-```
-
-### Test Infrastructure Lessons
-- **Provider Nesting**: All contexts used by components must be present in test wrappers
-- **Mock Completeness**: Partial mocks can cause runtime errors - provide full context interfaces
-- **Async Operations**: Use proper async/await patterns in test setup (beforeEach blocks)
-- **Context Validation**: Tests will fail fast if context providers are missing, making debugging easier
+### Test Infrastructure
+Use centralized utilities from `../test/`:
+- **TestWrapper**: Includes all required context providers
+- **Mock Context Values**: Factory functions for consistent mocking patterns

@@ -1,268 +1,127 @@
-# Pages Architecture Guidelines
+# Pages Architecture & Implementation Guide
 
-This directory contains React page components organized using a consistent, scalable pattern for maintainability and clarity.
+This directory contains React page components using a consistent, scalable architecture for the depot application.
 
-## Directory Structure
+## Core Architecture Principles
 
-Each page follows this modular file structure:
-
+### Directory Structure Pattern
 ```
 pages/
 ├── [page-name]/
 │   ├── index.tsx              # Main page component
-│   ├── index.test.tsx         # Main page component tests
+│   ├── index.test.tsx         # Page component tests
 │   ├── components/            # Page-specific components
-│   │   ├── component-a.tsx    # Focused, single-purpose components
-│   │   ├── component-a.test.tsx # Tests colocated with components
-│   │   ├── component-b.tsx    # Each handling specific UI concerns
-│   │   ├── component-b.test.tsx # No barrel files - explicit imports
-│   │   └── component-c.tsx    
-│   ├── utils/                 # Page-specific utilities and helpers
-│   │   ├── helper-functions.ts # Business logic extracted from components
-│   │   └── helper-functions.test.ts # Utility function tests
-└── CLAUDE.md                  # This documentation file
+│   └── utils/                 # Page-specific utilities
 ```
 
-## File Organization Principles
+### Component Responsibilities
+- **Main Page Component**: State orchestration, context integration, route handling, minimal logic
+- **Child Components**: Single responsibility, composable design, clear TypeScript interfaces
+- **Utility Functions**: Pure business logic, domain organization, fully testable
 
-### Main Page Component (`index.tsx`)
-- **Single Responsibility**: Orchestrates child components and manages top-level state
-- **Minimal Logic**: Delegates complex logic to utils and UI concerns to child components
-- **Explicit Imports**: Import components and utilities directly, no barrel files
-- **State Management**: Uses context hooks, custom hooks, and local state appropriately
-- **Error Boundaries**: Handles loading, error, and success states
+## Implementation Patterns
 
-### Child Components (`components/`)
-- **Focused Scope**: Each component handles one specific UI concern or user interaction
-- **Clear Naming**: Component names should clearly indicate their purpose
-- **Prop Interfaces**: Well-defined TypeScript interfaces for all props
-- **Composable**: Can be combined to build complex UI while remaining testable
-- **No Barrel Files**: Import components explicitly to maintain clarity
+### Context-Based Data Loading
+Pages use App Context hooks for data management. See `home/index.tsx` and `faction/index.tsx` for examples.
 
-### Utility Functions (`utils/`)
-- **Pure Functions**: Extract business logic, calculations, and data transformations
-- **Single File per Domain**: Group related functions by domain (e.g., `faction.ts`, `search.ts`)
-- **Export Named Functions**: Use named exports for better tree-shaking and clarity
-- **Type Definitions**: Co-locate interfaces and types with their related functions
-- **No Side Effects**: Keep functions pure and predictable
+### State Component Pattern
+Use dedicated components for different states:
+- Loading: Skeleton components that mirror content structure
+- Error: User-friendly error messages with recovery options
+- Empty: Meaningful empty states for filtered views
 
-### Test Files (`*.test.tsx` / `*.test.ts`)
-- **Colocated**: Tests live next to the files they test
-- **Comprehensive**: Cover component rendering, user interactions, and edge cases
-- **Pure Function Tests**: Test utility functions with various inputs and outputs
-- **Integration Tests**: Test component combinations and data flow between components
+### Utility Function Extraction
+Extract complex filtering, grouping, and calculation logic to `utils/` directory. Examples:
+- `home/utils/faction.ts` - Faction filtering and alliance grouping
+- `faction/utils/detachment.ts` - Detachment ability filtering and organization
+- `faction/utils/enhancement.ts` - Enhancement processing with cost handling
 
+## Card Component Design System
 
-## Development Guidelines
+### Consistent Structure
+All domain cards follow standardized layout patterns. Reference implementations:
+- `faction/components/stratagem-card.tsx` - CP cost badges, type classification
+- `faction/components/detachment-ability-card.tsx` - Detachment badges, descriptions
+- `faction/components/enhancement-card.tsx` - Cost + detachment badge combinations
 
-### Component Design
-1. **Single Purpose**: Each component should have one clear responsibility
-2. **Prop Drilling**: Prefer explicit prop passing over complex context usage
-3. **Composition**: Build complex UI through component composition
-4. **State Location**: Keep state as close to where it's used as possible
-5. **Loading States**: Always handle loading, error, and empty states
+## Tab Component Architecture
 
-### Code Organization
-1. **Explicit Imports**: Always import specific functions/components, avoid barrel files
-2. **Consistent Naming**: Use descriptive, consistent naming conventions
-3. **Type Safety**: Leverage TypeScript for all props, state, and function parameters
-4. **Extract Logic**: Move complex logic to utility functions for testability
-5. **Co-location**: Keep related files close together in the directory structure
+### Standardized Tab Pattern
+All tab components follow consistent structure:
+1. Local state management with debounced search
+2. Memoized filtering and grouping operations
+3. UI state calculations (empty checks)
+4. Consistent filter UI with clear functionality
+5. Grouped display with proper empty states
 
-### State Management
-1. **Context Usage**: Use app context for global state, local state for UI concerns
-2. **Custom Hooks**: Extract reusable stateful logic into custom hooks
-3. **Memoization**: Use useMemo and useCallback for expensive operations
-4. **State Updates**: Keep state updates predictable and well-typed
+See `faction/components/` directory for complete implementations.
 
-### Testing Strategy
-1. **Colocated Tests**: Place `*.test.tsx` and `*.test.ts` files next to source files
-2. **Component Tests**: Test user interactions, prop handling, and conditional rendering
-3. **Utility Tests**: Test business logic functions with various inputs and edge cases
-4. **Integration Tests**: Test component combinations and data flow
-5. **Mock Strategy**: Mock external dependencies (context, API calls, routing)
+## Performance Optimization
 
-#### Test Categories by Component Type
-- **State Components**: Focus on conditional rendering (loading, error, success states)
-- **Interaction Components**: Test user events (clicks, typing, form submissions)
-- **Data Components**: Test prop handling, data transformations, and edge cases
-- **Utility Functions**: Test pure functions with comprehensive input/output scenarios
+### Memoization Strategy
+- Filter operations: Memoize with proper dependency arrays
+- Grouping operations: Separate memoization from filtering
+- UI state: Memoize empty checks separately from data operations
+
+### Debouncing
+- Search inputs: 300ms debounce
+- Filter inputs: 100ms debounce
+
+## Testing Strategy
+
+### Test Infrastructure
+Use centralized testing utilities from `src/test/`:
+- **TestWrapper**: Required for all component tests (includes Router, Layout, Toast contexts)
+- **Mock Data**: Use factory functions from `mock-data.ts`
+
+See `src/test/CLAUDE.md` for comprehensive testing guidelines.
+
+### Test Coverage Categories
+1. **Main Component Tests**: Loading, error, success states, user interactions
+2. **Utility Function Tests**: Pure functions with edge cases and various inputs
+3. **Integration Tests**: Component combinations and data flow
+4. **Component-Specific Tests**: Mock child components, focus on integration logic
+
+### Test Organization
+Structure tests by interaction patterns: Loading/Error States, User Interactions, Data Display, Edge Cases.
+
+## Key Implementation Examples
+
+### Current Implementations
+- **Home Page** (`home/`): Complete modular architecture with alliance grouping
+- **Faction Page** (`faction/`): Advanced tab system with comprehensive filtering
+- **Test Infrastructure** (`../test/`): Centralized utilities and mock data
+
+### Reference Files
+- Context integration: `home/index.tsx`
+- Complex filtering: `faction/utils/detachment.ts`
+- Tab patterns: `faction/components/faction-datasheets.tsx`
+- Testing patterns: All `*.test.tsx` files
 
 ## Best Practices
 
+### Code Organization
+- Single responsibility components
+- Extract logic to testable utilities
+- Explicit imports, no barrel files
+- Colocated tests
+
 ### Performance
-- Extract expensive calculations to utility functions with memoization
-- Split loading states into separate components
-- Use skeleton loaders for better perceived performance
-- Minimize re-renders through proper dependency arrays
-- Debounce user inputs for search functionality
-- Use useMemo for complex data transformations (filtering, grouping)
+- Debounced user inputs
+- Proper memoization
+- Skeleton loading states
+- Minimize re-renders
 
-### Maintainability
-- Keep components small and focused
-- Use consistent file and component naming
-- Document complex business logic in utility functions
-- Prefer composition over inheritance
-
-### Accessibility
-- Include proper ARIA labels and semantic HTML
-- Handle keyboard navigation
-- Provide meaningful error messages
-- Support screen readers with descriptive text
-
-### Error Handling
-- Create dedicated error state components
-- Handle loading states gracefully
-- Provide user-friendly error messages
-- Implement proper fallback UI
-
-## Migration from Legacy Code
-
-When rebuilding existing pages:
-
-1. **Extract State Logic**: Move complex useMemo/useCallback logic to utility functions
-2. **Component Separation**: Break large components into focused child components
-3. **UI Library Migration**: Replace old components with new UI library components
-4. **Context Migration**: Replace deprecated state management with new context system
-5. **Testing Addition**: Add comprehensive tests for new component structure
-
-## Advanced Patterns Discovered
-
-### Context Migration Pattern
-When migrating from Recoil to Context, create versioned hooks in organized directories:
-```typescript
-// Old Recoil-based hook
-hooks/use-faction.ts
-
-// Context-based hook (replaced legacy hook)
-hooks/use-faction.ts
-
-// Benefits: Complete migration from Recoil, unified caching, consistent state handling
-```
-
-### Utility Function Extraction for Complex Logic
-Extract filtering and grouping logic to testable utility functions:
-```typescript
-// ❌ Avoid complex logic directly in components
-const groupedData = useMemo(() => {
-  const filtered = data.filter(/* complex logic */);
-  const grouped = filtered.reduce(/* complex grouping */);
-  // ... more complex logic
-  return grouped;
-}, [dependencies]);
-
-// ✅ Extract to utility functions
-const groupedData = useMemo(() => {
-  const filtered = filterEnhancements(data, query, detachment);
-  return groupEnhancementsByDetachment(filtered);
-}, [data, query, detachment]);
-```
-
-### Memoized Empty State Checks
-Create specific utility functions for checking if grouped data is empty:
-```typescript
-// utils/enhancement.ts
-export const isEnhancementGroupedDataEmpty = (
-  grouped: Record<string, depot.Enhancement[]>
-): boolean => {
-  return Object.keys(grouped).every(key => grouped[key].length === 0);
-};
-
-// Component usage with memoization
-const isEmpty = useMemo(
-  () => isEnhancementGroupedDataEmpty(groupedEnhancements),
-  [groupedEnhancements]
-);
-```
-
-### Consistent Card Component Pattern
-Create domain-specific card components with consistent styling:
-```typescript
-// Pattern: [Domain]Card components
-- StratagemCard.tsx
-- DetachmentAbilityCard.tsx  
-- EnhancementCard.tsx
-
-// Each follows consistent structure:
-- Header with name and badges/costs
-- Legend text (if present)
-- Description with proper typography
-- Dark mode support throughout
-```
-
-### Conditional Component Rendering
-Create dedicated components for different states instead of inline conditionals:
-```typescript
-// ❌ Avoid inline conditionals in main component
-if (loading) return <div>Loading...</div>;
-if (error) return <div>Error: {error}</div>;
-
-// ✅ Use dedicated state components
-if (loading) return <LoadingSkeleton />;
-if (error) return <ErrorState error={error} />;
-```
-
-### Skeleton Loading Pattern  
-Provide skeleton components that mirror actual content structure:
-```typescript
-// FactionGrid component with loading prop
-const FactionGrid = ({ factions, loading }) => {
-  if (loading) {
-    return (
-      <Grid>
-        {Array.from({ length: 6 }).map((_, index) => (
-          <SkeletonCard key={`skeleton-${index}`} />
-        ))}
-      </Grid>
-    );
-  }
-  // ... actual content
-};
-```
-
-### Comprehensive Test Mocking
-Mock child components to focus on integration logic:
-```typescript
-// Mock complex child components in integration tests
-vi.mock('./components/alliance-section', () => ({
-  default: ({ alliance, factions }) => (
-    <div data-testid={`alliance-${alliance}`}>
-      {factions.map(f => <div key={f.id}>{f.name}</div>)}
-    </div>
-  )
-}));
-```
-
-### Edge Case Handling in Utils
-Always handle null/undefined cases in utility functions:
-```typescript
-export const filterFactionsByQuery = (
-  factions: depot.Index[] | null, 
-  query: string
-): depot.Index[] => {
-  if (!factions) return []; // Handle null/undefined
-  if (!query) return factions; // Handle empty query
-  // ... filtering logic
-};
-```
-
-### Test Organization by Interaction Type
-Structure tests by interaction patterns:
-- **Loading/Error States**: Test conditional rendering
-- **User Interactions**: Test clicks, typing, navigation  
-- **Data Flow**: Test prop passing and state updates
-- **Edge Cases**: Test null values, empty arrays, error scenarios
-
-## Critical Test Infrastructure Lessons
-
-### Test Setup Location
-- **Location**: Test setup must be in `/src/test-setup.ts` (not `/tests/setup.ts`)
-- **Vitest Config**: Update `vite.config.ts` setupFiles to point to `./src/test-setup.ts`
-- **TypeScript**: Add test types to `tsconfig.json` types array: `["vitest/globals", "@testing-library/jest-dom"]`
+### User Experience
+- Meaningful loading states
+- Graceful error handling
+- Empty state management
+- Keyboard navigation support
 
 ### Testing
-- Use centralized utilities from `src/test/` for consistent test setup
-- Add `data-testid` attributes to components for reliable testing
-- See `src/test/CLAUDE.md` for comprehensive testing guidelines
+- Use centralized TestWrapper and mock data
+- React 19 act() patterns for interactions
+- Mock child components in integration tests
+- Cover edge cases and error scenarios
 
-This pattern promotes maintainable, testable, and scalable page components that are easy to understand and modify.
+This architecture ensures maintainable, testable, and performant page components across the depot application.

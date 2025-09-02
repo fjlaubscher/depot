@@ -21,24 +21,27 @@ npm install -g pnpm
 pnpm install
 ```
 
-## Data Generation
-
-First, generate data from Wahapedia's CSV exports:
-
-```bash
-pnpm cli
-# or explicitly
-pnpm --filter @depot/cli start
-```
-
-This creates `wahapedia.json` in `packages/cli/dist/` - copy this to `packages/web/public/` for the web app.
-
 ## Development
 
-Start the web development server:
+Start the application (generates data and starts web server):
 
 ```bash
 pnpm start
+```
+
+This script automatically:
+1. Downloads and processes Wahapedia data via the CLI
+2. Copies generated files to the web app's public directory
+3. Starts the development server
+
+### Individual Commands
+
+```bash
+# Generate data only
+pnpm run data:generate
+
+# Start web server only (requires data to be generated first)
+pnpm run dev
 ```
 
 ## Building

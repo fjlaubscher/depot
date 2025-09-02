@@ -4,8 +4,9 @@
   "scripts": {
     "build": "tsc --build",
     "build:packages": "pnpm --recursive run build",
-    "start": "pnpm --filter @depot/web start",
-    "cli": "pnpm --filter @depot/cli start",
+    "start": "pnpm run data:generate && pnpm run data:copy && pnpm --filter @depot/web start",
+    "data:generate": "pnpm --filter @depot/cli start",
+    "data:copy": "cp packages/cli/dist/data/* packages/web/public/data/ 2>/dev/null || mkdir -p packages/web/public/data && cp packages/cli/dist/data/* packages/web/public/data/",
     "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "clean": "pnpm --recursive run clean && rimraf node_modules",

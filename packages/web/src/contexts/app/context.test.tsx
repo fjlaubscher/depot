@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
 import { depot } from "@depot/core";
@@ -178,7 +178,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const loadButton = screen.getByTestId('load-faction');
-      loadButton.click();
+      await act(async () => {
+        loadButton.click();
+      });
 
       await waitFor(() => {
         expect(mockOfflineStorage.getFaction).toHaveBeenCalledWith('test-faction');
@@ -201,7 +203,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const loadButton = screen.getByTestId('load-faction');
-      loadButton.click();
+      await act(async () => {
+        loadButton.click();
+      });
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/data/test-faction.json');
@@ -221,7 +225,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const loadButton = screen.getByTestId('load-faction');
-      loadButton.click();
+      await act(async () => {
+        loadButton.click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('error')).toHaveTextContent('Network error');
@@ -239,7 +245,9 @@ describe('AppProvider with IndexedDB Integration', () => {
 
       // First load
       mockOfflineStorage.getFaction.mockResolvedValue(mockFaction);
-      loadButton.click();
+      await act(async () => {
+        loadButton.click();
+      });
 
       await waitFor(() => {
         expect(mockOfflineStorage.getFaction).toHaveBeenCalledWith('test-faction');
@@ -248,7 +256,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       vi.clearAllMocks();
 
       // Second load should not call IndexedDB or network
-      loadButton.click();
+      await act(async () => {
+        loadButton.click();
+      });
 
       await waitFor(() => {
         expect(mockOfflineStorage.getFaction).not.toHaveBeenCalled();
@@ -266,7 +276,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const updateButton = screen.getByTestId('update-settings');
-      updateButton.click();
+      await act(async () => {
+        updateButton.click();
+      });
 
       await waitFor(() => {
         expect(mockOfflineStorage.setSettings).toHaveBeenCalledWith({
@@ -290,7 +302,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const updateButton = screen.getByTestId('update-settings');
-      updateButton.click();
+      await act(async () => {
+        updateButton.click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('settings')).toHaveTextContent(
@@ -317,7 +331,9 @@ describe('AppProvider with IndexedDB Integration', () => {
         writable: true
       });
 
-      clearButton.click();
+      await act(async () => {
+        clearButton.click();
+      });
 
       await waitFor(() => {
         expect(mockOfflineStorage.clearAllData).toHaveBeenCalled();
@@ -338,7 +354,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       const clearButton = screen.getByTestId('clear-data');
-      clearButton.click();
+      await act(async () => {
+        clearButton.click();
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('error')).toHaveTextContent('Clear failed');
