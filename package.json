@@ -6,7 +6,7 @@
     "build:packages": "pnpm --recursive run build",
     "start": "pnpm run data:generate && pnpm run data:copy && pnpm --filter @depot/web start",
     "data:generate": "pnpm --filter @depot/cli start",
-    "data:copy": "cp packages/cli/dist/data/* packages/web/public/data/ 2>/dev/null || mkdir -p packages/web/public/data && cp packages/cli/dist/data/* packages/web/public/data/",
+    "data:copy": "node scripts/copy-data.ts",
     "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",
     "clean": "pnpm --recursive run clean && rimraf node_modules",
@@ -18,7 +18,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=8.0.0"
   }
 }
