@@ -2,9 +2,9 @@
   "name": "depot",
   "private": true,
   "scripts": {
-    "build": "pnpm --filter @depot/cli start && node scripts/copy-data.ts && pnpm --filter @depot/web build",
+    "build": "pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web build",
     "build:all": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/web build",
-    "start": "pnpm --filter @depot/cli start && node scripts/copy-data.ts && pnpm --filter @depot/web start",
+    "start": "pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
     "format": "pnpm --filter @depot/core format && pnpm --filter @depot/cli format && pnpm --filter @depot/web format",
     "lint": "pnpm --filter @depot/core lint && pnpm --filter @depot/cli lint && pnpm --filter @depot/web lint",
     "clean": "pnpm --filter @depot/core clean && pnpm --filter @depot/cli clean && pnpm --filter @depot/web clean && rimraf node_modules",
