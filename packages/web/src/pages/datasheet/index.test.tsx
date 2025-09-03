@@ -1,8 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DatasheetPage from './index';
 import {
-  mockDatasheet,
   mockFaction,
   mockFactionWithoutDatasheets,
   mockDatasheetWithoutCosts
@@ -13,6 +11,7 @@ import {
   setupCommonMocks,
   setupBrowserMocks
 } from '@/test/test-utils';
+import DatasheetPage from './index';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -100,8 +99,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Datasheet')).toBeInTheDocument();
-    // Loading is handled by Layout component, just check for loading structure
-    expect(screen.getByLabelText('Back to faction')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-loader')).toBeInTheDocument();
   });
 
   it('renders error state', () => {
@@ -114,7 +112,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Error')).toBeInTheDocument();
-    expect(screen.getByText(/Error loading faction data/)).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-error')).toBeInTheDocument();
   });
 
   it('renders not found state when datasheet is missing', () => {
@@ -127,16 +125,15 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Not Found')).toBeInTheDocument();
-    expect(screen.getByText('Datasheet not found')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-not-found')).toBeInTheDocument();
   });
 
   it('navigates back to faction page when back button is clicked', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    const backButton = screen.getByLabelText('Back to faction');
-    fireEvent.click(backButton);
-
-    expect(mockNavigate).toHaveBeenCalledWith('/faction/SM');
+    const backButton = screen.getByTestId('back-to-faction');
+    
+    expect(backButton).toHaveAttribute('href', '/faction/SM');
   });
 
   it('shows share button', () => {

@@ -65,7 +65,7 @@ const DatasheetPage: React.FC = () => {
           </NavigationButton>
         }
       >
-        <div className="text-center py-8">
+        <div className="text-center py-8" data-testid="datasheet-error">
           <p className="text-red-600 dark:text-red-400">Error loading faction data: {error}</p>
         </div>
       </Layout>
@@ -76,14 +76,13 @@ const DatasheetPage: React.FC = () => {
     return (
       <Layout
         title="Datasheet"
-        isLoading={true}
         home={
           <NavigationButton to={`/faction/${factionId}`}>
             <FaArrowLeft />
           </NavigationButton>
         }
       >
-        <div className="animate-pulse space-y-4">
+        <div className="animate-pulse space-y-4" data-testid="datasheet-loader">
           <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3"></div>
           <div className="flex justify-between">
             <div className="h-16 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
@@ -105,7 +104,7 @@ const DatasheetPage: React.FC = () => {
           </NavigationButton>
         }
       >
-        <div className="text-center py-8">
+        <div className="text-center py-8" data-testid="datasheet-not-found">
           <p className="text-gray-600 dark:text-gray-400 mb-4">Datasheet not found</p>
         </div>
       </Layout>
@@ -116,7 +115,7 @@ const DatasheetPage: React.FC = () => {
     <Layout
       title="Datasheet"
       home={
-        <NavigationButton to={`/faction/${factionId}`}>
+        <NavigationButton to={`/faction/${factionId}`} data-testid="back-to-faction">
           <FaArrowLeft />
         </NavigationButton>
       }

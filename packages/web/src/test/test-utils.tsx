@@ -77,14 +77,3 @@ export const setupBrowserMocks = () => {
   });
 };
 
-// Mock router params utility
-export const mockRouterParams = (params: Record<string, string>) => {
-  vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');
-    return {
-      ...actual,
-      useParams: () => params,
-      useNavigate: () => vi.fn()
-    };
-  });
-};
