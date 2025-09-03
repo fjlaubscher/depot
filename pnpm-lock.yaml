@@ -36,6 +36,9 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@20.19.11)
+      prettier:
+        specifier: ^3.4.0
+        version: 3.6.2
       rimraf:
         specifier: ^5.0.5
         version: 5.0.10
@@ -45,6 +48,9 @@ importers:
 
   packages/core:
     devDependencies:
+      prettier:
+        specifier: ^3.4.0
+        version: 3.6.2
       rimraf:
         specifier: ^5.0.5
         version: 5.0.10
