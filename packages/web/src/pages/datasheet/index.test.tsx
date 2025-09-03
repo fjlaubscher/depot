@@ -132,7 +132,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     const backButton = screen.getByTestId('back-to-faction');
-    
+
     expect(backButton).toHaveAttribute('href', '/faction/SM');
   });
 

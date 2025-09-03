@@ -23,41 +23,52 @@ pnpm install
 
 ## Development
 
+### Quick Start
 Start the application (generates data and starts web server):
 
 ```bash
 pnpm start
 ```
 
-This script automatically:
+This automatically:
 1. Downloads and processes Wahapedia data via the CLI
 2. Copies generated files to the web app's public directory
 3. Starts the development server
 
-### Individual Commands
+### Development Commands
 
 ```bash
-# Generate data only
-pnpm run data:generate
+# Start web dev server only (requires data first)
+pnpm dev
 
-# Start web server only (requires data to be generated first)
-pnpm run dev
+# Generate fresh data from Wahapedia
+pnpm --filter @depot/cli start
 ```
 
 ## Building
 
-Build all packages:
+### Production Build
+Build the application for production:
 
 ```bash
 pnpm build
 ```
 
+This automatically:
+1. Downloads and processes fresh Wahapedia data
+2. Copies data to web app
+3. Builds the production web app
+
+### Package Builds
+Build all packages individually:
+
+```bash
+pnpm build:all
+```
+
 ## Testing
 
 ```bash
-# Run all tests
-pnpm test
-
 # Test specific packages
 pnpm --filter @depot/cli test
 pnpm --filter @depot/web test
@@ -66,11 +77,16 @@ pnpm --filter @depot/web test
 ## Code Quality
 
 ```bash
-# Format code
+# Format all code
 pnpm format
 
-# Check formatting
+# Lint all code (includes TypeScript checking)
 pnpm lint
+
+# TypeScript type checking only
+pnpm --filter @depot/core typecheck
+pnpm --filter @depot/cli typecheck  
+pnpm --filter @depot/web typecheck
 ```
 
 ## Package Structure

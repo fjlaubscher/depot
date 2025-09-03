@@ -11,9 +11,13 @@
     "build": "tsc",
     "clean": "rimraf dist",
     "dev": "tsc --watch",
-    "prepublishOnly": "pnpm run clean && pnpm run build"
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "prettier": "^3.4.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   },

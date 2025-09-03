@@ -17,49 +17,60 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm install
 ```
 
+### Development Workflow
+Start the application (generates fresh data and starts dev server):
+```bash
+pnpm start
+```
+
+Start dev server only (requires existing data):
+```bash
+pnpm dev
+```
+
 ### Data Generation
-Generate data from Wahapedia (run before starting web app):
+Generate fresh data from Wahapedia:
 ```bash
 pnpm --filter @depot/cli start
-# or shorthand
-pnpm cli
 ```
-This creates `wahapedia.json` in `packages/cli/dist/` - copy this to `packages/web/public/` for the web app.
+This creates JSON files in `packages/cli/dist/` which are automatically copied to `packages/web/public/data/` by the build scripts.
 
 To force re-download of source data:
 ```bash
 pnpm --filter @depot/cli start -- --force-download
 ```
 
-### Development Server
-```bash
-pnpm start
-```
-
 ### Building
+Production build (generates data + builds web app):
 ```bash
 pnpm build
 ```
 
+Build all packages individually:
+```bash
+pnpm build:all
+```
+
 ### Testing
 ```bash
-# Run tests for CLI
+# Test specific packages
 pnpm --filter @depot/cli test
-
-# Run tests for web
 pnpm --filter @depot/web test
 ```
 
 ### Code Quality
+All packages have unified scripts:
 ```bash
-# Format code
+# Format all code
 pnpm format
 
-# Check formatting and TypeScript
+# Lint all code (includes TypeScript checking)
 pnpm lint
 
-# Lint web with TypeScript check
-pnpm --filter @depot/web run lint
+# TypeScript checking only
+pnpm --filter @depot/core typecheck
+pnpm --filter @depot/cli typecheck
+pnpm --filter @depot/web typecheck
 ```
 
 ## Architecture
@@ -112,7 +123,8 @@ Shared TypeScript definitions in `@depot/core` define the complete Warhammer 40K
 - Settings and data index structures
 
 ## Workspace Structure
-- Root package.json manages pnpm workspaces and provides unified commands
+- Root package.json manages pnpm workspaces and provides unified commands via `pnpm --filter @depot/package-name script`
+- All packages have consistent script naming: `build`, `clean`, `dev`, `format`, `lint`, `typecheck`
 - Each package in `packages/` has independent dependencies and build processes
 - **@depot/core** provides shared type definitions ensuring consistency between CLI output and web app consumption
 - Modern scoped package naming (`@depot/cli`, `@depot/core`, `@depot/web`)

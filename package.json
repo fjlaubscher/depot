@@ -2,15 +2,13 @@
   "name": "depot",
   "private": true,
   "scripts": {
-    "build": "tsc --build",
-    "build:packages": "pnpm --recursive run build",
-    "start": "pnpm run data:generate && pnpm run data:copy && pnpm --filter @depot/web start",
-    "data:generate": "pnpm --filter @depot/cli start",
-    "data:copy": "node scripts/copy-data.ts",
-    "format": "prettier --write \"**/src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "prettier --check \"**/src/**/*.{js,jsx,ts,tsx}\"",
-    "clean": "pnpm --recursive run clean && rimraf node_modules",
-    "dev": "pnpm --filter @depot/web start"
+    "build": "pnpm --filter @depot/cli start && node scripts/copy-data.ts && pnpm --filter @depot/web build",
+    "build:all": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/web build",
+    "start": "pnpm --filter @depot/cli start && node scripts/copy-data.ts && pnpm --filter @depot/web start",
+    "format": "pnpm --filter @depot/core format && pnpm --filter @depot/cli format && pnpm --filter @depot/web format",
+    "lint": "pnpm --filter @depot/core lint && pnpm --filter @depot/cli lint && pnpm --filter @depot/web lint",
+    "clean": "pnpm --filter @depot/core clean && pnpm --filter @depot/cli clean && pnpm --filter @depot/web clean && rimraf node_modules",
+    "dev": "pnpm --filter @depot/web dev"
   },
   "devDependencies": {
     "prettier": "^2.8.8",
