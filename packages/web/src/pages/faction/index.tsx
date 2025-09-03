@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaStar } from 'react-icons/fa';
 
 // UI Components
-import Layout from '@/components/ui/layout';
+import AppLayout from '@/components/layout';
 import IconButton from '@/components/ui/icon-button';
 import NavigationButton from '@/components/ui/navigation-button';
 import Stat from '@/components/ui/stat';
@@ -67,44 +67,38 @@ const Faction: React.FC = () => {
   // Error State Component
   if (error) {
     return (
-      <Layout
-        title="Error"
-        home={
+      <AppLayout title="Error">
+        <div className="space-y-4">
           <NavigationButton to="/">
-            <FaArrowLeft />
+            <FaArrowLeft className="mr-2" />
+            Back to Home
           </NavigationButton>
-        }
-      >
-        <div className="text-center py-12">
-          <p className="text-red-600 dark:text-red-400">Failed to load faction: {error}</p>
+          <div className="text-center py-12">
+            <p className="text-red-600 dark:text-red-400">Failed to load faction: {error}</p>
+          </div>
         </div>
-      </Layout>
+      </AppLayout>
     );
   }
 
   // Main Content
   return (
-    <Layout
-      title="Faction"
-      isLoading={loading}
-      home={
-        <NavigationButton to="/">
-          <FaArrowLeft />
-        </NavigationButton>
-      }
-      action={
-        faction && (
-          <IconButton
-            onClick={toggleMyFaction}
-            aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
-          >
-            {isMyFaction ? <FaStar className="text-blue-500" /> : <FaStar />}
-          </IconButton>
-        )
-      }
-    >
+    <AppLayout title="Faction">
       {faction && (
         <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <NavigationButton to="/">
+              <FaArrowLeft className="mr-2" />
+              Back to Home
+            </NavigationButton>
+            <IconButton
+              onClick={toggleMyFaction}
+              aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
+            >
+              {isMyFaction ? <FaStar className="text-blue-500" /> : <FaStar />}
+            </IconButton>
+          </div>
+
           <Stat title={alliance} value={faction.name} />
 
           <Tabs
@@ -119,7 +113,7 @@ const Faction: React.FC = () => {
           </Tabs>
         </div>
       )}
-    </Layout>
+    </AppLayout>
   );
 };
 

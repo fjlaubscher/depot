@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaHome, FaSearch } from 'react-icons/fa';
 
 // UI Components
-import Layout from '@/components/ui/layout';
+import AppLayout from '@/components/layout';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 
@@ -14,7 +14,7 @@ const NotFound: React.FC = () => {
   };
 
   return (
-    <Layout title="Not Found">
+    <AppLayout title="Not Found">
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="max-w-md text-center">
           <div className="space-y-6">
@@ -29,7 +29,10 @@ const NotFound: React.FC = () => {
 
             {/* Error Message */}
             <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2
+                className="text-xl font-semibold text-gray-900 dark:text-white"
+                data-testid="page-heading"
+              >
                 Page Not Found
               </h2>
               <p className="text-gray-600 dark:text-gray-400">
@@ -56,7 +59,7 @@ const NotFound: React.FC = () => {
           </div>
         </Card>
       </div>
-    </Layout>
+    </AppLayout>
   );
 };
 

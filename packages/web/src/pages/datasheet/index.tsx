@@ -4,7 +4,7 @@ import { FaShareAlt, FaArrowLeft } from 'react-icons/fa';
 import { depot } from '@depot/core';
 
 // components
-import Layout from '@/components/ui/layout';
+import AppLayout from '@/components/layout';
 import Stat from '@/components/ui/stat';
 import Tabs from '@/components/ui/tabs';
 import IconButton from '@/components/ui/icon-button';
@@ -57,102 +57,99 @@ const DatasheetPage: React.FC = () => {
 
   if (error) {
     return (
-      <Layout
-        title="Error"
-        home={
+      <AppLayout title="Error">
+        <div className="space-y-4">
           <NavigationButton to={`/faction/${factionId}`}>
-            <FaArrowLeft />
+            <FaArrowLeft className="mr-2" />
+            Back to Faction
           </NavigationButton>
-        }
-      >
-        <div className="text-center py-8" data-testid="datasheet-error">
-          <p className="text-red-600 dark:text-red-400">Error loading faction data: {error}</p>
+          <div className="text-center py-8" data-testid="datasheet-error">
+            <p className="text-red-600 dark:text-red-400">Error loading faction data: {error}</p>
+          </div>
         </div>
-      </Layout>
+      </AppLayout>
     );
   }
 
   if (loading) {
     return (
-      <Layout
-        title="Datasheet"
-        home={
+      <AppLayout title="Datasheet">
+        <div className="space-y-4">
           <NavigationButton to={`/faction/${factionId}`}>
-            <FaArrowLeft />
+            <FaArrowLeft className="mr-2" />
+            Back to Faction
           </NavigationButton>
-        }
-      >
-        <div className="animate-pulse space-y-4" data-testid="datasheet-loader">
-          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3"></div>
-          <div className="flex justify-between">
-            <div className="h-16 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
-            <div className="h-16 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
+          <div className="animate-pulse space-y-4" data-testid="datasheet-loader">
+            <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3"></div>
+            <div className="flex justify-between">
+              <div className="h-16 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+              <div className="h-16 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
+            </div>
+            <div className="h-64 bg-gray-300 dark:bg-gray-600 rounded"></div>
           </div>
-          <div className="h-64 bg-gray-300 dark:bg-gray-600 rounded"></div>
         </div>
-      </Layout>
+      </AppLayout>
     );
   }
 
   if (!datasheet) {
     return (
-      <Layout
-        title="Not Found"
-        home={
+      <AppLayout title="Not Found">
+        <div className="space-y-4">
           <NavigationButton to={`/faction/${factionId}`}>
-            <FaArrowLeft />
+            <FaArrowLeft className="mr-2" />
+            Back to Faction
           </NavigationButton>
-        }
-      >
-        <div className="text-center py-8" data-testid="datasheet-not-found">
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Datasheet not found</p>
+          <div className="text-center py-8" data-testid="datasheet-not-found">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Datasheet not found</p>
+          </div>
         </div>
-      </Layout>
+      </AppLayout>
     );
   }
 
   return (
-    <Layout
-      title="Datasheet"
-      home={
-        <NavigationButton to={`/faction/${factionId}`} data-testid="back-to-faction">
-          <FaArrowLeft />
-        </NavigationButton>
-      }
-      action={
-        <IconButton onClick={handleShare} aria-label="Share datasheet" className="ml-2">
-          <FaShareAlt />
-        </IconButton>
-      }
-    >
-      {/* Header with Stats */}
-      <div className="flex justify-between items-start mb-6" data-testid="datasheet-header">
-        <Stat
-          title={datasheet.role}
-          value={datasheet.name}
-          description={datasheetCost?.description}
-          variant="large"
-          className="text-left"
-        />
-        <Stat
-          title="Points"
-          value={datasheetCost?.cost || '-'}
-          description={alternateCost?.cost}
-          className="text-right"
-        />
-      </div>
+    <AppLayout title="Datasheet">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <NavigationButton to={`/faction/${factionId}`} data-testid="back-to-faction">
+            <FaArrowLeft className="mr-2" />
+            Back to Faction
+          </NavigationButton>
+          <IconButton onClick={handleShare} aria-label="Share datasheet">
+            <FaShareAlt />
+          </IconButton>
+        </div>
 
-      {/* Tabs */}
-      <Tabs
-        tabs={['Datasheet', 'Stratagems']}
-        active={activeTab}
-        onChange={setActiveTab}
-        data-testid="datasheet-tabs"
-      >
-        <DatasheetProfile datasheet={datasheet} />
-        <DatasheetStratagems stratagems={datasheet.stratagems} />
-      </Tabs>
-    </Layout>
+        {/* Header with Stats */}
+        <div className="flex justify-between items-start" data-testid="datasheet-header">
+          <Stat
+            title={datasheet.role}
+            value={datasheet.name}
+            description={datasheetCost?.description}
+            variant="large"
+            className="text-left"
+          />
+          <Stat
+            title="Points"
+            value={datasheetCost?.cost || '-'}
+            description={alternateCost?.cost}
+            className="text-right"
+          />
+        </div>
+
+        {/* Tabs */}
+        <Tabs
+          tabs={['Datasheet', 'Stratagems']}
+          active={activeTab}
+          onChange={setActiveTab}
+          data-testid="datasheet-tabs"
+        >
+          <DatasheetProfile datasheet={datasheet} />
+          <DatasheetStratagems stratagems={datasheet.stratagems} />
+        </Tabs>
+      </div>
+    </AppLayout>
   );
 };
 

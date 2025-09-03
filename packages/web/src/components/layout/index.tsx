@@ -1,91 +1,92 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaClipboardList } from 'react-icons/fa';
-import { Layout, Button } from '../ui';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { FaHome, FaChevronDown, FaChevronRight, FaUsers, FaCog, FaStar } from 'react-icons/fa';
+import { Layout } from '../ui';
+import { depot } from '@depot/core';
+import useLocalStorage from '@/hooks/use-local-storage';
+import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 
 interface Props {
   children: React.ReactNode;
   title: string;
-  action?: React.ReactNode;
-  isLoading?: boolean;
 }
 
-const AppLayout = ({ children, title, action, isLoading }: Props) => {
-  const { showToast } = useToast();
+const AppLayout = ({ children, title }: Props) => {
+  const [myFactions] = useLocalStorage<depot.Index[]>('my-factions');
+  const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
+  const { closeSidebar } = useLayoutContext();
 
-  // Test sidebar content
+  const hasMyFactions = myFactions && myFactions.length > 0;
+
   const sidebar = (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Navigation</h3>
       <div className="space-y-2">
         <Link
           to="/"
-          className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+          onClick={closeSidebar}
+          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
-          Home
+          <FaHome className="h-4 w-4" />
+          <span>Home</span>
+        </Link>
+        <Link
+          to="/factions"
+          onClick={closeSidebar}
+          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+        >
+          <FaUsers className="h-4 w-4" />
+          <span>Factions</span>
         </Link>
         <Link
           to="/settings"
-          className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+          onClick={closeSidebar}
+          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
-          Settings
+          <FaCog className="h-4 w-4" />
+          <span>Settings</span>
         </Link>
       </div>
 
-      <hr className="my-4 border-gray-200 dark:border-gray-600" />
+      {hasMyFactions && (
+        <>
+          <hr className="my-4 border-gray-200 dark:border-gray-600" />
 
-      <div className="space-y-2">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-white">Test Toast System</h4>
-        <Button
-          size="sm"
-          onClick={() =>
-            showToast({ title: 'Success!', message: 'This is a success toast', type: 'success' })
-          }
-        >
-          Test Success
-        </Button>
-        <Button
-          size="sm"
-          variant="error"
-          onClick={() =>
-            showToast({ title: 'Error!', message: 'This is an error toast', type: 'error' })
-          }
-        >
-          Test Error
-        </Button>
-        <Button
-          size="sm"
-          onClick={() =>
-            showToast({ title: 'Info', message: 'This is an info toast', type: 'info' })
-          }
-        >
-          Test Info
-        </Button>
-        <Button
-          size="sm"
-          onClick={() =>
-            showToast({ title: 'Warning', message: 'This is a warning toast', type: 'warning' })
-          }
-        >
-          Test Warning
-        </Button>
-      </div>
+          <div className="space-y-2">
+            <button
+              onClick={() => setIsMyFactionsExpanded(!isMyFactionsExpanded)}
+              className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            >
+              <span>My Factions</span>
+              {isMyFactionsExpanded ? (
+                <FaChevronDown className="h-3 w-3" />
+              ) : (
+                <FaChevronRight className="h-3 w-3" />
+              )}
+            </button>
+
+            {isMyFactionsExpanded && (
+              <div className="ml-4 space-y-1">
+                {myFactions.map((faction) => (
+                  <Link
+                    key={faction.id}
+                    to={`/faction/${faction.id}`}
+                    onClick={closeSidebar}
+                    className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                  >
+                    <FaStar className="h-3 w-3 text-yellow-500" />
+                    <span>{faction.name}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 
   return (
-    <Layout
-      action={action}
-      title={title}
-      home={
-        <Link to="/">
-          <FaClipboardList />
-        </Link>
-      }
-      isLoading={isLoading}
-      sidebar={sidebar}
-    >
+    <Layout title={title} sidebar={sidebar}>
       {children}
     </Layout>
   );

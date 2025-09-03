@@ -3,7 +3,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import { depot } from '@depot/core';
 
 // UI Components
-import Layout from '@/components/ui/layout';
+import AppLayout from '@/components/layout';
 import Button from '@/components/ui/button';
 import Loader from '@/components/ui/loader';
 import NavigationButton from '@/components/ui/navigation-button';
@@ -47,15 +47,13 @@ const Settings = () => {
   }, [clearOfflineData, showToast]);
 
   return (
-    <Layout
-      title="Settings"
-      home={
-        <NavigationButton to="/">
-          <FaArrowLeft />
-        </NavigationButton>
-      }
-    >
+    <AppLayout title="Settings">
       <div className="space-y-8">
+        <NavigationButton to="/">
+          <FaArrowLeft className="mr-2" />
+          Back to Home
+        </NavigationButton>
+
         {/* Datasheet Settings Section */}
         <div className="space-y-4">
           <Stat title="Settings" value="Datasheets" variant="large" />
@@ -116,7 +114,7 @@ const Settings = () => {
           )}
         </div>
       </div>
-    </Layout>
+    </AppLayout>
   );
 };
 

@@ -6,7 +6,6 @@ import { AppProvider } from './contexts/app/context';
 import { LayoutProvider } from './contexts/layout/context';
 import { ToastProvider } from './contexts/toast/context';
 import { ToastContainer } from './components/ui';
-import DataProvider from './components/data-provider';
 import Routes from './routes';
 
 import './styles/main.css';
@@ -17,10 +16,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <AppProvider>
         <LayoutProvider>
           <ToastProvider>
-            <DataProvider>
-              <Routes />
-              <ToastContainer />
-            </DataProvider>
+            <Routes />
+            <ToastContainer />
           </ToastProvider>
         </LayoutProvider>
       </AppProvider>

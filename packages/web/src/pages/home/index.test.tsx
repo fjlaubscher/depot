@@ -1,29 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import HomeNew from './index';
+import Home from './index';
 import { depot } from '@depot/core';
-import { AppContextType } from '@/contexts/app/types';
 import { TestWrapper } from '@/test/test-utils';
-
-// Mock the context with proper typing
-const mockAppContext: AppContextType = {
-  state: {
-    factionIndex: null as depot.Index[] | null,
-    offlineFactions: [],
-    loading: false,
-    error: null as string | null,
-    settings: null
-  },
-  dispatch: vi.fn(),
-  getFaction: vi.fn(),
-  clearOfflineData: vi.fn(),
-  updateSettings: vi.fn()
-};
-
-vi.mock('@/contexts/app/use-app-context', () => ({
-  useAppContext: () => mockAppContext
-}));
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -41,187 +21,147 @@ vi.mock('@/hooks/use-local-storage', () => ({
   default: () => mockLocalStorage()
 }));
 
-// Mock debounce hook
-vi.mock('@/hooks/use-debounce', () => ({
-  default: (value: string) => value
-}));
-
-// Mock child components
-vi.mock('./components/loading-skeleton', () => ({
-  default: () => <div data-testid="loading-skeleton">Loading...</div>
-}));
-
-vi.mock('./components/error-state', () => ({
-  default: ({ error }: { error: string }) => <div data-testid="error-state">Error: {error}</div>
-}));
-
-vi.mock('./components/my-factions-tab', () => ({
-  default: ({ factions }: { factions: depot.Index[] }) => (
-    <div data-testid="my-factions-tab">
-      {factions.map((f) => (
-        <div key={f.id}>{f.name}</div>
-      ))}
-    </div>
-  )
-}));
-
-vi.mock('./components/all-factions-tab', () => ({
-  default: ({ query, onQueryChange }: { query: string; onQueryChange: (q: string) => void }) => (
-    <div data-testid="all-factions-tab">
-      <input
-        data-testid="search-input"
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
-    </div>
-  )
-}));
-
 const mockFactions: depot.Index[] = [
   { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
 ];
 
-describe('HomeNew', () => {
+describe('Home', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
   });
 
-  describe('Loading State', () => {
-    it('should render LoadingSkeleton when loading', () => {
-      mockAppContext.state.loading = true;
-
+  describe('Component Rendering', () => {
+    it('should render welcome section', () => {
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
+      expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Depot')).toBeInTheDocument();
+      expect(screen.getByText(/Your Warhammer 40,000 companion app/)).toBeInTheDocument();
     });
 
-    it('should not render main content when loading', () => {
-      mockAppContext.state.loading = true;
-
+    it('should render browse factions card', () => {
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('all-factions-tab')).not.toBeInTheDocument();
+      expect(screen.getByText('Browse Factions')).toBeInTheDocument();
+      expect(screen.getByText(/Explore all Warhammer 40K factions/)).toBeInTheDocument();
+      expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
+    });
+
+    it('should render settings card', () => {
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
+      expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
+      expect(screen.getByText(/Configure Forge World and Legends/)).toBeInTheDocument();
+      expect(screen.getByTestId('settings-button')).toBeInTheDocument();
+    });
+
+    it('should render app info section', () => {
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
+      expect(screen.getByText(/Data sourced from/)).toBeInTheDocument();
+      expect(screen.getByText('Wahapedia')).toBeInTheDocument();
     });
   });
 
-  describe('Error State', () => {
-    beforeEach(() => {
-      mockAppContext.state.loading = false;
-      mockAppContext.state.error = 'Failed to load factions';
-    });
-
-    it('should render ErrorState when there is an error', () => {
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.getByTestId('error-state')).toBeInTheDocument();
-      expect(screen.getByText('Error: Failed to load factions')).toBeInTheDocument();
-    });
-
-    it('should not render main content when there is an error', () => {
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('all-factions-tab')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Success State - No My Factions', () => {
-    beforeEach(() => {
-      mockAppContext.state.loading = false;
-      mockAppContext.state.error = null;
-      mockAppContext.state.factionIndex = mockFactions;
+  describe('My Factions Feature', () => {
+    it('should not render my factions card when no favorites', () => {
       mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
-    });
 
-    it('should render only All Factions tab when no my factions', () => {
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      expect(screen.getByText('All Factions')).toBeInTheDocument();
+      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
+    });
+
+    it('should render my factions card when favorites exist', () => {
+      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
+
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
+      expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
+      expect(screen.getByText('2 favorite factions saved')).toBeInTheDocument();
+    });
+
+    it('should render quick access section when favorites exist', () => {
+      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
+
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
+      expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
+      expect(screen.getByText('Quick Access')).toBeInTheDocument();
+      // Check that faction links exist without checking text due to sidebar conflicts
+      const quickAccessSection = screen.getByTestId('quick-access-section');
+      expect(quickAccessSection).toBeInTheDocument();
+      expect(quickAccessSection.querySelectorAll('a[href^="/faction/"]')).toHaveLength(2);
+    });
+
+    it('should handle singular faction count correctly', () => {
+      mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
+
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
+      expect(screen.getByText('1 favorite faction saved')).toBeInTheDocument();
+    });
+
+    it('should handle empty favorites array', () => {
+      mockLocalStorage.mockReturnValue([[], vi.fn()]);
+
+      render(
+        <TestWrapper>
+          <Home />
+        </TestWrapper>
+      );
+
       expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
     });
-
-    it('should render AllFactionsTab', () => {
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.getByTestId('all-factions-tab')).toBeInTheDocument();
-    });
-
-    it('should render settings button', () => {
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      const settingsButton = screen.getByLabelText('Open settings');
-      expect(settingsButton).toBeInTheDocument();
-    });
   });
 
-  describe('Success State - With My Factions', () => {
-    beforeEach(() => {
-      mockAppContext.state.loading = false;
-      mockAppContext.state.error = null;
-      mockAppContext.state.factionIndex = mockFactions;
-      mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
-    });
+  describe('Navigation', () => {
+    it('should navigate to factions when browse button is clicked', async () => {
+      const user = userEvent.setup();
 
-    it('should render both My Factions and All Factions tabs when my factions exist', () => {
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      expect(screen.getByText('My Factions')).toBeInTheDocument();
-      expect(screen.getByText('All Factions')).toBeInTheDocument();
-    });
-
-    it('should render MyFactionsTab when favourites exist', () => {
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.getByTestId('my-factions-tab')).toBeInTheDocument();
-    });
-  });
-
-  describe('User Interactions', () => {
-    beforeEach(() => {
-      mockAppContext.state.loading = false;
-      mockAppContext.state.error = null;
-      mockAppContext.state.factionIndex = mockFactions;
-      mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
+      await user.click(screen.getByTestId('browse-factions-button'));
+      expect(mockNavigate).toHaveBeenCalledWith('/factions');
     });
 
     it('should navigate to settings when settings button is clicked', async () => {
@@ -229,81 +169,29 @@ describe('HomeNew', () => {
 
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      const settingsButton = screen.getByLabelText('Open settings');
-      await user.click(settingsButton);
-
+      await user.click(screen.getByTestId('settings-button'));
       expect(mockNavigate).toHaveBeenCalledWith('/settings');
     });
 
-    it('should handle search query changes', async () => {
+    it('should navigate to faction when quick access faction is clicked', async () => {
       const user = userEvent.setup();
+      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
 
       render(
         <TestWrapper>
-          <HomeNew />
+          <Home />
         </TestWrapper>
       );
 
-      const searchInput = screen.getByTestId('search-input');
-      await user.type(searchInput, 'space');
-
-      // The component should have the search input with the typed value
-      expect(searchInput).toHaveValue('space');
-    });
-
-    it('should handle empty my factions array gracefully', () => {
-      mockLocalStorage.mockReturnValue([[], vi.fn()]);
-
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
-      expect(screen.getByText('All Factions')).toBeInTheDocument();
-    });
-
-    it('should handle null my factions gracefully', () => {
-      mockLocalStorage.mockReturnValue([null, vi.fn()]);
-
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
-      expect(screen.getByText('All Factions')).toBeInTheDocument();
-    });
-  });
-
-  describe('Tab Management', () => {
-    it('should maintain tab state when switching between tabs', async () => {
-      const user = userEvent.setup();
-      mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
-
-      render(
-        <TestWrapper>
-          <HomeNew />
-        </TestWrapper>
-      );
-
-      // Should start with My Factions tab (index 0)
-      expect(screen.getByTestId('my-factions-tab')).toBeInTheDocument();
-
-      // Click on All Factions tab
-      const allFactionsTab = screen.getByText('All Factions');
-      await user.click(allFactionsTab);
-
-      // Should now show All Factions content
-      await waitFor(() => {
-        expect(screen.getByTestId('all-factions-tab')).toBeInTheDocument();
-      });
+      // Find faction links within the quick access section only
+      const quickAccessSection = screen.getByTestId('quick-access-section');
+      const factionLinks = quickAccessSection.querySelectorAll('a[href^="/faction/"]');
+      expect(factionLinks[0]).toHaveAttribute('href', '/faction/SM');
+      expect(factionLinks[1]).toHaveAttribute('href', '/faction/CSM');
     });
   });
 });

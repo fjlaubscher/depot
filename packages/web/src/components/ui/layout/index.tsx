@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaHome } from 'react-icons/fa';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -9,20 +9,10 @@ import Loader from '../loader';
 interface LayoutProps {
   children: React.ReactNode;
   title: string;
-  action?: React.ReactNode;
-  home?: React.ReactNode;
-  isLoading?: boolean;
   sidebar?: React.ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({
-  children,
-  title,
-  action,
-  home,
-  isLoading = false,
-  sidebar
-}) => {
+const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
   const { state, closeSidebar, toggleSidebar } = useLayoutContext();
   const { sidebarOpen } = state;
 
@@ -42,7 +32,7 @@ const Layout: React.FC<LayoutProps> = ({
   }, [sidebarOpen, closeSidebar]);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -51,18 +41,22 @@ const Layout: React.FC<LayoutProps> = ({
         />
       )}
 
-      {/* Sidebar */}
+      {/* Mobile sidebar */}
       {sidebar && (
         <aside
           className={`
-            fixed top-0 left-0 z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-lg border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
-            lg:relative lg:translate-x-0
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            fixed top-0 right-0 z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-lg border-l border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:hidden
+            ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
           `}
         >
           {/* Mobile sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 lg:hidden">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-3">
+              <div className="text-blue-600 dark:text-blue-400">
+                <FaHome />
+              </div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">depot</h2>
+            </div>
             <IconButton onClick={closeSidebar} variant="ghost" aria-label="Close sidebar">
               <FaTimes />
             </IconButton>
@@ -73,54 +67,54 @@ const Layout: React.FC<LayoutProps> = ({
         </aside>
       )}
 
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Left side - mobile menu + home */}
-              <div className="flex items-center space-x-4">
-                {sidebar && (
-                  <IconButton
-                    onClick={toggleSidebar}
-                    variant="ghost"
-                    className="lg:hidden"
-                    aria-label="Open sidebar"
-                  >
-                    <FaBars />
-                  </IconButton>
-                )}
-
-                {home && (
-                  <div className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
-                    {home}
-                  </div>
-                )}
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0 z-30">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 relative">
+            {/* Left side - logo + app name */}
+            <div className="flex items-center min-w-0 flex-shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
+                  <FaHome />
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
               </div>
+            </div>
 
-              {/* Center - Title */}
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white mx-4 flex-1 text-center lg:text-left">
-                {title}
-              </h1>
+            {/* Center - Title */}
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
+              {title}
+            </h1>
 
-              {/* Right side - Action */}
-              <div className="flex items-center">{action}</div>
+            {/* Right side - Mobile Menu */}
+            <div className="flex items-center min-w-0 flex-shrink-0">
+              {sidebar && (
+                <IconButton
+                  onClick={toggleSidebar}
+                  variant="ghost"
+                  className="lg:hidden"
+                  aria-label="Open menu"
+                >
+                  <FaBars />
+                </IconButton>
+              )}
             </div>
           </div>
-        </header>
+        </div>
+      </header>
+
+      {/* Main content area with sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Desktop sidebar */}
+        {sidebar && (
+          <aside className="hidden lg:block w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <div className="p-4 overflow-y-auto h-full">{sidebar}</div>
+          </aside>
+        )}
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader size="lg" />
-              </div>
-            ) : (
-              children
-            )}
-          </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</div>
         </main>
       </div>
     </div>

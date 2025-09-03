@@ -50,7 +50,7 @@ describe('NotFound', () => {
     it('has proper heading structure', () => {
       render(<NotFound />, { wrapper: TestWrapper });
 
-      const heading = screen.getByRole('heading', { level: 2 });
+      const heading = screen.getByTestId('page-heading');
       expect(heading).toHaveTextContent('Page Not Found');
     });
 
