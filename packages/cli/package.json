@@ -30,8 +30,5 @@
   "dependencies": {
     "@depot/core": "workspace:*",
     "node-fetch": "^2.7.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
