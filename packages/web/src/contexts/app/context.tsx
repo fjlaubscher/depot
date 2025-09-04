@@ -3,7 +3,8 @@ import { depot } from '@depot/core';
 import { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
-import { offlineStorage } from '../../data/offline-storage';
+import { offlineStorage } from '@/data/offline-storage';
+import { getDataUrl } from '@/utils/paths';
 
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -26,7 +27,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
 
       // If not cached, fetch from network
-      const response = await fetch(`/data/${id}.json`);
+      const response = await fetch(getDataUrl(`${id}.json`));
       if (!response.ok) {
         throw new Error(`Failed to load faction ${id}`);
       }
@@ -57,7 +58,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
 
       // Load fresh index from network (since IndexedDB was cleared)
-      const response = await fetch('/data/index.json');
+      const response = await fetch(getDataUrl('index.json'));
       if (!response.ok) {
         throw new Error('Failed to reload faction index after clearing cache');
       }
@@ -104,7 +105,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
         if (!index) {
           // Fallback to network
-          const response = await fetch('/data/index.json');
+          const response = await fetch(getDataUrl('index.json'));
           if (!response.ok) {
             throw new Error('Failed to load faction index');
           }
