@@ -19,21 +19,9 @@ vi.mock('./components/faction-datasheets', () => ({
   )
 }));
 
-vi.mock('./components/faction-stratagems', () => ({
-  default: ({ stratagems }: { stratagems: depot.Stratagem[] }) => (
-    <div data-testid="faction-stratagems">Stratagems: {stratagems.length}</div>
-  )
-}));
-
 vi.mock('./components/faction-detachments', () => ({
   default: ({ detachmentAbilities }: { detachmentAbilities: depot.DetachmentAbility[] }) => (
     <div data-testid="faction-detachments">Detachments: {detachmentAbilities.length}</div>
-  )
-}));
-
-vi.mock('./components/faction-enhancements', () => ({
-  default: ({ enhancements }: { enhancements: depot.Enhancement[] }) => (
-    <div data-testid="faction-enhancements">Enhancements: {enhancements.length}</div>
   )
 }));
 
@@ -167,8 +155,6 @@ describe('Faction Page', () => {
 
     expect(screen.getByText('Datasheets')).toBeInTheDocument();
     expect(screen.getByText('Detachments')).toBeInTheDocument();
-    expect(screen.getByText('Enhancements')).toBeInTheDocument();
-    expect(screen.getByText('Stratagems')).toBeInTheDocument();
   });
 
   it('switches between tabs', async () => {
@@ -178,10 +164,10 @@ describe('Faction Page', () => {
     expect(screen.getByTestId('faction-datasheets')).toBeInTheDocument();
 
     // Click on stratagems tab
-    fireEvent.click(screen.getByText('Stratagems'));
+    fireEvent.click(screen.getByText('Detachments'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('faction-stratagems')).toBeInTheDocument();
+      expect(screen.getByTestId('faction-detachments')).toBeInTheDocument();
     });
   });
 
@@ -232,12 +218,6 @@ describe('Faction Page', () => {
     // Switch to other tabs to test data passing
     fireEvent.click(screen.getByText('Detachments'));
     expect(screen.getByTestId('faction-detachments')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Enhancements'));
-    expect(screen.getByTestId('faction-enhancements')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Stratagems'));
-    expect(screen.getByTestId('faction-stratagems')).toBeInTheDocument();
   });
 
   it('shows unfilled star when not my faction', () => {
