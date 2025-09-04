@@ -83,6 +83,7 @@ describe('useFactions', () => {
     mockFetch.mockResolvedValue({
       ok: false
     } as Response);
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const { result } = renderHook(() => useFactions());
 
@@ -93,6 +94,7 @@ describe('useFactions', () => {
     });
 
     expect(mockOfflineStorage.setFactionIndex).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 
   it('should handle IndexedDB errors gracefully and fallback to network', async () => {
@@ -177,6 +179,7 @@ describe('useFactions', () => {
     mockFetch.mockResolvedValue({
       ok: false
     } as Response);
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Trigger refetch
     await act(async () => {
@@ -187,14 +190,18 @@ describe('useFactions', () => {
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe('Refetch error');
     });
+
+    consoleSpy.mockRestore();
   });
 
   it('should set empty array when network returns no data', async () => {
     mockOfflineStorage.getFactionIndex.mockResolvedValue(null);
+    mockOfflineStorage.setFactionIndex.mockRejectedValue(new Error('Cache error'));
     mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(null)
     } as Response);
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const { result } = renderHook(() => useFactions());
 
@@ -203,5 +210,7 @@ describe('useFactions', () => {
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe(null);
     });
+
+    consoleSpy.mockRestore();
   });
 });

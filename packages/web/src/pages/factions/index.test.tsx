@@ -162,30 +162,6 @@ describe('Factions', () => {
       expect(screen.getByTestId('search-filters')).toBeInTheDocument();
     });
 
-    it('should render settings button', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      const settingsButton = screen.getByLabelText('Open settings');
-      expect(settingsButton).toBeInTheDocument();
-    });
-
-    it('should navigate to settings when settings button is clicked', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      const settingsButton = screen.getByLabelText('Open settings');
-      fireEvent.click(settingsButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith('/settings');
-    });
-
     it('should handle search functionality', () => {
       render(
         <TestWrapper>

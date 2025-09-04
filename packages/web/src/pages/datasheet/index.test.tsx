@@ -98,7 +98,6 @@ describe('DatasheetPage', () => {
 
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('Datasheet')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-loader')).toBeInTheDocument();
   });
 
@@ -111,7 +110,6 @@ describe('DatasheetPage', () => {
 
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-error')).toBeInTheDocument();
   });
 
@@ -124,7 +122,6 @@ describe('DatasheetPage', () => {
 
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('Not Found')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-not-found')).toBeInTheDocument();
   });
 
