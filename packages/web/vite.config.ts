@@ -5,6 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/depot/' : '/',
   plugins: [
     tsconfigPaths(),
     react(),
@@ -18,8 +19,8 @@ export default defineConfig({
         theme_color: '#ff6900',
         background_color: '#ff6900',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: './',
+        start_url: './',
         icons: [
           {
             src: 'pwa-64x64.png',
