@@ -11,11 +11,11 @@ import Grid from '@/components/ui/grid';
 import Button from '@/components/ui/button';
 
 // Custom hooks
-import useLocalStorage from '@/hooks/use-local-storage';
+import useMyFactions from '@/hooks/use-my-factions';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [myFactions] = useLocalStorage<depot.Index[]>('my-factions');
+  const [myFactions] = useMyFactions();
 
   const hasMyFactions = myFactions && myFactions.length > 0;
 

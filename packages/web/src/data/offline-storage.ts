@@ -3,18 +3,20 @@ import { depot } from '@depot/core';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 1
+  VERSION: 2
 } as const;
 
 const STORES = {
   FACTION_INDEX: 'factionIndex',
   FACTIONS: 'factions',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  USER_DATA: 'userData'
 } as const;
 
 const KEYS = {
   INDEX: 'index',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  MY_FACTIONS: 'my-factions'
 } as const;
 
 // Database connection with proper error handling
@@ -45,6 +47,11 @@ class OfflineStorage {
           // Create settings store
           if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
             db.createObjectStore(STORES.SETTINGS);
+          }
+
+          // Create user data store for my-factions and other user preferences
+          if (!db.objectStoreNames.contains(STORES.USER_DATA)) {
+            db.createObjectStore(STORES.USER_DATA);
           }
         };
       });
@@ -205,11 +212,47 @@ class OfflineStorage {
   }
 
   // Database Management
+  // My Factions Operations
+  async getMyFactions(): Promise<depot.Option[] | null> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.USER_DATA], 'readonly');
+      const store = transaction.objectStore(STORES.USER_DATA);
+
+      return new Promise((resolve, reject) => {
+        const request = store.get(KEYS.MY_FACTIONS);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to get my factions from IndexedDB:', error);
+      return null;
+    }
+  }
+
+  async setMyFactions(myFactions: depot.Option[]): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.USER_DATA], 'readwrite');
+      const store = transaction.objectStore(STORES.USER_DATA);
+
+      return new Promise((resolve, reject) => {
+        const request = store.put(myFactions, KEYS.MY_FACTIONS);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to set my factions in IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  // Database Management
   async clearAllData(): Promise<void> {
     try {
       const db = await this.getDB();
       const transaction = db.transaction(
-        [STORES.FACTION_INDEX, STORES.FACTIONS, STORES.SETTINGS],
+        [STORES.FACTION_INDEX, STORES.FACTIONS, STORES.SETTINGS, STORES.USER_DATA],
         'readwrite'
       );
 
@@ -226,6 +269,11 @@ class OfflineStorage {
         }),
         new Promise<void>((resolve, reject) => {
           const request = transaction.objectStore(STORES.SETTINGS).clear();
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        }),
+        new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore(STORES.USER_DATA).clear();
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
         })

@@ -11,7 +11,7 @@ import Tabs from '@/components/ui/tabs';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
-import useLocalStorage from '@/hooks/use-local-storage';
+import useMyFactions from '@/hooks/use-my-factions';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
@@ -31,7 +31,7 @@ const Faction: React.FC = () => {
   const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(id);
 
-  const [myFactions, setMyFactions] = useLocalStorage<depot.Option[]>('my-factions');
+  const [myFactions, setMyFactions] = useMyFactions();
   const [activeTab, setActiveTab] = useState(0);
 
   const isMyFaction = useMemo(() => {
@@ -41,23 +41,31 @@ const Faction: React.FC = () => {
     return false;
   }, [id, myFactions]);
 
-  const toggleMyFaction = useCallback(() => {
+  const toggleMyFaction = useCallback(async () => {
     if (!faction || !id) return;
 
-    if (myFactions && isMyFaction) {
-      setMyFactions(myFactions.filter((f) => f.id !== id));
+    try {
+      if (myFactions && isMyFaction) {
+        await setMyFactions(myFactions.filter((f) => f.id !== id));
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: `${faction.name} removed from My Factions.`
+        });
+      } else {
+        const myFaction: depot.Option = { id: faction.id, name: faction.name };
+        await setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
+        showToast({
+          type: 'success',
+          title: 'Success',
+          message: `${faction.name} added to My Factions.`
+        });
+      }
+    } catch (error) {
       showToast({
-        type: 'success',
-        title: 'Success',
-        message: `${faction.name} removed from My Factions.`
-      });
-    } else {
-      const myFaction: depot.Option = { id: faction.id, name: faction.name };
-      setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
-      showToast({
-        type: 'success',
-        title: 'Success',
-        message: `${faction.name} added to My Factions.`
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to update My Factions. Please try again.'
       });
     }
   }, [isMyFaction, faction, myFactions, setMyFactions, showToast, id]);

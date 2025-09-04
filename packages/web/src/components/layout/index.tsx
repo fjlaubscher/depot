@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaHome, FaChevronDown, FaChevronRight, FaUsers, FaCog, FaStar } from 'react-icons/fa';
 import { Layout } from '../ui';
 import { depot } from '@depot/core';
-import useLocalStorage from '@/hooks/use-local-storage';
+import useMyFactions from '@/hooks/use-my-factions';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const AppLayout = ({ children, title }: Props) => {
-  const [myFactions] = useLocalStorage<depot.Index[]>('my-factions');
+  const [myFactions] = useMyFactions();
   const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
   const { closeSidebar } = useLayoutContext();
 
