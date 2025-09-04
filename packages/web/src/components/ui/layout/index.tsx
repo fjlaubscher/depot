@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FaBars, FaTimes, FaHome } from 'react-icons/fa';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 import { BREAKPOINTS } from '@/constants/breakpoints';
@@ -52,14 +53,19 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
         >
           {/* Mobile sidebar header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-3">
-              <div className="w-6 h-6 text-blue-600 dark:text-blue-400">
+            <Link to="/" className="flex items-center space-x-2" onClick={closeSidebar}>
+              <div className="w-10 h-10 text-white">
                 <Logo />
               </div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">depot</h2>
-            </div>
-            <IconButton onClick={closeSidebar} variant="ghost" aria-label="Close sidebar">
-              <FaTimes />
+              <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
+            </Link>
+            <IconButton
+              onClick={closeSidebar}
+              variant="ghost"
+              className="!text-white"
+              aria-label="Close sidebar"
+            >
+              <FaTimes className="w-6 h-6" />
             </IconButton>
           </div>
 
@@ -74,18 +80,16 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
           <div className="flex items-center justify-between h-16 relative">
             {/* Left side - logo + app name */}
             <div className="flex items-center min-w-0 flex-shrink-0">
-              <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
+              <Link
+                to="/"
+                className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-200"
+              >
+                <div className="w-10 h-10 text-white">
                   <Logo />
                 </div>
                 <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
-              </div>
+              </Link>
             </div>
-
-            {/* Center - Title */}
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white absolute left-1/2 transform -translate-x-1/2">
-              {title}
-            </h1>
 
             {/* Right side - Mobile Menu */}
             <div className="flex items-center min-w-0 flex-shrink-0">
@@ -93,10 +97,10 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
                 <IconButton
                   onClick={toggleSidebar}
                   variant="ghost"
-                  className="lg:hidden"
+                  className="lg:hidden !text-white"
                   aria-label="Open menu"
                 >
-                  <FaBars />
+                  <FaBars className="w-6 h-6" />
                 </IconButton>
               )}
             </div>

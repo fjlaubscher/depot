@@ -7,7 +7,7 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import IconButton from '@/components/ui/icon-button';
+import { PageHeader } from '@/components/ui';
 
 // Page components
 import LoadingSkeleton from './components/loading-skeleton';
@@ -17,7 +17,11 @@ import SearchFilters from './components/search-filters';
 import NoResults from './components/no-results';
 
 // Utilities
-import { filterFactionsByQuery, groupFactionsByAlliance } from './utils/faction';
+import {
+  filterFactionsByQuery,
+  filterFactionsBySettings,
+  groupFactionsByAlliance
+} from './utils/faction';
 
 // Custom hooks
 import useDebounce from '@/hooks/use-debounce';
@@ -29,10 +33,10 @@ const Factions: React.FC = () => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
-  const filteredFactions = useMemo(
-    () => filterFactionsByQuery(state.factionIndex, debouncedQuery),
-    [state.factionIndex, debouncedQuery]
-  );
+  const filteredFactions = useMemo(() => {
+    const queryFiltered = filterFactionsByQuery(state.factionIndex, debouncedQuery);
+    return filterFactionsBySettings(queryFiltered, state.settings);
+  }, [state.factionIndex, debouncedQuery, state.settings]);
 
   const groupedFactions = useMemo(
     () => groupFactionsByAlliance(filteredFactions),
@@ -40,6 +44,8 @@ const Factions: React.FC = () => {
   );
 
   const hasResults = Object.keys(groupedFactions).length > 0;
+  const totalFactions = filteredFactions.length;
+  const totalAlliances = Object.keys(groupedFactions).length;
 
   if (state.loading) {
     return <LoadingSkeleton />;
@@ -51,12 +57,11 @@ const Factions: React.FC = () => {
 
   return (
     <AppLayout title="Factions">
-      <div className="space-y-4">
-        <div className="flex justify-end">
-          <IconButton onClick={() => navigate('/settings')} aria-label="Open settings">
-            <FaCog />
-          </IconButton>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Factions"
+          subtitle={`Browse ${totalFactions} factions across ${totalAlliances} alliances`}
+        />
 
         <SearchFilters query={query} onQueryChange={setQuery} onClear={() => setQuery('')} />
 

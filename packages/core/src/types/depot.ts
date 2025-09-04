@@ -146,9 +146,14 @@ export interface Index {
   id: string;
   name: string;
   path: string;
+  datasheetCount?: number;
+  stratagemCount?: number;
+  enhancementCount?: number;
+  detachmentCount?: number;
 }
 
 export interface Settings {
   showForgeWorld?: boolean;
   showLegends?: boolean;
+  showUnaligned?: boolean;
 }

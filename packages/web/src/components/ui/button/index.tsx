@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
     'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    default: 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-600',
+    default: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
     secondary:
       'bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white dark:border-gray-600',
     error: 'bg-red-600 hover:bg-red-700 text-white border border-red-600'

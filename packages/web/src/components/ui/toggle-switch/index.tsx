@@ -23,10 +23,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, enabled, onChange, s
       <button
         type="button"
         className={classNames(
-          'relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
+          'relative inline-flex flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500',
           currentSize.container,
           {
-            'bg-blue-600': enabled,
+            'bg-primary-600': enabled,
             'bg-gray-200 dark:bg-gray-700': !enabled
           }
         )}

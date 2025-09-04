@@ -27,7 +27,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
 
   const selectClasses = classNames(
     'border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base transition-colors duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+    'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
     'disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800 dark:disabled:text-gray-400',
     'bg-white dark:bg-gray-800 text-gray-900 dark:text-white',
     '[color-scheme:light] dark:[color-scheme:dark]',

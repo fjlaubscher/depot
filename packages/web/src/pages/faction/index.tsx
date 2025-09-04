@@ -103,7 +103,7 @@ const Faction: React.FC = () => {
               onClick={toggleMyFaction}
               aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
             >
-              {isMyFaction ? <FaStar className="text-blue-500" /> : <FaStar />}
+              {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
             </IconButton>
           </div>
 

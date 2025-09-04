@@ -104,7 +104,23 @@ const init = async () => {
 
   data.forEach((faction) => {
     const filePath = `${DATA_DIR}/${faction.id}.json`;
-    index.push({ id: faction.id, name: faction.name, path: `/data/${faction.id}.json` });
+
+    // Calculate metadata counts for the index
+    const datasheetCount = faction.datasheets.length;
+    const stratagemCount = faction.stratagems.length;
+    const enhancementCount = faction.enhancements.length;
+    const detachmentCount = faction.detachmentAbilities.length;
+
+    index.push({
+      id: faction.id,
+      name: faction.name,
+      path: `/data/${faction.id}.json`,
+      datasheetCount,
+      stratagemCount,
+      enhancementCount,
+      detachmentCount
+    });
+
     console.log(`Creating ${filePath}`);
     writeFileSync(filePath, JSON.stringify(faction));
   });

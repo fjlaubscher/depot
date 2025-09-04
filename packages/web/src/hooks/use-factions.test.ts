@@ -35,7 +35,7 @@ describe('useFactions', () => {
     expect(result.current.factions).toBeUndefined();
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBe(null);
-    
+
     // Wait for the async operations to complete
     await waitFor(() => {
       expect(result.current.loading).toBe(false);

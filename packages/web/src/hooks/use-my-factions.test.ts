@@ -31,7 +31,7 @@ describe('useMyFactions', () => {
     const { result } = renderHook(() => useMyFactions());
 
     expect(result.current[0]).toBeUndefined();
-    
+
     // Wait for the async effect to complete
     await waitFor(() => {
       expect(result.current[0]).toBeUndefined();

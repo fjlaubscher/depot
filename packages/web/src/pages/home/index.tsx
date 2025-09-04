@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaCog, FaSearch, FaStar, FaCogs } from 'react-icons/fa';
+import { FaCog, FaSearch, FaStar, FaCogs, FaListAlt } from 'react-icons/fa';
 import { depot } from '@depot/core';
 
 // UI Components
@@ -38,8 +38,8 @@ const Home: React.FC = () => {
         <Grid>
           <Card>
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <FaSearch className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 bg-primary-100 dark:bg-primary-900 rounded-lg">
+                <FaSearch className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -51,6 +51,25 @@ const Home: React.FC = () => {
               </div>
               <Button onClick={() => navigate('/factions')} data-testid="browse-factions-button">
                 Browse
+              </Button>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                <FaListAlt className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  List Builder
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Create and manage your army lists
+                </p>
+              </div>
+              <Button variant="secondary" disabled data-testid="list-builder-button">
+                Coming Soon
               </Button>
             </div>
           </Card>
@@ -136,7 +155,7 @@ const Home: React.FC = () => {
               href="https://wahapedia.ru"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-primary-600 dark:text-primary-400 hover:underline"
             >
               Wahapedia
             </a>

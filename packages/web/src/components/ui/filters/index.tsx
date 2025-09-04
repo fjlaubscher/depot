@@ -19,7 +19,7 @@ const Filters: React.FC<FiltersProps> = ({ children, showClear, onClear, classNa
     {showClear && (
       <button
         onClick={onClear}
-        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium text-sm whitespace-nowrap self-start sm:self-center"
+        className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 font-medium text-sm whitespace-nowrap self-start sm:self-center"
       >
         Clear
       </button>

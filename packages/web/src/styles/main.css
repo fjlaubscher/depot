@@ -1,8 +1,20 @@
 @import 'tailwindcss';
 
-/* Font configuration */
+/* Font and color configuration */
 @theme {
   --font-family-sans: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  
+  /* Map primary colors to orange palette */
+  --color-primary-50: var(--color-orange-50);
+  --color-primary-100: var(--color-orange-100);
+  --color-primary-200: var(--color-orange-200);
+  --color-primary-300: var(--color-orange-300);
+  --color-primary-400: var(--color-orange-400);
+  --color-primary-500: var(--color-orange-500);
+  --color-primary-600: var(--color-orange-600);
+  --color-primary-700: var(--color-orange-700);
+  --color-primary-800: var(--color-orange-800);
+  --color-primary-900: var(--color-orange-900);
 }
 
 /* Dark mode support */
@@ -13,6 +25,11 @@
 }
 
 /* Custom styles will go here */
+
+/* Ensure font is applied to body */
+body {
+  font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
 
 /* Keyword spans from Wahapedia data */
 span.kwb,

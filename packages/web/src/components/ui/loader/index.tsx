@@ -15,7 +15,7 @@ const Loader: React.FC<LoaderProps> = ({ size = 'md', color = 'primary', classNa
   };
 
   const colorClasses = {
-    primary: 'border-blue-600 border-t-transparent',
+    primary: 'border-primary-600 border-t-transparent',
     secondary: 'border-gray-400 border-t-transparent',
     white: 'border-white border-t-transparent'
   };
