@@ -41,15 +41,12 @@ pnpm --filter @depot/cli start -- --force-download
 ```
 
 ### Building
-Production build (generates data + builds web app):
+Production build (builds all packages, generates data, copies to built web app):
 ```bash
 pnpm build
 ```
 
-Build all packages individually:
-```bash
-pnpm build:all
-```
+This runs: `pnpm -r build` → `pnpm --filter @depot/cli start` → `node scripts/copy-data.mjs`
 
 ### Testing
 ```bash

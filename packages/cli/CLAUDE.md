@@ -10,21 +10,21 @@ The @depot/cli package is a Node.js command-line tool that fetches Warhammer 40K
 
 ### Build
 ```bash
-yarn build
+pnpm build
 # or from root
-pnpm --filter @depot/cli run build
+pnpm --filter @depot/cli build
 ```
 
 ### Run Data Generation
 ```bash
-yarn start
+pnpm start
 # or from root
 pnpm --filter @depot/cli start
 ```
 
 ### Test
 ```bash
-yarn test
+pnpm test
 # or from root
 pnpm --filter @depot/cli test
 ```
@@ -42,7 +42,7 @@ The CLI follows a three-stage data processing pipeline:
 ### Key Components
 
 #### `index.ts` - Main Orchestrator
-- Fetches 18 different CSV files from Wahapedia URLs in parallel
+- Fetches CSV files from Wahapedia URLs in parallel
 - Manages directory creation/cleanup for output files
 - Coordinates the conversion and generation pipeline
 - Creates both individual JSON files and consolidated faction data
@@ -73,10 +73,11 @@ Wahapedia CSV URLs → Raw CSV → JSON Files → Consolidated Faction Data
 
 ### Type System
 
-Uses `types/depot.d.ts` and `types/wahapedia.d.ts`:
-- `Wahapedia.*` types represent raw CSV data structure
+Uses shared `@depot/core` types:
+- `wahapedia.*` types represent raw CSV data structure
 - `depot.*` types represent processed, web-ready data format
 - Type transformation happens in `generate-data.ts` build functions
+- Ensures consistency with web package data expectations
 
 ### Output Structure
 

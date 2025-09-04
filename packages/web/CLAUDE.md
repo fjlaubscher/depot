@@ -11,43 +11,70 @@ The @depot/web package is a React Progressive Web App (PWA) that displays Warham
 ### Development Server
 ```bash
 pnpm start
-# or from package directory
-pnpm run start
+# or from root
+pnpm --filter @depot/web start
+
+# Development only (requires existing data)
+pnpm dev
+# or from root  
+pnpm --filter @depot/web dev
 ```
 
 ### Build for Production
 ```bash
 pnpm build
-# or from package directory
-pnpm run build
+# or from root
+pnpm --filter @depot/web build
 ```
+
+This runs: `pwa-assets-generator` → `tsc` → `vite build`
 
 ### Testing
 ```bash
 pnpm test
-# or from package directory
-pnpm run test
+# or from root
+pnpm --filter @depot/web test
 ```
 
 ### Code Quality
 ```bash
 # Lint with TypeScript check
-pnpm run lint
+pnpm lint
+# or from root
+pnpm --filter @depot/web lint
 
 # Format code
-pnpm run format
+pnpm format
+# or from root
+pnpm --filter @depot/web format
+
+# TypeScript checking only
+pnpm typecheck
+# or from root
+pnpm --filter @depot/web typecheck
+
+# Clean build artifacts
+pnpm clean
+# or from root
+pnpm --filter @depot/web clean
+
+# Preview built application
+pnpm preview
+# or from root
+pnpm --filter @depot/web preview
 ```
 
 ## Architecture
 
 ### Technology Stack
-- **React 19** with React Router DOM for navigation
+- **React 19** with React Router DOM v7 for navigation
 - **Context + useReducer** for global state management
 - **IndexedDB** for offline-first data storage and caching
-- **Tailwind CSS v4** for utility-first styling
+- **Tailwind CSS v4** with PostCSS for utility-first styling
 - **Custom UI Library** in `src/components/ui/`
-- **Vite** for build tooling and development server
+- **Vite 6** for build tooling and development server
 - **Vite PWA Plugin** for offline functionality
+- **Vitest** for testing with React Testing Library
 
 ### Application Structure
 

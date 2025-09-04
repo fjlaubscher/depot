@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
     "dev": "tsc --watch",
     "prepublishOnly": "pnpm run clean && pnpm run build",

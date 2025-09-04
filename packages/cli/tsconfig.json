@@ -1,13 +1,15 @@
 {
-  "extends": "../core/tsconfig.base.json",
+  "extends": "../core/tsconfig.json",
   "compilerOptions": {
-    "noEmit": false,
+    "lib": ["ES2020"],
     "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": false,
     "outDir": "./dist",
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
