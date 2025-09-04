@@ -5,6 +5,7 @@ import { BREAKPOINTS } from '@/constants/breakpoints';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import IconButton from '../icon-button';
 import Loader from '../loader';
+import Logo from '@/components/logo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -52,8 +53,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
           {/* Mobile sidebar header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
-              <div className="text-blue-600 dark:text-blue-400">
-                <FaHome />
+              <div className="w-6 h-6 text-blue-600 dark:text-blue-400">
+                <Logo />
               </div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">depot</h2>
             </div>
@@ -74,8 +75,8 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
             {/* Left side - logo + app name */}
             <div className="flex items-center min-w-0 flex-shrink-0">
               <div className="flex items-center space-x-3">
-                <div className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
-                  <FaHome />
+                <div className="w-6 h-6 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200">
+                  <Logo />
                 </div>
                 <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
               </div>

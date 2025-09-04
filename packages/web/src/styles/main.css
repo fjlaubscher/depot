@@ -1,4 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+/* Font configuration */
+@theme {
+  --font-family-sans: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
@@ -12,5 +17,5 @@
 /* Keyword spans from Wahapedia data */
 span.kwb,
 span.kwbu {
-  @apply text-blue-600 dark:text-blue-400 font-semibold;
+  @apply text-orange-500 dark:text-orange-400 font-semibold;
 }

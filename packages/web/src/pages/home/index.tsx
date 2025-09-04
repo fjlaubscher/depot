@@ -5,7 +5,6 @@ import { depot } from '@depot/core';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import IconButton from '@/components/ui/icon-button';
 import Card from '@/components/ui/card';
 import Grid from '@/components/ui/grid';
 import Button from '@/components/ui/button';
@@ -28,7 +27,7 @@ const Home: React.FC = () => {
             className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
             data-testid="welcome-heading"
           >
-            Welcome to Depot
+            Welcome to depot
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Your Warhammer 40,000 companion app powered by Wahapedia data

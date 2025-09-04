@@ -25,12 +25,17 @@ describe('useMyFactions', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with undefined factions', () => {
+  it('should initialize with undefined factions', async () => {
     mockOfflineStorage.getMyFactions.mockResolvedValue(null);
 
     const { result } = renderHook(() => useMyFactions());
 
     expect(result.current[0]).toBeUndefined();
+    
+    // Wait for the async effect to complete
+    await waitFor(() => {
+      expect(result.current[0]).toBeUndefined();
+    });
   });
 
   it('should load factions from IndexedDB on mount', async () => {

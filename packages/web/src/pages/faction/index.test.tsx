@@ -6,7 +6,7 @@ import { TestWrapper } from '@/test/test-utils';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
-vi.mock('@/hooks/use-local-storage');
+vi.mock('@/hooks/use-my-factions');
 vi.mock('@/contexts/toast/use-toast-context');
 vi.mock('@/utils/faction', () => ({
   getFactionAlliance: vi.fn(() => 'Imperium')
@@ -95,7 +95,7 @@ const mockFaction: depot.Faction = {
 
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
-  const mockUseLocalStorage = vi.fn();
+  const mockUseMyFactions = vi.fn();
   const mockAddToast = vi.fn();
   const mockUseToastContext = vi.fn();
 
@@ -109,7 +109,7 @@ describe('Faction Page', () => {
       error: null
     });
 
-    mockUseLocalStorage.mockReturnValue([[], vi.fn()]);
+    mockUseMyFactions.mockReturnValue([[], vi.fn()]);
 
     mockUseToastContext.mockReturnValue({
       showToast: mockAddToast,
@@ -123,8 +123,8 @@ describe('Faction Page', () => {
     const useFactionMock = await import('@/hooks/use-faction');
     vi.mocked(useFactionMock.default).mockImplementation(mockUseFaction);
 
-    const useLocalStorageMock = await import('@/hooks/use-local-storage');
-    vi.mocked(useLocalStorageMock.default).mockImplementation(mockUseLocalStorage);
+    const useMyFactionsMock = await import('@/hooks/use-my-factions');
+    vi.mocked(useMyFactionsMock.default).mockImplementation(mockUseMyFactions);
 
     const useToastMock = await import('@/contexts/toast/use-toast-context');
     vi.mocked(useToastMock.useToast).mockImplementation(mockUseToastContext);
@@ -186,15 +186,17 @@ describe('Faction Page', () => {
   });
 
   it('handles favourite toggle when not favourite', async () => {
-    const mockSetMyFactions = vi.fn();
-    mockUseLocalStorage.mockReturnValue([[], mockSetMyFactions]);
+    const mockSetMyFactions = vi.fn().mockResolvedValue(undefined);
+    mockUseMyFactions.mockReturnValue([[], mockSetMyFactions]);
 
     render(<Faction />, { wrapper: TestWrapper });
 
     const favouriteButton = screen.getByRole('button', { name: /add to my factions/i });
     fireEvent.click(favouriteButton);
 
-    expect(mockSetMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
+    await waitFor(() => {
+      expect(mockSetMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
+    });
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
       title: 'Success',
@@ -203,16 +205,18 @@ describe('Faction Page', () => {
   });
 
   it('handles favourite toggle when already favourite', async () => {
-    const mockSetMyFactions = vi.fn();
+    const mockSetMyFactions = vi.fn().mockResolvedValue(undefined);
     const existingFactions = [{ id: 'SM', name: 'Space Marines' }];
-    mockUseLocalStorage.mockReturnValue([existingFactions, mockSetMyFactions]);
+    mockUseMyFactions.mockReturnValue([existingFactions, mockSetMyFactions]);
 
     render(<Faction />, { wrapper: TestWrapper });
 
     const favouriteButton = screen.getByRole('button', { name: /remove from my factions/i });
     fireEvent.click(favouriteButton);
 
-    expect(mockSetMyFactions).toHaveBeenCalledWith([]);
+    await waitFor(() => {
+      expect(mockSetMyFactions).toHaveBeenCalledWith([]);
+    });
     expect(mockAddToast).toHaveBeenCalledWith({
       type: 'success',
       title: 'Success',
@@ -237,7 +241,7 @@ describe('Faction Page', () => {
   });
 
   it('shows unfilled star when not my faction', () => {
-    mockUseLocalStorage.mockReturnValue([[], vi.fn()]);
+    mockUseMyFactions.mockReturnValue([[], vi.fn()]);
 
     render(<Faction />, { wrapper: TestWrapper });
 
@@ -246,7 +250,7 @@ describe('Faction Page', () => {
   });
 
   it('shows filled star when is my faction', () => {
-    mockUseLocalStorage.mockReturnValue([[{ id: 'SM', name: 'Space Marines' }], vi.fn()]);
+    mockUseMyFactions.mockReturnValue([[{ id: 'SM', name: 'Space Marines' }], vi.fn()]);
 
     render(<Faction />, { wrapper: TestWrapper });
 

@@ -23,7 +23,7 @@ describe('useFactions', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with loading state', () => {
+  it('should initialize with loading state', async () => {
     mockOfflineStorage.getFactionIndex.mockResolvedValue(null);
     mockFetch.mockResolvedValue({
       ok: true,
@@ -35,6 +35,11 @@ describe('useFactions', () => {
     expect(result.current.factions).toBeUndefined();
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBe(null);
+    
+    // Wait for the async operations to complete
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
   });
 
   it('should load factions from IndexedDB when available', async () => {

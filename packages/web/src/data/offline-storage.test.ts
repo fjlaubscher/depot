@@ -307,7 +307,7 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.clearAllData()).resolves.toBeUndefined();
 
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(3);
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(4);
     });
   });
 

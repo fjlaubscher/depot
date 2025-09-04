@@ -15,10 +15,10 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock localStorage hook
-const mockLocalStorage = vi.fn().mockReturnValue([undefined, vi.fn()]);
-vi.mock('@/hooks/use-local-storage', () => ({
-  default: () => mockLocalStorage()
+// Mock MyFactions hook
+const mockMyFactions = vi.fn().mockReturnValue([undefined, vi.fn()]);
+vi.mock('@/hooks/use-my-factions', () => ({
+  default: () => mockMyFactions()
 }));
 
 const mockFactions: depot.Index[] = [
@@ -29,7 +29,7 @@ const mockFactions: depot.Index[] = [
 describe('Home', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
+    mockMyFactions.mockReturnValue([undefined, vi.fn()]);
   });
 
   describe('Component Rendering', () => {
@@ -41,7 +41,7 @@ describe('Home', () => {
       );
 
       expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
-      expect(screen.getByText('Welcome to Depot')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to depot')).toBeInTheDocument();
       expect(screen.getByText(/Your Warhammer 40,000 companion app/)).toBeInTheDocument();
     });
 
@@ -83,7 +83,7 @@ describe('Home', () => {
 
   describe('My Factions Feature', () => {
     it('should not render my factions card when no favorites', () => {
-      mockLocalStorage.mockReturnValue([undefined, vi.fn()]);
+      mockMyFactions.mockReturnValue([undefined, vi.fn()]);
 
       render(
         <TestWrapper>
@@ -96,7 +96,7 @@ describe('Home', () => {
     });
 
     it('should render my factions card when favorites exist', () => {
-      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
+      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
 
       render(
         <TestWrapper>
@@ -109,7 +109,7 @@ describe('Home', () => {
     });
 
     it('should render quick access section when favorites exist', () => {
-      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
+      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
 
       render(
         <TestWrapper>
@@ -126,7 +126,7 @@ describe('Home', () => {
     });
 
     it('should handle singular faction count correctly', () => {
-      mockLocalStorage.mockReturnValue([[mockFactions[0]], vi.fn()]);
+      mockMyFactions.mockReturnValue([[mockFactions[0]], vi.fn()]);
 
       render(
         <TestWrapper>
@@ -138,7 +138,7 @@ describe('Home', () => {
     });
 
     it('should handle empty favorites array', () => {
-      mockLocalStorage.mockReturnValue([[], vi.fn()]);
+      mockMyFactions.mockReturnValue([[], vi.fn()]);
 
       render(
         <TestWrapper>
@@ -179,7 +179,7 @@ describe('Home', () => {
 
     it('should navigate to faction when quick access faction is clicked', async () => {
       const user = userEvent.setup();
-      mockLocalStorage.mockReturnValue([mockFactions, vi.fn()]);
+      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
 
       render(
         <TestWrapper>
