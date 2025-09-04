@@ -77,12 +77,12 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
     });
 
   const isForgeWorld = data.sources
-    .filter((s) => s.name.includes('Forge World:') || s.name.includes('Imperial Armour:'))
+    .filter((s) => s.name.includes('Imperial Armour:'))
     .map((s) => s.id)
     .includes(datasheet.sourceId);
 
   const isLegends = data.sources
-    .filter((s) => s.name.includes('Warhammer Legends:'))
+    .filter((s) => s.name.includes('Legends:'))
     .map((s) => s.id)
     .includes(datasheet.sourceId);
 

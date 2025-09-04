@@ -14,6 +14,7 @@ export { default as LinkCard } from './link-card';
 export { default as Search } from './search';
 export { default as Filters } from './filters';
 export { default as Skeleton, SkeletonCard, SkeletonText } from './skeleton';
+export { default as ToggleSwitch } from './toggle-switch';
 
 // TODO: Create these components in Phase 2
 // export { default as Table } from './table';

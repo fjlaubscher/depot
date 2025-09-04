@@ -7,17 +7,12 @@ import AppLayout from '@/components/layout';
 import Button from '@/components/ui/button';
 import Loader from '@/components/ui/loader';
 import NavigationButton from '@/components/ui/navigation-button';
-import SelectField from '@/components/ui/select-field';
+import ToggleSwitch from '@/components/ui/toggle-switch';
 import Stat from '@/components/ui/stat';
 
 // Hooks and Context
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
-
-const YES_NO = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' }
-];
 
 const Settings = () => {
   const { showToast } = useToast();
@@ -58,19 +53,15 @@ const Settings = () => {
         <div className="space-y-4">
           <Stat title="Settings" value="Datasheets" variant="large" />
           <div className="space-y-4">
-            <SelectField
+            <ToggleSwitch
               label="Show Forge World"
-              name="showForgeWorld"
-              options={YES_NO}
-              value={state.settings?.showForgeWorld ? 'true' : 'false'}
-              onChange={(e) => handleSettingsChange('showForgeWorld', e.target.value === 'true')}
+              enabled={state.settings?.showForgeWorld || false}
+              onChange={(value) => handleSettingsChange('showForgeWorld', value)}
             />
-            <SelectField
+            <ToggleSwitch
               label="Show Legends"
-              name="showLegends"
-              options={YES_NO}
-              value={state.settings?.showLegends ? 'true' : 'false'}
-              onChange={(e) => handleSettingsChange('showLegends', e.target.value === 'true')}
+              enabled={state.settings?.showLegends || false}
+              onChange={(value) => handleSettingsChange('showLegends', value)}
             />
           </div>
         </div>

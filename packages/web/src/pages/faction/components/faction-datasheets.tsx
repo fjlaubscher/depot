@@ -9,9 +9,9 @@ import Filters from '@/components/ui/filters';
 import LinkCard from '@/components/ui/link-card';
 
 // Hooks
+import { useAppContext } from '@/contexts/app/use-app-context';
 import useDebounce from '@/hooks/use-debounce';
 import useSelect from '@/hooks/use-select';
-import useLocalStorage from '@/hooks/use-local-storage';
 
 // Utils
 import { groupDatasheetsByRole } from '@/utils/datasheet';
@@ -21,7 +21,8 @@ interface FactionDatasheetsProps {
 }
 
 const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => {
-  const [settings] = useLocalStorage<depot.Settings>('settings');
+  const { state } = useAppContext();
+  const { settings } = state;
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
 
@@ -34,13 +35,15 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   const { value, description: role, onChange, options } = useSelect(roleOptions);
 
   const groupedDatasheets = useMemo(() => {
-    let filteredDatasheets = settings?.showLegends
-      ? datasheets
-      : datasheets.filter((ds) => ds.isLegends === false);
+    let filteredDatasheets = datasheets;
 
-    filteredDatasheets = settings?.showForgeWorld
-      ? filteredDatasheets
-      : filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
+    if (!settings?.showLegends) {
+      filteredDatasheets = filteredDatasheets.filter((ds) => ds.isLegends === false);
+    }
+
+    if (!settings?.showForgeWorld) {
+      filteredDatasheets = filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
+    }
 
     filteredDatasheets =
       role && value !== 0
