@@ -48,7 +48,7 @@ vi.mock('./components/loading-skeleton', () => ({
 vi.mock('@/components/ui', async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
+    ...(actual as object),
     ErrorState: ({ title, message, stackTrace }: any) => (
       <div data-testid="error-state">
         <h2>{title}</h2>
