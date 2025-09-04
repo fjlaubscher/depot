@@ -1,13 +1,10 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FaArrowLeft, FaStar } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import IconButton from '@/components/ui/icon-button';
-import NavigationButton from '@/components/ui/navigation-button';
-import Stat from '@/components/ui/stat';
-import Tabs from '@/components/ui/tabs';
+import { PageHeader, Tabs, IconButton, ErrorState } from '@/components/ui';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
@@ -18,6 +15,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { getFactionAlliance } from '@/utils/faction';
 
 // Components
+import LoadingSkeleton from './components/loading-skeleton';
 import FactionDatasheets from './components/faction-datasheets';
 import FactionStratagems from './components/faction-stratagems';
 import FactionDetachments from './components/faction-detachments';
@@ -72,19 +70,20 @@ const Faction: React.FC = () => {
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
+  // Loading State
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
   // Error State Component
   if (error) {
     return (
       <AppLayout title="Error">
-        <div className="space-y-4">
-          <NavigationButton to="/">
-            <FaArrowLeft className="mr-2" />
-            Back to Home
-          </NavigationButton>
-          <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-400">Failed to load faction: {error}</p>
-          </div>
-        </div>
+        <ErrorState
+          title="Failed to Load Faction"
+          message="We encountered an error while trying to load this faction. This could be due to network issues or the faction may not exist."
+          stackTrace={error}
+        />
       </AppLayout>
     );
   }
@@ -94,11 +93,8 @@ const Faction: React.FC = () => {
     <AppLayout title="Faction">
       {faction && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <NavigationButton to="/">
-              <FaArrowLeft className="mr-2" />
-              Back to Home
-            </NavigationButton>
+          <div className="flex items-start justify-between gap-4">
+            <PageHeader title={faction.name} subtitle={alliance} className="mb-0" />
             <IconButton
               onClick={toggleMyFaction}
               aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
@@ -106,8 +102,6 @@ const Faction: React.FC = () => {
               {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
             </IconButton>
           </div>
-
-          <Stat title={alliance} value={faction.name} />
 
           <Tabs
             tabs={['Datasheets', 'Detachments', 'Enhancements', 'Stratagems']}

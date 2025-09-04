@@ -1,6 +1,7 @@
 // Core UI Components built with Tailwind CSS
 export { default as Button } from './button';
 export { default as Card } from './card';
+export { default as ErrorState } from './error-state';
 export { default as Field } from './field';
 export { default as Filters } from './filters';
 export { default as Grid } from './grid';
@@ -12,7 +13,13 @@ export { default as NavigationButton } from './navigation-button';
 export { default as PageHeader } from './page-header';
 export { default as Search } from './search';
 export { default as SelectField } from './select-field';
-export { default as Skeleton, SkeletonCard, SkeletonText } from './skeleton';
+export {
+  default as Skeleton,
+  SkeletonCard,
+  SkeletonText,
+  PageHeaderSkeleton,
+  TabsSkeleton
+} from './skeleton';
 export { default as Stat } from './stat';
 export { default as Table } from './table';
 export { default as Tabs } from './tabs';

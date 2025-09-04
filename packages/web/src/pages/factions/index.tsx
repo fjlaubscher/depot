@@ -7,11 +7,10 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader } from '@/components/ui';
+import { PageHeader, ErrorState } from '@/components/ui';
 
 // Page components
 import LoadingSkeleton from './components/loading-skeleton';
-import ErrorState from './components/error-state';
 import AllianceSection from './components/alliance-section';
 import SearchFilters from './components/search-filters';
 import NoResults from './components/no-results';
@@ -52,7 +51,15 @@ const Factions: React.FC = () => {
   }
 
   if (state.error) {
-    return <ErrorState error={state.error} />;
+    return (
+      <AppLayout title="Error">
+        <ErrorState
+          title="Failed to Load Factions"
+          message="We encountered an error while trying to load the factions data. This could be due to network issues or server problems."
+          stackTrace={state.error}
+        />
+      </AppLayout>
+    );
   }
 
   return (

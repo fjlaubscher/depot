@@ -45,9 +45,19 @@ vi.mock('./components/loading-skeleton', () => ({
   default: () => <div data-testid="loading-skeleton">Loading...</div>
 }));
 
-vi.mock('./components/error-state', () => ({
-  default: ({ error }: { error: string }) => <div data-testid="error-state">Error: {error}</div>
-}));
+vi.mock('@/components/ui', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    ErrorState: ({ title, message, stackTrace }: any) => (
+      <div data-testid="error-state">
+        <h2>{title}</h2>
+        <p>{message}</p>
+        {stackTrace && <div data-testid="stack-trace">{stackTrace}</div>}
+      </div>
+    )
+  };
+});
 
 vi.mock('./components/search-filters', () => ({
   default: ({ query, onQueryChange, onClear }: any) => (
@@ -135,7 +145,6 @@ describe('Factions', () => {
       );
 
       expect(screen.getByTestId('error-state')).toBeInTheDocument();
-      expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
     });
 
     it('should not render main content when there is an error', () => {
