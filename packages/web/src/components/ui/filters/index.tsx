@@ -11,7 +11,7 @@ interface FiltersProps {
 const Filters: React.FC<FiltersProps> = ({ children, showClear, onClear, className }) => (
   <div
     className={classNames(
-      'flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6',
+      'flex flex-col sm:flex-row sm:items-center justify-between gap-4',
       className
     )}
   >

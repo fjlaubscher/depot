@@ -16,10 +16,10 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action, className }) => {
   return (
-    <div className={classNames('flex items-start justify-between gap-4 mb-6', className)}>
-      <div className="min-w-0 flex-1">
+    <div className={classNames('flex items-start justify-between gap-4', className)}>
+      <div className="min-w-0 flex-1 flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
       </div>
 
       {action && (

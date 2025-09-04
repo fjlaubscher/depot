@@ -3,15 +3,14 @@ import { depot } from '@depot/core';
 
 // UI Components
 import Grid from '@/components/ui/grid';
-import SelectField from '@/components/ui/select-field';
 import Search from '@/components/ui/search';
 import Filters from '@/components/ui/filters';
 import LinkCard from '@/components/ui/link-card';
+import { CollapsibleSection } from '@/components/ui';
 
 // Hooks
 import { useAppContext } from '@/contexts/app/use-app-context';
 import useDebounce from '@/hooks/use-debounce';
-import useSelect from '@/hooks/use-select';
 
 // Utils
 import { groupDatasheetsByRole } from '@/utils/datasheet';
@@ -26,14 +25,6 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 100);
 
-  // Generate role options from actual datasheets
-  const roleOptions = useMemo(() => {
-    const roles = [...new Set(datasheets.map((ds) => ds.role))].sort();
-    return roles.map((role) => role.toUpperCase());
-  }, [datasheets]);
-
-  const { value, description: role, onChange, options } = useSelect(roleOptions);
-
   const groupedDatasheets = useMemo(() => {
     let filteredDatasheets = datasheets;
 
@@ -45,11 +36,6 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
       filteredDatasheets = filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
     }
 
-    filteredDatasheets =
-      role && value !== 0
-        ? filteredDatasheets.filter((ds) => ds.role.toUpperCase() === role)
-        : filteredDatasheets;
-
     filteredDatasheets = debouncedQuery
       ? filteredDatasheets.filter((ds) =>
           ds.name.toLowerCase().includes(debouncedQuery.toLowerCase())
@@ -57,45 +43,34 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
       : filteredDatasheets;
 
     return groupDatasheetsByRole(filteredDatasheets);
-  }, [datasheets, debouncedQuery, role, value, settings]);
+  }, [datasheets, debouncedQuery, settings]);
 
   return (
-    <div className="space-y-6" data-testid="faction-datasheets">
-      <Filters
-        showClear={value !== 0 || !!query}
-        onClear={() => {
-          setQuery('');
-          onChange(0);
-        }}
-      >
-        <Search label="Search by name" value={query} onChange={setQuery} />
-        <SelectField
-          name="role"
-          value={value}
-          label="Filter by role"
-          onChange={(e) => onChange(Number(e.target.value))}
-          options={options}
-        />
+    <div className="flex flex-col gap-6" data-testid="faction-datasheets">
+      <Filters showClear={!!query} onClear={() => setQuery('')}>
+        <Search label="Search datasheets by name" value={query} onChange={setQuery} />
       </Filters>
 
-      {Object.keys(groupedDatasheets).map((key) =>
-        groupedDatasheets[key].length ? (
-          <div key={key} className="space-y-4">
-            <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">
-                {key}
-              </h2>
-            </div>
-            <Grid>
-              {groupedDatasheets[key].map((ds) => (
-                <LinkCard key={ds.id} to={`/faction/${ds.factionId}/datasheet/${ds.id}`}>
-                  {ds.name}
-                </LinkCard>
-              ))}
-            </Grid>
-          </div>
-        ) : null
-      )}
+      <div className="flex flex-col gap-4">
+        {Object.keys(groupedDatasheets).map((key) =>
+          groupedDatasheets[key].length ? (
+            <CollapsibleSection
+              key={key}
+              title={key.toUpperCase()}
+              defaultExpanded={true}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg"
+            >
+              <Grid>
+                {groupedDatasheets[key].map((ds) => (
+                  <LinkCard key={ds.id} to={`/faction/${ds.factionId}/datasheet/${ds.id}`}>
+                    {ds.name}
+                  </LinkCard>
+                ))}
+              </Grid>
+            </CollapsibleSection>
+          ) : null
+        )}
+      </div>
 
       {Object.keys(groupedDatasheets).every((key) => groupedDatasheets[key].length === 0) && (
         <div className="text-center py-12">
