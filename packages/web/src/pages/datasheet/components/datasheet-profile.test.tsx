@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { depot } from '@depot/core';
 import DatasheetProfile from './datasheet-profile';
-import { mockDatasheet, createMockDatasheet } from '@/test/mock-data';
+import { mockDatasheet } from '@/test/mock-data';
 import { TestWrapper } from '@/test/test-utils';
 
 // Mock child components to focus on DatasheetProfile logic
@@ -64,14 +63,9 @@ describe('DatasheetProfile', () => {
       datasheetId: 'SM_CAPTAIN'
     };
 
-    render(
-      <DatasheetProfile
-        datasheet={mockDatasheet}
-        cost={mockCost}
-        alternateCost={mockAlternateCost}
-      />,
-      { wrapper: TestWrapper }
-    );
+    render(<DatasheetProfile datasheet={mockDatasheet} cost={mockCost} />, {
+      wrapper: TestWrapper
+    });
 
     expect(screen.getByTestId('datasheet-hero')).toBeInTheDocument();
   });

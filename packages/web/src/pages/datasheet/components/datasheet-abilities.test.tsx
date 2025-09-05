@@ -23,13 +23,15 @@ describe('DatasheetAbilities', () => {
       id: 'LEADER',
       name: 'Leader',
       description: 'This model can be attached to a unit',
-      datasheetId: 'SM_CAPTAIN'
+      legend: '',
+      factionId: 'SM'
     },
     {
       id: 'OATH',
       name: 'Oath of Moment',
       description: 'Once per battle, this model can declare an oath',
-      datasheetId: 'SM_CAPTAIN'
+      legend: '',
+      factionId: 'SM'
     }
   ];
 

@@ -58,7 +58,7 @@ const DatasheetPage: React.FC = () => {
     return <DatasheetErrorState error={error} />;
   }
 
-  if (loading) {
+  if (loading || !faction) {
     return <LoadingSkeleton />;
   }
 
@@ -78,7 +78,7 @@ const DatasheetPage: React.FC = () => {
       {/* Header */}
       <PageHeader
         title={datasheet.name}
-        subtitle={`${faction?.name} • ${datasheetCost?.description || ''}`}
+        subtitle={`${faction?.name} • ${datasheet.role}`}
         action={{
           label: 'Share',
           onClick: handleShare,
