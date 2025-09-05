@@ -65,15 +65,13 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
       )}
     >
       <div className="p-4">
-        <div className="flex items-start">
+        <div className="flex items-start gap-2">
           <div className={classNames('flex-shrink-0', config.iconColor)}>{config.icon}</div>
-          <div className="ml-3 w-0 flex-1">
+          <div className="w-0 flex-1 flex flex-col gap-1">
             <p className={classNames('text-sm font-medium', config.titleColor)}>{title}</p>
-            {message && (
-              <p className={classNames('mt-1 text-sm', config.messageColor)}>{message}</p>
-            )}
+            {message && <p className={classNames('text-sm', config.messageColor)}>{message}</p>}
           </div>
-          <div className="ml-4 flex-shrink-0 flex">
+          <div className="flex-shrink-0 flex">
             <IconButton
               variant="ghost"
               size="sm"

@@ -18,6 +18,7 @@ import { getFactionAlliance } from '@/utils/faction';
 import LoadingSkeleton from './components/loading-skeleton';
 import FactionDatasheets from './components/faction-datasheets';
 import FactionDetachments from './components/faction-detachments';
+import NotFoundState from './components/not-found-state';
 
 // Types
 import { depot } from '@depot/core';
@@ -86,31 +87,40 @@ const Faction: React.FC = () => {
     );
   }
 
+  if (!faction) {
+    return (
+      <NotFoundState
+        title="Faction not found"
+        message="The faction you're looking for doesn't exist or may have been removed."
+        homeUrl="/"
+        testId="faction-not-found"
+      />
+    );
+  }
+
   // Main Content
   return (
     <AppLayout title="Faction">
-      {faction && (
-        <div className="space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <PageHeader title={faction.name} subtitle={alliance} className="mb-0" />
-            <IconButton
-              onClick={toggleMyFaction}
-              aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
-            >
-              {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
-            </IconButton>
-          </div>
-
-          <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
-            <FactionDatasheets datasheets={faction.datasheets} />
-            <FactionDetachments
-              detachmentAbilities={faction.detachmentAbilities}
-              enhancements={faction.enhancements}
-              stratagems={faction.stratagems}
-            />
-          </Tabs>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <PageHeader title={faction.name} subtitle={alliance} />
+          <IconButton
+            onClick={toggleMyFaction}
+            aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
+          >
+            {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
+          </IconButton>
         </div>
-      )}
+
+        <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
+          <FactionDatasheets datasheets={faction.datasheets} />
+          <FactionDetachments
+            detachmentAbilities={faction.detachmentAbilities}
+            enhancements={faction.enhancements}
+            stratagems={faction.stratagems}
+          />
+        </Tabs>
+      </div>
     </AppLayout>
   );
 };

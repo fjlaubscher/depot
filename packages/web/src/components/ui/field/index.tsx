@@ -7,7 +7,7 @@ interface FieldProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Field: React.FC<FieldProps> = ({ className, children, ...props }) => {
   return (
-    <div className={classNames('space-y-1', className)} {...props}>
+    <div className={classNames('flex flex-col gap-1', className)} {...props}>
       {children}
     </div>
   );

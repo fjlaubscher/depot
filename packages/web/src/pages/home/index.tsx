@@ -20,11 +20,11 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout title="Home">
-      <div className="space-y-6">
+      <div className="flex flex-col gap-4">
         {/* Welcome Section */}
-        <div className="text-center">
+        <div className="text-center flex flex-col gap-2">
           <h1
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+            className="text-3xl font-bold text-gray-900 dark:text-white"
             data-testid="welcome-heading"
           >
             Welcome to depot
@@ -125,7 +125,7 @@ const Home: React.FC = () => {
 
         {/* My Factions Quick Access */}
         {hasMyFactions && (
-          <div className="space-y-4" data-testid="quick-access-section">
+          <div className="flex flex-col gap-4" data-testid="quick-access-section">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quick Access</h2>
             <Grid>
               {myFactions?.slice(0, 6).map((faction) => (

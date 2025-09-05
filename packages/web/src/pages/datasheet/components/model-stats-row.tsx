@@ -10,21 +10,19 @@ interface ModelStatsRowProps {
 const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+      <div className="flex items-center text-sm font-medium text-gray-900 dark:text-white">
+        {model.name}
+        {model.baseSize && (
+          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">[{model.baseSize}]</span>
+        )}
+      </div>
+      <div className="flex gap-2">
         <StatCard label="M" value={model.m} />
         <StatCard label="T" value={model.t} />
         <StatCard label="Sv" value={model.sv} />
         <StatCard label="W" value={model.w} />
         <StatCard label="Ld" value={model.ld} />
         <StatCard label="OC" value={model.oc} />
-        <div className="flex items-center ml-4 text-sm font-medium text-gray-900 dark:text-white">
-          {model.name}
-          {model.baseSize && (
-            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-              [{model.baseSize}]
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );

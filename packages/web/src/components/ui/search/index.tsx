@@ -20,7 +20,7 @@ const Search: React.FC<SearchProps> = ({
     {label && (
       <label
         htmlFor="search"
-        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-200"
       >
         {label}
       </label>

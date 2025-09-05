@@ -11,10 +11,9 @@ import { groupKeywords } from '@/utils/keywords';
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
   cost?: depot.ModelCost;
-  alternateCost?: depot.ModelCost;
 }
 
-const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost, alternateCost }) => {
+const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost }) => {
   const { role, models, keywords } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 
@@ -45,11 +44,6 @@ const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost, alternat
                 <span className="text-lg font-bold text-gray-900 dark:text-white tabular-nums">
                   {cost.cost}
                 </span>
-                {alternateCost && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400 tabular-nums">
-                    ({alternateCost.cost})
-                  </span>
-                )}
               </div>
             </div>
           )}

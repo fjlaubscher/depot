@@ -59,7 +59,7 @@ export const SkeletonText: React.FC<{
   className?: string;
   lastLineWidth?: string;
 }> = ({ lines = 3, className, lastLineWidth = '75%' }) => (
-  <div className={classNames('space-y-2', className)}>
+  <div className={classNames('flex flex-col gap-2', className)}>
     {Array.from({ length: lines }).map((_, index) => (
       <Skeleton key={index} height={16} width={index === lines - 1 ? lastLineWidth : '100%'} />
     ))}
@@ -68,8 +68,8 @@ export const SkeletonText: React.FC<{
 
 export const PageHeaderSkeleton: React.FC<{ className?: string }> = ({ className }) => (
   <div className={classNames('flex items-start justify-between gap-4', className)}>
-    <div className="min-w-0 flex-1">
-      <Skeleton height={32} width="60%" className="mb-2" />
+    <div className="min-w-0 flex-1 flex flex-col gap-2">
+      <Skeleton height={32} width="60%" />
       <Skeleton height={16} width="40%" />
     </div>
     <div className="flex-shrink-0">

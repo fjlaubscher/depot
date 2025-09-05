@@ -17,7 +17,7 @@ const Stat: React.FC<StatProps> = ({
   className
 }) => {
   return (
-    <div className={classNames('text-center space-y-1', className)}>
+    <div className={classNames('text-center flex flex-col gap-1', className)}>
       {title && (
         <div
           className={classNames(

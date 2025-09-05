@@ -28,9 +28,9 @@ const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, chil
   );
 
   return (
-    <div className={classNames('w-full', className)}>
+    <div className={classNames('w-full flex flex-col gap-4', className)}>
       <div className="border-b border-gray-200 dark:border-gray-700">
-        <nav className="flex space-x-4 overflow-x-auto" aria-label="Tabs">
+        <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (
             <button
               key={`tab-${index}`}
@@ -51,7 +51,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, chil
           ))}
         </nav>
       </div>
-      <div className="mt-4">{validChildren[activeTab] || null}</div>
+      <div>{validChildren[activeTab] || null}</div>
     </div>
   );
 };

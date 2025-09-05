@@ -64,7 +64,7 @@ const Factions: React.FC = () => {
 
   return (
     <AppLayout title="Factions">
-      <div className="space-y-6">
+      <div className="flex flex-col gap-4">
         <PageHeader
           title="Factions"
           subtitle={`Browse ${totalFactions} factions across ${totalAlliances} alliances`}
@@ -73,13 +73,15 @@ const Factions: React.FC = () => {
         <SearchFilters query={query} onQueryChange={setQuery} onClear={() => setQuery('')} />
 
         {hasResults ? (
-          Object.keys(groupedFactions).map((allianceKey) => (
-            <AllianceSection
-              key={`alliance-${allianceKey}`}
-              alliance={allianceKey}
-              factions={groupedFactions[allianceKey]}
-            />
-          ))
+          <div className="flex flex-col gap-4">
+            {Object.keys(groupedFactions).map((allianceKey) => (
+              <AllianceSection
+                key={`alliance-${allianceKey}`}
+                alliance={allianceKey}
+                factions={groupedFactions[allianceKey]}
+              />
+            ))}
+          </div>
         ) : debouncedQuery ? (
           <NoResults query={debouncedQuery} />
         ) : null}
