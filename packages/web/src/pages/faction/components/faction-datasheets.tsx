@@ -63,7 +63,7 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
   }, [debouncedQuery, sortedRoleKeys, groupedDatasheets]);
 
   return (
-    <div className="flex flex-col gap-6" data-testid="faction-datasheets">
+    <div className="flex flex-col gap-4" data-testid="faction-datasheets">
       <Filters showClear={!!query} onClear={() => setQuery('')}>
         <Search label="Search datasheets by name" value={query} onChange={setQuery} />
       </Filters>

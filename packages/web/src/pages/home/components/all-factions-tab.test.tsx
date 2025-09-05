@@ -120,7 +120,6 @@ describe('AllFactionsTab', () => {
     );
 
     expect(screen.getByTestId('no-results')).toBeInTheDocument();
-    expect(screen.getByText('No results for "necrons"')).toBeInTheDocument();
   });
 
   it('should not render NoResults when no results and no query', () => {

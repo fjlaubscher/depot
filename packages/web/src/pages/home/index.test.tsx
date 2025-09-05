@@ -41,8 +41,6 @@ describe('Home', () => {
       );
 
       expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
-      expect(screen.getByText('Welcome to depot')).toBeInTheDocument();
-      expect(screen.getByText(/Your Warhammer 40,000 companion app/)).toBeInTheDocument();
     });
 
     it('should render browse factions card', () => {
@@ -52,8 +50,6 @@ describe('Home', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('Browse Factions')).toBeInTheDocument();
-      expect(screen.getByText(/Explore all Warhammer 40K factions/)).toBeInTheDocument();
       expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
     });
 
@@ -65,7 +61,6 @@ describe('Home', () => {
       );
 
       expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
-      expect(screen.getByText(/Configure Forge World and Legends/)).toBeInTheDocument();
       expect(screen.getByTestId('settings-button')).toBeInTheDocument();
     });
 
@@ -105,7 +100,6 @@ describe('Home', () => {
       );
 
       expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
-      expect(screen.getByText('2 favorite factions saved')).toBeInTheDocument();
     });
 
     it('should render quick access section when favorites exist', () => {

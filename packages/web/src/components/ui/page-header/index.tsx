@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-interface PageHeaderProps {
+interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   subtitle?: string;
   action?: {
@@ -10,13 +10,14 @@ interface PageHeaderProps {
     variant?: 'default' | 'secondary' | 'error';
     disabled?: boolean;
     loading?: boolean;
+    testId?: string;
   };
   className?: string;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action, className }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action, className, ...props }) => {
   return (
-    <div className={classNames('flex items-start justify-between gap-4', className)}>
+    <div className={classNames('flex items-start justify-between gap-4', className)} {...props}>
       <div className="min-w-0 flex-1 flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
         {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
@@ -27,6 +28,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action, classN
           <button
             onClick={action.onClick}
             disabled={action.disabled || action.loading}
+            data-testid={action.testId}
             className={classNames(
               'inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200',
               'disabled:opacity-50 disabled:cursor-not-allowed',

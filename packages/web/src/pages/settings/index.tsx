@@ -43,7 +43,7 @@ const Settings = () => {
         subtitle="Configure your app preferences and manage offline data"
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {/* Content Preferences Card */}
         <Card>
           <div className="mb-4">

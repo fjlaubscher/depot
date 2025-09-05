@@ -80,7 +80,7 @@ export interface DatasheetWargear {
   name: string;
   description: string;
   range: string;
-  type: string;
+  type: 'Ranged' | 'Melee';
   a: string;
   bsWs: string;
   s: string;

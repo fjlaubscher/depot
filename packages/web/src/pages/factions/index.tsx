@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaCog } from 'react-icons/fa';
 
 // Context hooks
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -10,10 +8,9 @@ import AppLayout from '@/components/layout';
 import { PageHeader, ErrorState } from '@/components/ui';
 
 // Page components
-import LoadingSkeleton from './components/loading-skeleton';
+import Skeleton from './components/skeleton';
 import AllianceSection from './components/alliance-section';
 import SearchFilters from './components/search-filters';
-import NoResults from './components/no-results';
 
 // Utilities
 import {
@@ -26,7 +23,6 @@ import {
 import useDebounce from '@/hooks/use-debounce';
 
 const Factions: React.FC = () => {
-  const navigate = useNavigate();
   const { state } = useAppContext();
 
   const [query, setQuery] = useState('');
@@ -47,7 +43,7 @@ const Factions: React.FC = () => {
   const totalAlliances = Object.keys(groupedFactions).length;
 
   if (state.loading) {
-    return <LoadingSkeleton />;
+    return <Skeleton />;
   }
 
   if (state.error) {
@@ -83,7 +79,11 @@ const Factions: React.FC = () => {
             ))}
           </div>
         ) : debouncedQuery ? (
-          <NoResults query={debouncedQuery} />
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">
+              No factions found matching "{debouncedQuery}"
+            </p>
+          </div>
         ) : null}
       </div>
     </AppLayout>

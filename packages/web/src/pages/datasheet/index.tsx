@@ -3,8 +3,7 @@ import { useParams } from 'react-router-dom';
 
 // components
 import AppLayout from '@/components/layout';
-import Tabs from '@/components/ui/tabs';
-import PageHeader from '@/components/ui/page-header';
+import { Tabs, PageHeader, ErrorState } from '@/components/ui';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -13,9 +12,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 // page components
 import DatasheetProfile from './components/datasheet-profile';
 import DatasheetStratagems from './components/datasheet-stratagems';
-import LoadingSkeleton from './components/loading-skeleton';
-import DatasheetErrorState from './components/error-state';
-import NotFoundState from './components/not-found-state';
+import Skeleton from './components/skeleton';
 
 const DatasheetPage: React.FC = () => {
   const { factionId, id } = useParams<{ factionId: string; id: string }>();
@@ -55,21 +52,33 @@ const DatasheetPage: React.FC = () => {
   };
 
   if (error) {
-    return <DatasheetErrorState error={error} />;
+    return (
+      <AppLayout title="Error">
+        <ErrorState
+          title="Failed to Load Datasheet"
+          message="We encountered an error while trying to load this datasheet. This could be due to network issues or the datasheet may not exist."
+          stackTrace={error}
+          data-testid="datasheet-error"
+        />
+      </AppLayout>
+    );
   }
 
   if (loading || !faction) {
-    return <LoadingSkeleton />;
+    return <Skeleton />;
   }
 
   if (!datasheet) {
     return (
-      <NotFoundState
-        title="Datasheet not found"
-        message="The datasheet you're looking for doesn't exist or may have been removed."
-        homeUrl={factionId ? `/faction/${factionId}` : '/'}
-        testId="datasheet-not-found"
-      />
+      <AppLayout title="Not Found">
+        <ErrorState
+          title="Datasheet not found"
+          message="The datasheet you're looking for doesn't exist or may have been removed."
+          showRetry={false}
+          homeUrl={factionId ? `/faction/${factionId}` : '/'}
+          data-testid="datasheet-not-found"
+        />
+      </AppLayout>
     );
   }
 
@@ -82,8 +91,10 @@ const DatasheetPage: React.FC = () => {
         action={{
           label: 'Share',
           onClick: handleShare,
-          variant: 'secondary'
+          variant: 'secondary',
+          testId: 'share-datasheet-button'
         }}
+        data-testid="datasheet-header"
       />
 
       {/* Tabs */}

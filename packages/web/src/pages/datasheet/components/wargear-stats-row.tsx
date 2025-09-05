@@ -1,36 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { depot } from '@depot/core';
 
-import StatCard from './stat-card';
+import { StatCard } from '@/components/ui';
+import WargearRow from '@/components/shared/wargear-row';
+import { parseWargearKeywords } from '@/utils/wargear';
 
-interface WargearStatsRow {
+interface WargearStatsRowProps {
   wargear: depot.Wargear;
-  type: 'ranged' | 'melee';
+  type: depot.Wargear['type'];
 }
 
-const WargearStatsRow: React.FC<WargearStatsRow> = ({ wargear, type }) => {
+const WargearStatsRow: React.FC<WargearStatsRowProps> = ({ wargear, type }) => {
+  const keywords = useMemo(() => parseWargearKeywords(wargear.description), [wargear.description]);
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center text-sm font-medium text-gray-900 dark:text-white">
-        {wargear.name}
-        {wargear.description && (
-          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-            [{wargear.description}]
-          </span>
-        )}
-      </div>
-      <div className="flex gap-2">
-        {type === 'ranged' ? <StatCard label="Range" value={`${wargear.range}"`} /> : null}
-        <StatCard label="A" value={wargear.a} />
-        <StatCard
-          label={type === 'ranged' ? 'BS' : 'WS'}
-          value={wargear.bsWs === 'N/A' ? wargear.bsWs : `${wargear.bsWs}+`}
-        />
-        <StatCard label="S" value={wargear.s} />
-        <StatCard label="AP" value={wargear.ap} />
-        <StatCard label="D" value={wargear.d} />
-      </div>
-    </div>
+    <WargearRow
+      name={wargear.name}
+      range={type === 'Ranged' ? wargear.range : undefined}
+      keywords={keywords}
+    >
+      <StatCard label="A" value={wargear.a} />
+      <StatCard
+        label={type === 'Ranged' ? 'BS' : 'WS'}
+        value={wargear.bsWs === 'N/A' ? wargear.bsWs : `${wargear.bsWs}+`}
+      />
+      <StatCard label="S" value={wargear.s} />
+      <StatCard label="AP" value={wargear.ap} />
+      <StatCard label="D" value={wargear.d} />
+    </WargearRow>
   );
 };
 

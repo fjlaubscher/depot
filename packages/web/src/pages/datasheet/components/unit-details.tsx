@@ -17,7 +17,7 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unitComposition, options, mod
   if (!hasComposition && !hasOptions) return null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Unit Composition */}
       {hasComposition && (
         <div data-testid="unit-composition">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaExclamationTriangle, FaHome, FaRedo } from 'react-icons/fa';
 import Button from '../button';
 
-interface ErrorStateProps {
+interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   message?: string;
   stackTrace?: string;
@@ -22,11 +22,13 @@ const ErrorState: React.FC<ErrorStateProps> = ({
   showHome = true,
   onRetry = () => window.location.reload(),
   homeUrl = '/',
-  className = ''
+  className = '',
+  ...props
 }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center min-h-[400px] text-center px-4 gap-6 ${className}`}
+      className={`flex flex-col items-center justify-center min-h-[400px] text-center px-4 gap-4 ${className}`}
+      {...props}
     >
       <div className="flex flex-col gap-4">
         <FaExclamationTriangle className="w-16 h-16 text-red-500 mx-auto" />

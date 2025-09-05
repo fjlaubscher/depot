@@ -26,22 +26,26 @@ const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
   }, [wargear]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col md:flex-row md:items-start gap-4">
       {/* Ranged Weapons */}
       {rangedWargear.length > 0 ? (
-        <CollapsibleSection title="Ranged Wargear">
-          {rangedWargear.map((wargear) => (
-            <WargearStatsRow key={wargear.line} wargear={wargear} type="ranged" />
-          ))}
+        <CollapsibleSection title="Ranged Wargear" className="flex-1">
+          <div className="flex flex-col gap-4">
+            {rangedWargear.map((wargear) => (
+              <WargearStatsRow key={wargear.line} wargear={wargear} type="Ranged" />
+            ))}
+          </div>
         </CollapsibleSection>
       ) : null}
 
       {/* Melee Weapons */}
       {meleeWargear.length > 0 && (
-        <CollapsibleSection title="Melee Wargear">
-          {meleeWargear.map((wargear) => (
-            <WargearStatsRow key={wargear.line} wargear={wargear} type="melee" />
-          ))}
+        <CollapsibleSection title="Melee Wargear" className="flex-1">
+          <div className="flex flex-col gap-4">
+            {meleeWargear.map((wargear) => (
+              <WargearStatsRow key={wargear.line} wargear={wargear} type="Melee" />
+            ))}
+          </div>
         </CollapsibleSection>
       )}
     </div>

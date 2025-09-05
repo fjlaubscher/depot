@@ -15,10 +15,9 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { getFactionAlliance } from '@/utils/faction';
 
 // Components
-import LoadingSkeleton from './components/loading-skeleton';
+import Skeleton from './components/skeleton';
 import FactionDatasheets from './components/faction-datasheets';
 import FactionDetachments from './components/faction-detachments';
-import NotFoundState from './components/not-found-state';
 
 // Types
 import { depot } from '@depot/core';
@@ -69,11 +68,6 @@ const Faction: React.FC = () => {
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
-  // Loading State
-  if (loading) {
-    return <LoadingSkeleton />;
-  }
-
   // Error State Component
   if (error) {
     return (
@@ -82,19 +76,28 @@ const Faction: React.FC = () => {
           title="Failed to Load Faction"
           message="We encountered an error while trying to load this faction. This could be due to network issues or the faction may not exist."
           stackTrace={error}
+          data-testid="error-state"
         />
       </AppLayout>
     );
   }
 
+  // Loading State
+  if (loading || !faction) {
+    return <Skeleton />;
+  }
+
   if (!faction) {
     return (
-      <NotFoundState
-        title="Faction not found"
-        message="The faction you're looking for doesn't exist or may have been removed."
-        homeUrl="/"
-        testId="faction-not-found"
-      />
+      <AppLayout title="Not Found">
+        <ErrorState
+          title="Faction not found"
+          message="The faction you're looking for doesn't exist or may have been removed."
+          showRetry={false}
+          homeUrl="/"
+          data-testid="faction-not-found"
+        />
+      </AppLayout>
     );
   }
 

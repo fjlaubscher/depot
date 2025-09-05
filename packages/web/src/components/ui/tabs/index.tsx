@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
-interface TabsProps {
+interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   tabs: string[];
   active?: number;
   onChange?: (index: number) => void;
@@ -9,7 +9,7 @@ interface TabsProps {
   children: React.ReactNode;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, children }) => {
+const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, ...props }) => {
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, chil
   );
 
   return (
-    <div className={classNames('w-full flex flex-col gap-4', className)}>
+    <div className={classNames('w-full flex flex-col gap-4', className)} {...props}>
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (

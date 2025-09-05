@@ -2,10 +2,10 @@ import React from 'react';
 import AppLayout from '@/components/layout';
 import { PageHeaderSkeleton, TabsSkeleton, SkeletonCard } from '@/components/ui';
 
-const LoadingSkeleton: React.FC = () => {
+const Skeleton: React.FC = () => {
   return (
     <AppLayout title="Datasheet">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4" data-testid="datasheet-loader">
         <PageHeaderSkeleton />
 
         {/* Points Stats Skeleton */}
@@ -28,4 +28,4 @@ const LoadingSkeleton: React.FC = () => {
   );
 };
 
-export default LoadingSkeleton;
+export default Skeleton;

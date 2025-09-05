@@ -14,13 +14,13 @@ interface DatasheetHeroProps {
 }
 
 const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost }) => {
-  const { role, models, keywords } = datasheet;
+  const { models, keywords } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 
   if (models.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Model Stats Rows */}
       <div className="flex flex-col gap-4 overflow-x-scroll">
         {models.map((model) => (

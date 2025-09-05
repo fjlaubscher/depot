@@ -86,12 +86,12 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-6" data-testid="faction-detachments">
+    <div className="flex flex-col gap-4" data-testid="faction-detachments">
       <Filters showClear={!!query} onClear={clearFilters}>
         <Search label="Search detachments by name" value={query} onChange={setQuery} />
       </Filters>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         {Object.keys(filteredDetachments)
           .sort()
           .map((detachmentName) => (
