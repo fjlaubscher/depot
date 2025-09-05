@@ -39,14 +39,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
-      - name: Generate data
-        run: pnpm --filter @depot/cli start
-        
-      - name: Copy data to web app
-        run: node scripts/copy-data.mjs
-        
-      - name: Build web app
-        run: pnpm --filter @depot/web build
+      - name: Build all packages and generate data
+        run: pnpm build
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
