@@ -145,7 +145,11 @@ const DatasheetPage: React.FC = () => {
           onChange={setActiveTab}
           data-testid="datasheet-tabs"
         >
-          <DatasheetProfile datasheet={datasheet} />
+          <DatasheetProfile
+            datasheet={datasheet}
+            cost={datasheetCost}
+            alternateCost={alternateCost}
+          />
           <DatasheetStratagems stratagems={datasheet.stratagems} />
         </Tabs>
       </div>

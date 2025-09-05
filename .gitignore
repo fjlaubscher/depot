@@ -26,3 +26,4 @@ dist-ssr
 packages/web/public/data/*
 *.tsbuildinfo
 docs
+plans
