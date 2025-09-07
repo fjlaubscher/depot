@@ -147,7 +147,7 @@ describe('Faction Page', () => {
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    expect(screen.getByText(/Failed to load faction/)).toBeInTheDocument();
+    expect(screen.getByTestId('error-state')).toBeInTheDocument();
   });
 
   it('renders all tabs', () => {

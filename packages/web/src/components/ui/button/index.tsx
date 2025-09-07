@@ -19,7 +19,7 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const variantClasses = {
     default: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
@@ -49,8 +49,8 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <div className="flex items-center">
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           Loading...
         </div>
       ) : (

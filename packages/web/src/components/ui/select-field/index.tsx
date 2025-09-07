@@ -37,11 +37,11 @@ const SelectField: React.FC<SelectFieldProps> = ({
   );
 
   return (
-    <div className={fullWidth ? 'w-full' : ''}>
+    <div className={classNames('flex flex-col gap-1', fullWidth ? 'w-full' : '')}>
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
           {label}
         </label>
@@ -53,7 +53,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
           </option>
         ))}
       </select>
-      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 };

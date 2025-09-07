@@ -45,19 +45,36 @@ const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => 
     return groupDatasheetsByRole(filteredDatasheets);
   }, [datasheets, debouncedQuery, settings]);
 
+  const sortedRoleKeys = useMemo(() => {
+    return Object.keys(groupedDatasheets).sort();
+  }, [groupedDatasheets]);
+
+  const shouldExpandSection = useMemo(() => {
+    // If there's a search query, expand sections that have results
+    if (debouncedQuery) {
+      const expandedSections: { [key: string]: boolean } = {};
+      sortedRoleKeys.forEach((key) => {
+        expandedSections[key] = groupedDatasheets[key].length > 0;
+      });
+      return expandedSections;
+    }
+    // If no search query, collapse all sections
+    return {};
+  }, [debouncedQuery, sortedRoleKeys, groupedDatasheets]);
+
   return (
-    <div className="flex flex-col gap-6" data-testid="faction-datasheets">
+    <div className="flex flex-col gap-4" data-testid="faction-datasheets">
       <Filters showClear={!!query} onClear={() => setQuery('')}>
         <Search label="Search datasheets by name" value={query} onChange={setQuery} />
       </Filters>
 
       <div className="flex flex-col gap-4">
-        {Object.keys(groupedDatasheets).map((key) =>
+        {sortedRoleKeys.map((key) =>
           groupedDatasheets[key].length ? (
             <CollapsibleSection
-              key={key}
+              key={`${key}-${!!debouncedQuery}`}
               title={key.toUpperCase()}
-              defaultExpanded={true}
+              defaultExpanded={shouldExpandSection[key] || false}
               className="border border-gray-200 dark:border-gray-700 rounded-lg"
             >
               <Grid>

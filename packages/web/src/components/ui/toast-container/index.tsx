@@ -12,7 +12,7 @@ const ToastContainer: React.FC = () => {
 
   return (
     <div
-      className="fixed top-0 right-0 z-50 p-6 space-y-4 pointer-events-none"
+      className="fixed top-0 right-0 z-50 p-6 flex flex-col gap-4 pointer-events-none"
       aria-live="assertive"
     >
       {toasts.map((toast) => (

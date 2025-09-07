@@ -41,8 +41,8 @@ vi.mock('@/hooks/use-debounce', () => ({
 }));
 
 // Mock child components
-vi.mock('./components/loading-skeleton', () => ({
-  default: () => <div data-testid="loading-skeleton">Loading...</div>
+vi.mock('./components/skeleton', () => ({
+  default: () => <div data-testid="skeleton">Loading...</div>
 }));
 
 vi.mock('@/components/ui', async (importOriginal) => {
@@ -116,8 +116,7 @@ describe('Factions', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
+      expect(screen.getByTestId('skeleton')).toBeInTheDocument();
     });
 
     it('should not render main content when loading', () => {

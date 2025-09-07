@@ -1,20 +1,35 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { depot } from '@depot/core';
 import DatasheetProfile from './datasheet-profile';
-import { mockDatasheet, createMockDatasheet } from '@/test/mock-data';
+import { mockDatasheet } from '@/test/mock-data';
 import { TestWrapper } from '@/test/test-utils';
 
 // Mock child components to focus on DatasheetProfile logic
-vi.mock('./model-profile-table', () => ({
-  default: ({ models }: { models: any[] }) => (
-    <div data-testid="model-profile-table">Models: {models.length}</div>
+vi.mock('./datasheet-hero', () => ({
+  default: ({ datasheet, cost, alternateCost }: any) => (
+    <div data-testid="datasheet-hero">
+      Hero - {datasheet.name} - {cost?.cost || 'No cost'}
+    </div>
   )
 }));
 
-vi.mock('./wargear-table', () => ({
-  default: ({ wargear, type }: { wargear: any[]; type: string }) => (
-    <div data-testid={`wargear-table-${type.toLowerCase()}`}>{type} Wargear Table</div>
+vi.mock('./datasheet-wargear', () => ({
+  default: ({ datasheet }: any) => (
+    <div data-testid="datasheet-wargear">Wargear - {datasheet.wargear.length} weapons</div>
+  )
+}));
+
+vi.mock('./datasheet-abilities', () => ({
+  default: ({ abilities }: any) => (
+    <div data-testid="datasheet-abilities">Abilities - {abilities.length} abilities</div>
+  )
+}));
+
+vi.mock('./unit-details', () => ({
+  default: ({ unitComposition, options }: any) => (
+    <div data-testid="unit-details">
+      Unit Details - {unitComposition.length} compositions, {options.length} options
+    </div>
   )
 }));
 
@@ -23,157 +38,59 @@ vi.mock('@/utils/array', () => ({
   sortByName: (items: any[]) => items.sort((a, b) => a.name.localeCompare(b.name))
 }));
 
-vi.mock('@/utils/keywords', () => ({
-  groupKeywords: (keywords: depot.Keyword[]) => ({
-    datasheet: keywords.filter((k) => k.isFactionKeyword !== 'true').map((k) => k.keyword),
-    faction: keywords.filter((k) => k.isFactionKeyword === 'true').map((k) => k.keyword)
-  })
-}));
-
 describe('DatasheetProfile', () => {
   it('renders all sections with mock datasheet', () => {
     render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('datasheet-profile')).toBeInTheDocument();
-    expect(screen.getByTestId('model-profile-table')).toBeInTheDocument();
-    expect(screen.getByText('Models: 2')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-hero')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-abilities')).toBeInTheDocument();
+    expect(screen.getByTestId('unit-details')).toBeInTheDocument();
   });
 
-  it('renders wargear tables for ranged and melee weapons', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
+  it('passes cost data to hero component', () => {
+    const mockCost = {
+      line: '1',
+      description: 'Base cost',
+      cost: '100',
+      datasheetId: 'SM_CAPTAIN'
+    };
+    const mockAlternateCost = {
+      line: '2',
+      description: 'Alternate cost',
+      cost: '120',
+      datasheetId: 'SM_CAPTAIN'
+    };
 
-    expect(screen.getByTestId('wargear-table-ranged')).toBeInTheDocument();
-    expect(screen.getByText('Ranged Wargear Table')).toBeInTheDocument();
-
-    expect(screen.getByTestId('wargear-table-melee')).toBeInTheDocument();
-    expect(screen.getByText('Melee Wargear Table')).toBeInTheDocument();
-  });
-
-  it('renders unit composition section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
-
-    const unitComposition = screen.getByTestId('unit-composition');
-    expect(unitComposition).toBeInTheDocument();
-    expect(unitComposition).toHaveTextContent('Unit Composition');
-    expect(unitComposition).toHaveTextContent('1 Captain');
-  });
-
-  it('renders unit options section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
-
-    const unitOptions = screen.getByTestId('unit-options');
-    expect(unitOptions).toBeInTheDocument();
-    expect(unitOptions).toHaveTextContent('Unit Options');
-    expect(unitOptions).toHaveTextContent('This model may be equipped with a jump pack');
-  });
-
-  it('renders abilities section', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
-
-    const abilities = screen.getByTestId('abilities');
-    expect(abilities).toBeInTheDocument();
-    expect(abilities).toHaveTextContent('Abilities');
-    expect(abilities).toHaveTextContent('Leader');
-    expect(abilities).toHaveTextContent('This model can be attached to a unit');
-  });
-
-  it('renders keywords sections', () => {
-    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
-
-    const keywords = screen.getByTestId('keywords');
-    expect(keywords).toBeInTheDocument();
-    expect(keywords).toHaveTextContent('Keywords');
-
-    const factionKeywords = screen.getByTestId('faction-keywords');
-    expect(factionKeywords).toBeInTheDocument();
-    expect(factionKeywords).toHaveTextContent('Faction Keywords');
-  });
-
-  it('handles empty unit composition', () => {
-    const datasheetWithoutComposition = createMockDatasheet({
-      unitComposition: []
+    render(<DatasheetProfile datasheet={mockDatasheet} cost={mockCost} />, {
+      wrapper: TestWrapper
     });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutComposition} />, { wrapper: TestWrapper });
-
-    expect(screen.queryByTestId('unit-composition')).not.toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-hero')).toBeInTheDocument();
   });
 
-  it('handles empty unit options', () => {
-    const datasheetWithoutOptions = createMockDatasheet({
-      options: []
-    });
+  it('handles missing cost data', () => {
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutOptions} />, { wrapper: TestWrapper });
-
-    expect(screen.queryByTestId('unit-options')).not.toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-hero')).toBeInTheDocument();
   });
 
-  it('handles empty abilities', () => {
-    const datasheetWithoutAbilities = createMockDatasheet({
-      abilities: []
-    });
+  it('passes wargear data to wargear component', () => {
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
-    render(<DatasheetProfile datasheet={datasheetWithoutAbilities} />, { wrapper: TestWrapper });
-
-    expect(screen.queryByTestId('abilities')).not.toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();
   });
 
-  it('filters options with descriptions', () => {
-    const datasheetWithEmptyOptions = createMockDatasheet({
-      options: [
-        { line: '1', description: 'Valid option', button: '-', datasheetId: 'SM_CAPTAIN' },
-        { line: '2', description: '', button: '-', datasheetId: 'SM_CAPTAIN' }, // Should be filtered out
-        { line: '3', description: 'Another valid option', button: '-', datasheetId: 'SM_CAPTAIN' }
-      ]
-    });
+  it('passes abilities to abilities component', () => {
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
-    render(<DatasheetProfile datasheet={datasheetWithEmptyOptions} />, { wrapper: TestWrapper });
-
-    expect(screen.getByText('Valid option')).toBeInTheDocument();
-    expect(screen.getByText('Another valid option')).toBeInTheDocument();
-    expect(screen.queryByText('line 2')).not.toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-abilities')).toBeInTheDocument();
   });
 
-  it('calls wargear tables with correct weapon types', () => {
-    const datasheetWithMixedWargear = createMockDatasheet({
-      wargear: [
-        {
-          line: '1',
-          name: 'Bolt pistol',
-          type: 'Ranged',
-          range: '12',
-          a: '1',
-          bsWs: '2',
-          s: '4',
-          ap: '0',
-          d: '1',
-          description: '',
-          datasheetId: 'SM_CAPTAIN',
-          dice: '',
-          lineInWargear: ''
-        },
-        {
-          line: '2',
-          name: 'Power sword',
-          type: 'Melee',
-          range: '',
-          a: '4',
-          bsWs: '2',
-          s: '5',
-          ap: '-2',
-          d: '2',
-          description: '',
-          datasheetId: 'SM_CAPTAIN',
-          dice: '',
-          lineInWargear: ''
-        }
-      ]
-    });
+  it('passes unit details to unit details component', () => {
+    render(<DatasheetProfile datasheet={mockDatasheet} />, { wrapper: TestWrapper });
 
-    render(<DatasheetProfile datasheet={datasheetWithMixedWargear} />, { wrapper: TestWrapper });
-
-    expect(screen.getByTestId('wargear-table-ranged')).toBeInTheDocument();
-    expect(screen.getByTestId('wargear-table-melee')).toBeInTheDocument();
+    expect(screen.getByTestId('unit-details')).toBeInTheDocument();
   });
 });

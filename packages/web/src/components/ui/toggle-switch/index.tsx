@@ -18,8 +18,8 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, enabled, onChange, s
   const currentSize = sizeClasses[size];
 
   return (
-    <div className="flex items-center">
-      <span className="mr-3 text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>
       <button
         type="button"
         className={classNames(

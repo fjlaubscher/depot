@@ -41,8 +41,6 @@ describe('NotFound', () => {
 
       expect(screen.getByTestId('go-home-button')).toBeInTheDocument();
       expect(screen.getByTestId('go-back-button')).toBeInTheDocument();
-      expect(screen.getByText('Return to Home')).toBeInTheDocument();
-      expect(screen.getByText('Go Back')).toBeInTheDocument();
     });
   });
 

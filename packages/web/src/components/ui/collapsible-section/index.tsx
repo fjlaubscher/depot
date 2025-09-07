@@ -21,7 +21,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   };
 
   return (
-    <div className={className}>
+    <div className={`border border-gray-200 dark:border-gray-700 rounded-lg ${className}`}>
       <button
         onClick={toggleExpanded}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"

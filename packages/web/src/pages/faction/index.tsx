@@ -15,7 +15,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { getFactionAlliance } from '@/utils/faction';
 
 // Components
-import LoadingSkeleton from './components/loading-skeleton';
+import Skeleton from './components/skeleton';
 import FactionDatasheets from './components/faction-datasheets';
 import FactionDetachments from './components/faction-detachments';
 
@@ -68,11 +68,6 @@ const Faction: React.FC = () => {
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
-  // Loading State
-  if (loading) {
-    return <LoadingSkeleton />;
-  }
-
   // Error State Component
   if (error) {
     return (
@@ -81,6 +76,26 @@ const Faction: React.FC = () => {
           title="Failed to Load Faction"
           message="We encountered an error while trying to load this faction. This could be due to network issues or the faction may not exist."
           stackTrace={error}
+          data-testid="error-state"
+        />
+      </AppLayout>
+    );
+  }
+
+  // Loading State
+  if (loading || !faction) {
+    return <Skeleton />;
+  }
+
+  if (!faction) {
+    return (
+      <AppLayout title="Not Found">
+        <ErrorState
+          title="Faction not found"
+          message="The faction you're looking for doesn't exist or may have been removed."
+          showRetry={false}
+          homeUrl="/"
+          data-testid="faction-not-found"
         />
       </AppLayout>
     );
@@ -89,28 +104,26 @@ const Faction: React.FC = () => {
   // Main Content
   return (
     <AppLayout title="Faction">
-      {faction && (
-        <div className="space-y-6">
-          <div className="flex items-start justify-between gap-4">
-            <PageHeader title={faction.name} subtitle={alliance} className="mb-0" />
-            <IconButton
-              onClick={toggleMyFaction}
-              aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
-            >
-              {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
-            </IconButton>
-          </div>
-
-          <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
-            <FactionDatasheets datasheets={faction.datasheets} />
-            <FactionDetachments
-              detachmentAbilities={faction.detachmentAbilities}
-              enhancements={faction.enhancements}
-              stratagems={faction.stratagems}
-            />
-          </Tabs>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-4">
+          <PageHeader title={faction.name} subtitle={alliance} />
+          <IconButton
+            onClick={toggleMyFaction}
+            aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
+          >
+            {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
+          </IconButton>
         </div>
-      )}
+
+        <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
+          <FactionDatasheets datasheets={faction.datasheets} />
+          <FactionDetachments
+            detachmentAbilities={faction.detachmentAbilities}
+            enhancements={faction.enhancements}
+            stratagems={faction.stratagems}
+          />
+        </Tabs>
+      </div>
     </AppLayout>
   );
 };

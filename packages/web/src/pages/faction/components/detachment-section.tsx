@@ -46,7 +46,7 @@ const DetachmentSection: React.FC<DetachmentSectionProps> = ({
           <CollapsibleSection
             title="Enhancements"
             defaultExpanded={false}
-            className="border-t border-gray-200 dark:border-gray-700"
+            className="!border-x-0 !border-b-0 !rounded-none border-t border-gray-200 dark:border-gray-700"
           >
             <Grid>
               {enhancements.map((enhancement) => (
@@ -61,7 +61,7 @@ const DetachmentSection: React.FC<DetachmentSectionProps> = ({
           <CollapsibleSection
             title="Stratagems"
             defaultExpanded={false}
-            className="border-t border-gray-200 dark:border-gray-700"
+            className="!border-x-0 !border-b-0 !rounded-none border-t border-gray-200 dark:border-gray-700"
           >
             <Grid>
               {stratagems.map((stratagem) => (

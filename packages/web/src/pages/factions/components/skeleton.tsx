@@ -5,7 +5,7 @@ import { SkeletonCard, PageHeaderSkeleton } from '@/components/ui/skeleton';
 const LoadingSkeleton: React.FC = () => {
   return (
     <Layout title="Home">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <PageHeaderSkeleton />
 
         {/* Search/Filters skeleton */}

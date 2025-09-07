@@ -4,9 +4,9 @@ const stripHtml = (input: string) => {
   // First, completely remove div elements with class="abName" and their contents
   let processedInput = input.replace(/<div\s+class="abName"[^>]*>.*?<\/div>/gis, '');
 
-  // Preserve span tags with class="kwb" and their variations, list elements, and br tags
+  // Preserve span tags with class="kwb" and their variations, list elements, bold tags, and br tags
   const preserveRegex =
-    /(<span\s+class="kwb[^"]*"[^>]*>.*?<\/span>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<br[^>]*\/?>)/gis;
+    /(<span\s+class="kwb[^"]*"[^>]*>.*?<\/span>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<b[^>]*>.*?<\/b>|<br[^>]*\/?>)/gis;
   const preservedElements: string[] = [];
 
   // Extract and temporarily replace preserved elements with placeholders
