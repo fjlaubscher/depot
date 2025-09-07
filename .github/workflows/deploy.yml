@@ -41,6 +41,8 @@ jobs:
         
       - name: Build all packages and generate data
         run: pnpm build
+        env:
+          NODE_ENV: production
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
