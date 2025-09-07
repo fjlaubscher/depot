@@ -4,7 +4,9 @@ import { copyFileSync, mkdirSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const sourceDir = 'packages/cli/dist/data';
-const targetDir = 'packages/web/public/data';
+const targetDir = process.env.NODE_ENV === 'production' 
+  ? 'packages/web/dist/data' 
+  : 'packages/web/public/data';
 
 try {
   // Check if source directory exists
