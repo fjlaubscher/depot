@@ -15,7 +15,13 @@ interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, action, className, ...props }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({
+  title,
+  subtitle,
+  action,
+  className,
+  ...props
+}) => {
   return (
     <div className={classNames('flex items-start justify-between gap-4', className)} {...props}>
       <div className="min-w-0 flex-1 flex flex-col gap-1">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
-interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
   tabs: string[];
   active?: number;
   onChange?: (index: number) => void;
@@ -9,7 +9,14 @@ interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, ...props }) => {
+const Tabs: React.FC<TabsProps> = ({
+  tabs,
+  active = 0,
+  onChange,
+  className,
+  children,
+  ...props
+}) => {
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
