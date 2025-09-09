@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaHome, FaChevronDown, FaChevronRight, FaUsers, FaCog, FaStar } from 'react-icons/fa';
 import { Layout } from '../ui';
 import { depot } from '@depot/core';
-import useMyFactions from '@/hooks/use-my-factions';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 
 interface Props {
@@ -12,11 +12,11 @@ interface Props {
 }
 
 const AppLayout = ({ children, title }: Props) => {
-  const [myFactions] = useMyFactions();
+  const { state } = useAppContext();
   const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
   const { closeSidebar } = useLayoutContext();
 
-  const hasMyFactions = myFactions && myFactions.length > 0;
+  const hasMyFactions = state.myFactions && state.myFactions.length > 0;
 
   const sidebar = (
     <div className="space-y-4">
@@ -66,7 +66,7 @@ const AppLayout = ({ children, title }: Props) => {
 
             {isMyFactionsExpanded && (
               <div className="ml-4 space-y-1">
-                {myFactions.map((faction) => (
+                {state.myFactions.map((faction) => (
                   <Link
                     key={faction.id}
                     to={`/faction/${faction.id}`}

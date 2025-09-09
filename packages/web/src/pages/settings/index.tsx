@@ -3,7 +3,11 @@ import { depot } from '@depot/core';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Button, Loader, ToggleSwitch, PageHeader, Card } from '@/components/ui';
+import { Button, Loader, PageHeader } from '@/components/ui';
+
+// Components
+import SettingsCard from './components/settings-card';
+import SettingToggleItem from './components/setting-toggle-item';
 
 // Hooks and Context
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -38,140 +42,112 @@ const Settings = () => {
 
   return (
     <AppLayout title="Settings">
-      <PageHeader
-        title="Settings"
-        subtitle="Configure your app preferences and manage offline data"
-      />
+      <div className="flex flex-col gap-4">
+        <PageHeader
+          title="Settings"
+          subtitle="Configure your app preferences and manage offline data"
+        />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Content Preferences Card */}
-        <Card>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Content Preferences
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Choose which content to display in datasheets
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Forge World Units
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Show Forge World datasheets and rules
-                </div>
-              </div>
-              <ToggleSwitch
-                label=""
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Faction Preferences Card */}
+          <SettingsCard title="Faction Preferences" description="Choose which factions to display">
+            <div className="flex flex-col gap-4">
+              <SettingToggleItem
+                title="Forge World Units"
+                description="Show Forge World datasheets and rules"
                 enabled={state.settings?.showForgeWorld || false}
                 onChange={(value) => handleSettingsChange('showForgeWorld', value)}
-                size="sm"
               />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Legends Units
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Show legacy Legends datasheets
-                </div>
-              </div>
-              <ToggleSwitch
-                label=""
+              <SettingToggleItem
+                title="Legends Units"
+                description="Show legacy Legends datasheets"
                 enabled={state.settings?.showLegends || false}
                 onChange={(value) => handleSettingsChange('showLegends', value)}
-                size="sm"
               />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Unaligned Factions
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  Show factions without specific allegiances
-                </div>
-              </div>
-              <ToggleSwitch
-                label=""
+              <SettingToggleItem
+                title="Unaligned Factions"
+                description="Show factions without specific allegiances"
                 enabled={state.settings?.showUnaligned ?? true}
                 onChange={(value) => handleSettingsChange('showUnaligned', value)}
-                size="sm"
               />
             </div>
-          </div>
-        </Card>
+          </SettingsCard>
 
-        {/* Offline Data Card */}
-        <Card>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Offline Data</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Manage cached faction data for offline use
-            </p>
-          </div>
-
-          {state.loading ? (
-            <div className="flex justify-center py-8">
-              <Loader size="md" />
+          {/* Datasheet Preferences Card */}
+          <SettingsCard
+            title="Datasheet Preferences"
+            description="Customize how datasheets are displayed"
+          >
+            <div className="flex flex-col gap-4">
+              <SettingToggleItem
+                title="Show Fluff Text"
+                description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
+                enabled={state.settings?.showFluff ?? true}
+                onChange={(value) => handleSettingsChange('showFluff', value)}
+              />
             </div>
-          ) : (
-            <div className="space-y-4">
-              {state.offlineFactions && state.offlineFactions.length > 0 ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        Cached Factions
-                      </span>
-                      <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
-                        {state.offlineFactions.length}
-                      </span>
-                    </div>
+          </SettingsCard>
 
-                    <div className="flex flex-col gap-2">
-                      {state.offlineFactions.slice(0, 4).map((f) => (
-                        <div
-                          key={`faction-${f.id}`}
-                          className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded px-3"
-                        >
-                          <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
-                          <span className="truncate">{f.name}</span>
-                        </div>
-                      ))}
-                      {state.offlineFactions.length > 4 && (
-                        <div className="text-center">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            +{state.offlineFactions.length - 4} more factions cached
-                          </span>
-                        </div>
-                      )}
+          {/* Offline Data Card */}
+          <SettingsCard
+            title="Offline Data"
+            description="Manage cached faction data for offline use"
+          >
+            {state.loading ? (
+              <div className="flex justify-center py-8">
+                <Loader size="md" />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {state.offlineFactions && state.offlineFactions.length > 0 ? (
+                  <>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          Cached Factions
+                        </span>
+                        <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
+                          {state.offlineFactions.length}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        {state.offlineFactions.slice(0, 4).map((f) => (
+                          <div
+                            key={`faction-${f.id}`}
+                            className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded px-3"
+                          >
+                            <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
+                            <span className="truncate">{f.name}</span>
+                          </div>
+                        ))}
+                        {state.offlineFactions.length > 4 && (
+                          <div className="text-center">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              +{state.offlineFactions.length - 4} more factions cached
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Button variant="error" onClick={handleReset} size="sm" fullWidth>
+                      Clear All Offline Data
+                    </Button>
+                  </>
+                ) : (
+                  <div className="text-center py-6">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      No offline data cached
+                    </div>
+                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                      Visit faction pages to cache data offline
                     </div>
                   </div>
-                  <Button variant="error" onClick={handleReset} size="sm" fullWidth>
-                    Clear All Offline Data
-                  </Button>
-                </>
-              ) : (
-                <div className="text-center py-6">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    No offline data cached
-                  </div>
-                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    Visit faction pages to cache data offline
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </Card>
+                )}
+              </div>
+            )}
+          </SettingsCard>
+        </div>
       </div>
     </AppLayout>
   );

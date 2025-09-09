@@ -79,7 +79,8 @@ pnpm --filter @depot/web preview
 ### Application Structure
 
 #### Route-Based Architecture
-- `/` - Home page with faction selection
+- `/` - Dashboard/home page with user overview and quick access
+- `/factions` - Faction selection page with all available factions
 - `/faction/:id` - Faction overview with datasheets, stratagems, etc.
 - `/faction/:factionId/datasheet/:id` - Individual datasheet details
 - `/settings` - User preferences (show Forge World, Legends content)

@@ -9,6 +9,7 @@ export interface Ability {
   legend: string;
   factionId: string;
   description: string;
+  type: string;
 }
 
 export interface Keyword {
@@ -156,4 +157,5 @@ export interface Settings {
   showForgeWorld?: boolean;
   showLegends?: boolean;
   showUnaligned?: boolean;
+  showFluff?: boolean;
 }

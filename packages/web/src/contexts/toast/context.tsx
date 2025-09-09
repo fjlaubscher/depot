@@ -25,7 +25,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       const id = generateId();
       const toast: Toast = {
         id,
-        duration: 5000, // Default 5 second duration
+        duration: 3000, // Default 3 second duration
         ...toastData
       };
 

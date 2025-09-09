@@ -1,14 +1,14 @@
-import React, { useCallback, useState, useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useCallback, useState, useMemo, startTransition } from 'react';
+import { useParams } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader, Tabs, IconButton, ErrorState } from '@/components/ui';
+import { PageHeader, Tabs, IconButton, ErrorState, Breadcrumbs } from '@/components/ui';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
-import useMyFactions from '@/hooks/use-my-factions';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
@@ -26,45 +26,50 @@ const Faction: React.FC = () => {
   const { id } = useParams();
   const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(id);
-
-  const [myFactions, setMyFactions] = useMyFactions();
+  const { state, updateMyFactions } = useAppContext();
   const [activeTab, setActiveTab] = useState(0);
 
   const isMyFaction = useMemo(() => {
-    if (myFactions && id) {
-      return myFactions.some((f) => f.id === id);
+    if (state.myFactions && id) {
+      return state.myFactions.some((f) => f.id === id);
     }
     return false;
-  }, [id, myFactions]);
+  }, [id, state.myFactions]);
 
   const toggleMyFaction = useCallback(async () => {
     if (!faction || !id) return;
 
     try {
-      if (myFactions && isMyFaction) {
-        await setMyFactions(myFactions.filter((f) => f.id !== id));
-        showToast({
-          type: 'success',
-          title: 'Success',
-          message: `${faction.name} removed from My Factions.`
+      if (state.myFactions && isMyFaction) {
+        await updateMyFactions(state.myFactions.filter((f) => f.id !== id));
+        startTransition(() => {
+          showToast({
+            type: 'success',
+            title: 'Success',
+            message: `${faction.name} removed from My Factions.`
+          });
         });
       } else {
         const myFaction: depot.Option = { id: faction.id, name: faction.name };
-        await setMyFactions(myFactions ? [...myFactions, myFaction] : [myFaction]);
-        showToast({
-          type: 'success',
-          title: 'Success',
-          message: `${faction.name} added to My Factions.`
+        await updateMyFactions(state.myFactions ? [...state.myFactions, myFaction] : [myFaction]);
+        startTransition(() => {
+          showToast({
+            type: 'success',
+            title: 'Success',
+            message: `${faction.name} added to My Factions.`
+          });
         });
       }
     } catch (error) {
-      showToast({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to update My Factions. Please try again.'
+      startTransition(() => {
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Failed to update My Factions. Please try again.'
+        });
       });
     }
-  }, [isMyFaction, faction, myFactions, setMyFactions, showToast, id]);
+  }, [isMyFaction, faction, state.myFactions, updateMyFactions, showToast, id]);
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
@@ -105,15 +110,22 @@ const Faction: React.FC = () => {
   return (
     <AppLayout title="Faction">
       <div className="flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-4">
-          <PageHeader title={faction.name} subtitle={alliance} />
-          <IconButton
-            onClick={toggleMyFaction}
-            aria-label={isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'}
-          >
-            {isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />}
-          </IconButton>
-        </div>
+        <Breadcrumbs
+          items={[
+            { label: 'Factions', path: '/factions' },
+            { label: faction.name, path: `/faction/${faction.id}` }
+          ]}
+        />
+
+        <PageHeader
+          title={faction.name}
+          subtitle={alliance}
+          action={{
+            icon: isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />,
+            onClick: toggleMyFaction,
+            ariaLabel: isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'
+          }}
+        />
 
         <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
           <FactionDatasheets datasheets={faction.datasheets} />

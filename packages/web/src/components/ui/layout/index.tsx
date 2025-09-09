@@ -75,7 +75,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
       )}
 
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 flex-shrink-0 z-30">
+      <header className="bg-primary-500 shadow-sm flex-shrink-0 z-30">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 relative">
             {/* Left side - logo + app name */}

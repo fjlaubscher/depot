@@ -139,7 +139,8 @@ export const mockDatasheet: depot.Datasheet = {
       name: 'Leader',
       legend: '',
       factionId: 'SM',
-      description: 'This model can be attached to a unit.'
+      description: 'This model can be attached to a unit.',
+      type: 'Core'
     }
   ],
   keywords: [

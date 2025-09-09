@@ -23,7 +23,7 @@ export interface Datasheet {
   role: string;
   loadout: string;
   transport: string;
-  virtual: boolean;
+  virtual: string;
   leaderHead: string;
   leaderFooter: string;
   damagedW: string;

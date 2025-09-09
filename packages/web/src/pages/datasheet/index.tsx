@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { FaChevronLeft, FaShareAlt } from 'react-icons/fa';
 
 // components
 import AppLayout from '@/components/layout';
-import { Tabs, PageHeader, ErrorState } from '@/components/ui';
+import { Tabs, PageHeader, ErrorState, Breadcrumbs } from '@/components/ui';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -12,6 +13,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 // page components
 import DatasheetProfile from './components/datasheet-profile';
 import DatasheetStratagems from './components/datasheet-stratagems';
+import DatasheetAbilitiesTab from './components/datasheet-abilities-tab';
 import Skeleton from './components/skeleton';
 
 const DatasheetPage: React.FC = () => {
@@ -27,8 +29,16 @@ const DatasheetPage: React.FC = () => {
     return undefined;
   }, [faction, id]);
 
-  const datasheetCost = datasheet ? datasheet.modelCosts[0] : undefined;
-  const alternateCost = datasheet ? datasheet.modelCosts[1] : undefined;
+  const datasheetCost = useMemo(() => {
+    if (datasheet) {
+      return datasheet.modelCosts.reduce((acc, curr) => {
+        const formattedCost = `${curr.cost} pts (${curr.description})`;
+        return acc ? `${acc} • ${formattedCost}` : formattedCost;
+      }, '');
+    }
+
+    return undefined;
+  }, [datasheet]);
 
   const handleShare = () => {
     const url = window.location.href;
@@ -84,29 +94,42 @@ const DatasheetPage: React.FC = () => {
 
   return (
     <AppLayout title="Datasheet">
-      {/* Header */}
-      <PageHeader
-        title={datasheet.name}
-        subtitle={`${faction?.name} • ${datasheet.role}`}
-        action={{
-          label: 'Share',
-          onClick: handleShare,
-          variant: 'secondary',
-          testId: 'share-datasheet-button'
-        }}
-        data-testid="datasheet-header"
-      />
+      <div className="flex flex-col gap-4">
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: 'Factions', path: '/factions' },
+            { label: faction.name, path: `/faction/${faction.id}` },
+            { label: datasheet.name, path: `/faction/${faction.id}/datasheet/${datasheet.id}` }
+          ]}
+        />
 
-      {/* Tabs */}
-      <Tabs
-        tabs={['Datasheet', 'Stratagems']}
-        active={activeTab}
-        onChange={setActiveTab}
-        data-testid="datasheet-tabs"
-      >
-        <DatasheetProfile datasheet={datasheet} cost={datasheetCost} />
-        <DatasheetStratagems stratagems={datasheet.stratagems} />
-      </Tabs>
+        {/* Header */}
+        <PageHeader
+          title={datasheet.name}
+          subtitle={datasheetCost}
+          action={{
+            icon: <FaShareAlt />,
+            onClick: handleShare,
+            ariaLabel: 'Share datasheet',
+            variant: 'default',
+            testId: 'share-datasheet-button'
+          }}
+          data-testid="datasheet-header"
+        />
+
+        {/* Tabs */}
+        <Tabs
+          tabs={['Datasheet', 'Abilities', 'Stratagems']}
+          active={activeTab}
+          onChange={setActiveTab}
+          data-testid="datasheet-tabs"
+        >
+          <DatasheetProfile datasheet={datasheet} />
+          <DatasheetAbilitiesTab abilities={datasheet.abilities} />
+          <DatasheetStratagems stratagems={datasheet.stratagems} />
+        </Tabs>
+      </div>
     </AppLayout>
   );
 };

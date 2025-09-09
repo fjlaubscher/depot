@@ -73,8 +73,32 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
   const abilities = data.datasheetAbilities
     .filter((ability) => ability.datasheetId === datasheet.id)
     .map((a) => {
-      return data.abilities.filter((ability) => ability.id === a.abilityId)[0];
-    });
+      // If ability has an abilityId, look it up in the abilities table
+      if (a.abilityId) {
+        const referencedAbility = data.abilities.filter((ability) => ability.id === a.abilityId)[0];
+        if (referencedAbility) {
+          return {
+            ...referencedAbility,
+            type: a.type // Add the type from the datasheet-abilities data
+          };
+        }
+        return undefined;
+      }
+      // If no abilityId but has name, use the inline ability data
+      else if (a.name) {
+        return {
+          id: '', // inline abilities don't have IDs
+          name: a.name,
+          legend: '', // inline abilities don't have legends
+          factionId: '', // inline abilities don't have factionIds
+          description: a.description,
+          type: a.type // Add the type from the datasheet-abilities data
+        };
+      }
+      // Skip empty entries
+      return undefined;
+    })
+    .filter((ability) => ability !== undefined);
 
   const isForgeWorld = data.sources
     .filter((s) => s.name.includes('Imperial Armour:'))
@@ -113,6 +137,7 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
 
   return {
     ...datasheet,
+    virtual: datasheet.virtual === 'true',
     abilities,
     keywords,
     models,
@@ -131,7 +156,7 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
 
 const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): depot.Faction => {
   const datasheets = data.datasheets
-    .filter((datasheet) => datasheet.factionId === faction.id)
+    .filter((datasheet) => datasheet.factionId === faction.id && datasheet.virtual === 'false')
     .map((datasheet) => buildDatasheet(data, datasheet));
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);

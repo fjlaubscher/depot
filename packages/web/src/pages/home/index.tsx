@@ -1,22 +1,20 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaCog, FaSearch, FaStar, FaCogs, FaListAlt } from 'react-icons/fa';
+import { Search, Star, Settings, List, Cog } from 'lucide-react';
 import { depot } from '@depot/core';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import Card from '@/components/ui/card';
-import Grid from '@/components/ui/grid';
-import Button from '@/components/ui/button';
+import { Card, Grid, Button, DashboardCard } from '@/components/ui';
 
 // Custom hooks
-import useMyFactions from '@/hooks/use-my-factions';
+import { useAppContext } from '@/contexts/app/use-app-context';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [myFactions] = useMyFactions();
+  const { state } = useAppContext();
 
-  const hasMyFactions = myFactions && myFactions.length > 0;
+  const hasMyFactions = state.myFactions && state.myFactions.length > 0;
 
   return (
     <AppLayout title="Home">
@@ -36,82 +34,59 @@ const Home: React.FC = () => {
 
         {/* Quick Actions */}
         <Grid>
-          <Card>
-            <div className="flex items-center space-x-4">
+          <DashboardCard
+            icon={
               <div className="p-3 bg-primary-100 dark:bg-primary-900 rounded-lg">
-                <FaSearch className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+                <Search className="h-6 w-6 text-primary-600 dark:text-primary-400" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Browse Factions
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Explore all Warhammer 40K factions and their datasheets
-                </p>
-              </div>
+            }
+            title="Browse Factions"
+            description="Explore all Warhammer 40K factions and their datasheets"
+            action={
               <Button onClick={() => navigate('/factions')} data-testid="browse-factions-button">
                 Browse
               </Button>
-            </div>
-          </Card>
+            }
+          />
 
-          <Card>
-            <div className="flex items-center space-x-4">
+          <DashboardCard
+            icon={
               <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
-                <FaListAlt className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                <List className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  List Builder
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Create and manage your army lists
-                </p>
-              </div>
+            }
+            title="List Builder"
+            description="Create and manage your army lists"
+            action={
               <Button variant="secondary" disabled data-testid="list-builder-button">
                 Coming Soon
               </Button>
-            </div>
-          </Card>
+            }
+          />
 
           {hasMyFactions && (
-            <Card>
-              <div className="flex items-center space-x-4">
+            <DashboardCard
+              icon={
                 <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-                  <FaStar className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                  <Star className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <div className="flex-1">
-                  <h3
-                    className="text-lg font-semibold text-gray-900 dark:text-white"
-                    data-testid="my-factions-card-heading"
-                  >
-                    My Factions
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {myFactions?.length || 0} favorite faction
-                    {(myFactions?.length || 0) !== 1 ? 's' : ''} saved
-                  </p>
-                </div>
-              </div>
-            </Card>
+              }
+              title="My Factions"
+              description={`${state.myFactions?.length || 0} favorite faction${(state.myFactions?.length || 0) !== 1 ? 's' : ''} saved`}
+              titleTestId="my-factions-card-heading"
+            />
           )}
 
-          <Card>
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                <FaCogs className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+          <DashboardCard
+            icon={
+              <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <Settings className="h-6 w-6 text-gray-600 dark:text-gray-400" />
               </div>
-              <div className="flex-1">
-                <h3
-                  className="text-lg font-semibold text-gray-900 dark:text-white"
-                  data-testid="settings-card-heading"
-                >
-                  Settings
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Configure Forge World and Legends content
-                </p>
-              </div>
+            }
+            title="Settings"
+            description="Configure Forge World and Legends content"
+            titleTestId="settings-card-heading"
+            action={
               <Button
                 variant="secondary"
                 onClick={() => navigate('/settings')}
@@ -119,8 +94,8 @@ const Home: React.FC = () => {
               >
                 Configure
               </Button>
-            </div>
-          </Card>
+            }
+          />
         </Grid>
 
         {/* My Factions Quick Access */}
@@ -128,7 +103,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col gap-4" data-testid="quick-access-section">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quick Access</h2>
             <Grid>
-              {myFactions?.slice(0, 6).map((faction) => (
+              {state.myFactions?.slice(0, 6).map((faction) => (
                 <Card key={faction.id}>
                   <Link
                     to={`/faction/${faction.id}`}

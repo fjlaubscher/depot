@@ -24,7 +24,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     <div className={`border border-gray-200 dark:border-gray-700 rounded-lg ${className}`}>
       <button
         onClick={toggleExpanded}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         aria-expanded={isExpanded}
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>

@@ -2,7 +2,7 @@ import React from 'react';
 import { depot } from '@depot/core';
 
 // components
-import { Tag, TagGroup } from '@/components/ui/tag';
+import { Card, Tag, TagGroup } from '@/components/ui';
 import ModelStatsRow from './model-stats-row';
 
 // utils
@@ -10,11 +10,10 @@ import { groupKeywords } from '@/utils/keywords';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
-  cost?: depot.ModelCost;
 }
 
-const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost }) => {
-  const { models, keywords } = datasheet;
+const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet }) => {
+  const { models, keywords, unitComposition, loadout } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 
   if (models.length === 0) return null;
@@ -22,11 +21,28 @@ const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet, cost }) => {
   return (
     <div className="flex flex-col gap-4">
       {/* Model Stats Rows */}
-      <div className="flex flex-col gap-4 overflow-x-scroll">
+      <div className="flex flex-col gap-4">
         {models.map((model) => (
           <ModelStatsRow key={model.line} model={model} />
         ))}
       </div>
+
+      <Card className="p-4" data-testid="unit-composition">
+        <ul className="space-y-2 list-disc pl-4 mb-2">
+          {unitComposition.map((comp, i) => (
+            <li
+              key={`composition-${comp.line}`}
+              className="text-sm text-gray-700 dark:text-gray-300"
+            >
+              {comp.description}
+            </li>
+          ))}
+        </ul>
+        <p
+          className="text-sm text-gray-700 dark:text-gray-300"
+          dangerouslySetInnerHTML={{ __html: loadout }}
+        />
+      </Card>
 
       {/* Keywords */}
       <div className="flex flex-col gap-2">

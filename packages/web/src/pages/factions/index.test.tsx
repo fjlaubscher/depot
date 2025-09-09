@@ -10,6 +10,7 @@ const mockAppContext: AppContextType = {
   state: {
     factionIndex: null as depot.Index[] | null,
     offlineFactions: [],
+    myFactions: [],
     loading: false,
     error: null as string | null,
     settings: null
@@ -17,7 +18,8 @@ const mockAppContext: AppContextType = {
   dispatch: vi.fn(),
   getFaction: vi.fn(),
   clearOfflineData: vi.fn(),
-  updateSettings: vi.fn()
+  updateSettings: vi.fn(),
+  updateMyFactions: vi.fn()
 };
 
 // Mock context provider

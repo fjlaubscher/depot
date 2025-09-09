@@ -4,6 +4,28 @@ import userEvent from '@testing-library/user-event';
 import Home from './index';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
+import { AppContextType } from '@/contexts/app/types';
+
+// Mock AppLayout to avoid sidebar duplication
+vi.mock('@/components/layout', () => ({
+  default: ({ children, title }: { children: React.ReactNode; title: string }) => (
+    <div data-testid="app-layout" data-title={title}>
+      {children}
+    </div>
+  )
+}));
+
+// Mock DashboardCard to avoid responsive button duplication
+vi.mock('@/components/ui/dashboard-card', () => ({
+  default: ({ icon, title, description, action, titleTestId, ...props }: any) => (
+    <div data-testid="dashboard-card" {...props}>
+      {icon}
+      <h3 data-testid={titleTestId}>{title}</h3>
+      <p>{description}</p>
+      {action}
+    </div>
+  )
+}));
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -15,61 +37,61 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock MyFactions hook
-const mockMyFactions = vi.fn().mockReturnValue([undefined, vi.fn()]);
-vi.mock('@/hooks/use-my-factions', () => ({
-  default: () => mockMyFactions()
+// Mock App Context
+const mockUseAppContext = vi.fn();
+vi.mock('@/contexts/app/use-app-context', () => ({
+  useAppContext: () => mockUseAppContext()
 }));
 
-const mockFactions: depot.Index[] = [
-  { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-  { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
+const mockFactions: depot.Option[] = [
+  { id: 'SM', name: 'Space Marines' },
+  { id: 'CSM', name: 'Chaos Space Marines' }
 ];
 
 describe('Home', () => {
+  const defaultAppContext: AppContextType = {
+    state: {
+      factionIndex: null,
+      offlineFactions: [],
+      myFactions: [],
+      loading: false,
+      error: null,
+      settings: null
+    },
+    dispatch: vi.fn(),
+    getFaction: vi.fn(),
+    clearOfflineData: vi.fn(),
+    updateSettings: vi.fn(),
+    updateMyFactions: vi.fn()
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mockMyFactions.mockReturnValue([undefined, vi.fn()]);
+    mockUseAppContext.mockReturnValue(defaultAppContext);
   });
 
   describe('Component Rendering', () => {
     it('should render welcome section', () => {
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
     });
 
     it('should render browse factions card', () => {
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
     });
 
     it('should render settings card', () => {
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
       expect(screen.getByTestId('settings-button')).toBeInTheDocument();
     });
 
     it('should render app info section', () => {
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByText(/Data sourced from/)).toBeInTheDocument();
       expect(screen.getByText('Wahapedia')).toBeInTheDocument();
@@ -78,38 +100,38 @@ describe('Home', () => {
 
   describe('My Factions Feature', () => {
     it('should not render my factions card when no favorites', () => {
-      mockMyFactions.mockReturnValue([undefined, vi.fn()]);
-
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
       expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
     });
 
     it('should render my factions card when favorites exist', () => {
-      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
+      const contextWithMyFactions = {
+        ...defaultAppContext,
+        state: {
+          ...defaultAppContext.state,
+          myFactions: mockFactions
+        }
+      };
+      mockUseAppContext.mockReturnValue(contextWithMyFactions);
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
     });
 
     it('should render quick access section when favorites exist', () => {
-      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
+      const contextWithMyFactions = {
+        ...defaultAppContext,
+        state: {
+          ...defaultAppContext.state,
+          myFactions: mockFactions
+        }
+      };
+      mockUseAppContext.mockReturnValue(contextWithMyFactions);
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
       expect(screen.getByText('Quick Access')).toBeInTheDocument();
@@ -120,25 +142,31 @@ describe('Home', () => {
     });
 
     it('should handle singular faction count correctly', () => {
-      mockMyFactions.mockReturnValue([[mockFactions[0]], vi.fn()]);
+      const contextWithOneFaction = {
+        ...defaultAppContext,
+        state: {
+          ...defaultAppContext.state,
+          myFactions: [mockFactions[0]]
+        }
+      };
+      mockUseAppContext.mockReturnValue(contextWithOneFaction);
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.getByText('1 favorite faction saved')).toBeInTheDocument();
     });
 
     it('should handle empty favorites array', () => {
-      mockMyFactions.mockReturnValue([[], vi.fn()]);
+      const contextWithEmptyFactions = {
+        ...defaultAppContext,
+        state: {
+          ...defaultAppContext.state,
+          myFactions: []
+        }
+      };
+      mockUseAppContext.mockReturnValue(contextWithEmptyFactions);
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
     });
@@ -148,11 +176,7 @@ describe('Home', () => {
     it('should navigate to factions when browse button is clicked', async () => {
       const user = userEvent.setup();
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       await user.click(screen.getByTestId('browse-factions-button'));
       expect(mockNavigate).toHaveBeenCalledWith('/factions');
@@ -161,25 +185,23 @@ describe('Home', () => {
     it('should navigate to settings when settings button is clicked', async () => {
       const user = userEvent.setup();
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       await user.click(screen.getByTestId('settings-button'));
       expect(mockNavigate).toHaveBeenCalledWith('/settings');
     });
 
     it('should navigate to faction when quick access faction is clicked', async () => {
-      const user = userEvent.setup();
-      mockMyFactions.mockReturnValue([mockFactions, vi.fn()]);
+      const contextWithMyFactions = {
+        ...defaultAppContext,
+        state: {
+          ...defaultAppContext.state,
+          myFactions: mockFactions
+        }
+      };
+      mockUseAppContext.mockReturnValue(contextWithMyFactions);
 
-      render(
-        <TestWrapper>
-          <Home />
-        </TestWrapper>
-      );
+      render(<Home />, { wrapper: TestWrapper });
 
       // Find faction links within the quick access section only
       const quickAccessSection = screen.getByTestId('quick-access-section');

@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { LayoutProvider } from '@/contexts/layout/context';
 import { ToastProvider } from '@/contexts/toast/context';
+import { AppProvider } from '@/contexts/app/context';
 
 /**
  * Test utilities for consistent testing setup
@@ -11,9 +12,11 @@ import { ToastProvider } from '@/contexts/toast/context';
 // Common test wrapper with all required providers - uses MemoryRouter for isolated testing
 export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <MemoryRouter>
-    <ToastProvider>
-      <LayoutProvider>{children}</LayoutProvider>
-    </ToastProvider>
+    <AppProvider>
+      <ToastProvider>
+        <LayoutProvider>{children}</LayoutProvider>
+      </ToastProvider>
+    </AppProvider>
   </MemoryRouter>
 );
 
@@ -26,16 +29,17 @@ export const createMockFunctions = () => ({
   mockAppContext: {
     state: {
       factionIndex: null,
-      factionCache: {},
       offlineFactions: [],
+      myFactions: [],
       loading: false,
       error: null,
       settings: null
     },
     dispatch: vi.fn(),
-    loadFaction: vi.fn(),
+    getFaction: vi.fn(),
     clearOfflineData: vi.fn(),
-    updateSettings: vi.fn()
+    updateSettings: vi.fn(),
+    updateMyFactions: vi.fn()
   }
 });
 

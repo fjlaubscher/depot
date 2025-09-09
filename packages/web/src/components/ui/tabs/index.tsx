@@ -43,7 +43,7 @@ const Tabs: React.FC<TabsProps> = ({
               key={`tab-${index}`}
               onClick={() => handleTabClick(index)}
               className={classNames(
-                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0',
+                'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0 cursor-pointer',
                 {
                   'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400':
                     activeTab === index,

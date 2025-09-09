@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect, useCallback } from 'react';
 import { depot } from '@depot/core';
 import { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
@@ -18,7 +18,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Get faction data directly from IndexedDB with network fallback
-  const getFaction = async (id: string): Promise<depot.Faction | null> => {
+  const getFaction = useCallback(async (id: string): Promise<depot.Faction | null> => {
     try {
       // First, try to load from IndexedDB
       const cachedFaction = await offlineStorage.getFaction(id);
@@ -48,7 +48,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       console.error(`Failed to load faction ${id}:`, error);
       return null;
     }
-  };
+  }, []);
 
   // Clear all offline data
   const clearOfflineData = async () => {
@@ -90,6 +90,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       console.error('Failed to save settings to IndexedDB:', error);
       // Still update in-memory state even if offline save fails
       dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: settings });
+    }
+  };
+
+  // Update my factions with offline storage
+  const updateMyFactions = async (factions: depot.Option[]) => {
+    try {
+      await offlineStorage.setMyFactions(factions);
+      dispatch({ type: APP_ACTIONS.UPDATE_MY_FACTIONS, payload: factions });
+    } catch (error) {
+      console.error('Failed to save my factions to IndexedDB:', error);
+      // Still update in-memory state even if offline save fails
+      dispatch({ type: APP_ACTIONS.UPDATE_MY_FACTIONS, payload: factions });
+      throw error;
     }
   };
 
@@ -148,6 +161,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       } catch (error) {
         console.warn('Failed to load offline factions list:', error);
       }
+
+      // Load my factions (user favorites) from IndexedDB
+      try {
+        const myFactions = await offlineStorage.getMyFactions();
+        dispatch({ type: APP_ACTIONS.LOAD_MY_FACTIONS_SUCCESS, payload: myFactions || [] });
+      } catch (error) {
+        console.warn('Failed to load my factions:', error);
+      }
     };
 
     initializeApp();
@@ -158,7 +179,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     dispatch,
     getFaction,
     clearOfflineData,
-    updateSettings
+    updateSettings,
+    updateMyFactions
   };
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;

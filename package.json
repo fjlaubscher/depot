@@ -4,6 +4,7 @@
   "scripts": {
     "build": "pnpm -r build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs",
     "start": "pnpm --filter @depot/cli build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
+    "refresh-data": "pnpm --filter @depot/cli build && pnpm --filter @depot/cli start -- --force-download && node scripts/copy-data.mjs",
     "format": "pnpm -r format",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",

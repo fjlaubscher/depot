@@ -4,29 +4,29 @@ import { depot } from '@depot/core';
 // components
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
-import DatasheetAbilities from './datasheet-abilities';
+import DatasheetInlineAbilities from './datasheet-inline-abilities';
 import UnitDetails from './unit-details';
 
 // utils
-import { sortByName } from '@/utils/array';
+import { categorizeAbilities } from '../utils/abilities';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
-  cost?: depot.ModelCost;
 }
 
-const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet, cost }) => {
-  const { abilities, unitComposition, models, options: datasheetOptions } = datasheet;
-
-  const sortedAbilities = useMemo(() => sortByName(abilities) as depot.Ability[], [abilities]);
-  const options = useMemo(() => datasheetOptions.filter((o) => o.description), [datasheetOptions]);
+const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
+  // Extract only inline abilities for this tab
+  const inlineAbilities = useMemo(() => {
+    const { inline } = categorizeAbilities(datasheet.abilities);
+    return inline;
+  }, [datasheet.abilities]);
 
   return (
     <div className="flex flex-col gap-4" data-testid="datasheet-profile">
-      <DatasheetHero datasheet={datasheet} cost={cost} />
+      <DatasheetHero datasheet={datasheet} />
       <DatasheetWargear datasheet={datasheet} />
-      <DatasheetAbilities abilities={sortedAbilities} />
-      <UnitDetails unitComposition={unitComposition} options={options} models={models} />
+      <DatasheetInlineAbilities abilities={inlineAbilities} />
+      <UnitDetails datasheet={datasheet} />
     </div>
   );
 };

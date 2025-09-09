@@ -1,6 +1,8 @@
 // Core UI Components built with Tailwind CSS
+export { default as Breadcrumbs } from './breadcrumbs';
 export { default as Button } from './button';
 export { default as Card } from './card';
+export { default as DashboardCard } from './dashboard-card';
 export { default as CollapsibleSection } from './collapsible-section';
 export { default as ErrorState } from './error-state';
 export { default as Field } from './field';

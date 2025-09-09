@@ -1,13 +1,16 @@
 import React from 'react';
 import classNames from 'classnames';
+import IconButton from '../icon-button';
 
 interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   subtitle?: string;
   action?: {
-    label: string;
+    icon: React.ReactNode;
     onClick: () => void;
-    variant?: 'default' | 'secondary' | 'error';
+    ariaLabel: string;
+    variant?: 'default' | 'ghost';
+    size?: 'sm' | 'md' | 'lg';
     disabled?: boolean;
     loading?: boolean;
     testId?: string;
@@ -30,34 +33,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       </div>
 
       {action && (
-        <div className="flex-shrink-0">
-          <button
-            onClick={action.onClick}
-            disabled={action.disabled || action.loading}
-            data-testid={action.testId}
-            className={classNames(
-              'inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              {
-                'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600':
-                  !action.variant || action.variant === 'default',
-                'bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white dark:border-gray-600':
-                  action.variant === 'secondary',
-                'bg-red-600 hover:bg-red-700 text-white border border-red-600':
-                  action.variant === 'error'
-              }
-            )}
-          >
-            {action.loading ? (
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                Loading...
-              </div>
-            ) : (
-              action.label
-            )}
-          </button>
-        </div>
+        <IconButton
+          onClick={action.onClick}
+          aria-label={action.ariaLabel}
+          variant={action.variant}
+          size={action.size}
+          loading={action.loading}
+          disabled={action.disabled}
+          data-testid={action.testId}
+        >
+          {action.icon}
+        </IconButton>
       )}
     </div>
   );

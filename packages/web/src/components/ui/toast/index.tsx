@@ -60,6 +60,8 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
       className={classNames(
         'w-80 shadow-lg rounded-lg pointer-events-auto border',
         'transform transition-all duration-300 ease-in-out',
+        'animate-in slide-in-from-right-full fade-in',
+        'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-full data-[state=closed]:fade-out',
         config.bgColor,
         config.borderColor
       )}

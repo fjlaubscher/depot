@@ -3,11 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { depot } from '@depot/core';
 import Faction from './index';
 import { TestWrapper } from '@/test/test-utils';
+import { AppContextType } from '@/contexts/app/types';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
-vi.mock('@/hooks/use-my-factions');
 vi.mock('@/contexts/toast/use-toast-context');
+vi.mock('@/contexts/app/use-app-context');
 vi.mock('@/utils/faction', () => ({
   getFactionAlliance: vi.fn(() => 'Imperium')
 }));
@@ -83,9 +84,26 @@ const mockFaction: depot.Faction = {
 
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
-  const mockUseMyFactions = vi.fn();
-  const mockAddToast = vi.fn();
-  const mockUseToastContext = vi.fn();
+  const mockUseAppContext = vi.fn();
+  const mockUpdateMyFactions = vi.fn();
+  const mockShowToast = vi.fn();
+  const mockUseToast = vi.fn();
+
+  const defaultAppContext: AppContextType = {
+    state: {
+      factionIndex: null,
+      offlineFactions: [],
+      myFactions: [],
+      loading: false,
+      error: null,
+      settings: null
+    },
+    dispatch: vi.fn(),
+    getFaction: vi.fn(),
+    clearOfflineData: vi.fn(),
+    updateSettings: vi.fn(),
+    updateMyFactions: mockUpdateMyFactions
+  };
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -97,10 +115,10 @@ describe('Faction Page', () => {
       error: null
     });
 
-    mockUseMyFactions.mockReturnValue([[], vi.fn()]);
+    mockUseAppContext.mockReturnValue(defaultAppContext);
 
-    mockUseToastContext.mockReturnValue({
-      showToast: mockAddToast,
+    mockUseToast.mockReturnValue({
+      showToast: mockShowToast,
       removeToast: vi.fn(),
       clearAllToasts: vi.fn(),
       state: { toasts: [] },
@@ -111,11 +129,11 @@ describe('Faction Page', () => {
     const useFactionMock = await import('@/hooks/use-faction');
     vi.mocked(useFactionMock.default).mockImplementation(mockUseFaction);
 
-    const useMyFactionsMock = await import('@/hooks/use-my-factions');
-    vi.mocked(useMyFactionsMock.default).mockImplementation(mockUseMyFactions);
+    const useAppContextMock = await import('@/contexts/app/use-app-context');
+    vi.mocked(useAppContextMock.useAppContext).mockImplementation(mockUseAppContext);
 
     const useToastMock = await import('@/contexts/toast/use-toast-context');
-    vi.mocked(useToastMock.useToast).mockImplementation(mockUseToastContext);
+    vi.mocked(useToastMock.useToast).mockImplementation(mockUseToast);
   });
 
   it('renders faction name and alliance', () => {
@@ -172,8 +190,7 @@ describe('Faction Page', () => {
   });
 
   it('handles favourite toggle when not favourite', async () => {
-    const mockSetMyFactions = vi.fn().mockResolvedValue(undefined);
-    mockUseMyFactions.mockReturnValue([[], mockSetMyFactions]);
+    mockUpdateMyFactions.mockResolvedValue(undefined);
 
     render(<Faction />, { wrapper: TestWrapper });
 
@@ -181,9 +198,9 @@ describe('Faction Page', () => {
     fireEvent.click(favouriteButton);
 
     await waitFor(() => {
-      expect(mockSetMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
+      expect(mockUpdateMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
     });
-    expect(mockAddToast).toHaveBeenCalledWith({
+    expect(mockShowToast).toHaveBeenCalledWith({
       type: 'success',
       title: 'Success',
       message: 'Space Marines added to My Factions.'
@@ -191,9 +208,15 @@ describe('Faction Page', () => {
   });
 
   it('handles favourite toggle when already favourite', async () => {
-    const mockSetMyFactions = vi.fn().mockResolvedValue(undefined);
-    const existingFactions = [{ id: 'SM', name: 'Space Marines' }];
-    mockUseMyFactions.mockReturnValue([existingFactions, mockSetMyFactions]);
+    mockUpdateMyFactions.mockResolvedValue(undefined);
+    const contextWithMyFaction = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: [{ id: 'SM', name: 'Space Marines' }]
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithMyFaction);
 
     render(<Faction />, { wrapper: TestWrapper });
 
@@ -201,9 +224,9 @@ describe('Faction Page', () => {
     fireEvent.click(favouriteButton);
 
     await waitFor(() => {
-      expect(mockSetMyFactions).toHaveBeenCalledWith([]);
+      expect(mockUpdateMyFactions).toHaveBeenCalledWith([]);
     });
-    expect(mockAddToast).toHaveBeenCalledWith({
+    expect(mockShowToast).toHaveBeenCalledWith({
       type: 'success',
       title: 'Success',
       message: 'Space Marines removed from My Factions.'
@@ -221,8 +244,6 @@ describe('Faction Page', () => {
   });
 
   it('shows unfilled star when not my faction', () => {
-    mockUseMyFactions.mockReturnValue([[], vi.fn()]);
-
     render(<Faction />, { wrapper: TestWrapper });
 
     const button = screen.getByRole('button', { name: /add to my factions/i });
@@ -230,7 +251,14 @@ describe('Faction Page', () => {
   });
 
   it('shows filled star when is my faction', () => {
-    mockUseMyFactions.mockReturnValue([[{ id: 'SM', name: 'Space Marines' }], vi.fn()]);
+    const contextWithMyFaction = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: [{ id: 'SM', name: 'Space Marines' }]
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithMyFaction);
 
     render(<Faction />, { wrapper: TestWrapper });
 

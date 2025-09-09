@@ -25,6 +25,9 @@ const stripHtml = (input: string) => {
     processedInput = processedInput.replace(placeholder, element);
   });
 
+  // Remove anchor tags but keep their inner text content (after restoring preserved elements)
+  processedInput = processedInput.replace(/<a[^>]*>(.*?)<\/a>/gis, '$1');
+
   return processedInput;
 };
 
