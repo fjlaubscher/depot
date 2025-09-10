@@ -35,10 +35,12 @@ pnpm --filter @depot/cli start
 ```
 This creates JSON files in `packages/cli/dist/` which are automatically copied to `packages/web/public/data/` by the build scripts.
 
-To force re-download of source data:
+To force re-download of source data and copy to web app:
 ```bash
-pnpm --filter @depot/cli start -- --force-download
+pnpm refresh-data
 ```
+
+This runs: CLI build → CLI start with `--force-download` → copy data to web app
 
 ### Building
 Production build (builds all packages, generates data, copies to built web app):
@@ -61,7 +63,7 @@ All packages have unified scripts:
 # Format all code
 pnpm format
 
-# Lint all code (includes TypeScript checking)
+# Lint all code (includes TypeScript checking)  
 pnpm lint
 
 # TypeScript checking only
@@ -69,6 +71,8 @@ pnpm --filter @depot/core typecheck
 pnpm --filter @depot/cli typecheck
 pnpm --filter @depot/web typecheck
 ```
+
+**Important**: Always run `pnpm format` before committing changes to ensure consistent code formatting across the repository.
 
 ## Architecture
 
@@ -85,11 +89,14 @@ The CLI orchestrates data processing:
 See `packages/web/CLAUDE.md` for detailed web app documentation.
 
 Modern React PWA with:
+- **React 19**: Latest React with React Router DOM v7 for navigation
+- **Build System**: Vite 6 with TypeScript 5.9+ support
 - **Styling**: Tailwind CSS v4 with PostCSS integration and system dark mode support
 - **UI Library**: Custom component library in `src/components/ui/`
 - **State Management**: Context-based architecture (App, Layout, Toast contexts)
 - **Data Storage**: IndexedDB integration for offline-first functionality
-- **PWA**: Vite PWA plugin for offline capabilities
+- **PWA**: Vite PWA plugin with asset generation for offline capabilities
+- **Testing**: Vitest with React Testing Library and jsdom
 - **Layout**: Responsive design with desktop sidebar and mobile slide-out navigation
 
 ## Key Architectural Patterns
@@ -118,6 +125,10 @@ Shared TypeScript definitions in `@depot/core` define the complete Warhammer 40K
 - Wargear, Models, Keywords
 - Enhancements, Detachment Abilities
 - Settings and data index structures
+
+## Requirements
+- **Node.js**: >=22.0.0
+- **Package Manager**: pnpm >=8.0.0
 
 ## Workspace Structure
 - Root package.json manages pnpm workspaces and provides unified commands via `pnpm --filter @depot/package-name script`

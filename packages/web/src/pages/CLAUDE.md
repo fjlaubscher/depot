@@ -57,15 +57,8 @@ All tab components follow consistent structure:
 See `faction/components/` directory for complete implementations.
 
 ## Performance Optimization
-
-### Memoization Strategy
-- Filter operations: Memoize with proper dependency arrays
-- Grouping operations: Separate memoization from filtering
-- UI state: Memoize empty checks separately from data operations
-
-### Debouncing
-- Search inputs: 300ms debounce
-- Filter inputs: 100ms debounce
+- **Memoization**: Filter/grouping operations with proper dependency arrays
+- **Debouncing**: Search inputs (300ms), filter inputs (100ms)
 
 ## Testing Strategy
 
@@ -76,14 +69,10 @@ Use centralized testing utilities from `src/test/`:
 
 See `src/test/CLAUDE.md` for comprehensive testing guidelines.
 
-### Test Coverage Categories
-1. **Main Component Tests**: Loading, error, success states, user interactions
-2. **Utility Function Tests**: Pure functions with edge cases and various inputs
-3. **Integration Tests**: Component combinations and data flow
-4. **Component-Specific Tests**: Mock child components, focus on integration logic
-
-### Test Organization
-Structure tests by interaction patterns: Loading/Error States, User Interactions, Data Display, Edge Cases.
+### Test Coverage
+- **Main Components**: Loading/error/success states, user interactions
+- **Utilities**: Pure functions with edge cases
+- **Integration**: Component combinations and data flow
 
 ## Key Implementation Examples
 
@@ -99,29 +88,9 @@ Structure tests by interaction patterns: Loading/Error States, User Interactions
 - Testing patterns: All `*.test.tsx` files
 
 ## Best Practices
-
-### Code Organization
-- Single responsibility components
-- Extract logic to testable utilities
-- Explicit imports, no barrel files
-- Colocated tests
-
-### Performance
-- Debounced user inputs
-- Proper memoization
-- Skeleton loading states
-- Minimize re-renders
-
-### User Experience
-- Meaningful loading states
-- Graceful error handling
-- Empty state management
-- Keyboard navigation support
-
-### Testing
-- Use centralized TestWrapper and mock data
-- React 19 act() patterns for interactions
-- Mock child components in integration tests
-- Cover edge cases and error scenarios
+- **Code Organization**: Single responsibility components, extract logic to utilities
+- **Performance**: Debounced inputs, proper memoization, skeleton loading
+- **User Experience**: Meaningful loading/error/empty states
+- **Testing**: Use TestWrapper, React 19 act() patterns, comprehensive coverage
 
 This architecture ensures maintainable, testable, and performant page components across the depot application.

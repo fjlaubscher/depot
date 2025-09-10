@@ -22,11 +22,22 @@ pnpm start
 pnpm --filter @depot/cli start
 ```
 
-### Test
+### Development & Testing
 ```bash
+# Development (watch mode)
+pnpm dev
+# or from root
+pnpm --filter @depot/cli dev
+
+# Test
 pnpm test
 # or from root
 pnpm --filter @depot/cli test
+
+# Code Quality
+pnpm format
+pnpm lint
+pnpm typecheck
 ```
 
 ## Architecture

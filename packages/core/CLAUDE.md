@@ -22,29 +22,12 @@ pnpm dev
 pnpm --filter @depot/core dev
 ```
 
-### Code Quality
+### Other Commands
 ```bash
-# Format code
-pnpm format
-# or from root
-pnpm --filter @depot/core format
-
-# Lint with TypeScript check
-pnpm lint
-# or from root
-pnpm --filter @depot/core lint
-
-# TypeScript checking only
-pnpm typecheck
-# or from root
-pnpm --filter @depot/core typecheck
-```
-
-### Clean
-```bash
-pnpm clean
-# or from root
-pnpm --filter @depot/core clean
+pnpm format      # Format code
+pnpm lint        # Lint with TypeScript check
+pnpm typecheck   # TypeScript checking only
+pnpm clean       # Clean build artifacts
 ```
 
 ## Architecture
@@ -128,19 +111,12 @@ The core package ensures type consistency between:
 ## Best Practices
 
 ### Adding New Types
-1. Add raw CSV types to `wahapedia.ts` first
+1. Add raw CSV types to `wahapedia.ts` first  
 2. Add processed types to `depot.ts`
-3. Update exports in `index.ts` if needed (currently uses namespace re-exports)
-4. Update CLI transformation logic
-5. Update web components as needed
+3. Update CLI transformation logic
+4. Update web components as needed
 
 ### Type Naming
-- Use PascalCase for interface names
-- Use camelCase for property names  
-- Prefix raw CSV types with `wahapedia` namespace
-- Use `depot` namespace for application types
-
-### Documentation
-- Document complex nested structures
-- Include property descriptions for business logic
-- Reference related types in comments
+- PascalCase for interface names, camelCase for properties
+- `wahapedia` namespace for raw CSV types
+- `depot` namespace for application types

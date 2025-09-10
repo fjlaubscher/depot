@@ -7,13 +7,10 @@ A modern monorepo built with pnpm workspaces containing:
 - **@depot/core** - Shared types and utilities
 - **@depot/web** - React PWA for browsing game data
 
-## Getting Started
+## Requirements
 
-This project uses pnpm workspaces. Install pnpm if you don't have it:
-
-```bash
-npm install -g pnpm
-```
+- **Node.js**: >=22.0.0
+- **Package Manager**: pnpm >=8.0.0
 
 ## Installation
 
@@ -38,11 +35,14 @@ This automatically:
 ### Development Commands
 
 ```bash
-# Start web dev server only (requires data first)
+# Start web dev server only (requires existing data)
 pnpm dev
 
 # Generate fresh data from Wahapedia
 pnpm --filter @depot/cli start
+
+# Force re-download of source data and copy to web app
+pnpm refresh-data
 ```
 
 ## Building
@@ -55,16 +55,9 @@ pnpm build
 ```
 
 This automatically:
-1. Downloads and processes fresh Wahapedia data
-2. Copies data to web app
-3. Builds the production web app
-
-### Package Builds
-Build all packages individually:
-
-```bash
-pnpm build:all
-```
+1. Builds all packages
+2. Downloads and processes fresh Wahapedia data
+3. Copies data to web app
 
 ## Testing
 
@@ -88,6 +81,8 @@ pnpm --filter @depot/core typecheck
 pnpm --filter @depot/cli typecheck  
 pnpm --filter @depot/web typecheck
 ```
+
+**Important**: Always run `pnpm format` before committing changes to ensure consistent code formatting.
 
 ## Package Structure
 

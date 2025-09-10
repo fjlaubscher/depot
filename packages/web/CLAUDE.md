@@ -36,32 +36,14 @@ pnpm test
 pnpm --filter @depot/web test
 ```
 
-### Code Quality
+### Other Commands
 ```bash
-# Lint with TypeScript check
-pnpm lint
-# or from root
-pnpm --filter @depot/web lint
-
-# Format code
-pnpm format
-# or from root
-pnpm --filter @depot/web format
-
-# TypeScript checking only
-pnpm typecheck
-# or from root
-pnpm --filter @depot/web typecheck
-
-# Clean build artifacts
-pnpm clean
-# or from root
-pnpm --filter @depot/web clean
-
-# Preview built application
-pnpm preview
-# or from root
-pnpm --filter @depot/web preview
+pnpm format          # Format code
+pnpm lint            # Lint with TypeScript check
+pnpm typecheck       # TypeScript checking only
+pnpm clean           # Clean build artifacts
+pnpm preview         # Preview built application
+pnpm generate-pwa-assets  # Generate PWA icons/assets
 ```
 
 ## Architecture
@@ -101,11 +83,7 @@ See `src/pages/CLAUDE.md` for detailed page implementation patterns.
 - **Comprehensive Testing**: Full test coverage with centralized utilities
 
 #### Component Library
-Custom Tailwind-based component library in `src/components/ui/`:
-- Button, IconButton, Card, Grid, Layout
-- Field, SelectField, Search, Filters
-- Loader, Toast, ToastContainer
-- Dark mode support and responsive design
+Custom Tailwind-based components in `src/components/ui/` with dark mode support and responsive design.
 
 ### Data Flow (Offline-First)
 ```

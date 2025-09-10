@@ -106,56 +106,17 @@ The App Context integrates with `data/offline-storage.ts` for offline-first data
 
 See `app/context.tsx` for complete implementation examples.
 
-## Benefits of This Pattern
-
-### Modularity
-- Each context is self-contained
-- Easy to add, remove, or modify contexts
-- Clear separation of concerns
-
-### Offline Capability
-- True offline-first data loading
-- Automatic caching without user intervention
-- Graceful fallback between IndexedDB and network
-
-### Type Safety
-- Full TypeScript support
-- Compile-time error checking
-- IntelliSense support
-
-### Consistency
-- Predictable file structure
-- Standard naming conventions
-- Uniform API patterns
-
-### Maintainability
-- Easy to locate context-related code
-- Clear separation between UI state and business logic
-- Testable reducer functions
+## Benefits
+- **Modularity**: Self-contained contexts with clear separation
+- **Offline-First**: IndexedDB → Network fallback with automatic caching
+- **Type Safety**: Full TypeScript support with compile-time checking
+- **Consistency**: Predictable file structure and uniform patterns
 
 ## Best Practices
-
-### Context Scope
-- Keep contexts focused on specific domains
-- App context: global data and business logic
-- Layout context: UI-specific state
-- Consider creating additional contexts for distinct feature areas
-
-### Action Design
-- Use descriptive action type names
-- Include payload data when needed
-- Keep actions focused and atomic
-
-### Provider Placement
-- Place providers at the appropriate level in component tree
-- App context: typically at root level
-- Layout context: often at root or layout component level
-- Feature contexts: closer to where they're needed
-
-### Performance Considerations
-- Split contexts by update frequency
-- Use React.memo() for components when needed
-- Consider using multiple contexts instead of one large context
+- **Context Scope**: Keep focused on specific domains (app data, UI state, etc.)
+- **Action Design**: Use descriptive names, atomic operations
+- **Provider Placement**: App context at root, others closer to usage
+- **Performance**: Split by update frequency, use React.memo() when needed
 
 ## Testing Patterns
 

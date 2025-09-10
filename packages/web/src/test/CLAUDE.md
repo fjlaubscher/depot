@@ -40,15 +40,17 @@ const customDatasheet = createMockDatasheet({
 
 **Exception**: Edge cases may create minimal custom mocks when testing specific scenarios not covered by centralized data.
 
-### 3. Use `data-testid` Over Text Queries
+### 3. Prefer `data-testid` Over Text Queries
 ```typescript
-// ❌ Fragile
+// ❌ Fragile - breaks if text changes
 expect(screen.getByText('Captain')).toBeInTheDocument();
 
-// ✅ Reliable
+// ✅ Reliable - use data-testid for element selection
 const element = screen.getByTestId('unit-composition');
 expect(element).toHaveTextContent('Captain');
 ```
+
+Always use `screen.getByTestId()` instead of `screen.getByText()` or similar text-based queries for more reliable, maintainable tests.
 
 ### 4. Import Pattern
 ```typescript
