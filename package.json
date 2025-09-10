@@ -11,6 +11,7 @@
     "dev": "pnpm --filter @depot/web dev"
   },
   "devDependencies": {
+    "@fjlaubscher/agent-rules-mcp": "^0.4.1",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"

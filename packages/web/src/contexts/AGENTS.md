@@ -20,7 +20,7 @@ contexts/
 │   ├── reducer.ts
 │   ├── context.tsx
 │   └── use-layout-context.ts
-└── CLAUDE.md             # This documentation file
+└── AGENTS.md             # This documentation file
 ```
 
 ## File Responsibilities
@@ -120,7 +120,7 @@ See `app/context.tsx` for complete implementation examples.
 
 ## Testing Patterns
 
-See `../test/CLAUDE.md` for comprehensive testing guidelines.
+See `../test/AGENTS.md` for comprehensive testing guidelines.
 
 ### Key Testing Rules
 - **Always use TestWrapper**: Required for all component tests (includes all providers)

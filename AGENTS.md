@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Agents when working with code in this repository.
 
 ## Project Overview
 
@@ -77,7 +77,7 @@ pnpm --filter @depot/web typecheck
 ## Architecture
 
 ### @depot/cli Architecture
-See `packages/cli/CLAUDE.md` for detailed CLI documentation.
+See `packages/cli/AGENTS.md` for detailed CLI documentation.
 
 The CLI orchestrates data processing:
 1. Fetches CSV files from Wahapedia URLs
@@ -86,7 +86,7 @@ The CLI orchestrates data processing:
 4. Outputs structured JSON files for web consumption
 
 ### @depot/web Architecture
-See `packages/web/CLAUDE.md` for detailed web app documentation.
+See `packages/web/AGENTS.md` for detailed web app documentation.
 
 Modern React PWA with:
 - **React 19**: Latest React with React Router DOM v7 for navigation
@@ -102,12 +102,12 @@ Modern React PWA with:
 ## Key Architectural Patterns
 
 ### Context Architecture
-See `packages/web/src/contexts/CLAUDE.md` for detailed context patterns.
+See `packages/web/src/contexts/AGENTS.md` for detailed context patterns.
 
 Modular contexts with constants, types, reducer, provider, and custom hook files.
 
 ### Page Architecture
-See `packages/web/src/pages/CLAUDE.md` for detailed page implementation patterns.
+See `packages/web/src/pages/AGENTS.md` for detailed page implementation patterns.
 
 Consistent page structure with component breakdown, utility extraction, and comprehensive testing.
 
@@ -115,7 +115,7 @@ Consistent page structure with component breakdown, utility extraction, and comp
 Custom Tailwind-based UI components with dark mode support and TypeScript interfaces.
 
 ### Testing Infrastructure
-See `packages/web/src/test/CLAUDE.md` for comprehensive testing guidelines.
+See `packages/web/src/test/AGENTS.md` for comprehensive testing guidelines.
 
 Centralized testing utilities with TestWrapper and mock data patterns.
 

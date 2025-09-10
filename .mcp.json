@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "agent-rules": {
+      "command": "node",
+      "args": [
+        "./node_modules/@fjlaubscher/agent-rules-mcp/dist/index.js"
+      ]
+    }
+  }
+}

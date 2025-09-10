@@ -127,5 +127,5 @@ describe('ComponentToTest', () => {
 - **Maintainability**: Updates to data structure only need changing in one place
 
 ## Related Documentation
-- Testing patterns: `src/pages/CLAUDE.md` 
-- Context testing: `src/contexts/CLAUDE.md`
+- Testing patterns: `src/pages/AGENTS.md` 
+- Context testing: `src/contexts/AGENTS.md`

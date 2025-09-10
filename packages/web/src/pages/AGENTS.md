@@ -67,7 +67,7 @@ Use centralized testing utilities from `src/test/`:
 - **TestWrapper**: Required for all component tests (includes Router, Layout, Toast contexts)
 - **Mock Data**: Use factory functions from `mock-data.ts`
 
-See `src/test/CLAUDE.md` for comprehensive testing guidelines.
+See `src/test/AGENTS.md` for comprehensive testing guidelines.
 
 ### Test Coverage
 - **Main Components**: Loading/error/success states, user interactions

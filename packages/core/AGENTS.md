@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with the @depot/core package.
+This file provides guidance to Agents when working with the @depot/core package.
 
 ## Package Overview
 

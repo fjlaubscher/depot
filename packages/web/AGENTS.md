@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with the @depot/web package.
+This file provides guidance to Agents when working with the @depot/web package.
 
 ## Package Overview
 
@@ -68,7 +68,7 @@ pnpm generate-pwa-assets  # Generate PWA icons/assets
 - `/settings` - User preferences (show Forge World, Legends content)
 
 #### State Management
-See `src/contexts/CLAUDE.md` for detailed context architecture.
+See `src/contexts/AGENTS.md` for detailed context architecture.
 
 - **App Context**: Global state for data index, faction cache, and settings
 - **Layout Context**: UI state management (sidebar, responsive behavior)
@@ -76,7 +76,7 @@ See `src/contexts/CLAUDE.md` for detailed context architecture.
 - **IndexedDB Storage**: Primary storage for faction data, index, and settings (offline-first)
 
 #### Page Architecture
-See `src/pages/CLAUDE.md` for detailed page implementation patterns.
+See `src/pages/AGENTS.md` for detailed page implementation patterns.
 
 - **Page Components**: Route-specific containers with component breakdown
 - **Utility Functions**: Business logic extracted to testable utilities
@@ -103,7 +103,7 @@ Faction Data: IndexedDB → App Context → Faction Pages
 - **Responsive Design**: Mobile-first approach with desktop enhancements
 
 ### Testing Infrastructure
-See `src/test/CLAUDE.md` for comprehensive testing guidelines.
+See `src/test/AGENTS.md` for comprehensive testing guidelines.
 
 - **TestWrapper**: Centralized test wrapper with all required providers
 - **Mock Data**: Factory functions for consistent test data
