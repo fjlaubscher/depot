@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaTimes, FaHome } from 'react-icons/fa';
+import { Menu, X, Home } from 'lucide-react';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -65,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
               className="!text-white"
               aria-label="Close sidebar"
             >
-              <FaTimes className="w-6 h-6" />
+              <X size={24} />
             </IconButton>
           </div>
 
@@ -100,7 +100,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
                   className="lg:hidden !text-white"
                   aria-label="Open menu"
                 >
-                  <FaBars className="w-6 h-6" />
+                  <Menu size={24} />
                 </IconButton>
               )}
             </div>

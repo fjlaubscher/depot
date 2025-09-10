@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaExclamationTriangle, FaHome, FaRedo } from 'react-icons/fa';
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Button from '../button';
 
 interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -31,7 +31,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
       {...props}
     >
       <div className="flex flex-col gap-4">
-        <FaExclamationTriangle className="w-16 h-16 text-red-500 mx-auto" />
+        <AlertTriangle size={64} className="text-red-500 mx-auto" />
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-md">{message}</p>
@@ -51,7 +51,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
       <div className="flex flex-col sm:flex-row gap-3">
         {showRetry && (
           <Button onClick={onRetry} className="flex items-center gap-2">
-            <FaRedo className="w-4 h-4" />
+            <RefreshCw size={16} />
             Try Again
           </Button>
         )}
@@ -59,7 +59,7 @@ const ErrorState: React.FC<ErrorStateProps> = ({
         {showHome && (
           <Link to={homeUrl}>
             <Button variant="secondary" className="flex items-center gap-2">
-              <FaHome className="w-4 h-4" />
+              <Home size={16} />
               Back to Home
             </Button>
           </Link>

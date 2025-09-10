@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CollapsibleSectionProps {
   title: string;
@@ -29,9 +29,9 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
         {isExpanded ? (
-          <FaChevronUp className="text-gray-500 dark:text-gray-400" />
+          <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" />
         ) : (
-          <FaChevronDown className="text-gray-500 dark:text-gray-400" />
+          <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />
         )}
       </button>
 

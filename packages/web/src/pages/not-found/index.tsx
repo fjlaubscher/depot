@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FaHome, FaSearch } from 'react-icons/fa';
+import { Home, Search } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -21,8 +21,9 @@ const NotFound: React.FC = () => {
             {/* Large 404 Display */}
             <div className="space-y-2">
               <div className="text-6xl font-bold text-gray-300 dark:text-gray-600">404</div>
-              <FaSearch
-                className="mx-auto text-4xl text-gray-400 dark:text-gray-500"
+              <Search
+                size={64}
+                className="mx-auto text-gray-400 dark:text-gray-500"
                 data-testid="not-found-icon"
               />
             </div>
@@ -43,7 +44,7 @@ const NotFound: React.FC = () => {
             {/* Actions */}
             <div className="space-y-3">
               <Button onClick={handleGoHome} className="w-full" data-testid="go-home-button">
-                <FaHome className="mr-2" />
+                <Home size={16} className="mr-2" />
                 Return to Home
               </Button>
 

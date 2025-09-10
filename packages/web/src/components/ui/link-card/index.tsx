@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiChevronRight } from 'react-icons/fi';
+import { ChevronRight } from 'lucide-react';
 import classNames from 'classnames';
 import Card from '../card';
 
@@ -19,10 +19,7 @@ const LinkCard: React.FC<LinkCardProps> = ({ to, children, className }) => {
       >
         <div className="flex items-center justify-between">
           <div className="text-gray-900 dark:text-gray-100 font-medium">{children}</div>
-          <FiChevronRight
-            className="text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0"
-            size={20}
-          />
+          <ChevronRight className="text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0" size={20} />
         </div>
       </Card>
     </Link>

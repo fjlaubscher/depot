@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo, startTransition } from 'react';
-import { useParams } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa';
+import { useParams, Link } from 'react-router-dom';
+import { Star, ArrowLeft } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -110,18 +110,37 @@ const Faction: React.FC = () => {
   return (
     <AppLayout title="Faction">
       <div className="flex flex-col gap-4">
-        <Breadcrumbs
-          items={[
-            { label: 'Factions', path: '/factions' },
-            { label: faction.name, path: `/faction/${faction.id}` }
-          ]}
-        />
+        {/* Mobile Back Button */}
+        <div className="md:hidden">
+          <Link
+            to="/factions"
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
+            aria-label="Back to Factions"
+          >
+            <ArrowLeft size={16} />
+            <span className="font-medium">Factions</span>
+          </Link>
+        </div>
+
+        {/* Desktop Breadcrumbs */}
+        <div className="hidden md:block">
+          <Breadcrumbs
+            items={[
+              { label: 'Factions', path: '/factions' },
+              { label: faction.name, path: `/faction/${faction.id}` }
+            ]}
+          />
+        </div>
 
         <PageHeader
           title={faction.name}
           subtitle={alliance}
           action={{
-            icon: isMyFaction ? <FaStar className="text-primary-500" /> : <FaStar />,
+            icon: isMyFaction ? (
+              <Star size={16} className="text-primary-500 fill-current" />
+            ) : (
+              <Star size={16} />
+            ),
             onClick: toggleMyFaction,
             ariaLabel: isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'
           }}

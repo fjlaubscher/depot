@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { FaChevronLeft, FaShareAlt } from 'react-icons/fa';
+import { ArrowLeft, Share2 } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
@@ -95,21 +95,35 @@ const DatasheetPage: React.FC = () => {
   return (
     <AppLayout title="Datasheet">
       <div className="flex flex-col gap-4">
-        {/* Breadcrumbs */}
-        <Breadcrumbs
-          items={[
-            { label: 'Factions', path: '/factions' },
-            { label: faction.name, path: `/faction/${faction.id}` },
-            { label: datasheet.name, path: `/faction/${faction.id}/datasheet/${datasheet.id}` }
-          ]}
-        />
+        {/* Mobile Back Button */}
+        <div className="md:hidden">
+          <Link
+            to={`/faction/${faction.id}`}
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
+            aria-label={`Back to ${faction.name}`}
+          >
+            <ArrowLeft size={16} />
+            <span className="font-medium">{faction.name}</span>
+          </Link>
+        </div>
+
+        {/* Desktop Breadcrumbs */}
+        <div className="hidden md:block">
+          <Breadcrumbs
+            items={[
+              { label: 'Factions', path: '/factions' },
+              { label: faction.name, path: `/faction/${faction.id}` },
+              { label: datasheet.name, path: `/faction/${faction.id}/datasheet/${datasheet.id}` }
+            ]}
+          />
+        </div>
 
         {/* Header */}
         <PageHeader
           title={datasheet.name}
           subtitle={datasheetCost}
           action={{
-            icon: <FaShareAlt />,
+            icon: <Share2 size={16} />,
             onClick: handleShare,
             ariaLabel: 'Share datasheet',
             variant: 'default',

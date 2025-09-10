@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaHome, FaChevronDown, FaChevronRight, FaUsers, FaCog, FaStar } from 'react-icons/fa';
+import { Home, ChevronDown, ChevronRight, Users, Settings, Star } from 'lucide-react';
 import { Layout } from '../ui';
 import { depot } from '@depot/core';
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -26,7 +26,7 @@ const AppLayout = ({ children, title }: Props) => {
           onClick={closeSidebar}
           className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
-          <FaHome className="h-4 w-4" />
+          <Home size={16} />
           <span>Home</span>
         </Link>
         <Link
@@ -34,7 +34,7 @@ const AppLayout = ({ children, title }: Props) => {
           onClick={closeSidebar}
           className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
-          <FaUsers className="h-4 w-4" />
+          <Users size={16} />
           <span>Factions</span>
         </Link>
         <Link
@@ -42,7 +42,7 @@ const AppLayout = ({ children, title }: Props) => {
           onClick={closeSidebar}
           className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
         >
-          <FaCog className="h-4 w-4" />
+          <Settings size={16} />
           <span>Settings</span>
         </Link>
       </div>
@@ -57,11 +57,7 @@ const AppLayout = ({ children, title }: Props) => {
               className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
             >
               <span>My Factions</span>
-              {isMyFactionsExpanded ? (
-                <FaChevronDown className="h-3 w-3" />
-              ) : (
-                <FaChevronRight className="h-3 w-3" />
-              )}
+              {isMyFactionsExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             </button>
 
             {isMyFactionsExpanded && (
@@ -73,7 +69,7 @@ const AppLayout = ({ children, title }: Props) => {
                     onClick={closeSidebar}
                     className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   >
-                    <FaStar className="h-3 w-3 text-yellow-500" />
+                    <Star size={12} className="text-yellow-500 fill-current" />
                     <span>{faction.name}</span>
                   </Link>
                 ))}

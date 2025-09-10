@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import { getAbilityTypeBadge } from '../utils/abilities';
@@ -31,12 +31,12 @@ const ExpandableAbilityCard: React.FC<ExpandableAbilityCardProps> = ({ ability }
       >
         {isExpanded ? (
           <>
-            <FaChevronUp className="w-3 h-3" />
+            <ChevronUp className="w-3 h-3" />
             Hide Details
           </>
         ) : (
           <>
-            <FaChevronDown className="w-3 h-3" />
+            <ChevronDown className="w-3 h-3" />
             Show Details
           </>
         )}
