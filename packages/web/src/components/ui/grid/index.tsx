@@ -1,13 +1,13 @@
-import React from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GridProps extends HTMLAttributes<HTMLDivElement> {
   cols?: 1 | 2 | 3 | 4 | 6 | 12;
   gap?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   responsive?: boolean;
 }
 
-const Grid: React.FC<GridProps> = ({
+const Grid: FC<GridProps> = ({
   cols = 3,
   gap = 'md',
   responsive = true,

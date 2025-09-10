@@ -1,13 +1,13 @@
-import React from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'outlined';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   hover?: boolean;
 }
 
-const Card: React.FC<CardProps> = ({
+const Card: FC<CardProps> = ({
   variant = 'default',
   padding = 'md',
   hover = false,

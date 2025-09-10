@@ -1,14 +1,15 @@
-import React from 'react';
+import type { FC, ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
+import Loader from '../loader';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'secondary' | 'error';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   loading?: boolean;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button: FC<ButtonProps> = ({
   variant = 'default',
   size = 'md',
   fullWidth = false,
@@ -50,7 +51,7 @@ const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          <Loader size="sm" color="white" />
           Loading...
         </div>
       ) : (

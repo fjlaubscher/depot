@@ -1,8 +1,8 @@
-import React from 'react';
+import type { FC } from 'react';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import Toast from '../toast';
 
-const ToastContainer: React.FC = () => {
+const ToastContainer: FC = () => {
   const { state, removeToast } = useToast();
   const { toasts } = state;
 

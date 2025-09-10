@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import classNames from 'classnames';
 
 interface StatProps {
@@ -9,13 +9,7 @@ interface StatProps {
   className?: string;
 }
 
-const Stat: React.FC<StatProps> = ({
-  title,
-  value,
-  description,
-  variant = 'default',
-  className
-}) => {
+const Stat: FC<StatProps> = ({ title, value, description, variant = 'default', className }) => {
   return (
     <div className={classNames('text-center flex flex-col gap-1', className)}>
       {title && (

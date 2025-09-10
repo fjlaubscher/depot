@@ -1,9 +1,9 @@
-import React from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Button from '../button';
 
-interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ErrorStateProps extends HTMLAttributes<HTMLDivElement> {
   title?: string;
   message?: string;
   stackTrace?: string;
@@ -14,7 +14,7 @@ interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-const ErrorState: React.FC<ErrorStateProps> = ({
+const ErrorState: FC<ErrorStateProps> = ({
   title = 'Something went wrong',
   message = 'We encountered an error while loading this content. Please try again.',
   stackTrace,

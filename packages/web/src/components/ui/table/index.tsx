@@ -1,12 +1,14 @@
-import React from 'react';
+import type {
+  FC,
+  TableHTMLAttributes,
+  HTMLAttributes,
+  ThHTMLAttributes,
+  TdHTMLAttributes
+} from 'react';
 import classNames from 'classnames';
 
 // Base table components for flexible composition
-const Table: React.FC<React.TableHTMLAttributes<HTMLTableElement>> = ({
-  className,
-  children,
-  ...props
-}) => (
+const Table: FC<TableHTMLAttributes<HTMLTableElement>> = ({ className, children, ...props }) => (
   <div className="overflow-x-auto">
     <table
       className={classNames('min-w-full divide-y divide-gray-200 dark:divide-gray-700', className)}
@@ -17,7 +19,7 @@ const Table: React.FC<React.TableHTMLAttributes<HTMLTableElement>> = ({
   </div>
 );
 
-const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
+const TableHeader: FC<HTMLAttributes<HTMLTableSectionElement>> = ({
   className,
   children,
   ...props
@@ -27,7 +29,7 @@ const TableHeader: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
   </thead>
 );
 
-const TableBody: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
+const TableBody: FC<HTMLAttributes<HTMLTableSectionElement>> = ({
   className,
   children,
   ...props
@@ -43,17 +45,13 @@ const TableBody: React.FC<React.HTMLAttributes<HTMLTableSectionElement>> = ({
   </tbody>
 );
 
-const TableRow: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = ({
-  className,
-  children,
-  ...props
-}) => (
+const TableRow: FC<HTMLAttributes<HTMLTableRowElement>> = ({ className, children, ...props }) => (
   <tr className={classNames('hover:bg-gray-50 dark:hover:bg-gray-800', className)} {...props}>
     {children}
   </tr>
 );
 
-const TableHead: React.FC<React.ThHTMLAttributes<HTMLTableHeaderCellElement>> = ({
+const TableHead: FC<ThHTMLAttributes<HTMLTableHeaderCellElement>> = ({
   className,
   children,
   ...props
@@ -70,7 +68,7 @@ const TableHead: React.FC<React.ThHTMLAttributes<HTMLTableHeaderCellElement>> = 
   </th>
 );
 
-const TableCell: React.FC<React.TdHTMLAttributes<HTMLTableDataCellElement>> = ({
+const TableCell: FC<TdHTMLAttributes<HTMLTableDataCellElement>> = ({
   className,
   children,
   ...props

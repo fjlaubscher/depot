@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC, SelectHTMLAttributes } from 'react';
 import classNames from 'classnames';
 
 interface Option {
@@ -6,14 +6,14 @@ interface Option {
   value: string | number;
 }
 
-interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   options: Option[];
   error?: string;
   fullWidth?: boolean;
 }
 
-const SelectField: React.FC<SelectFieldProps> = ({
+const SelectField: FC<SelectFieldProps> = ({
   label,
   options,
   error,

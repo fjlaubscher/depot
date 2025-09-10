@@ -1,12 +1,12 @@
-import React from 'react';
+import type { FC, ReactNode } from 'react';
 
 interface StatsRowProps {
   title: string;
   subtitle?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
-const StatsRow: React.FC<StatsRowProps> = ({ title, subtitle, children }) => {
+const StatsRow: FC<StatsRowProps> = ({ title, subtitle, children }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2 items-center text-sm font-medium text-gray-900 dark:text-white">

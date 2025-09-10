@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import Field from '../field';
 
 interface SearchProps {
@@ -9,13 +9,7 @@ interface SearchProps {
   className?: string;
 }
 
-const Search: React.FC<SearchProps> = ({
-  label,
-  value,
-  placeholder = 'Search',
-  onChange,
-  className
-}) => (
+const Search: FC<SearchProps> = ({ label, value, placeholder = 'Search', onChange, className }) => (
   <Field className={className}>
     {label && (
       <label

@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import classNames from 'classnames';
 
 interface ToggleSwitchProps {
@@ -8,7 +8,7 @@ interface ToggleSwitchProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, enabled, onChange, size = 'md' }) => {
+const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, enabled, onChange, size = 'md' }) => {
   const sizeClasses = {
     sm: { container: 'h-5 w-9', knob: 'h-4 w-4', translate: 'translate-x-4' },
     md: { container: 'h-6 w-11', knob: 'h-5 w-5', translate: 'translate-x-5' },

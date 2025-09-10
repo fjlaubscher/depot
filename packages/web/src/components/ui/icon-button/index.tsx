@@ -1,14 +1,15 @@
-import React from 'react';
+import type { FC, ButtonHTMLAttributes } from 'react';
 import classNames from 'classnames';
+import Loader from '../loader';
 
-interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   'aria-label': string; // Required for accessibility
 }
 
-const IconButton: React.FC<IconButtonProps> = ({
+const IconButton: FC<IconButtonProps> = ({
   variant = 'default',
   size = 'md',
   loading = false,
@@ -38,11 +39,7 @@ const IconButton: React.FC<IconButtonProps> = ({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? (
-        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-      ) : (
-        children
-      )}
+      {loading ? <Loader size="sm" color="secondary" /> : children}
     </button>
   );
 };

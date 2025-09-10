@@ -1,18 +1,12 @@
-import React from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
+interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
   size?: 'sm' | 'md' | 'lg';
 }
 
-const Tag: React.FC<TagProps> = ({
-  variant = 'default',
-  size = 'md',
-  className,
-  children,
-  ...props
-}) => {
+const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, children, ...props }) => {
   const baseClasses = 'inline-flex items-center font-medium rounded transition-colors duration-200';
 
   const variantClasses = {
@@ -40,11 +34,11 @@ const Tag: React.FC<TagProps> = ({
   );
 };
 
-interface TagGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TagGroupProps extends HTMLAttributes<HTMLDivElement> {
   spacing?: 'sm' | 'md' | 'lg';
 }
 
-const TagGroup: React.FC<TagGroupProps> = ({ spacing = 'md', className, children, ...props }) => {
+const TagGroup: FC<TagGroupProps> = ({ spacing = 'md', className, children, ...props }) => {
   const spacingClasses = {
     sm: 'gap-1',
     md: 'gap-2',

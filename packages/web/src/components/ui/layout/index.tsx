@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import type { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, Home } from 'lucide-react';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
@@ -9,12 +10,12 @@ import Loader from '../loader';
 import Logo from '@/components/logo';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   title: string;
-  sidebar?: React.ReactNode;
+  sidebar?: ReactNode;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
+const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
   const { state, closeSidebar, toggleSidebar } = useLayoutContext();
   const { sidebarOpen } = state;
 
@@ -53,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
         >
           {/* Mobile sidebar header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <Link to="/" className="flex items-center space-x-2" onClick={closeSidebar}>
+            <Link to="/" className="flex items-center gap-2" onClick={closeSidebar}>
               <div className="w-10 h-10 text-white">
                 <Logo />
               </div>
@@ -82,7 +83,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, sidebar }) => {
             <div className="flex items-center min-w-0 flex-shrink-0">
               <Link
                 to="/"
-                className="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-200"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
               >
                 <div className="w-10 h-10 text-white">
                   <Logo />

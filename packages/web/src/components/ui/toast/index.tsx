@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import classNames from 'classnames';
 import { X, Check, AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import { Toast as ToastType } from '@/contexts/toast/types';
@@ -9,7 +9,7 @@ interface ToastProps {
   onRemove: (id: string) => void;
 }
 
-const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
+const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
   const { id, title, message, type } = toast;
 
   const typeConfig = {

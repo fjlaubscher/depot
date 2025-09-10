@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import classNames from 'classnames';
 
 interface SkeletonProps {
@@ -9,7 +9,7 @@ interface SkeletonProps {
   animate?: boolean;
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({
+const Skeleton: FC<SkeletonProps> = ({
   className,
   width,
   height,
@@ -40,7 +40,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 };
 
 // Pre-built skeleton components for common use cases
-export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) => (
+export const SkeletonCard: FC<{ className?: string }> = ({ className }) => (
   <div
     className={classNames(
       'p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800',
@@ -54,7 +54,7 @@ export const SkeletonCard: React.FC<{ className?: string }> = ({ className }) =>
   </div>
 );
 
-export const SkeletonText: React.FC<{
+export const SkeletonText: FC<{
   lines?: number;
   className?: string;
   lastLineWidth?: string;
@@ -66,7 +66,7 @@ export const SkeletonText: React.FC<{
   </div>
 );
 
-export const PageHeaderSkeleton: React.FC<{ className?: string }> = ({ className }) => (
+export const PageHeaderSkeleton: FC<{ className?: string }> = ({ className }) => (
   <div className={classNames('flex items-start justify-between gap-4', className)}>
     <div className="min-w-0 flex-1 flex flex-col gap-2">
       <Skeleton height={32} width="60%" />
@@ -78,7 +78,7 @@ export const PageHeaderSkeleton: React.FC<{ className?: string }> = ({ className
   </div>
 );
 
-export const TabsSkeleton: React.FC<{
+export const TabsSkeleton: FC<{
   className?: string;
   tabCount?: number;
 }> = ({ className, tabCount = 2 }) => (

@@ -1,22 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, Children } from 'react';
+import type { FC, ReactNode, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
-interface TabsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   tabs: string[];
   active?: number;
   onChange?: (index: number) => void;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const Tabs: React.FC<TabsProps> = ({
-  tabs,
-  active = 0,
-  onChange,
-  className,
-  children,
-  ...props
-}) => {
+const Tabs: FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, ...props }) => {
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
@@ -30,9 +24,7 @@ const Tabs: React.FC<TabsProps> = ({
 
   // Filter out empty tab names
   const validTabs = tabs.filter((tab) => tab.trim() !== '');
-  const validChildren = React.Children.toArray(children).filter(
-    (_, index) => tabs[index]?.trim() !== ''
-  );
+  const validChildren = Children.toArray(children).filter((_, index) => tabs[index]?.trim() !== '');
 
   return (
     <div className={classNames('w-full flex flex-col gap-4', className)} {...props}>
