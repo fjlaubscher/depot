@@ -28,7 +28,8 @@ const mockObjectStore = {
   put: vi.fn(),
   delete: vi.fn(),
   clear: vi.fn(),
-  openCursor: vi.fn()
+  openCursor: vi.fn(),
+  getAll: vi.fn()
 };
 
 const mockRequest = {
@@ -307,7 +308,7 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.clearAllData()).resolves.toBeUndefined();
 
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(4);
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(5);
     });
   });
 
@@ -325,6 +326,152 @@ describe('OfflineStorage', () => {
 
       expect(mockDatabase.close).toHaveBeenCalled();
       expect(mockIndexedDB.deleteDatabase).toHaveBeenCalledWith('depot-offline');
+    });
+  });
+
+  describe('Roster Operations', () => {
+    const mockRoster = {
+      id: 'test-roster',
+      name: 'Test Roster',
+      factionId: 'SM',
+      detachment: {
+        name: 'Test Detachment',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      },
+      points: { current: 0, max: 2000 },
+      units: [],
+      enhancements: []
+    };
+
+    it('should save roster to IndexedDB', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.saveRoster(mockRoster)).resolves.toBeUndefined();
+      expect(mockObjectStore.put).toHaveBeenCalledWith(mockRoster);
+    });
+
+    it('should get roster from IndexedDB', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest, result: mockRoster };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getRoster('test-roster');
+      expect(result).toEqual(mockRoster);
+      expect(mockObjectStore.get).toHaveBeenCalledWith('test-roster');
+    });
+
+    it('should return null when roster does not exist', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getRoster('non-existent');
+      expect(result).toBeNull();
+    });
+
+    it('should get all rosters from IndexedDB', async () => {
+      const mockRosters = [mockRoster, { ...mockRoster, id: 'roster-2' }];
+
+      mockObjectStore.getAll.mockImplementation(() => {
+        const request = { ...mockRequest, result: mockRosters };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getAllRosters();
+      expect(result).toEqual(mockRosters);
+    });
+
+    it('should return empty array when no rosters exist', async () => {
+      mockObjectStore.getAll.mockImplementation(() => {
+        const request = { ...mockRequest, result: [] };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getAllRosters();
+      expect(result).toEqual([]);
+    });
+
+    it('should delete roster from IndexedDB', async () => {
+      mockObjectStore.delete.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.deleteRoster('test-roster')).resolves.toBeUndefined();
+      expect(mockObjectStore.delete).toHaveBeenCalledWith('test-roster');
+    });
+
+    it('should handle roster save errors', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onerror) request.onerror();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.saveRoster(mockRoster)).rejects.toThrow();
+    });
+
+    it('should handle roster retrieval errors gracefully', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Mock a database transaction error
+      mockTransaction.objectStore.mockImplementation(() => {
+        throw new Error('DB Error');
+      });
+
+      const result = await offlineStorage.getRoster('error-roster');
+      expect(result).toBeNull();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to get roster error-roster from IndexedDB:',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle getAllRosters errors gracefully', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      // Mock a database transaction error
+      mockTransaction.objectStore.mockImplementation(() => {
+        throw new Error('DB Error');
+      });
+
+      const result = await offlineStorage.getAllRosters();
+      expect(result).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to get all rosters from IndexedDB:',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
     });
   });
 

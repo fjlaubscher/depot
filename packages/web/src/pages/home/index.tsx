@@ -55,12 +55,12 @@ const Home: React.FC = () => {
                 <List className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
             }
-            title="List Builder"
-            description="Create and manage your army lists"
+            title="Roster Builder"
+            description="Create and manage your army rosters"
             action={
-              <Button variant="secondary" disabled data-testid="list-builder-button">
-                Coming Soon
-              </Button>
+              <Link to="/rosters">
+                <Button data-testid="roster-builder-button">Build Rosters</Button>
+              </Link>
             }
           />
 

@@ -7,6 +7,9 @@ import Factions from './pages/factions';
 import Faction from './pages/faction';
 import Datasheet from './pages/datasheet';
 import Settings from './pages/settings';
+import Rosters from './pages/rosters';
+import CreateRoster from './pages/create-roster';
+import Roster from './pages/roster';
 
 const AppRoutes = () => (
   <Routes>
@@ -16,6 +19,9 @@ const AppRoutes = () => (
     <Route path="/faction/:id" element={<Faction />} />
     <Route path="/faction/:factionId/datasheet/:id" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
+    <Route path="/rosters" element={<Rosters />} />
+    <Route path="/rosters/:rosterId" element={<Roster />} />
+    <Route path="/rosters/create" element={<CreateRoster />} />
 
     {/* Catch all */}
     <Route path="*" element={<NotFound />} />

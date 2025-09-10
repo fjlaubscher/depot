@@ -113,7 +113,10 @@ describe('useFactions', () => {
       expect(result.current.error).toBe('IndexedDB error');
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load factions:', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'useFactions: Error loading factions:',
+      expect.any(Error)
+    );
     consoleSpy.mockRestore();
   });
 

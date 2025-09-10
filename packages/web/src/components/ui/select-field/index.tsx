@@ -11,6 +11,7 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: Option[];
   error?: string;
   fullWidth?: boolean;
+  placeholder?: string; // Add placeholder prop
 }
 
 const SelectField: FC<SelectFieldProps> = ({
@@ -21,6 +22,8 @@ const SelectField: FC<SelectFieldProps> = ({
   className,
   id,
   name,
+  placeholder,
+  'data-testid': dataTestId,
   ...props
 }) => {
   const selectId = id || name || label?.toLowerCase().replace(/\s+/g, '-');
@@ -37,7 +40,10 @@ const SelectField: FC<SelectFieldProps> = ({
   );
 
   return (
-    <div className={classNames('flex flex-col gap-1', fullWidth ? 'w-full' : '')}>
+    <div
+      className={classNames('flex flex-col gap-1', fullWidth ? 'w-full' : '')}
+      data-testid={dataTestId}
+    >
       {label && (
         <label
           htmlFor={selectId}
@@ -46,7 +52,18 @@ const SelectField: FC<SelectFieldProps> = ({
           {label}
         </label>
       )}
-      <select id={selectId} name={name} className={selectClasses} {...props}>
+      <select
+        id={selectId}
+        name={name}
+        className={selectClasses}
+        data-testid={dataTestId ? `${dataTestId}-select` : undefined}
+        {...props}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

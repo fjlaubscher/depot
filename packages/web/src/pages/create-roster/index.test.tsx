@@ -1,0 +1,268 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { TestWrapper } from '@/test/test-utils';
+import { mockFactionIndex } from '@/test/mock-data';
+import CreateRoster from './index';
+
+// Mock AppLayout to avoid sidebar duplication
+vi.mock('@/components/layout', () => ({
+  default: ({ children, title }: { children: React.ReactNode; title: string }) => (
+    <div data-testid="app-layout" data-title={title}>
+      {children}
+    </div>
+  )
+}));
+
+// Mock react-router-dom
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate
+  };
+});
+
+// Mock useFactions hook
+const mockUseFactions = vi.hoisted(() => ({
+  factions: [],
+  loading: false,
+  error: null
+}));
+
+vi.mock('@/hooks/use-factions', () => ({
+  default: () => mockUseFactions
+}));
+
+// Mock useRoster hook
+const mockUseRoster = vi.hoisted(() => ({
+  createRoster: vi.fn()
+}));
+
+vi.mock('@/contexts/roster/use-roster-context', () => ({
+  useRoster: () => mockUseRoster
+}));
+
+// Mock useToast hook
+const mockShowToast = vi.fn();
+vi.mock('@/contexts/toast/use-toast-context', () => ({
+  useToast: () => ({
+    showToast: mockShowToast
+  })
+}));
+
+describe('CreateRoster', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseFactions.factions = mockFactionIndex;
+    mockUseFactions.loading = false;
+    mockUseFactions.error = null;
+    mockUseRoster.createRoster.mockReturnValue('new-roster-id');
+  });
+
+  it('renders form with all required fields', () => {
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('page-header')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-form')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-name-field')).toBeInTheDocument();
+    expect(screen.getByTestId('faction-field')).toBeInTheDocument();
+    expect(screen.getByTestId('max-points-field')).toBeInTheDocument();
+    expect(screen.getByTestId('cancel-button')).toBeInTheDocument();
+    expect(screen.getByTestId('submit-button')).toBeInTheDocument();
+  });
+
+  it('shows loading skeleton while factions are loading', () => {
+    mockUseFactions.loading = true;
+
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('field-skeleton')).toBeInTheDocument();
+  });
+
+  it('shows faction select field when factions are loaded', async () => {
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('faction-field')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByTestId('field-skeleton')).not.toBeInTheDocument();
+  });
+
+  it('validates required roster name', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    // Enable the form first
+    const nameInput = screen.getByTestId('roster-name-input');
+    const factionSelect = screen.getByTestId('faction-field-select');
+    await user.selectOptions(factionSelect, 'SM');
+    await user.clear(nameInput); // Make sure it's empty
+
+    const submitButton = screen.getByTestId('submit-button');
+    await user.click(submitButton);
+
+    expect(mockShowToast).toHaveBeenCalledWith({
+      type: 'error',
+      title: 'Validation Error',
+      message: 'Please enter a roster name.'
+    });
+    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
+  });
+
+  it('validates required faction selection', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const nameInput = screen.getByTestId('roster-name-input');
+    await user.type(nameInput, 'Test Roster');
+
+    // Leave faction unselected (should stay as empty value)
+    const submitButton = screen.getByTestId('submit-button');
+
+    // Submit button should still be disabled
+    expect(submitButton).toBeDisabled();
+
+    // Force enable the button by selecting faction then clearing it
+    const factionSelect = screen.getByTestId('faction-field-select');
+    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, ''); // Clear selection
+
+    // Now the form should show validation error when submitted
+    await user.click(submitButton);
+
+    expect(mockShowToast).toHaveBeenCalledWith({
+      type: 'error',
+      title: 'Validation Error',
+      message: 'Please select a faction.'
+    });
+    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
+  });
+
+  it('validates positive max points', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const nameInput = screen.getByTestId('roster-name-input');
+    const factionSelect = screen.getByTestId('faction-field-select');
+    const pointsInput = screen.getByTestId('max-points-input');
+
+    await user.type(nameInput, 'Test Roster');
+    await user.selectOptions(factionSelect, 'SM');
+    await user.clear(pointsInput);
+    await user.type(pointsInput, '0');
+
+    const submitButton = screen.getByTestId('submit-button');
+    await user.click(submitButton);
+
+    expect(mockShowToast).toHaveBeenCalledWith({
+      type: 'error',
+      title: 'Validation Error',
+      message: 'Max points must be greater than 0.'
+    });
+    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
+  });
+
+  it('trims whitespace from roster name', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const nameInput = screen.getByTestId('roster-name-input');
+    const factionSelect = screen.getByTestId('faction-field-select');
+
+    await user.type(nameInput, '  Test Roster  ');
+    await user.selectOptions(factionSelect, 'SM');
+
+    const submitButton = screen.getByTestId('submit-button');
+    await user.click(submitButton);
+
+    expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
+      name: 'Test Roster',
+      factionId: 'SM',
+      maxPoints: 2000
+    });
+  });
+
+  it('creates roster and navigates on successful submission', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const nameInput = screen.getByTestId('roster-name-input');
+    const factionSelect = screen.getByTestId('faction-field-select');
+    const pointsInput = screen.getByTestId('max-points-input');
+
+    await user.type(nameInput, 'My Awesome Roster');
+    await user.selectOptions(factionSelect, 'SM');
+    await user.clear(pointsInput);
+    await user.type(pointsInput, '1500');
+
+    const submitButton = screen.getByTestId('submit-button');
+    await user.click(submitButton);
+
+    expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
+      name: 'My Awesome Roster',
+      factionId: 'SM',
+      maxPoints: 1500
+    });
+    expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id');
+  });
+
+  it('navigates back to rosters list when cancel is clicked', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const cancelButton = screen.getByTestId('cancel-button');
+    await user.click(cancelButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/rosters');
+  });
+
+  it('disables submit button when factions are loading', () => {
+    mockUseFactions.loading = true;
+
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const submitButton = screen.getByTestId('submit-button');
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('disables submit button when required fields are empty', async () => {
+    const user = userEvent.setup();
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const submitButton = screen.getByTestId('submit-button');
+
+    // Initially disabled (no name or faction)
+    expect(submitButton).toBeDisabled();
+
+    // Still disabled with only name
+    const nameInput = screen.getByTestId('roster-name-input');
+    await user.type(nameInput, 'Test');
+    expect(submitButton).toBeDisabled();
+
+    // Enabled with name and faction
+    const factionSelect = screen.getByTestId('faction-field-select');
+    await user.selectOptions(factionSelect, 'SM');
+    expect(submitButton).not.toBeDisabled();
+  });
+
+  it('uses default max points of 2000', () => {
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const pointsInput = screen.getByTestId('max-points-input');
+    expect(pointsInput).toHaveValue(2000);
+  });
+
+  it('handles empty faction list gracefully', () => {
+    mockUseFactions.factions = [];
+
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    const factionSelect = screen.getByTestId('faction-field-select');
+    expect(factionSelect).toBeInTheDocument();
+    // Should show placeholder but no options
+    expect(factionSelect.children.length).toBe(1); // Just the placeholder
+  });
+});

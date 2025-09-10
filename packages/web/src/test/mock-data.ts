@@ -284,3 +284,72 @@ export const mockEmptyFaction = createMockFaction({
   enhancements: [],
   detachmentAbilities: []
 });
+
+/**
+ * Roster-related mock data
+ */
+
+export const mockDetachment: depot.Detachment = {
+  name: 'Gladius Task Force',
+  abilities: [mockDetachmentAbility],
+  enhancements: [mockEnhancement],
+  stratagems: [mockStratagem]
+};
+
+export const mockRosterUnit: depot.RosterUnit = {
+  id: 'roster-unit-1',
+  datasheet: mockDatasheet,
+  modelCost: mockDatasheet.modelCosts[0],
+  selectedWargear: []
+};
+
+export const mockRoster: depot.Roster = {
+  id: 'test-roster-1',
+  name: 'Test Space Marines Roster',
+  factionId: 'SM',
+  detachment: mockDetachment,
+  points: {
+    current: 80,
+    max: 2000
+  },
+  units: [mockRosterUnit],
+  enhancements: []
+};
+
+export const createMockDetachment = (
+  overrides: Partial<depot.Detachment> = {}
+): depot.Detachment => ({
+  ...mockDetachment,
+  ...overrides
+});
+
+export const createMockRosterUnit = (
+  overrides: Partial<depot.RosterUnit> = {}
+): depot.RosterUnit => ({
+  ...mockRosterUnit,
+  ...overrides
+});
+
+export const createMockRoster = (overrides: Partial<depot.Roster> = {}): depot.Roster => ({
+  ...mockRoster,
+  ...overrides
+});
+
+/**
+ * Common roster test data variations
+ */
+
+export const mockEmptyRoster = createMockRoster({
+  id: 'empty-roster',
+  name: 'Empty Roster',
+  points: { current: 0, max: 2000 },
+  units: [],
+  enhancements: []
+});
+
+export const mockFullRoster = createMockRoster({
+  id: 'full-roster',
+  name: 'Full Roster',
+  points: { current: 2000, max: 2000 },
+  units: [mockRosterUnit, createMockRosterUnit({ id: 'roster-unit-2' })]
+});
