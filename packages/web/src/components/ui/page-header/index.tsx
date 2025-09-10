@@ -16,6 +16,7 @@ interface PageHeaderProps extends HTMLAttributes<HTMLDivElement> {
     testId?: string;
   };
   className?: string;
+  'data-testid'?: string;
 }
 
 const PageHeader: FC<PageHeaderProps> = ({

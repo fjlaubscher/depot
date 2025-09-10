@@ -11,7 +11,8 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: Option[];
   error?: string;
   fullWidth?: boolean;
-  placeholder?: string; // Add placeholder prop
+  placeholder?: string;
+  'data-testid'?: string;
 }
 
 const SelectField: FC<SelectFieldProps> = ({

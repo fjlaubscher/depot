@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockFactionIndex } from '@/test/mock-data';
 import CreateRoster from './index';
@@ -26,7 +27,7 @@ vi.mock('react-router-dom', async () => {
 
 // Mock useFactions hook
 const mockUseFactions = vi.hoisted(() => ({
-  factions: [],
+  factions: [] as depot.Index[],
   loading: false,
   error: null
 }));
@@ -95,11 +96,11 @@ describe('CreateRoster', () => {
     const user = userEvent.setup();
     render(<CreateRoster />, { wrapper: TestWrapper });
 
-    // Enable the form first
+    // Fill with whitespace-only name to bypass disabled button but trigger validation
     const nameInput = screen.getByTestId('roster-name-input');
     const factionSelect = screen.getByTestId('faction-field-select');
+    await user.type(nameInput, '   '); // Whitespace only
     await user.selectOptions(factionSelect, 'SM');
-    await user.clear(nameInput); // Make sure it's empty
 
     const submitButton = screen.getByTestId('submit-button');
     await user.click(submitButton);
@@ -122,22 +123,11 @@ describe('CreateRoster', () => {
     // Leave faction unselected (should stay as empty value)
     const submitButton = screen.getByTestId('submit-button');
 
-    // Submit button should still be disabled
+    // Submit button should be disabled when no faction is selected
     expect(submitButton).toBeDisabled();
-
-    // Force enable the button by selecting faction then clearing it
-    const factionSelect = screen.getByTestId('faction-field-select');
-    await user.selectOptions(factionSelect, 'SM');
-    await user.selectOptions(factionSelect, ''); // Clear selection
-
-    // Now the form should show validation error when submitted
-    await user.click(submitButton);
-
-    expect(mockShowToast).toHaveBeenCalledWith({
-      type: 'error',
-      title: 'Validation Error',
-      message: 'Please select a faction.'
-    });
+    
+    // Verify the showToast isn't called since form can't be submitted
+    expect(mockShowToast).not.toHaveBeenCalled();
     expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
   });
 

@@ -95,7 +95,10 @@ describe('RosterProvider', () => {
   });
 
   it('should handle storage errors gracefully when loading roster', async () => {
-    mockOfflineStorage.getRoster.mockRejectedValue(new Error('Storage error'));
+    const error = new Error('Storage error');
+    mockOfflineStorage.getRoster.mockRejectedValue(error);
+    
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
       <TestWrapper rosterId="test-roster-id">
@@ -109,6 +112,9 @@ describe('RosterProvider', () => {
     });
 
     expect(mockOfflineStorage.getRoster).toHaveBeenCalledWith('test-roster-id');
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to load roster:', error);
+    
+    consoleSpy.mockRestore();
   });
 
   it('should create new roster with generated ID', async () => {

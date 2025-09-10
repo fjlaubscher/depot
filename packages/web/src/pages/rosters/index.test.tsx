@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockRoster, createMockRoster, mockEmptyRoster } from '@/test/mock-data';
 import Rosters from './index';
@@ -26,9 +27,9 @@ vi.mock('react-router-dom', async () => {
 
 // Mock useRosters hook
 const mockUseRosters = vi.hoisted(() => ({
-  rosters: [],
+  rosters: [] as depot.Roster[],
   loading: false,
-  error: null
+  error: null as string | null
 }));
 
 vi.mock('@/hooks/use-rosters', () => ({

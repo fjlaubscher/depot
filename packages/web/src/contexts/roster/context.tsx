@@ -19,9 +19,13 @@ export const RosterProvider: React.FC<RosterProviderProps> = ({ children, roster
   useEffect(() => {
     if (rosterId) {
       const loadRoster = async () => {
-        const roster = await offlineStorage.getRoster(rosterId);
-        if (roster) {
-          dispatch({ type: 'SET_ROSTER', payload: roster });
+        try {
+          const roster = await offlineStorage.getRoster(rosterId);
+          if (roster) {
+            dispatch({ type: 'SET_ROSTER', payload: roster });
+          }
+        } catch (err) {
+          console.error('Failed to load roster:', err);
         }
       };
       loadRoster();
