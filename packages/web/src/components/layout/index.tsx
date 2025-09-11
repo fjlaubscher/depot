@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ChevronDown, ChevronRight, Users, Settings, Star, List } from 'lucide-react';
-import { Layout } from '../ui';
-import { depot } from '@depot/core';
+
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
+
+import { Layout } from '../ui';
 
 interface Props {
   children: React.ReactNode;

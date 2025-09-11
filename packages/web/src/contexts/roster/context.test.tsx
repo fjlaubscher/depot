@@ -97,7 +97,7 @@ describe('RosterProvider', () => {
   it('should handle storage errors gracefully when loading roster', async () => {
     const error = new Error('Storage error');
     mockOfflineStorage.getRoster.mockRejectedValue(error);
-    
+
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     render(
@@ -113,7 +113,7 @@ describe('RosterProvider', () => {
 
     expect(mockOfflineStorage.getRoster).toHaveBeenCalledWith('test-roster-id');
     expect(consoleSpy).toHaveBeenCalledWith('Failed to load roster:', error);
-    
+
     consoleSpy.mockRestore();
   });
 

@@ -21,6 +21,7 @@ const Rosters: React.FC = () => {
         <div className="flex flex-col gap-4">
           <PageHeader
             title="My Rosters"
+            subtitle="Manage your army rosters"
             action={{
               icon: <Plus size={16} />,
               onClick: handleCreate,
@@ -39,6 +40,7 @@ const Rosters: React.FC = () => {
         <div className="flex flex-col gap-4">
           <PageHeader
             title="My Rosters"
+            subtitle="Manage your army rosters"
             action={{
               icon: <Plus size={16} />,
               onClick: handleCreate,
@@ -56,6 +58,7 @@ const Rosters: React.FC = () => {
       <div className="flex flex-col gap-4">
         <PageHeader
           title="My Rosters"
+          subtitle="Manage your army rosters"
           action={{
             icon: <Plus size={16} />,
             onClick: handleCreate,
@@ -75,7 +78,10 @@ const Rosters: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {rosters.map((roster) => (
-              <LinkCard key={roster.id} to={`/rosters/${roster.id}`}>
+              <LinkCard
+                key={roster.id}
+                to={roster.points.current ? `/rosters/${roster.id}/edit` : `/rosters/${roster.id}`}
+              >
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                     {roster.name}

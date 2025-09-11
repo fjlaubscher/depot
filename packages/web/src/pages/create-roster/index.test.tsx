@@ -125,7 +125,7 @@ describe('CreateRoster', () => {
 
     // Submit button should be disabled when no faction is selected
     expect(submitButton).toBeDisabled();
-    
+
     // Verify the showToast isn't called since form can't be submitted
     expect(mockShowToast).not.toHaveBeenCalled();
     expect(mockUseRoster.createRoster).not.toHaveBeenCalled();

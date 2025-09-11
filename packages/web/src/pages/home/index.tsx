@@ -59,7 +59,12 @@ const Home: React.FC = () => {
             description="Create and manage your army rosters"
             action={
               <Link to="/rosters">
-                <Button data-testid="roster-builder-button">Build Rosters</Button>
+                <Button
+                  data-testid="roster-builder-button"
+                  className="bg-purple-600 hover:bg-purple-700 border-purple-600 text-white"
+                >
+                  View Rosters
+                </Button>
               </Link>
             }
           />

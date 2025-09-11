@@ -1,9 +1,9 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 
 interface StatProps {
   title?: string;
-  value: string;
+  value: ReactNode;
   description?: string;
   variant?: 'default' | 'large';
   className?: string;
