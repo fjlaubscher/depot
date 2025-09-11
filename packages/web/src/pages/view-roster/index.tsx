@@ -11,6 +11,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, CollapsibleSection, Button } from '@/components/ui';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
+import WargearDisplay from '@/components/shared/wargear-display';
 import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
 
 const RosterView: React.FC = () => {
@@ -274,65 +275,13 @@ const RosterView: React.FC = () => {
 
       {/* Global Wargear Section */}
       {globalWargear.length > 0 && (
-        <CollapsibleSection
+        <WargearDisplay
+          wargear={globalWargear}
           title="Global Wargear"
-          defaultExpanded={false}
+          showTypeHeaders={true}
+          showCollapsibleWrapper={true}
           className="border border-gray-200 dark:border-gray-700 print:border-gray-300 rounded-lg print:break-inside-avoid"
-        >
-          <div className="flex flex-col gap-3">
-            {globalWargear.map((wargear: depot.Wargear) => (
-              <div
-                key={wargear.name}
-                className="border-b border-gray-200 dark:border-gray-700 print:border-gray-300 last:border-b-0 pb-3 last:pb-0"
-              >
-                <h4 className="font-semibold text-gray-900 dark:text-white print:text-black mb-1">
-                  {wargear.name}
-                </h4>
-                <div className="text-sm text-gray-700 dark:text-gray-300 print:text-black">
-                  <div className="flex gap-4 flex-wrap">
-                    {wargear.range && (
-                      <span>
-                        <strong>Range:</strong> {wargear.range}
-                      </span>
-                    )}
-                    {wargear.a && (
-                      <span>
-                        <strong>A:</strong> {wargear.a}
-                      </span>
-                    )}
-                    {wargear.bsWs && (
-                      <span>
-                        <strong>BS/WS:</strong> {wargear.bsWs}+
-                      </span>
-                    )}
-                    {wargear.s && (
-                      <span>
-                        <strong>S:</strong> {wargear.s}
-                      </span>
-                    )}
-                    {wargear.ap && (
-                      <span>
-                        <strong>AP:</strong> {wargear.ap}
-                      </span>
-                    )}
-                    {wargear.d && (
-                      <span>
-                        <strong>D:</strong> {wargear.d}
-                      </span>
-                    )}
-                  </div>
-                  {wargear.description && (
-                    <div className="mt-1">
-                      <span className="text-xs text-gray-500 dark:text-gray-400 print:text-gray-600">
-                        {wargear.description}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CollapsibleSection>
+        />
       )}
     </div>
   );
