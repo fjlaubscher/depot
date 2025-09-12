@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
-import { mockFactionIndexes } from '@/test/mock-data';
+import { mockFactionIndexes, mockFaction } from '@/test/mock-data';
 import CreateRoster from './index';
 
 // Mock AppLayout to avoid sidebar duplication
@@ -36,6 +36,17 @@ vi.mock('@/hooks/use-factions', () => ({
   default: () => mockUseFactions
 }));
 
+// Mock useFaction hook
+const mockUseFaction = vi.hoisted(() => ({
+  data: null as depot.Faction | null,
+  loading: false,
+  error: null
+}));
+
+vi.mock('@/hooks/use-faction', () => ({
+  default: () => mockUseFaction
+}));
+
 // Mock useRoster hook
 const mockUseRoster = vi.hoisted(() => ({
   createRoster: vi.fn()
@@ -59,6 +70,9 @@ describe('CreateRoster', () => {
     mockUseFactions.factions = mockFactionIndexes;
     mockUseFactions.loading = false;
     mockUseFactions.error = null;
+    mockUseFaction.data = mockFaction;
+    mockUseFaction.loading = false;
+    mockUseFaction.error = null;
     mockUseRoster.createRoster.mockReturnValue('new-roster-id');
   });
 
@@ -102,6 +116,13 @@ describe('CreateRoster', () => {
     await user.type(nameInput, '   '); // Whitespace only
     await user.selectOptions(factionSelect, 'SM');
 
+    // Wait for detachment field to appear and select it
+    await waitFor(() => {
+      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
+    });
+    const detachmentSelect = screen.getByTestId('detachment-field-select');
+    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
+
     const submitButton = screen.getByTestId('submit-button');
     await user.click(submitButton);
 
@@ -141,6 +162,14 @@ describe('CreateRoster', () => {
 
     await user.type(nameInput, 'Test Roster');
     await user.selectOptions(factionSelect, 'SM');
+
+    // Wait for detachment field to appear and select it
+    await waitFor(() => {
+      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
+    });
+    const detachmentSelect = screen.getByTestId('detachment-field-select');
+    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
+
     await user.clear(pointsInput);
     await user.type(pointsInput, '0');
 
@@ -164,6 +193,13 @@ describe('CreateRoster', () => {
 
     await user.type(nameInput, '  Test Roster  ');
     await user.selectOptions(factionSelect, 'SM');
+
+    // Wait for detachment field to appear and select it
+    await waitFor(() => {
+      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
+    });
+    const detachmentSelect = screen.getByTestId('detachment-field-select');
+    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
 
     const submitButton = screen.getByTestId('submit-button');
     await user.click(submitButton);
@@ -190,6 +226,14 @@ describe('CreateRoster', () => {
 
     await user.type(nameInput, 'My Awesome Roster');
     await user.selectOptions(factionSelect, 'SM');
+
+    // Wait for detachment field to appear and select it
+    await waitFor(() => {
+      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
+    });
+    const detachmentSelect = screen.getByTestId('detachment-field-select');
+    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
+
     await user.clear(pointsInput);
     await user.type(pointsInput, '1500');
 
@@ -242,9 +286,17 @@ describe('CreateRoster', () => {
     await user.type(nameInput, 'Test');
     expect(submitButton).toBeDisabled();
 
-    // Enabled with name and faction
+    // Still disabled with name and faction (no detachment)
     const factionSelect = screen.getByTestId('faction-field-select');
     await user.selectOptions(factionSelect, 'SM');
+    expect(submitButton).toBeDisabled();
+
+    // Enabled with name, faction, and detachment
+    await waitFor(() => {
+      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
+    });
+    const detachmentSelect = screen.getByTestId('detachment-field-select');
+    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
     expect(submitButton).not.toBeDisabled();
   });
 
