@@ -12,7 +12,11 @@ interface LinkCardProps {
 
 const LinkCard: FC<LinkCardProps> = ({ to, children, className }) => {
   return (
-    <Link to={to} className={classNames('block text-decoration-none', className)}>
+    <Link
+      to={to}
+      className={classNames('block text-decoration-none', className)}
+      data-testid="link-card"
+    >
       <Card
         hover={true}
         className="dark:bg-gray-800 dark:border-gray-700 hover:shadow-lg transition-all duration-200 h-full"

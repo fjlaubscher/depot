@@ -20,18 +20,15 @@ function useFactions(): UseFactions {
       setLoading(true);
       setError(null);
 
-      // Try IndexedDB first
       let index = await offlineStorage.getFactionIndex();
 
       if (!index) {
-        // Fallback to network
         const response = await fetch(getDataUrl('index.json'));
         if (!response.ok) {
           throw new Error('Failed to load faction index');
         }
         index = await response.json();
 
-        // Cache for offline use
         try {
           await offlineStorage.setFactionIndex(index as depot.Index[]);
         } catch (cacheError) {
@@ -43,7 +40,7 @@ function useFactions(): UseFactions {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error loading factions';
       setError(errorMessage);
-      console.error('Failed to load factions:', err);
+      console.error('useFactions: Error loading factions:', err);
     } finally {
       setLoading(false);
     }

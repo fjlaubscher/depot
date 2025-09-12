@@ -22,6 +22,7 @@ const Loader: FC<LoaderProps> = ({ size = 'md', color = 'primary', className }) 
 
   return (
     <div
+      data-testid="loader"
       className={classNames(
         'rounded-full animate-spin',
         sizeClasses[size],

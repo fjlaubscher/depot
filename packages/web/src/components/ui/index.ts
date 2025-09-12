@@ -16,13 +16,7 @@ export { default as NavigationButton } from './navigation-button';
 export { default as PageHeader } from './page-header';
 export { default as Search } from './search';
 export { default as SelectField } from './select-field';
-export {
-  default as Skeleton,
-  SkeletonCard,
-  SkeletonText,
-  PageHeaderSkeleton,
-  TabsSkeleton
-} from './skeleton';
+export { Skeleton, SkeletonCard, SkeletonText, PageHeaderSkeleton, TabsSkeleton } from './skeleton';
 export { default as Stat } from './stat';
 export { default as StatCard } from './stat-card';
 export { default as StatsRow } from './stats-row';

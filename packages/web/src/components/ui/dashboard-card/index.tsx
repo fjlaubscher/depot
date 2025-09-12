@@ -19,7 +19,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 }) => {
   return (
     <Card {...props}>
-      <div className="flex flex-col xl:justify-between xl:h-full xl:gap-4">
+      <div className="flex flex-col lg:justify-between lg:h-full lg:gap-4">
         <div className="flex items-center gap-4">
           {icon}
           <div className="flex-1">
@@ -31,9 +31,9 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
           </div>
-          {action && <div className="xl:hidden">{action}</div>}
+          {action && <div className="lg:hidden">{action}</div>}
         </div>
-        {action && <div className="hidden xl:flex xl:justify-end">{action}</div>}
+        {action && <div className="hidden lg:flex lg:justify-end">{action}</div>}
       </div>
     </Card>
   );

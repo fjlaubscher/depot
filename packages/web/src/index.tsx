@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { AppProvider } from './contexts/app/context';
 import { LayoutProvider } from './contexts/layout/context';
+import { RosterProvider } from './contexts/roster/context';
 import { ToastProvider } from './contexts/toast/context';
 import { ToastContainer } from './components/ui';
 import Routes from './routes';
@@ -15,10 +16,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <BrowserRouter basename={process.env.NODE_ENV === 'production' ? '/depot' : undefined}>
       <AppProvider>
         <LayoutProvider>
-          <ToastProvider>
-            <Routes />
-            <ToastContainer />
-          </ToastProvider>
+          <RosterProvider>
+            <ToastProvider>
+              <Routes />
+              <ToastContainer />
+            </ToastProvider>
+          </RosterProvider>
         </LayoutProvider>
       </AppProvider>
     </BrowserRouter>
