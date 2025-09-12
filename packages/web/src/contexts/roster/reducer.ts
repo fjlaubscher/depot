@@ -14,6 +14,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         id: action.payload.id,
         name: action.payload.name,
         factionId: action.payload.factionId,
+        faction: action.payload.faction,
+        detachment: action.payload.detachment,
         points: {
           ...initialState.points,
           max: action.payload.maxPoints

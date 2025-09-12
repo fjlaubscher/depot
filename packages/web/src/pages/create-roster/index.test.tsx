@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
-import { mockFactionIndex } from '@/test/mock-data';
+import { mockFactionIndexes } from '@/test/mock-data';
 import CreateRoster from './index';
 
 // Mock AppLayout to avoid sidebar duplication
@@ -56,7 +56,7 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 describe('CreateRoster', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseFactions.factions = mockFactionIndex;
+    mockUseFactions.factions = mockFactionIndexes;
     mockUseFactions.loading = false;
     mockUseFactions.error = null;
     mockUseRoster.createRoster.mockReturnValue('new-roster-id');
@@ -171,7 +171,12 @@ describe('CreateRoster', () => {
     expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
       name: 'Test Roster',
       factionId: 'SM',
-      maxPoints: 2000
+      faction: expect.objectContaining({
+        id: 'SM',
+        name: 'Space Marines'
+      }),
+      maxPoints: 2000,
+      detachment: expect.any(Object)
     });
   });
 
@@ -194,7 +199,12 @@ describe('CreateRoster', () => {
     expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
       name: 'My Awesome Roster',
       factionId: 'SM',
-      maxPoints: 1500
+      faction: expect.objectContaining({
+        id: 'SM',
+        name: 'Space Marines'
+      }),
+      maxPoints: 1500,
+      detachment: expect.any(Object)
     });
     expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id');
   });

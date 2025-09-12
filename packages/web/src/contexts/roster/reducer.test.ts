@@ -3,6 +3,7 @@ import { rosterReducer } from './reducer';
 import { initialState } from './constants';
 import { RosterAction } from './types';
 import { depot } from '@depot/core';
+import { mockFactionIndex } from '@/test/mock-data';
 
 describe('rosterReducer', () => {
   it('should return initial state for unknown action', () => {
@@ -16,6 +17,7 @@ describe('rosterReducer', () => {
         id: 'test-id',
         name: 'Test Roster',
         factionId: 'SM',
+        faction: mockFactionIndex,
         detachment: {
           name: 'Test Detachment',
           abilities: [],
@@ -43,13 +45,22 @@ describe('rosterReducer', () => {
 
   describe('CREATE_ROSTER', () => {
     it('should create a new roster with provided data', () => {
+      const mockDetachment: depot.Detachment = {
+        name: 'Test Detachment',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      };
+
       const action: RosterAction = {
         type: 'CREATE_ROSTER',
         payload: {
           id: 'new-roster-id',
           name: 'New Roster',
           factionId: 'CHAOS',
-          maxPoints: 1500
+          faction: { ...mockFactionIndex, id: 'CHAOS', name: 'Chaos Space Marines' },
+          maxPoints: 1500,
+          detachment: mockDetachment
         }
       };
 
@@ -60,6 +71,8 @@ describe('rosterReducer', () => {
         id: 'new-roster-id',
         name: 'New Roster',
         factionId: 'CHAOS',
+        faction: { ...mockFactionIndex, id: 'CHAOS', name: 'Chaos Space Marines' },
+        detachment: mockDetachment,
         points: {
           current: 0,
           max: 1500
@@ -69,24 +82,28 @@ describe('rosterReducer', () => {
     });
 
     it('should preserve initial detachment structure', () => {
+      const mockDetachment: depot.Detachment = {
+        name: 'Combat Patrol',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      };
+
       const action: RosterAction = {
         type: 'CREATE_ROSTER',
         payload: {
           id: 'roster-id',
           name: 'Test',
           factionId: 'SM',
-          maxPoints: 2000
+          faction: mockFactionIndex,
+          maxPoints: 2000,
+          detachment: mockDetachment
         }
       };
 
       const result = rosterReducer(initialState, action);
 
-      expect(result.detachment).toEqual({
-        name: '',
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      });
+      expect(result.detachment).toEqual(mockDetachment);
     });
   });
 
@@ -167,7 +184,14 @@ describe('rosterReducer', () => {
         { type: 'SET_ROSTER', payload: { ...initialState, name: 'New Name' } },
         {
           type: 'CREATE_ROSTER',
-          payload: { id: 'id', name: 'name', factionId: 'SM', maxPoints: 2000 }
+          payload: {
+            id: 'id',
+            name: 'name',
+            factionId: 'SM',
+            faction: mockFactionIndex,
+            maxPoints: 2000,
+            detachment: { name: 'Test', abilities: [], enhancements: [], stratagems: [] }
+          }
         },
         {
           type: 'SET_DETACHMENT',

@@ -224,7 +224,7 @@ export const mockFaction: depot.Faction = {
   detachmentAbilities: [mockDetachmentAbility]
 };
 
-export const mockFactionIndex: depot.Index[] = [
+export const mockFactionIndexes: depot.Index[] = [
   { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' },
   { id: 'IG', name: 'Astra Militarum', path: '/data/ig.json' }
@@ -303,10 +303,21 @@ export const mockRosterUnit: depot.RosterUnit = {
   selectedWargear: []
 };
 
+export const mockFactionIndex: depot.Index = {
+  id: 'SM',
+  name: 'Space Marines',
+  path: 'SM.json',
+  datasheetCount: 50,
+  stratagemCount: 12,
+  enhancementCount: 8,
+  detachmentCount: 4
+};
+
 export const mockRoster: depot.Roster = {
   id: 'test-roster-1',
   name: 'Test Space Marines Roster',
   factionId: 'SM',
+  faction: mockFactionIndex,
   detachment: mockDetachment,
   points: {
     current: 80,

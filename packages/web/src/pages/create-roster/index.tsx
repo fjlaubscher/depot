@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useFactions from '@/hooks/use-factions';
+import useFaction from '@/hooks/use-faction';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { depot } from '@depot/core';
+
+import { groupFactionDataByDetachment } from '@/utils/faction';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
@@ -13,14 +16,48 @@ import { FieldSkeleton } from '@/components/ui/skeleton';
 const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const { createRoster } = useRoster();
-  const { factions, loading: factionsLoading } = useFactions();
   const { showToast } = useToast();
 
   const [name, setName] = useState('');
   const [factionId, setFactionId] = useState<string | null>(null);
+  const [detachmentName, setDetachmentName] = useState<string | null>(null);
   const [maxPoints, setMaxPoints] = useState(2000);
 
+  const { factions, loading: factionsLoading } = useFactions();
+  const { data: selectedFaction, loading: factionLoading } = useFaction(factionId || undefined);
+
   const factionOptions = factions?.map((f) => ({ value: f.id, label: f.name })) || [];
+
+  // Group detachment data from selected faction
+  const detachmentsData = useMemo(() => {
+    if (
+      !selectedFaction?.detachmentAbilities ||
+      !selectedFaction?.enhancements ||
+      !selectedFaction?.stratagems
+    ) {
+      return {};
+    }
+
+    return groupFactionDataByDetachment(
+      selectedFaction.detachmentAbilities,
+      selectedFaction.enhancements,
+      selectedFaction.stratagems
+    );
+  }, [selectedFaction]);
+
+  // Create detachment options from grouped data
+  const detachmentOptions = useMemo(() => {
+    return Object.keys(detachmentsData)
+      .sort()
+      .map((name) => ({ value: name, label: name }));
+  }, [detachmentsData]);
+
+  // Reset detachment when faction changes
+  useEffect(() => {
+    if (factionId && detachmentName) {
+      setDetachmentName(null);
+    }
+  }, [factionId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +77,14 @@ const CreateRoster: React.FC = () => {
       });
       return;
     }
+    if (!detachmentName) {
+      showToast({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Please select a detachment.'
+      });
+      return;
+    }
     if (maxPoints <= 0) {
       showToast({
         type: 'error',
@@ -49,7 +94,42 @@ const CreateRoster: React.FC = () => {
       return;
     }
 
-    const newId = createRoster({ name: name.trim(), factionId, maxPoints });
+    // Build the complete detachment object using lookup
+    const selectedDetachmentData = detachmentsData[detachmentName];
+    if (!selectedDetachmentData) {
+      showToast({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Selected detachment not found.'
+      });
+      return;
+    }
+
+    const detachment: depot.Detachment = {
+      name: detachmentName,
+      abilities: selectedDetachmentData.abilities,
+      enhancements: selectedDetachmentData.enhancements,
+      stratagems: selectedDetachmentData.stratagems
+    };
+
+    // Find the faction Index entry
+    const selectedFactionIndex = factions?.find((f) => f.id === factionId);
+    if (!selectedFactionIndex) {
+      showToast({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Selected faction not found.'
+      });
+      return;
+    }
+
+    const newId = createRoster({
+      name: name.trim(),
+      factionId,
+      faction: selectedFactionIndex,
+      maxPoints,
+      detachment
+    });
     navigate(`/rosters/${newId}`);
   };
 
@@ -91,6 +171,29 @@ const CreateRoster: React.FC = () => {
               />
             )}
 
+            {factionLoading ? (
+              <FieldSkeleton />
+            ) : factionId && detachmentOptions.length > 0 ? (
+              <SelectField
+                data-testid="detachment-field"
+                label="Detachment"
+                options={detachmentOptions}
+                value={detachmentName || ''}
+                onChange={(e) => setDetachmentName(e.target.value || null)}
+                placeholder="Select a Detachment"
+                required
+              />
+            ) : factionId ? (
+              <Field>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Detachment
+                </label>
+                <div className="text-sm text-gray-500 dark:text-gray-400 italic">
+                  No detachments available for this faction
+                </div>
+              </Field>
+            ) : null}
+
             <Field data-testid="max-points-field">
               <label
                 htmlFor="max-points"
@@ -120,7 +223,9 @@ const CreateRoster: React.FC = () => {
               <Button
                 data-testid="submit-button"
                 type="submit"
-                disabled={!name || !factionId || factionsLoading}
+                disabled={
+                  !name || !factionId || !detachmentName || factionsLoading || factionLoading
+                }
               >
                 Create Roster
               </Button>

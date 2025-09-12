@@ -6,7 +6,14 @@ export type RosterAction =
   | { type: 'SET_ROSTER'; payload: depot.Roster }
   | {
       type: 'CREATE_ROSTER';
-      payload: { id: string; factionId: string; maxPoints: number; name: string };
+      payload: {
+        id: string;
+        factionId: string;
+        faction: depot.Index;
+        maxPoints: number;
+        name: string;
+        detachment: depot.Detachment;
+      };
     }
   | { type: 'SET_DETACHMENT'; payload: depot.Detachment }
   | { type: 'ADD_UNIT'; payload: { datasheet: depot.Datasheet; modelCost: depot.ModelCost } }
@@ -19,7 +26,13 @@ export type RosterAction =
 
 export interface RosterContextValue {
   state: RosterState;
-  createRoster: (payload: { factionId: string; maxPoints: number; name: string }) => string;
+  createRoster: (payload: {
+    factionId: string;
+    faction: depot.Index;
+    maxPoints: number;
+    name: string;
+    detachment: depot.Detachment;
+  }) => string;
   setDetachment: (detachment: depot.Detachment) => void;
   addUnit: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
   duplicateUnit: (unit: depot.RosterUnit) => void;

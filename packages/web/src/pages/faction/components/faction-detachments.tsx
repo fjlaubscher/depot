@@ -9,6 +9,9 @@ import DetachmentSection from './detachment-section';
 // Hooks
 import useDebounce from '@/hooks/use-debounce';
 
+// Utils
+import { groupFactionDataByDetachment } from '@/utils/faction';
+
 interface FactionDetachmentsProps {
   detachmentAbilities: depot.DetachmentAbility[];
   enhancements: depot.Enhancement[];
@@ -25,44 +28,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({
 
   // Get all unique detachments from all data sources
   const detachmentsByName = useMemo(() => {
-    const detachmentNames = new Set<string>();
-
-    detachmentAbilities.forEach((ability) => detachmentNames.add(ability.detachment));
-    enhancements.forEach((enhancement) => detachmentNames.add(enhancement.detachment));
-    stratagems.forEach((stratagem) => detachmentNames.add(stratagem.detachment));
-
-    const detachments: Record<
-      string,
-      {
-        abilities: depot.DetachmentAbility[];
-        enhancements: depot.Enhancement[];
-        stratagems: depot.Stratagem[];
-      }
-    > = {};
-
-    // Initialize each detachment
-    detachmentNames.forEach((name) => {
-      detachments[name] = {
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      };
-    });
-
-    // Group data by detachment
-    detachmentAbilities.forEach((ability) => {
-      detachments[ability.detachment].abilities.push(ability);
-    });
-
-    enhancements.forEach((enhancement) => {
-      detachments[enhancement.detachment].enhancements.push(enhancement);
-    });
-
-    stratagems.forEach((stratagem) => {
-      detachments[stratagem.detachment].stratagems.push(stratagem);
-    });
-
-    return detachments;
+    return groupFactionDataByDetachment(detachmentAbilities, enhancements, stratagems);
   }, [detachmentAbilities, enhancements, stratagems]);
 
   // Filter detachments by name query

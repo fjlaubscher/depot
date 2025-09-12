@@ -22,7 +22,22 @@ const TestComponent = ({ rosterId }: { rosterId?: string }) => {
     const newId = createRoster({
       name: 'Test Roster',
       factionId: 'SM',
-      maxPoints: 2000
+      faction: {
+        id: 'SM',
+        name: 'Space Marines',
+        path: 'SM.json',
+        datasheetCount: 50,
+        stratagemCount: 12,
+        enhancementCount: 8,
+        detachmentCount: 4
+      },
+      maxPoints: 2000,
+      detachment: {
+        name: 'Test Detachment',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      }
     });
     return newId;
   };
@@ -31,7 +46,7 @@ const TestComponent = ({ rosterId }: { rosterId?: string }) => {
     <div>
       <div data-testid="roster-id">{state.id}</div>
       <div data-testid="roster-name">{state.name}</div>
-      <div data-testid="roster-faction">{state.factionId}</div>
+      <div data-testid="roster-faction">{state.faction.name}</div>
       <div data-testid="roster-points">
         {state.points.current}/{state.points.max}
       </div>
@@ -87,7 +102,7 @@ describe('RosterProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('roster-id')).toHaveTextContent('test-roster-id');
       expect(screen.getByTestId('roster-name')).toHaveTextContent('Test Roster');
-      expect(screen.getByTestId('roster-faction')).toHaveTextContent('SM');
+      expect(screen.getByTestId('roster-faction')).toHaveTextContent('Space Marines');
       expect(screen.getByTestId('roster-points')).toHaveTextContent('500/2000');
     });
 
@@ -130,7 +145,7 @@ describe('RosterProvider', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('roster-name')).toHaveTextContent('Test Roster');
-      expect(screen.getByTestId('roster-faction')).toHaveTextContent('SM');
+      expect(screen.getByTestId('roster-faction')).toHaveTextContent('Space Marines');
       expect(screen.getByTestId('roster-points')).toHaveTextContent('0/2000');
     });
 

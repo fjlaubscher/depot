@@ -41,7 +41,13 @@ export const RosterProvider: React.FC<RosterProviderProps> = ({ children, roster
   }, [state]);
 
   const createRoster = useCallback(
-    (payload: { factionId: string; maxPoints: number; name: string }): string => {
+    (payload: {
+      factionId: string;
+      faction: depot.Index;
+      maxPoints: number;
+      name: string;
+      detachment: depot.Detachment;
+    }): string => {
       const newId = crypto.randomUUID();
       dispatch({ type: 'CREATE_ROSTER', payload: { ...payload, id: newId } });
       return newId;

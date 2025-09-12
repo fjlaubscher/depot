@@ -334,6 +334,15 @@ describe('OfflineStorage', () => {
       id: 'test-roster',
       name: 'Test Roster',
       factionId: 'SM',
+      faction: {
+        id: 'SM',
+        name: 'Space Marines',
+        path: 'SM.json',
+        datasheetCount: 50,
+        stratagemCount: 12,
+        enhancementCount: 8,
+        detachmentCount: 4
+      },
       detachment: {
         name: 'Test Detachment',
         abilities: [],
