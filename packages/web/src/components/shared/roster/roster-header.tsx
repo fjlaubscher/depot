@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { depot } from '@depot/core';
-import { Stat } from '@/components/ui';
 
 interface RosterHeaderProps {
   roster: depot.Roster;
@@ -15,18 +14,18 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
         : 'text-green-500 dark:text-green-400';
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-      <div className="flex justify-around items-center gap-4">
-        <Stat
-          title="Points"
-          value={
-            <span className={pointsColor}>
-              {roster.points.current} / {roster.points.max}
-            </span>
-          }
-        />
-        <Stat title="Units" value={roster.units.length.toString()} />
-        <Stat title="Enhancements" value={roster.enhancements.length.toString()} />
+    <div className="flex items-center gap-4 text-sm">
+      <div className="flex items-center gap-2">
+        <span className="text-gray-500 dark:text-gray-400">Points</span>
+        <span className={`font-semibold ${pointsColor}`}>
+          {roster.points.current} / {roster.points.max}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-gray-500 dark:text-gray-400">Enhancements</span>
+        <span className="font-semibold text-gray-900 dark:text-white">
+          {roster.enhancements.length}
+        </span>
       </div>
     </div>
   );

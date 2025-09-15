@@ -14,6 +14,7 @@ export { default as LinkCard } from './link-card';
 export { default as Loader } from './loader';
 export { default as NavigationButton } from './navigation-button';
 export { default as PageHeader } from './page-header';
+export { default as PointsTag } from './points-tag';
 export { default as Search } from './search';
 export { default as SelectField } from './select-field';
 export { Skeleton, SkeletonCard, SkeletonText, PageHeaderSkeleton, TabsSkeleton } from './skeleton';

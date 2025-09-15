@@ -12,8 +12,8 @@ export interface UseRosterUnitSelectionResult {
   totalSelectedPoints: number;
   addToSelection: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
   removeFromSelection: (unitId: string) => void;
-  toggleSelection: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
-  isUnitSelected: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => boolean;
+  removeLatestUnit: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
+  getUnitCount: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => number;
   clearSelection: () => void;
   hasSelection: boolean;
 }
@@ -28,13 +28,13 @@ export const useRosterUnitSelection = (): UseRosterUnitSelectionResult => {
     );
   }, [selectedUnits]);
 
-  const generateUnitId = useCallback((datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-    return `${datasheet.id}-${modelCost.cost}-${modelCost.description}`;
+  const generateUnitId = useCallback(() => {
+    return `unit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }, []);
 
   const addToSelection = useCallback(
     (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      const unitId = generateUnitId(datasheet, modelCost);
+      const unitId = generateUnitId();
       const newUnit: SelectedUnit = {
         datasheet,
         modelCost,
@@ -50,26 +50,34 @@ export const useRosterUnitSelection = (): UseRosterUnitSelectionResult => {
     setSelectedUnits((prev) => prev.filter((unit) => unit.id !== unitId));
   }, []);
 
-  const toggleSelection = useCallback(
-    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      const unitId = generateUnitId(datasheet, modelCost);
-      const existingIndex = selectedUnits.findIndex((unit) => unit.id === unitId);
+  const removeLatestUnit = useCallback((datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
+    setSelectedUnits((prev) => {
+      // Find the last unit that matches the datasheet and model cost
+      const matchingUnits = prev.filter(
+        (unit) =>
+          unit.datasheet.id === datasheet.id &&
+          unit.modelCost.cost === modelCost.cost &&
+          unit.modelCost.description === modelCost.description
+      );
 
-      if (existingIndex >= 0) {
-        removeFromSelection(unitId);
-      } else {
-        addToSelection(datasheet, modelCost);
-      }
-    },
-    [selectedUnits, generateUnitId, addToSelection, removeFromSelection]
-  );
+      if (matchingUnits.length === 0) return prev;
 
-  const isUnitSelected = useCallback(
+      // Remove the last matching unit
+      const lastMatchingUnit = matchingUnits[matchingUnits.length - 1];
+      return prev.filter((unit) => unit.id !== lastMatchingUnit.id);
+    });
+  }, []);
+
+  const getUnitCount = useCallback(
     (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      const unitId = generateUnitId(datasheet, modelCost);
-      return selectedUnits.some((unit) => unit.id === unitId);
+      return selectedUnits.filter(
+        (unit) =>
+          unit.datasheet.id === datasheet.id &&
+          unit.modelCost.cost === modelCost.cost &&
+          unit.modelCost.description === modelCost.description
+      ).length;
     },
-    [selectedUnits, generateUnitId]
+    [selectedUnits]
   );
 
   const clearSelection = useCallback(() => {
@@ -85,8 +93,8 @@ export const useRosterUnitSelection = (): UseRosterUnitSelectionResult => {
     totalSelectedPoints,
     addToSelection,
     removeFromSelection,
-    toggleSelection,
-    isUnitSelected,
+    removeLatestUnit,
+    getUnitCount,
     clearSelection,
     hasSelection
   };

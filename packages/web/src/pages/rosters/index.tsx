@@ -3,16 +3,37 @@ import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
+import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, LinkCard, Loader, ErrorState } from '@/components/ui';
+import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import { RosterCard } from './components/roster-card';
 
 const Rosters: React.FC = () => {
   const navigate = useNavigate();
-  const { rosters, loading, error } = useRosters();
+  const { rosters, loading, error, deleteRoster } = useRosters();
+  const { showToast } = useToast();
 
   const handleCreate = () => {
     navigate('/rosters/create');
+  };
+
+  const handleDeleteRoster = async (rosterId: string) => {
+    try {
+      await deleteRoster(rosterId);
+      showToast({
+        type: 'success',
+        title: 'Roster Deleted',
+        message: 'The roster has been successfully deleted.'
+      });
+    } catch (error) {
+      console.error('Failed to delete roster:', error);
+      showToast({
+        type: 'error',
+        title: 'Delete Failed',
+        message: 'Failed to delete the roster. Please try again.'
+      });
+    }
   };
 
   if (loading) {
@@ -78,17 +99,7 @@ const Rosters: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {rosters.map((roster) => (
-              <LinkCard
-                key={roster.id}
-                to={roster.points.current ? `/rosters/${roster.id}/edit` : `/rosters/${roster.id}`}
-              >
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    {roster.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{`${roster.points.current} / ${roster.points.max} pts`}</p>
-                </div>
-              </LinkCard>
+              <RosterCard key={roster.id} roster={roster} onDelete={handleDeleteRoster} />
             ))}
           </div>
         )}

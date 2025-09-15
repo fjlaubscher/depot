@@ -250,7 +250,7 @@ describe('CreateRoster', () => {
       maxPoints: 1500,
       detachment: expect.any(Object)
     });
-    expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id');
+    expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id/edit');
   });
 
   it('navigates back to rosters list when cancel is clicked', async () => {

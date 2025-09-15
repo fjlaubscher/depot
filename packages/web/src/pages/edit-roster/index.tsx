@@ -66,14 +66,13 @@ const RosterView: React.FC = () => {
       <PageHeader
         title={roster.name}
         subtitle={subtitle}
+        stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Eye size={16} />,
           onClick: handleViewRoster,
           ariaLabel: 'View roster'
         }}
       />
-
-      <RosterHeader roster={roster} />
 
       <Button onClick={handleAddUnits} className="w-full flex items-center gap-2">
         <Plus size={16} />

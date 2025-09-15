@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil, Share, Download, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Pencil, Share, Download } from 'lucide-react';
 import { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
@@ -10,42 +10,9 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
+import { RosterHeader } from '@/components/shared/roster';
 import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
-import UnitDetails from './components/unit-details';
-
-const ViewRosterUnitCard: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
-
-  return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-      {/* Collapsed Header - Always Visible */}
-      <div
-        className="flex items-center justify-between py-3 px-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex flex-col gap-1">
-          <div className="text-base font-medium text-gray-900 dark:text-white">
-            {unit.datasheet.name}
-          </div>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {unit.modelCost.description}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
-            {unitPoints} pts
-          </span>
-          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </div>
-      </div>
-
-      {/* Expanded Details - Game Stats */}
-      {isExpanded && <UnitDetails unit={unit} />}
-    </div>
-  );
-};
+import ViewRosterUnitCard from './components/view-roster-unit-card';
 
 const RosterView: React.FC = () => {
   const { state: roster } = useRoster();
@@ -106,15 +73,8 @@ const RosterView: React.FC = () => {
       ? `${factionName} • ${roster.detachment.name}`
       : factionName || roster.factionId;
 
-  const pointsColor =
-    roster.points.current > roster.points.max
-      ? 'text-red-600 dark:text-red-400'
-      : roster.points.current === roster.points.max
-        ? 'text-yellow-600 dark:text-yellow-400'
-        : 'text-green-600 dark:text-green-400';
-
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Mobile Back Button */}
       <div className="md:hidden">
         <Link
@@ -140,6 +100,7 @@ const RosterView: React.FC = () => {
       <PageHeader
         title={roster.name}
         subtitle={subtitle}
+        stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/edit`),
@@ -147,26 +108,8 @@ const RosterView: React.FC = () => {
         }}
       />
 
-      {/* Stats Summary */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
-        <div className="flex justify-center gap-8">
-          <div className="text-center">
-            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Points</div>
-            <div className={`text-2xl font-bold ${pointsColor}`}>
-              {roster.points.current} / {roster.points.max}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Units</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">
-              {roster.units.length}
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Actions */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-4">
         <Button
           variant="secondary"
           onClick={handleExportMarkdown}
@@ -183,9 +126,9 @@ const RosterView: React.FC = () => {
 
       {/* Units List */}
       {roster.units.length > 0 ? (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {roleKeys.map((role) => (
-            <div key={role} className="flex flex-col gap-3">
+            <div key={role} className="flex flex-col gap-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {role.charAt(0).toUpperCase() + role.slice(1)} ({groupedUnits[role].length})
               </h3>

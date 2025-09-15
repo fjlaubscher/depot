@@ -1,14 +1,15 @@
 import React, { ReactNode } from 'react';
 import { depot } from '@depot/core';
-import { Search, Filters, CollapsibleSection } from '@/components/ui';
-import { useDatasheetSearch } from '@/hooks/use-datasheet-search';
+import { Search, Filters, CollapsibleSection, Grid, LinkCard } from '@/components/ui';
+import { useDatasheetSearch, DatasheetFilters } from '@/hooks/use-datasheet-search';
 
 interface DatasheetBrowserProps {
   datasheets: depot.Datasheet[];
-  renderDatasheet: (datasheet: depot.Datasheet) => ReactNode;
+  renderDatasheet?: (datasheet: depot.Datasheet) => ReactNode;
   searchPlaceholder?: string;
   emptyStateMessage?: string;
   showItemCount?: boolean;
+  filters?: DatasheetFilters;
 }
 
 export const DatasheetBrowser: React.FC<DatasheetBrowserProps> = ({
@@ -16,7 +17,8 @@ export const DatasheetBrowser: React.FC<DatasheetBrowserProps> = ({
   renderDatasheet,
   searchPlaceholder = 'Search datasheets...',
   emptyStateMessage = 'No datasheets found.',
-  showItemCount = true
+  showItemCount = true,
+  filters
 }) => {
   const {
     query,
@@ -26,7 +28,15 @@ export const DatasheetBrowser: React.FC<DatasheetBrowserProps> = ({
     sortedRoleKeys,
     shouldExpandSection,
     hasResults
-  } = useDatasheetSearch(datasheets);
+  } = useDatasheetSearch(datasheets, filters);
+
+  const defaultRenderDatasheet = (datasheet: depot.Datasheet) => (
+    <LinkCard to={`/faction/${datasheet.factionId}/datasheet/${datasheet.id}`}>
+      {datasheet.name}
+    </LinkCard>
+  );
+
+  const renderItem = renderDatasheet || defaultRenderDatasheet;
 
   return (
     <div className="flex flex-col gap-4">
@@ -52,14 +62,14 @@ export const DatasheetBrowser: React.FC<DatasheetBrowserProps> = ({
                     ? `${role.toUpperCase()} (${groupedDatasheets[role].length})`
                     : role.toUpperCase()
                 }
-                defaultExpanded={shouldExpandSection[role] || !debouncedQuery}
+                defaultExpanded={shouldExpandSection[role] || false}
                 className="border border-gray-200 dark:border-gray-700 rounded-lg"
               >
-                <div className="flex flex-col gap-2">
+                <Grid>
                   {groupedDatasheets[role].map((datasheet) => (
-                    <div key={datasheet.id}>{renderDatasheet(datasheet)}</div>
+                    <div key={datasheet.id}>{renderItem(datasheet)}</div>
                   ))}
-                </div>
+                </Grid>
               </CollapsibleSection>
             ) : null
           )}

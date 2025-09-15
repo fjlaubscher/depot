@@ -23,8 +23,9 @@ const AddRosterUnitsView: React.FC = () => {
   const {
     selectedUnits,
     totalSelectedPoints,
-    toggleSelection,
-    isUnitSelected,
+    addToSelection,
+    removeLatestUnit,
+    getUnitCount,
     clearSelection,
     hasSelection
   } = useRosterUnitSelection();
@@ -130,12 +131,7 @@ const AddRosterUnitsView: React.FC = () => {
         searchPlaceholder="Search by unit name..."
         emptyStateMessage="No units available for this faction."
         renderDatasheet={(datasheet) => (
-          <DatasheetSelectionCard
-            datasheet={datasheet}
-            onSelect={toggleSelection}
-            isSelected={isUnitSelected}
-            showSelectionState={true}
-          />
+          <DatasheetSelectionCard datasheet={datasheet} onAdd={addToSelection} />
         )}
       />
     </div>

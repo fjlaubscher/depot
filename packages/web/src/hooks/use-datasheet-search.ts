@@ -3,6 +3,11 @@ import { depot } from '@depot/core';
 import { groupDatasheetsByRole } from '@/utils/datasheet';
 import useDebounce from './use-debounce';
 
+export interface DatasheetFilters {
+  showLegends?: boolean;
+  showForgeWorld?: boolean;
+}
+
 export interface UseDatasheetSearchResult {
   query: string;
   setQuery: (query: string) => void;
@@ -15,18 +20,34 @@ export interface UseDatasheetSearchResult {
 
 export const useDatasheetSearch = (
   datasheets: depot.Datasheet[],
+  filters?: DatasheetFilters,
   debounceMs = 300
 ): UseDatasheetSearchResult => {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, debounceMs);
 
   const groupedDatasheets = useMemo(() => {
-    const filteredDatasheets = debouncedQuery
-      ? datasheets.filter((ds) => ds.name.toLowerCase().includes(debouncedQuery.toLowerCase()))
-      : datasheets;
+    let filteredDatasheets = datasheets;
+
+    // Apply settings filters
+    if (filters) {
+      if (filters.showLegends === false) {
+        filteredDatasheets = filteredDatasheets.filter((ds) => ds.isLegends === false);
+      }
+      if (filters.showForgeWorld === false) {
+        filteredDatasheets = filteredDatasheets.filter((ds) => ds.isForgeWorld === false);
+      }
+    }
+
+    // Apply search filter
+    filteredDatasheets = debouncedQuery
+      ? filteredDatasheets.filter((ds) =>
+          ds.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+        )
+      : filteredDatasheets;
 
     return groupDatasheetsByRole(filteredDatasheets);
-  }, [datasheets, debouncedQuery]);
+  }, [datasheets, filters, debouncedQuery]);
 
   const sortedRoleKeys = useMemo(() => {
     return Object.keys(groupedDatasheets).sort();

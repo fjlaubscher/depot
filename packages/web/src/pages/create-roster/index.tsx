@@ -130,7 +130,7 @@ const CreateRoster: React.FC = () => {
       maxPoints,
       detachment
     });
-    navigate(`/rosters/${newId}`);
+    navigate(`/rosters/${newId}/edit`);
   };
 
   return (
@@ -212,7 +212,7 @@ const CreateRoster: React.FC = () => {
               />
             </Field>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-4">
               <Button
                 data-testid="cancel-button"
                 variant="secondary"
