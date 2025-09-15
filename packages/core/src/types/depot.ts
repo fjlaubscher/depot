@@ -159,3 +159,34 @@ export interface Settings {
   showUnaligned?: boolean;
   showFluff?: boolean;
 }
+
+// Detachment, composed from other types
+export interface Detachment {
+  name: string;
+  abilities: DetachmentAbility[];
+  enhancements: Enhancement[];
+  stratagems: Stratagem[];
+}
+
+// Represents a single unit added to a roster, including its selected options and cost.
+export interface RosterUnit {
+  id: string; // A unique ID for this specific instance in the roster
+  datasheet: Datasheet;
+  modelCost: ModelCost; // The selected model/unit count and its point cost
+  selectedWargear: Wargear[];
+}
+
+// The main roster object that represents a user's army list.
+export interface Roster {
+  id: string; // A unique ID for this roster
+  name: string;
+  factionId: string;
+  faction?: Index; // Faction metadata from the index (name, path, counts, etc.)
+  detachment: Detachment;
+  points: {
+    current: number;
+    max: number;
+  };
+  units: RosterUnit[];
+  enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
+}

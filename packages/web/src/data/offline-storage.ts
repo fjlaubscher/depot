@@ -3,14 +3,15 @@ import { depot } from '@depot/core';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 2
+  VERSION: 3 // Increment version to trigger onupgradeneeded
 } as const;
 
 const STORES = {
   FACTION_INDEX: 'factionIndex',
   FACTIONS: 'factions',
   SETTINGS: 'settings',
-  USER_DATA: 'userData'
+  USER_DATA: 'userData',
+  ROSTERS: 'rosters'
 } as const;
 
 const KEYS = {
@@ -52,6 +53,11 @@ class OfflineStorage {
           // Create user data store for my-factions and other user preferences
           if (!db.objectStoreNames.contains(STORES.USER_DATA)) {
             db.createObjectStore(STORES.USER_DATA);
+          }
+
+          // Create rosters store
+          if (!db.objectStoreNames.contains(STORES.ROSTERS)) {
+            db.createObjectStore(STORES.ROSTERS, { keyPath: 'id' });
           }
         };
       });
@@ -211,7 +217,6 @@ class OfflineStorage {
     }
   }
 
-  // Database Management
   // My Factions Operations
   async getMyFactions(): Promise<depot.Option[] | null> {
     try {
@@ -247,12 +252,81 @@ class OfflineStorage {
     }
   }
 
+  // Roster Operations
+  async saveRoster(roster: depot.Roster): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.ROSTERS], 'readwrite');
+      const store = transaction.objectStore(STORES.ROSTERS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.put(roster);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to save roster ${roster.id} in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async getRoster(rosterId: string): Promise<depot.Roster | null> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.ROSTERS], 'readonly');
+      const store = transaction.objectStore(STORES.ROSTERS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.get(rosterId);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to get roster ${rosterId} from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async getAllRosters(): Promise<depot.Roster[]> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.ROSTERS], 'readonly');
+      const store = transaction.objectStore(STORES.ROSTERS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to get all rosters from IndexedDB:', error);
+      return [];
+    }
+  }
+
+  async deleteRoster(rosterId: string): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.ROSTERS], 'readwrite');
+      const store = transaction.objectStore(STORES.ROSTERS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.delete(rosterId);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to delete roster ${rosterId} from IndexedDB:`, error);
+      throw error;
+    }
+  }
+
   // Database Management
   async clearAllData(): Promise<void> {
     try {
       const db = await this.getDB();
       const transaction = db.transaction(
-        [STORES.FACTION_INDEX, STORES.FACTIONS, STORES.SETTINGS, STORES.USER_DATA],
+        [STORES.FACTION_INDEX, STORES.FACTIONS, STORES.SETTINGS, STORES.USER_DATA, STORES.ROSTERS],
         'readwrite'
       );
 
@@ -274,6 +348,11 @@ class OfflineStorage {
         }),
         new Promise<void>((resolve, reject) => {
           const request = transaction.objectStore(STORES.USER_DATA).clear();
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        }),
+        new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore(STORES.ROSTERS).clear();
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
         })

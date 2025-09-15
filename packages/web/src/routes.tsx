@@ -7,6 +7,12 @@ import Factions from './pages/factions';
 import Faction from './pages/faction';
 import Datasheet from './pages/datasheet';
 import Settings from './pages/settings';
+import Rosters from './pages/rosters';
+import CreateRoster from './pages/create-roster';
+import EditRoster from './pages/edit-roster';
+import ViewRoster from './pages/view-roster';
+import AddRosterUnits from './pages/add-roster-units';
+import EditRosterUnit from './pages/edit-roster-unit';
 
 const AppRoutes = () => (
   <Routes>
@@ -16,6 +22,12 @@ const AppRoutes = () => (
     <Route path="/faction/:id" element={<Faction />} />
     <Route path="/faction/:factionId/datasheet/:id" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
+    <Route path="/rosters" element={<Rosters />} />
+    <Route path="/rosters/:rosterId/edit" element={<EditRoster />} />
+    <Route path="/rosters/:rosterId/add-units" element={<AddRosterUnits />} />
+    <Route path="/rosters/:rosterId/units/:unitId/edit" element={<EditRosterUnit />} />
+    <Route path="/rosters/:rosterId" element={<ViewRoster />} />
+    <Route path="/rosters/create" element={<CreateRoster />} />
 
     {/* Catch all */}
     <Route path="*" element={<NotFound />} />

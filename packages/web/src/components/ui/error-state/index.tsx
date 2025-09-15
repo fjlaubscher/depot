@@ -27,6 +27,7 @@ const ErrorState: FC<ErrorStateProps> = ({
 }) => {
   return (
     <div
+      data-testid="error-state"
       className={`flex flex-col items-center justify-center min-h-[400px] text-center px-4 gap-4 ${className}`}
       {...props}
     >

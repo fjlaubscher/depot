@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronDown, ChevronRight, Users, Settings, Star } from 'lucide-react';
-import { Layout } from '../ui';
-import { depot } from '@depot/core';
+import { Home, ChevronDown, ChevronRight, Users, Settings, Star, List } from 'lucide-react';
+
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
+
+import { Layout } from '../ui';
 
 interface Props {
   children: React.ReactNode;
@@ -36,6 +37,14 @@ const AppLayout = ({ children, title }: Props) => {
         >
           <Users size={16} />
           <span>Factions</span>
+        </Link>
+        <Link
+          to="/rosters"
+          onClick={closeSidebar}
+          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+        >
+          <List size={16} />
+          <span>Rosters</span>
         </Link>
         <Link
           to="/settings"

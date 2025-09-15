@@ -224,7 +224,7 @@ export const mockFaction: depot.Faction = {
   detachmentAbilities: [mockDetachmentAbility]
 };
 
-export const mockFactionIndex: depot.Index[] = [
+export const mockFactionIndexes: depot.Index[] = [
   { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
   { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' },
   { id: 'IG', name: 'Astra Militarum', path: '/data/ig.json' }
@@ -283,4 +283,84 @@ export const mockEmptyFaction = createMockFaction({
   stratagems: [],
   enhancements: [],
   detachmentAbilities: []
+});
+
+/**
+ * Roster-related mock data
+ */
+
+export const mockDetachment: depot.Detachment = {
+  name: 'Gladius Task Force',
+  abilities: [mockDetachmentAbility],
+  enhancements: [mockEnhancement],
+  stratagems: [mockStratagem]
+};
+
+export const mockRosterUnit: depot.RosterUnit = {
+  id: 'roster-unit-1',
+  datasheet: mockDatasheet,
+  modelCost: mockDatasheet.modelCosts[0],
+  selectedWargear: []
+};
+
+export const mockFactionIndex: depot.Index = {
+  id: 'SM',
+  name: 'Space Marines',
+  path: 'SM.json',
+  datasheetCount: 50,
+  stratagemCount: 12,
+  enhancementCount: 8,
+  detachmentCount: 4
+};
+
+export const mockRoster: depot.Roster = {
+  id: 'test-roster-1',
+  name: 'Test Space Marines Roster',
+  factionId: 'SM',
+  faction: mockFactionIndex,
+  detachment: mockDetachment,
+  points: {
+    current: 80,
+    max: 2000
+  },
+  units: [mockRosterUnit],
+  enhancements: []
+};
+
+export const createMockDetachment = (
+  overrides: Partial<depot.Detachment> = {}
+): depot.Detachment => ({
+  ...mockDetachment,
+  ...overrides
+});
+
+export const createMockRosterUnit = (
+  overrides: Partial<depot.RosterUnit> = {}
+): depot.RosterUnit => ({
+  ...mockRosterUnit,
+  ...overrides
+});
+
+export const createMockRoster = (overrides: Partial<depot.Roster> = {}): depot.Roster => ({
+  ...mockRoster,
+  ...overrides
+});
+
+/**
+ * Common roster test data variations
+ */
+
+export const mockEmptyRoster = createMockRoster({
+  id: 'empty-roster',
+  name: 'Empty Roster',
+  points: { current: 0, max: 2000 },
+  units: [],
+  enhancements: []
+});
+
+export const mockFullRoster = createMockRoster({
+  id: 'full-roster',
+  name: 'Full Roster',
+  points: { current: 2000, max: 2000 },
+  units: [mockRosterUnit, createMockRosterUnit({ id: 'roster-unit-2' })]
 });
