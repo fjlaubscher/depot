@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TestWrapper } from '@/test/test-utils';
-import { mockRoster } from '@/test/mock-data';
+import { createMockRosterUnit } from '@/test/mock-data';
 import ViewRosterPage from './index';
 
 // Mock AppLayout
@@ -24,6 +24,8 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+import { depot } from '@depot/core';
+
 // Mock RosterProvider and useRoster
 const mockRosterState = vi.hoisted(() => ({
   state: {
@@ -32,7 +34,7 @@ const mockRosterState = vi.hoisted(() => ({
     factionId: 'space-marines',
     faction: { id: 'space-marines', name: 'Space Marines' },
     detachment: { name: 'Gladius Task Force' },
-    units: [],
+    units: [] as depot.RosterUnit[],
     enhancements: [],
     points: { current: 0, max: 2000 }
   },
@@ -53,9 +55,7 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   state: {
-    factionIndex: [
-      { id: 'space-marines', name: 'Space Marines' }
-    ]
+    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }]
   }
 }));
 
@@ -145,13 +145,14 @@ describe('ViewRosterPage', () => {
   });
 
   it('displays units in sections by role', () => {
+    const mockUnit = createMockRosterUnit();
     // Mock roster with units and grouped units
     mockRosterState.state = {
       ...mockRosterState.state,
-      units: [{ id: 'unit-1', datasheet: { name: 'Test Unit' } }]
+      units: [mockUnit]
     };
     mockGroupRosterUnitsByRole.mockReturnValue({
-      HQ: [{ id: 'unit-1', datasheet: { name: 'Test Unit' } }]
+      HQ: [mockUnit]
     });
 
     render(<ViewRosterPage />, { wrapper: TestWrapper });
@@ -166,7 +167,9 @@ describe('ViewRosterPage', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('No units in this roster')).toBeInTheDocument();
-    expect(screen.getByText('Use the edit button to start building your roster')).toBeInTheDocument();
+    expect(
+      screen.getByText('Use the edit button to start building your roster')
+    ).toBeInTheDocument();
   });
 
   it('renders mobile back button', () => {

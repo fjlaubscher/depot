@@ -46,7 +46,7 @@ const TestComponent = ({ rosterId }: { rosterId?: string }) => {
     <div>
       <div data-testid="roster-id">{state.id}</div>
       <div data-testid="roster-name">{state.name}</div>
-      <div data-testid="roster-faction">{state.faction.name}</div>
+      <div data-testid="roster-faction">{state.faction?.name}</div>
       <div data-testid="roster-points">
         {state.points.current}/{state.points.max}
       </div>
@@ -80,7 +80,7 @@ describe('RosterProvider', () => {
 
     expect(screen.getByTestId('roster-id')).toHaveTextContent('');
     expect(screen.getByTestId('roster-name')).toHaveTextContent('');
-    expect(screen.getByTestId('roster-faction')).toHaveTextContent('');
+    expect(screen.getByTestId('roster-faction')).toBeEmptyDOMElement();
     expect(screen.getByTestId('roster-points')).toHaveTextContent('0/2000');
   });
 

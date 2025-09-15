@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { TestWrapper } from '@/test/test-utils';
-import { mockDatasheet } from '@/test/mock-data';
+import { createMockRosterUnit } from '@/test/mock-data';
 import AddRosterUnitsPage from './index';
 
 // Mock AppLayout
@@ -70,9 +70,11 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
   })
 }));
 
+import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
+
 // Mock useRosterUnitSelection hook
 const mockUnitSelection = vi.hoisted(() => ({
-  selectedUnits: [],
+  selectedUnits: [] as SelectedUnit[],
   totalSelectedPoints: 0,
   addToSelection: vi.fn(),
   removeLatestUnit: vi.fn(),
@@ -87,7 +89,10 @@ vi.mock('@/hooks/use-roster-unit-selection', () => ({
 
 // Mock DatasheetBrowser component
 vi.mock('@/components/shared/datasheet', () => ({
-  DatasheetBrowser: ({ datasheets, renderDatasheet }: {
+  DatasheetBrowser: ({
+    datasheets,
+    renderDatasheet
+  }: {
     datasheets: any[];
     renderDatasheet?: (datasheet: any) => React.ReactNode;
   }) => (
@@ -99,20 +104,19 @@ vi.mock('@/components/shared/datasheet', () => ({
       ))}
     </div>
   ),
-  DatasheetSelectionCard: ({ datasheet, onAdd }: {
+  DatasheetSelectionCard: ({
+    datasheet,
+    onAdd
+  }: {
     datasheet: any;
     onAdd: (datasheet: any, modelCost: any) => void;
   }) => (
     <div data-testid="datasheet-selection-card" data-datasheet-name={datasheet.name}>
       <span>{datasheet.name}</span>
-      <button onClick={() => onAdd(datasheet, datasheet.modelCosts[0])}>
-        Add
-      </button>
+      <button onClick={() => onAdd(datasheet, datasheet.modelCosts[0])}>Add</button>
     </div>
   )
 }));
-
-
 
 describe('AddRosterUnitsPage', () => {
   beforeEach(() => {
@@ -132,30 +136,38 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.totalSelectedPoints = 0;
   });
 
-  it('renders loading state when roster has no id', () => {
+  it('renders loading state when roster has no id', async () => {
     mockRosterContext.state = { ...mockRosterContext.state, id: '' };
 
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 
-  it('renders add roster units view with provider wrapper', () => {
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+  it('renders add roster units view with provider wrapper', async () => {
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.getByTestId('app-layout')).toBeInTheDocument();
     expect(screen.getByTestId('roster-provider')).toBeInTheDocument();
   });
 
-  it('displays roster header information', () => {
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+  it('displays roster header information', async () => {
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.getByText('Add Units')).toBeInTheDocument();
     expect(screen.getByText('Space Marines • Gladius Task Force')).toBeInTheDocument();
   });
 
-  it('renders page header with back navigation', () => {
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+  it('renders page header with back navigation', async () => {
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.getByTestId('page-header')).toBeInTheDocument();
     expect(screen.getByText('Add Units')).toBeInTheDocument();
@@ -169,53 +181,59 @@ describe('AddRosterUnitsPage', () => {
       faction: { id: 'space-marines', name: 'Space Marines' }
     };
 
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     // Wait for faction data to load and check for datasheet browser
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(screen.queryByTestId('datasheet-browser')).toBeInTheDocument();
     });
   });
 
-  
-
-  it('renders mobile back button', () => {
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+  it('renders mobile back button', async () => {
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     const editLink = screen.getByText('Back to Roster');
     expect(editLink.closest('a')).toHaveAttribute('href', '/rosters/test-roster-id/edit');
   });
 
-  it('shows unit selection summary when units are selected', () => {
+  it('shows unit selection summary when units are selected', async () => {
+    const mockUnit = createMockRosterUnit();
     mockUnitSelection.hasSelection = true;
-    mockUnitSelection.selectedUnits = [{
-      datasheet: { id: 'test-datasheet', name: 'Test Unit', modelCosts: [{ cost: '100', description: 'Test Model' }] },
-      modelCost: { cost: '100', description: 'Test Model' }
-    }];
+    mockUnitSelection.selectedUnits = [mockUnit];
     mockUnitSelection.totalSelectedPoints = 100;
 
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.getByText('1 unit selected')).toBeInTheDocument();
     expect(screen.getByText('Total: 100 pts')).toBeInTheDocument();
   });
 
-  it('hides unit selection summary when no units selected', () => {
+  it('hides unit selection summary when no units selected', async () => {
     mockUnitSelection.hasSelection = false;
 
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     expect(screen.queryByTestId('unit-selection-summary')).not.toBeInTheDocument();
   });
 
-  it('handles missing faction name gracefully', () => {
+  it('handles missing faction name gracefully', async () => {
     mockRosterContext.state = {
       ...mockRosterContext.state,
       id: 'test-roster-id',
-      faction: undefined
+      faction: { id: 'space-marines', name: '' }
     };
 
-    render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
 
     // Should fall back to faction ID
     expect(screen.getByText('space-marines')).toBeInTheDocument();

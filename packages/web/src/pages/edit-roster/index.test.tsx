@@ -54,9 +54,7 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   state: {
-    factionIndex: [
-      { id: 'space-marines', name: 'Space Marines' }
-    ]
+    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }]
   }
 }));
 
@@ -85,15 +83,23 @@ vi.mock('@/components/shared/roster', async () => {
   const actual = await vi.importActual('@/components/shared/roster');
   return {
     ...actual,
-    RosterUnitCardEdit: ({ unit, onDuplicate, onRemove }: {
+    RosterUnitCardEdit: ({
+      unit,
+      onDuplicate,
+      onRemove
+    }: {
       unit: any;
       onDuplicate: () => void;
       onRemove: () => void;
     }) => (
       <div data-testid="roster-unit-card-edit" data-unit-name={unit.datasheet.name}>
         <span>{unit.datasheet.name}</span>
-        <button onClick={onDuplicate} data-testid="duplicate-unit">Duplicate</button>
-        <button onClick={onRemove} data-testid="remove-unit">Remove</button>
+        <button onClick={onDuplicate} data-testid="duplicate-unit">
+          Duplicate
+        </button>
+        <button onClick={onRemove} data-testid="remove-unit">
+          Remove
+        </button>
       </div>
     )
   };

@@ -181,7 +181,7 @@ export interface Roster {
   id: string; // A unique ID for this roster
   name: string;
   factionId: string;
-  faction: Index; // Faction metadata from the index (name, path, counts, etc.)
+  faction?: Index; // Faction metadata from the index (name, path, counts, etc.)
   detachment: Detachment;
   points: {
     current: number;
