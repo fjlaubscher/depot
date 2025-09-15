@@ -6,6 +6,7 @@ import { groupRosterUnitsByRole } from '@/utils/roster';
 
 interface RosterUnitsListProps {
   units: depot.RosterUnit[];
+  rosterId: string;
   onRemoveUnit: (unitId: string) => void;
   onDuplicateUnit: (unit: depot.RosterUnit) => void;
   onUpdateUnitWargear?: (unitId: string, wargear: depot.Wargear[]) => void;
@@ -13,6 +14,7 @@ interface RosterUnitsListProps {
 
 const RosterUnitsList: React.FC<RosterUnitsListProps> = ({
   units,
+  rosterId,
   onRemoveUnit,
   onDuplicateUnit,
   onUpdateUnitWargear
@@ -52,6 +54,7 @@ const RosterUnitsList: React.FC<RosterUnitsListProps> = ({
                 <RosterUnitCard
                   key={unit.id}
                   unit={unit}
+                  rosterId={rosterId}
                   onRemove={onRemoveUnit}
                   onDuplicate={onDuplicateUnit}
                   onUpdateWargear={onUpdateUnitWargear}

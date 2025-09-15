@@ -81,6 +81,7 @@ const RosterView: React.FC = () => {
 
       <RosterUnitsList
         units={roster.units}
+        rosterId={roster.id}
         onRemoveUnit={removeUnit}
         onDuplicateUnit={duplicateUnit}
         onUpdateUnitWargear={updateUnitWargear}

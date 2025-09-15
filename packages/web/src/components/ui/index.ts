@@ -1,4 +1,5 @@
 // Core UI Components built with Tailwind CSS
+export { default as Alert } from './alert';
 export { default as Breadcrumbs } from './breadcrumbs';
 export { default as Button } from './button';
 export { default as Card } from './card';

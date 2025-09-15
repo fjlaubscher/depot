@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+import { Link } from 'react-router-dom';
 import { depot } from '@depot/core';
 import { Card, IconButton } from '@/components/ui';
-import { Trash2, Copy } from 'lucide-react';
+import { Trash2, Copy, Edit } from 'lucide-react';
 
 interface RosterUnitCardProps {
   unit: depot.RosterUnit;
+  rosterId: string;
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
   onUpdateWargear?: (unitId: string, wargear: depot.Wargear[]) => void;
@@ -12,6 +14,7 @@ interface RosterUnitCardProps {
 
 const RosterUnitCard: FC<RosterUnitCardProps> = ({
   unit,
+  rosterId,
   onRemove,
   onDuplicate,
   onUpdateWargear
@@ -27,6 +30,16 @@ const RosterUnitCard: FC<RosterUnitCardProps> = ({
           </h3>
 
           <div className="flex items-center gap-2">
+            <Link to={`/rosters/${rosterId}/units/${unit.id}/edit`}>
+              <IconButton
+                aria-label="Edit unit wargear and enhancements"
+                variant="ghost"
+                size="sm"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
+                <Edit size={16} />
+              </IconButton>
+            </Link>
             <IconButton
               onClick={() => onDuplicate(unit)}
               aria-label="Duplicate unit"
