@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { depot } from '@depot/core';
@@ -36,9 +36,9 @@ const EditRosterUnitView: React.FC = () => {
   const unit = roster.units.find((u) => u.id === unitId);
 
   // State for form values
-  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>(
-    unit?.selectedWargear || []
-  );
+  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>(() => {
+    return unit?.selectedWargear || [];
+  });
   const [selectedModelCost, setSelectedModelCost] = useState<depot.ModelCost | undefined>(
     unit?.modelCost
   );
@@ -46,6 +46,18 @@ const EditRosterUnitView: React.FC = () => {
     return roster.enhancements.filter((e) => e.unitId === unitId).map((e) => e.enhancement.id);
   });
   const [isWarlord, setIsWarlord] = useState(false); // TODO: Implement warlord tracking
+
+  // Sync state when unit data loads/changes
+  useEffect(() => {
+    if (unit) {
+      setSelectedWargear(unit.selectedWargear || []);
+      setSelectedModelCost(unit.modelCost);
+      const unitEnhancements = roster.enhancements
+        .filter((e) => e.unitId === unitId)
+        .map((e) => e.enhancement.id);
+      setSelectedEnhancements(unitEnhancements);
+    }
+  }, [unit, roster.enhancements, unitId]);
 
   // Loading state while roster loads
   if (!roster.id) {
@@ -204,19 +216,17 @@ const EditRosterUnitView: React.FC = () => {
         )}
 
         {/* Wargear Selection */}
-        <Card data-testid="wargear-section">
-          <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Wargear</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Select wargear options for this unit
-            </p>
-            <WargearSelection
-              unit={unit}
-              selectedWargear={selectedWargear}
-              onWargearChange={setSelectedWargear}
-            />
-          </div>
-        </Card>
+        <div className="flex flex-col gap-4" data-testid="wargear-section">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Wargear</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Select wargear options for this unit
+          </p>
+          <WargearSelection
+            unit={unit}
+            selectedWargear={selectedWargear}
+            onWargearChange={setSelectedWargear}
+          />
+        </div>
 
         {/* Enhancement Selection for Characters */}
         {isCharacter && (

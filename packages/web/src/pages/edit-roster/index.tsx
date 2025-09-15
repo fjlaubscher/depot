@@ -10,13 +10,16 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
-import { RosterHeader, RosterUnitsList } from '@/components/shared/roster';
-import { generateRosterMarkdown } from '@/utils/roster';
+import { RosterHeader, RosterSection, RosterUnitCardEdit } from '@/components/shared/roster';
+import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
 
 const RosterView: React.FC = () => {
   const { state: roster, duplicateUnit, removeUnit, updateUnitWargear } = useRoster();
   const { state: appState } = useAppContext();
   const navigate = useNavigate();
+
+  const groupedUnits = groupRosterUnitsByRole(roster.units);
+  const roleKeys = Object.keys(groupedUnits).sort();
 
   if (!roster.id) {
     return <Loader />;
@@ -79,13 +82,37 @@ const RosterView: React.FC = () => {
         Add Units to Roster
       </Button>
 
-      <RosterUnitsList
-        units={roster.units}
-        rosterId={roster.id}
-        onRemoveUnit={removeUnit}
-        onDuplicateUnit={duplicateUnit}
-        onUpdateUnitWargear={updateUnitWargear}
-      />
+      {/* Units List */}
+      {roster.units.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {roleKeys.map((role) => (
+            <RosterSection
+              key={role}
+              title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
+            >
+              {groupedUnits[role].map((unit) => (
+                <RosterUnitCardEdit
+                  key={unit.id}
+                  unit={unit}
+                  rosterId={roster.id}
+                  onRemove={removeUnit}
+                  onDuplicate={duplicateUnit}
+                  onUpdateWargear={updateUnitWargear}
+                />
+              ))}
+            </RosterSection>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+          <div className="flex flex-col gap-2">
+            <p className="text-gray-500 dark:text-gray-400 text-lg">No units added yet</p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm">
+              Use the "Add Units to Roster" button to start building your roster
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

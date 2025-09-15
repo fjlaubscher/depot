@@ -10,7 +10,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
-import { RosterHeader } from '@/components/shared/roster';
+import { RosterHeader, RosterSection } from '@/components/shared/roster';
 import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
@@ -128,16 +128,14 @@ const RosterView: React.FC = () => {
       {roster.units.length > 0 ? (
         <div className="flex flex-col gap-4">
           {roleKeys.map((role) => (
-            <div key={role} className="flex flex-col gap-2">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {role.charAt(0).toUpperCase() + role.slice(1)} ({groupedUnits[role].length})
-              </h3>
-              <div className="flex flex-col gap-2">
-                {groupedUnits[role].map((unit) => (
-                  <ViewRosterUnitCard key={unit.id} unit={unit} />
-                ))}
-              </div>
-            </div>
+            <RosterSection
+              key={role}
+              title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
+            >
+              {groupedUnits[role].map((unit) => (
+                <ViewRosterUnitCard key={unit.id} unit={unit} />
+              ))}
+            </RosterSection>
           ))}
         </div>
       ) : (

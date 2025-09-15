@@ -19,6 +19,7 @@ const AddRosterUnitsView: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [factionData, setFactionData] = useState<depot.Faction | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const {
     selectedUnits,

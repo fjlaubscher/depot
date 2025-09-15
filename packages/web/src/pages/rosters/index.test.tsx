@@ -97,7 +97,7 @@ describe('Rosters', () => {
     render(<Rosters />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('rosters-grid')).toBeInTheDocument();
-    expect(screen.getAllByTestId('link-card')).toHaveLength(2);
+    expect(screen.getAllByTestId('roster-card')).toHaveLength(2);
   });
 
   it('navigates to create roster page when create button is clicked', async () => {
@@ -110,7 +110,7 @@ describe('Rosters', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/rosters/create');
   });
 
-  it('creates LinkCards with correct routes for each roster', () => {
+  it('creates RosterCards with correct data for each roster', () => {
     const testRosters = [
       createMockRoster({ id: 'roster-1', name: 'Test Roster 1' }),
       createMockRoster({ id: 'roster-2', name: 'Test Roster 2' })
@@ -120,8 +120,8 @@ describe('Rosters', () => {
 
     render(<Rosters />, { wrapper: TestWrapper });
 
-    const linkCards = screen.getAllByTestId('link-card');
-    expect(linkCards).toHaveLength(2);
+    const rosterCards = screen.getAllByTestId('roster-card');
+    expect(rosterCards).toHaveLength(2);
   });
 
   it('displays single roster correctly', () => {
@@ -135,7 +135,7 @@ describe('Rosters', () => {
     render(<Rosters />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('rosters-grid')).toBeInTheDocument();
-    expect(screen.getAllByTestId('link-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('roster-card')).toHaveLength(1);
   });
 
   it('handles multiple rosters correctly', () => {
@@ -149,7 +149,7 @@ describe('Rosters', () => {
 
     render(<Rosters />, { wrapper: TestWrapper });
 
-    expect(screen.getAllByTestId('link-card')).toHaveLength(3);
+    expect(screen.getAllByTestId('roster-card')).toHaveLength(3);
   });
 
   it('maintains create button accessibility in all states', () => {

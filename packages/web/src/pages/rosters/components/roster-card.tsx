@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
 import { Edit, Trash2, Eye } from 'lucide-react';
-import { Card, IconButton, PointsTag } from '@/components/ui';
+import { Card, ActionGroup, PointsTag } from '@/components/ui';
 
 interface RosterCardProps {
   roster: depot.Roster;
@@ -63,37 +63,30 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
         <div className="flex justify-between items-center">
           <PointsTag points={roster.points.current} maxPoints={roster.points.max} />
 
-          <div className="flex items-center gap-2">
-            <IconButton
-              onClick={handleView}
-              aria-label="View roster"
-              variant="ghost"
-              size="sm"
-              className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <Eye size={16} />
-            </IconButton>
-            <IconButton
-              onClick={handleEdit}
-              aria-label="Edit roster"
-              variant="ghost"
-              size="sm"
-              className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-            >
-              <Edit size={16} />
-            </IconButton>
-            <IconButton
-              onClick={handleDelete}
-              disabled={isDeleting}
-              aria-label="Delete roster"
-              variant="ghost"
-              size="sm"
-              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-              data-testid="delete-roster-button"
-            >
-              <Trash2 size={16} />
-            </IconButton>
-          </div>
+          <ActionGroup
+            actions={[
+              {
+                icon: <Eye size={16} />,
+                onClick: handleView,
+                ariaLabel: 'View roster',
+                variant: 'primary'
+              },
+              {
+                icon: <Edit size={16} />,
+                onClick: handleEdit,
+                ariaLabel: 'Edit roster',
+                variant: 'secondary'
+              },
+              {
+                icon: <Trash2 size={16} />,
+                onClick: handleDelete,
+                ariaLabel: 'Delete roster',
+                variant: 'danger',
+                disabled: isDeleting,
+                'data-testid': 'delete-roster-button'
+              }
+            ]}
+          />
         </div>
       </div>
     </Card>
