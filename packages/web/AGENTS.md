@@ -1,123 +1,67 @@
-# AGENTS.md
+# Web Package
 
-This file provides guidance to Agents when working with the @depot/web package.
+React PWA that displays Warhammer 40K game data. Offline-capable with IndexedDB caching.
 
-## Package Overview
+## Key Commands
 
-The @depot/web package is a React Progressive Web App (PWA) that displays Warhammer 40K game data processed by @depot/cli. It provides an offline-capable interface for browsing factions, datasheets, stratagems, and other game content.
-
-## Development Commands
-
-### Development Server
 ```bash
+# Start development (generates data + dev server)
 pnpm start
-# or from root
-pnpm --filter @depot/web start
 
-# Development only (requires existing data)
+# Dev server only (requires existing data)
 pnpm dev
-# or from root  
-pnpm --filter @depot/web dev
-```
 
-### Build for Production
-```bash
+# Production build
 pnpm build
-# or from root
-pnpm --filter @depot/web build
-```
 
-This runs: `pwa-assets-generator` → `tsc` → `vite build`
-
-### Testing
-```bash
+# Run tests
 pnpm test
-# or from root
-pnpm --filter @depot/web test
 ```
+## Technology Stack
 
-### Other Commands
-```bash
-pnpm format          # Format code
-pnpm lint            # Lint with TypeScript check
-pnpm typecheck       # TypeScript checking only
-pnpm clean           # Clean build artifacts
-pnpm preview         # Preview built application
-pnpm generate-pwa-assets  # Generate PWA icons/assets
-```
+- **React 19** + React Router DOM v7
+- **Context + useReducer** for state management
+- **IndexedDB** for offline-first data storage
+- **Tailwind CSS v4** for styling
+- **Vite 6** for build tooling
+- **Vitest** + React Testing Library for testing
+
+## Key Routes
+
+- `/` - Home dashboard
+- `/factions` - Faction selection
+- `/faction/:id` - Faction overview
+- `/faction/:factionId/datasheet/:id` - Unit details
+- `/rosters` - Roster management
+- `/settings` - User preferences
 
 ## Architecture
 
-### Technology Stack
-- **React 19** with React Router DOM v7 for navigation
-- **Context + useReducer** for global state management
-- **IndexedDB** for offline-first data storage and caching
-- **Tailwind CSS v4** with PostCSS for utility-first styling
-- **Custom UI Library** in `src/components/ui/`
-- **Vite 6** for build tooling and development server
-- **Vite PWA Plugin** for offline functionality
-- **Vitest** for testing with React Testing Library
+### State Management
+- **App Context**: Global data, faction cache, settings
+- **Layout Context**: UI state (sidebar, responsive)
+- **Toast Context**: Notifications
+- **Roster Context**: Roster building state
 
-### Application Structure
-
-#### Route-Based Architecture
-- `/` - Dashboard/home page with user overview and quick access
-- `/factions` - Faction selection page with all available factions
-- `/faction/:id` - Faction overview with datasheets, stratagems, etc.
-- `/faction/:factionId/datasheet/:id` - Individual datasheet details
-- `/settings` - User preferences (show Forge World, Legends content)
-
-#### State Management
-See `src/contexts/AGENTS.md` for detailed context architecture.
-
-- **App Context**: Global state for data index, faction cache, and settings
-- **Layout Context**: UI state management (sidebar, responsive behavior)
-- **Toast Context**: Notification system with auto-dismiss functionality
-- **IndexedDB Storage**: Primary storage for faction data, index, and settings (offline-first)
-
-#### Page Architecture
-See `src/pages/AGENTS.md` for detailed page implementation patterns.
-
-- **Page Components**: Route-specific containers with component breakdown
-- **Utility Functions**: Business logic extracted to testable utilities
-- **Comprehensive Testing**: Full test coverage with centralized utilities
-
-#### Component Library
-Custom Tailwind-based components in `src/components/ui/` with dark mode support and responsive design.
-
-### Data Flow (Offline-First)
-```
-IndexedDB ──→ App Context ──→ React Components
-   ↑               ↓
-   └─ Static JSON Files (network fallback)
-   
-Settings: IndexedDB ←→ App Context ←→ Settings Page
-Faction Data: IndexedDB → App Context → Faction Pages
-             (Auto-cached from network when visited)
+### Data Flow
 ```
 
-### PWA Features
-- **Offline Support**: Service worker caches static assets and data files
-- **App Manifest**: Installable as native-like app experience
-- **Icon Assets**: Full set of platform-specific icons in `public/`
-- **Responsive Design**: Mobile-first approach with desktop enhancements
-
-### Testing Infrastructure
-See `src/test/AGENTS.md` for comprehensive testing guidelines.
-
-- **TestWrapper**: Centralized test wrapper with all required providers
-- **Mock Data**: Factory functions for consistent test data
-- **React 19 Compliance**: Proper act() patterns for user interactions
-
-### Type System
-Uses shared `@depot/core` types with web-specific additions:
-- `depot.Settings` interface for user preferences
-- Component prop interfaces
-- Vite environment types (`types/vite-env.d.ts`)
+### Directory Structure
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI library
+│   └── shared/         # Domain-specific components
+├── contexts/           # React contexts for state
+├── pages/              # Route components
+├── hooks/              # Custom React hooks
+├── utils/              # Business logic utilities
+└── data/               # IndexedDB and data utilities
+```
 
 ## Data Requirements
 
-The web app expects processed data files in `public/data/`:
-- `index.json` - Faction index for navigation
-- `{factionId}.json` - Individual faction data files
-- Generated by running `pnpm --filter @depot/cli start`
+Requires JSON files in `public/data/`:
+- `index.json` - Faction navigation index
+- `{factionId}.json` - Individual faction data
+- Generated by CLI package

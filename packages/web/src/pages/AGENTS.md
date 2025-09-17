@@ -1,96 +1,63 @@
-# Pages Architecture & Implementation Guide
+# Pages
 
-This directory contains React page components using a consistent, scalable architecture for the depot application.
+React page components with consistent architecture patterns.
 
-## Core Architecture Principles
+## Structure Pattern
 
-### Directory Structure Pattern
 ```
 pages/
 ├── [page-name]/
 │   ├── index.tsx              # Main page component
-│   ├── index.test.tsx         # Page component tests
+│   ├── index.test.tsx         # Page tests
 │   ├── components/            # Page-specific components
-│   └── utils/                 # Page-specific utilities
+│   └── utils/                 # Page utilities
 ```
 
-### Component Responsibilities
-- **Main Page Component**: State orchestration, context integration, route handling, minimal logic
-- **Child Components**: Single responsibility, composable design, clear TypeScript interfaces
-- **Utility Functions**: Pure business logic, domain organization, fully testable
+## Implementation
 
-## Implementation Patterns
+### Main Page Component
+- Route handling and context integration
+- State orchestration with minimal logic
+- Composition of child components
 
-### Context-Based Data Loading
-Pages use App Context hooks for data management. See `home/index.tsx` and `faction/index.tsx` for examples.
+### Child Components
+- Single responsibility
+- Page-specific functionality
+- Clear TypeScript interfaces
 
-### State Component Pattern
-Use dedicated components for different states:
-- Loading: Skeleton components that mirror content structure
-- Error: User-friendly error messages with recovery options
-- Empty: Meaningful empty states for filtered views
+### Utility Functions
+- Pure business logic in `utils/`
+- Filtering, grouping, calculations
+- Fully testable functions
 
-### Utility Function Extraction
-Extract complex filtering, grouping, and calculation logic to `utils/` directory. Examples:
-- `home/utils/faction.ts` - Faction filtering and alliance grouping
-- `faction/utils/detachment.ts` - Detachment ability filtering and organization
-- `faction/utils/enhancement.ts` - Enhancement processing with cost handling
+## State Patterns
 
-## Card Component Design System
+- **Loading**: Skeleton components
+- **Error**: Recovery options
+- **Empty**: Meaningful empty states
 
-### Consistent Structure
-All domain cards follow standardized layout patterns. Reference implementations:
-- `faction/components/stratagem-card.tsx` - CP cost badges, type classification
-- `faction/components/detachment-ability-card.tsx` - Detachment badges, descriptions
-- `faction/components/enhancement-card.tsx` - Cost + detachment badge combinations
+## Data Patterns
 
-## Tab Component Architecture
+### Context Integration
+```typescript
+const { factions, loadFaction } = useAppContext();
+const { showToast } = useToastContext();
+```
 
-### Standardized Tab Pattern
-All tab components follow consistent structure:
-1. Local state management with debounced search
-2. Memoized filtering and grouping operations
-3. UI state calculations (empty checks)
-4. Consistent filter UI with clear functionality
-5. Grouped display with proper empty states
+### State Management
+- Local state for UI interactions
+- Context for global data
+- Debounced search inputs
 
-See `faction/components/` directory for complete implementations.
+## Performance
 
-## Performance Optimization
-- **Memoization**: Filter/grouping operations with proper dependency arrays
-- **Debouncing**: Search inputs (300ms), filter inputs (100ms)
+- **Memoization**: Filter/grouping operations
+- **Debouncing**: Search (300ms), filters (100ms)
+- **Skeleton Loading**: Content structure mirrors
 
-## Testing Strategy
+## Testing
 
-### Test Infrastructure
-Use centralized testing utilities from `src/test/`:
-- **TestWrapper**: Required for all component tests (includes Router, Layout, Toast contexts)
-- **Mock Data**: Use factory functions from `mock-data.ts`
-
-See `src/test/AGENTS.md` for comprehensive testing guidelines.
-
-### Test Coverage
-- **Main Components**: Loading/error/success states, user interactions
-- **Utilities**: Pure functions with edge cases
-- **Integration**: Component combinations and data flow
-
-## Key Implementation Examples
-
-### Current Implementations
-- **Home Page** (`home/`): Complete modular architecture with alliance grouping
-- **Faction Page** (`faction/`): Advanced tab system with comprehensive filtering
-- **Test Infrastructure** (`../test/`): Centralized utilities and mock data
-
-### Reference Files
-- Context integration: `home/index.tsx`
-- Complex filtering: `faction/utils/detachment.ts`
-- Tab patterns: `faction/components/faction-datasheets.tsx`
-- Testing patterns: All `*.test.tsx` files
-
-## Best Practices
-- **Code Organization**: Single responsibility components, extract logic to utilities
-- **Performance**: Debounced inputs, proper memoization, skeleton loading
-- **User Experience**: Meaningful loading/error/empty states
-- **Testing**: Use TestWrapper, React 19 act() patterns, comprehensive coverage
-
-This architecture ensures maintainable, testable, and performant page components across the depot application.
+Use centralized utilities from `src/test/`:
+- **TestWrapper**: Required for all tests
+- **Mock Data**: Factory functions
+- Comprehensive coverage patterns

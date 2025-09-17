@@ -1,99 +1,38 @@
-# AGENTS.md
+# CLI Package
 
-This file provides guidance to Agents when working with the @depot/cli package.
+Fetches Warhammer 40K data from Wahapedia CSV exports and converts to structured JSON.
 
-## Package Overview
+## Key Commands
 
-The @depot/cli package is a Node.js command-line tool that fetches Warhammer 40K data from Wahapedia's CSV exports and converts it into structured JSON files for consumption by the web application.
-
-## Development Commands
-
-### Build
 ```bash
-pnpm build
-# or from root
-pnpm --filter @depot/cli build
-```
-
-### Run Data Generation
-```bash
+# Generate data from Wahapedia
 pnpm start
-# or from root
-pnpm --filter @depot/cli start
-```
 
-### Development & Testing
-```bash
-# Development (watch mode)
+# Force re-download source data
+pnpm start --force-download
+
+# Build TypeScript
+pnpm build
+
+# Watch mode
 pnpm dev
-# or from root
-pnpm --filter @depot/cli dev
-
-# Test
-pnpm test
-# or from root
-pnpm --filter @depot/cli test
-
-# Code Quality
-pnpm format
-pnpm lint
-pnpm typecheck
 ```
 
-## Architecture
+## Processing Pipeline
 
-### Data Processing Pipeline
+1. **Fetch** (`index.ts`): Downloads CSV files from Wahapedia URLs
+2. **Convert** (`convert-to-json.ts`): Transforms CSV → JSON with cleaning
+3. **Generate** (`generate-data.ts`): Builds faction-specific consolidated files
 
-The CLI follows a three-stage data processing pipeline:
-
-1. **Fetch** (`index.ts`): Downloads CSV files from predefined Wahapedia URLs
-2. **Convert** (`convert-to-json.ts`): Transforms CSV data to JSON with cleaning and normalization
-3. **Generate** (`generate-data.ts`): Consolidates related data and builds faction-specific files
-
-### Key Components
-
-#### `index.ts` - Main Orchestrator
-- Fetches CSV files from Wahapedia URLs in parallel
-- Manages directory creation/cleanup for output files
-- Coordinates the conversion and generation pipeline
-- Creates both individual JSON files and consolidated faction data
-
-#### `convert-to-json.ts` - CSV Parser
-- Handles CSV cleaning (removes BOM, splits on pipe delimiters)
-- Converts headers to camelCase format
-- Strips HTML tags from data when specified
-- Processes pipe-delimited CSV format specific to Wahapedia exports
-
-#### `generate-data.ts` - Data Consolidator
-- Reads all JSON files and builds relationships between entities
-- Creates comprehensive faction objects with nested datasheets, stratagems, etc.
-- Handles complex data associations (abilities → datasheets, wargear profiles, etc.)
-- Filters and categorizes content (Forge World, Legends classification)
-
-### Data Flow
-
-```
-Wahapedia CSV URLs → Raw CSV → JSON Files → Consolidated Faction Data
-                                    ↓
-                           Individual JSON files in /json/
-                                    ↓
-                           Faction-specific files in /data/
-                                    ↓
-                           Index file for web app navigation
-```
-
-### Type System
-
-Uses shared `@depot/core` types:
-- `wahapedia.*` types represent raw CSV data structure
-- `depot.*` types represent processed, web-ready data format
-- Type transformation happens in `generate-data.ts` build functions
-- Ensures consistency with web package data expectations
-
-### Output Structure
+## Output Structure
 
 - `dist/json/` - Individual converted CSV files
-- `dist/data/` - Faction-specific consolidated files  
-- `dist/data/index.json` - Navigation index for web app
+- `dist/data/` - Faction-specific files for web app
+- `dist/data/index.json` - Navigation index
 
-The generated files should be copied to `packages/web/public/data/` for web consumption.
+## Type System
+
+- Uses `@depot/core` types as source of truth
+- `wahapedia.*` types = raw CSV structure
+- `depot.*` types = processed web-ready format
+- Transformation in `generate-data.ts`
