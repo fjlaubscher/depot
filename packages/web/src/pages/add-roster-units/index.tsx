@@ -62,7 +62,7 @@ const AddRosterUnitsView: React.FC = () => {
   };
 
   return (
-    <div className={`flex flex-col gap-4 ${hasSelection ? 'pb-20 md:pb-4' : ''}`}>
+    <div className="flex flex-col gap-4">
       {/* Mobile Back Button */}
       <div className="md:hidden">
         <Link
@@ -89,12 +89,12 @@ const AddRosterUnitsView: React.FC = () => {
 
       <PageHeader title="Add Units" subtitle={subtitle} />
 
-      {/* Selection Summary */}
+      {/* Sticky Selection Summary */}
       {hasSelection && (
-        <>
+        <div className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 py-3 mb-4">
           <Card
             padding="sm"
-            className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+            className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -110,20 +110,12 @@ const AddRosterUnitsView: React.FC = () => {
                   Clear Selection
                 </Button>
                 <Button size="sm" onClick={handleAddSelectedUnits}>
-                  Add to Roster
+                  Add
                 </Button>
               </div>
             </div>
           </Card>
-
-          {/* Mobile Sticky Bottom Button */}
-          <div className="fixed bottom-4 left-4 right-4 md:hidden z-10">
-            <Button onClick={handleAddSelectedUnits} className="w-full shadow-lg">
-              Add {selectedUnits.length} Unit{selectedUnits.length === 1 ? '' : 's'} (
-              {totalSelectedPoints} pts)
-            </Button>
-          </div>
-        </>
+        </div>
       )}
 
       {/* Units Browser */}

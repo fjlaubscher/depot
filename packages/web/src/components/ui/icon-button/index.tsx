@@ -1,4 +1,5 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 import Loader from '../loader';
 
@@ -15,11 +16,22 @@ const IconButton: FC<IconButtonProps> = ({
   loading = false,
   className,
   disabled,
+  onClick,
   children,
   ...props
 }) => {
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!disabled && !loading) {
+      setIsPressed(true);
+      setTimeout(() => setIsPressed(false), 60);
+      onClick?.(e);
+    }
+  };
+
   const baseClasses =
-    'inline-flex items-center justify-center rounded-md transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center rounded-md transition-all duration-75 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
     default:
@@ -35,8 +47,15 @@ const IconButton: FC<IconButtonProps> = ({
 
   return (
     <button
-      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={classNames(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        isPressed ? 'scale-95' : '',
+        className
+      )}
       disabled={disabled || loading}
+      onClick={handleClick}
       {...props}
     >
       {loading ? <Loader size="sm" color="secondary" /> : children}

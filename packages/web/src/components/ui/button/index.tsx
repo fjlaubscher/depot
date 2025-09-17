@@ -1,4 +1,5 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 import Loader from '../loader';
 
@@ -16,11 +17,22 @@ const Button: FC<ButtonProps> = ({
   loading = false,
   className,
   disabled,
+  onClick,
   children,
   ...props
 }) => {
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!disabled && !loading) {
+      setIsPressed(true);
+      setTimeout(() => setIsPressed(false), 60);
+      onClick?.(e);
+    }
+  };
+
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
+    'inline-flex items-center justify-center font-medium rounded-md transition-all duration-75 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const variantClasses = {
     default: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
@@ -44,9 +56,11 @@ const Button: FC<ButtonProps> = ({
         variantClasses[variant],
         sizeClasses[size],
         widthClasses,
+        isPressed ? 'scale-95' : '',
         className
       )}
       disabled={disabled || loading}
+      onClick={handleClick}
       {...props}
     >
       {loading ? (

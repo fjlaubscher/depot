@@ -25,7 +25,7 @@ export const DatasheetSelectionCard: React.FC<DatasheetSelectionCardProps> = ({
       <div className="flex justify-between items-center">
         {defaultModelCost && <PointsTag points={defaultModelCost.cost} />}
 
-        <Button size="sm" onClick={handleAdd} disabled={!defaultModelCost}>
+        <Button size="sm" variant="secondary" onClick={handleAdd} disabled={!defaultModelCost}>
           <Plus size={16} className="mr-1" />
           Add
         </Button>
