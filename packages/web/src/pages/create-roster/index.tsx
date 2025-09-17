@@ -26,9 +26,10 @@ const CreateRoster: React.FC = () => {
   const { factions, loading: factionsLoading } = useFactions();
   const { data: selectedFaction, loading: factionLoading } = useFaction(factionId || undefined);
 
-  const factionOptions = factions
-    ?.map((f) => ({ value: f.id, label: f.name }))
-    .sort((a, b) => a.label.localeCompare(b.label)) || [];
+  const factionOptions =
+    factions
+      ?.map((f) => ({ value: f.id, label: f.name }))
+      .sort((a, b) => a.label.localeCompare(b.label)) || [];
 
   // Group detachment data from selected faction
   const detachmentsData = useMemo(() => {

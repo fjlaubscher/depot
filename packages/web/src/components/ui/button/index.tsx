@@ -1,5 +1,5 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import Loader from '../loader';
 
@@ -22,11 +22,20 @@ const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const [isPressed, setIsPressed] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading) {
       setIsPressed(true);
-      setTimeout(() => setIsPressed(false), 60);
+      timeoutRef.current = setTimeout(() => setIsPressed(false), 60);
       onClick?.(e);
     }
   };
