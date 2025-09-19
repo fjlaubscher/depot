@@ -1,13 +1,13 @@
 import React from 'react';
 import { depot } from '@depot/core';
-import WargearTableRow from './wargear-table-row';
+import WargearRow from './wargear-row';
 
 interface WargearSectionProps {
   wargear: depot.Wargear[];
   title: string;
   isRanged: boolean;
-  showSelectionColumn: boolean;
-  selectedWargear: depot.Wargear[];
+  showSelectionColumn?: boolean;
+  selectedWargear?: depot.Wargear[];
   onSelectionChange?: (wargear: depot.Wargear, selected: boolean) => void;
 }
 
@@ -15,8 +15,8 @@ const WargearSection: React.FC<WargearSectionProps> = ({
   wargear,
   title,
   isRanged,
-  showSelectionColumn,
-  selectedWargear,
+  showSelectionColumn = false,
+  selectedWargear = [],
   onSelectionChange
 }) => {
   if (wargear.length === 0) return null;
@@ -31,7 +31,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
       <h4 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h4>
       <div className="flex flex-col gap-2">
         {wargear.map((weapon) => {
-          const rowData = WargearTableRow({
+          const rowData = WargearRow({
             weapon,
             isRanged,
             showSelectionColumn,
@@ -51,7 +51,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
           return (
             <div
               key={`${weapon.line}-${weapon.name}`}
-              className={`flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 ${
+              className={`flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg ${
                 showSelectionColumn ? 'cursor-pointer' : ''
               }`}
               onClick={handleCardClick}

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { depot } from '@depot/core';
 import { Tag, TagGroup } from '@/components/ui';
 import { parseWargearKeywords } from '@/utils/wargear';
@@ -11,7 +11,7 @@ interface WargearTableRowProps {
   onSelectionChange?: (wargear: depot.Wargear, selected: boolean) => void;
 }
 
-const WargearTableRow = ({
+const WargearRow = ({
   weapon,
   isRanged,
   showSelectionColumn,
@@ -65,4 +65,4 @@ const WargearTableRow = ({
   };
 };
 
-export default WargearTableRow;
+export default WargearRow;

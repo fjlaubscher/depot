@@ -5,7 +5,6 @@ import { depot } from '@depot/core';
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
 import DatasheetInlineAbilities from './datasheet-inline-abilities';
-import UnitDetails from './unit-details';
 
 // utils
 import { categorizeAbilities } from '../utils/abilities';
@@ -24,9 +23,8 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
   return (
     <div className="flex flex-col gap-4" data-testid="datasheet-profile">
       <DatasheetHero datasheet={datasheet} />
-      <DatasheetWargear datasheet={datasheet} />
       <DatasheetInlineAbilities abilities={inlineAbilities} />
-      <UnitDetails datasheet={datasheet} />
+      <DatasheetWargear datasheet={datasheet} />
     </div>
   );
 };

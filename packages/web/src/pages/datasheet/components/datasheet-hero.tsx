@@ -4,6 +4,7 @@ import { depot } from '@depot/core';
 // components
 import { Card, Tag, TagGroup } from '@/components/ui';
 import ModelStatsRow from '@/components/shared/model-stats-row';
+import DatasheetComposition from '@/components/shared/datasheet/datasheet-composition';
 
 // utils
 import { groupKeywords } from '@/utils/keywords';
@@ -27,22 +28,11 @@ const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet }) => {
         ))}
       </div>
 
-      <Card className="p-4" data-testid="unit-composition">
-        <ul className="space-y-2 list-disc pl-4 mb-2">
-          {unitComposition.map((comp, i) => (
-            <li
-              key={`composition-${comp.line}`}
-              className="text-sm text-gray-700 dark:text-gray-300"
-            >
-              {comp.description}
-            </li>
-          ))}
-        </ul>
-        <p
-          className="text-sm text-gray-700 dark:text-gray-300"
-          dangerouslySetInnerHTML={{ __html: loadout }}
-        />
-      </Card>
+      <DatasheetComposition
+        composition={unitComposition}
+        loadout={loadout}
+        data-testid="unit-composition"
+      />
 
       {/* Keywords */}
       <div className="flex flex-col gap-2">

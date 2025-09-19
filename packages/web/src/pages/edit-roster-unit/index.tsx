@@ -11,7 +11,6 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import {
   PageHeader,
-  Loader,
   Breadcrumbs,
   Button,
   Card,
@@ -20,7 +19,7 @@ import {
   PageHeaderSkeleton,
   SkeletonCard
 } from '@/components/ui';
-import WargearSelection from './components/wargear-selection';
+import WargearSelectionContainer from './components/wargear-selection-container';
 import ModelCostSelection from './components/model-cost-selection';
 import EnhancementSelection from './components/enhancement-selection';
 import WarlordSelection from './components/warlord-selection';
@@ -221,7 +220,7 @@ const EditRosterUnitView: React.FC = () => {
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Select wargear options for this unit
           </p>
-          <WargearSelection
+          <WargearSelectionContainer
             unit={unit}
             selectedWargear={selectedWargear}
             onWargearChange={setSelectedWargear}

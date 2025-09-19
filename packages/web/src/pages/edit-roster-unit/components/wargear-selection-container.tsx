@@ -1,14 +1,14 @@
 import React from 'react';
 import { depot } from '@depot/core';
-import WargearTable from '@/components/shared/wargear-table';
+import WargearSelection from '@/components/shared/wargear-selection';
 
-interface WargearSelectionProps {
+interface WargearSelectionContainerProps {
   unit: depot.RosterUnit;
   selectedWargear: depot.Wargear[];
   onWargearChange: (wargear: depot.Wargear[]) => void;
 }
 
-const WargearSelection: React.FC<WargearSelectionProps> = ({
+const WargearSelectionContainer: React.FC<WargearSelectionContainerProps> = ({
   unit,
   selectedWargear,
   onWargearChange
@@ -36,7 +36,7 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   }
 
   return (
-    <WargearTable
+    <WargearSelection
       wargear={unit.datasheet.wargear}
       showSelectionColumn={true}
       selectedWargear={selectedWargear}
@@ -45,4 +45,4 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   );
 };
 
-export default WargearSelection;
+export default WargearSelectionContainer;
