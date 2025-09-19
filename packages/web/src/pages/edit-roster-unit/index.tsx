@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { depot } from '@depot/core';
@@ -23,6 +23,8 @@ import WargearSelectionContainer from './components/wargear-selection-container'
 import ModelCostSelection from './components/model-cost-selection';
 import EnhancementSelection from './components/enhancement-selection';
 import WarlordSelection from './components/warlord-selection';
+import DatasheetComposition from '@/components/shared/datasheet/datasheet-composition';
+import { parseLoadoutWargear } from '@/utils/wargear';
 
 const EditRosterUnitView: React.FC = () => {
   const { state: roster, updateUnitWargear, applyEnhancement, removeEnhancement } = useRoster();
@@ -34,10 +36,11 @@ const EditRosterUnitView: React.FC = () => {
   // Find the unit we're editing
   const unit = roster.units.find((u) => u.id === unitId);
 
+  // Track which unit we've initialized to avoid resetting user selections
+  const initializedUnitRef = useRef<string | null>(null);
+
   // State for form values
-  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>(() => {
-    return unit?.selectedWargear || [];
-  });
+  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>([]);
   const [selectedModelCost, setSelectedModelCost] = useState<depot.ModelCost | undefined>(
     unit?.modelCost
   );
@@ -46,17 +49,32 @@ const EditRosterUnitView: React.FC = () => {
   });
   const [isWarlord, setIsWarlord] = useState(false); // TODO: Implement warlord tracking
 
-  // Sync state when unit data loads/changes
+  // Initialize wargear only when switching to a new unit
   useEffect(() => {
-    if (unit) {
-      setSelectedWargear(unit.selectedWargear || []);
+    if (unit && unitId && initializedUnitRef.current !== unitId) {
+      // Calculate smart wargear selection
+      let wargearToSelect: depot.Wargear[] = [];
+
+      if (unit.selectedWargear && unit.selectedWargear.length > 0) {
+        // Use existing selections if they exist
+        wargearToSelect = unit.selectedWargear;
+      } else if (unit.datasheet.loadout && unit.datasheet.wargear.length > 0) {
+        // Auto-select wargear based on loadout parsing
+        const matchedLines = parseLoadoutWargear(unit.datasheet.loadout, unit.datasheet.wargear);
+        wargearToSelect = unit.datasheet.wargear.filter((w) => matchedLines.includes(w.line));
+      }
+
+      setSelectedWargear(wargearToSelect);
       setSelectedModelCost(unit.modelCost);
       const unitEnhancements = roster.enhancements
         .filter((e) => e.unitId === unitId)
         .map((e) => e.enhancement.id);
       setSelectedEnhancements(unitEnhancements);
+
+      // Mark this unit as initialized
+      initializedUnitRef.current = unitId;
     }
-  }, [unit, roster.enhancements, unitId]);
+  }, [unitId, unit, roster.enhancements]);
 
   // Loading state while roster loads
   if (!roster.id) {
@@ -197,6 +215,13 @@ const EditRosterUnitView: React.FC = () => {
             </div>
           </Card>
         )}
+
+        {/* Unit Composition */}
+        <DatasheetComposition
+          composition={unit.datasheet.unitComposition}
+          loadout={unit.datasheet.loadout}
+          data-testid="unit-composition"
+        />
 
         {/* Wargear Options */}
         {unit.datasheet.options.length > 0 && (
