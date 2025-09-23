@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { depot } from '@depot/core';
+import { LinkCard } from '@/components/ui';
 
 interface FactionCardProps {
   faction: depot.Index;
@@ -15,10 +15,7 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
   ].filter((stat) => stat.value > 0);
 
   return (
-    <Link
-      to={`/faction/${faction.id}`}
-      className="block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 p-4"
-    >
+    <LinkCard to={`/faction/${faction.id}`}>
       <div className="flex flex-col gap-3">
         <h3 className="font-semibold text-primary-600 dark:text-primary-400 text-lg">
           {faction.name}
@@ -37,7 +34,7 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
           </div>
         )}
       </div>
-    </Link>
+    </LinkCard>
   );
 };
 

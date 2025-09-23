@@ -75,6 +75,13 @@ export const RosterProvider: React.FC<RosterProviderProps> = ({ children, roster
     dispatch({ type: 'UPDATE_UNIT_WARGEAR', payload: { rosterUnitId, wargear } });
   }, []);
 
+  const updateUnitModelCost = useCallback(
+    (rosterUnitId: string, modelCost: depot.ModelCost): void => {
+      dispatch({ type: 'UPDATE_UNIT_MODEL_COST', payload: { rosterUnitId, modelCost } });
+    },
+    []
+  );
+
   const applyEnhancement = useCallback(
     (enhancement: depot.Enhancement, targetUnitId: string): void => {
       dispatch({ type: 'APPLY_ENHANCEMENT', payload: { enhancement, targetUnitId } });
@@ -100,6 +107,7 @@ export const RosterProvider: React.FC<RosterProviderProps> = ({ children, roster
         duplicateUnit,
         removeUnit,
         updateUnitWargear,
+        updateUnitModelCost,
         applyEnhancement,
         removeEnhancement,
         recalculatePoints

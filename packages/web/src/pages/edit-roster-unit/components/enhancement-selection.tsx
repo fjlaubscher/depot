@@ -1,6 +1,7 @@
 import React from 'react';
 import { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
+import { useAppContext } from '@/contexts/app/use-app-context';
 
 interface EnhancementSelectionProps {
   unit: depot.RosterUnit;
@@ -15,7 +16,9 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
   selectedEnhancements,
   onEnhancementChange
 }) => {
+  const { state: appState } = useAppContext();
   const availableEnhancements = roster.detachment?.enhancements || [];
+  const showFluff = appState.settings?.showFluff ?? true;
 
   const isEnhancementSelected = (enhancementId: string): boolean => {
     return selectedEnhancements.includes(enhancementId);
@@ -58,10 +61,10 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
         {availableEnhancements.map((enhancement) => (
           <div
             key={enhancement.id}
-            className={`flex items-start justify-between p-4 border rounded-lg transition-colors ${
+            className={`flex items-start justify-between p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors ${
               isEnhancementSelected(enhancement.id)
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : ''
             }`}
             data-testid={`enhancement-option-${enhancement.id}`}
           >
@@ -73,14 +76,14 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
                 </span>
               </div>
 
-              {enhancement.legend && (
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {enhancement.legend && showFluff && (
+                <div className="text-sm text-gray-600 dark:text-gray-400 italic">
                   {enhancement.legend}
                 </div>
               )}
 
               <div
-                className="text-sm text-gray-600 dark:text-gray-400"
+                className="text-sm font-medium text-gray-900 dark:text-white"
                 dangerouslySetInnerHTML={{ __html: enhancement.description }}
               />
 

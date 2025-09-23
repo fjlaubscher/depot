@@ -67,16 +67,36 @@ export function parseLoadoutWargear(loadout: string, wargear: depot.Wargear[]): 
   const foundWargear: string[] = [];
 
   for (const item of equipmentItems) {
-    // Clean up the item - remove articles and basic cleanup
+    // Clean up the item - remove HTML tags, articles and basic cleanup
     const cleanItem = item
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
       .replace(/^(a |an |the |and )/i, '')
       .trim()
       .toLowerCase();
 
-    // Try to find exact match using the map
-    const matchedWargearLine = wargearMap.get(cleanItem);
+    // Try to find exact match first
+    let matchedWargearLine = wargearMap.get(cleanItem);
 
-    if (matchedWargearLine !== undefined) {
+    // If no exact match, try partial matching for weapons with multiple profiles
+    if (matchedWargearLine === undefined) {
+      // Find all wargear that starts with the clean item name followed by a separator
+      const partialMatches: string[] = [];
+      for (const [wargearName, wargearLine] of wargearMap.entries()) {
+        // Match if it starts with cleanItem and is followed by separator chars (–, -, :, etc.) or end of string
+        if (
+          wargearName.startsWith(cleanItem) &&
+          (wargearName === cleanItem ||
+            /^.+[\s–\-:].+/.test(wargearName.substring(cleanItem.length)))
+        ) {
+          partialMatches.push(wargearLine);
+        }
+      }
+
+      if (partialMatches.length > 0) {
+        // Add all matching profiles for this weapon
+        foundWargear.push(...partialMatches);
+      }
+    } else {
       foundWargear.push(matchedWargearLine);
     }
   }

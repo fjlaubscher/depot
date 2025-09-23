@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
-import { ArrowLeft } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
@@ -11,7 +10,7 @@ import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Card } from '@/components/ui';
-import { DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared/datasheet';
+import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared';
 
 const AddRosterUnitsView: React.FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -63,17 +62,12 @@ const AddRosterUnitsView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile Back Button */}
-      <div className="md:hidden">
-        <Link
-          to={`/rosters/${roster.id}/edit`}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
-          aria-label="Back to Edit Roster"
-        >
-          <ArrowLeft size={16} />
-          <span className="font-medium">Back to Roster</span>
-        </Link>
-      </div>
+      <BackButton
+        to={`/rosters/${roster.id}/edit`}
+        label="Back to Roster"
+        ariaLabel="Back to Edit Roster"
+        className="md:hidden"
+      />
 
       {/* Desktop Breadcrumbs */}
       <div className="hidden md:block">

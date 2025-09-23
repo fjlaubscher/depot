@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
-import { ArrowLeft, Eye, Plus } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
@@ -10,6 +10,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
+import { BackButton } from '@/components/shared';
 import { RosterHeader, RosterSection, RosterUnitCardEdit } from '@/components/shared/roster';
 import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
 
@@ -44,17 +45,7 @@ const RosterView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile Back Button */}
-      <div className="md:hidden">
-        <Link
-          to="/rosters"
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
-          aria-label="Back to Rosters"
-        >
-          <ArrowLeft size={16} />
-          <span className="font-medium">Rosters</span>
-        </Link>
-      </div>
+      <BackButton to="/rosters" label="Rosters" ariaLabel="Back to Rosters" className="md:hidden" />
 
       {/* Desktop Breadcrumbs */}
       <div className="hidden md:block">
@@ -97,7 +88,6 @@ const RosterView: React.FC = () => {
                   rosterId={roster.id}
                   onRemove={removeUnit}
                   onDuplicate={duplicateUnit}
-                  onUpdateWargear={updateUnitWargear}
                 />
               ))}
             </RosterSection>

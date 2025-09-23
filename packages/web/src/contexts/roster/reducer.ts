@@ -107,6 +107,25 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
       };
     }
 
+    case 'UPDATE_UNIT_MODEL_COST': {
+      const updatedState = {
+        ...state,
+        units: state.units.map((unit) =>
+          unit.id === action.payload.rosterUnitId
+            ? { ...unit, modelCost: action.payload.modelCost }
+            : unit
+        )
+      };
+
+      return {
+        ...updatedState,
+        points: {
+          ...updatedState.points,
+          current: calculateTotalPoints(updatedState)
+        }
+      };
+    }
+
     case 'APPLY_ENHANCEMENT': {
       const updatedState = {
         ...state,

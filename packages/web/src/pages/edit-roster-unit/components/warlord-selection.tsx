@@ -31,7 +31,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
 
   return (
     <div className="flex flex-col gap-4" data-testid="warlord-selection">
-      <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors">
         <div className="flex flex-col gap-2">
           <h5 className="font-medium text-gray-900 dark:text-white">Nominate as Warlord</h5>
           <p className="text-sm text-gray-600 dark:text-gray-400">

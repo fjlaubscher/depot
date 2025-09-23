@@ -1,10 +1,11 @@
 import React, { useCallback, useState, useMemo, startTransition } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, ArrowLeft } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
 import { PageHeader, Tabs, IconButton, ErrorState, Breadcrumbs } from '@/components/ui';
+import { BackButton } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
@@ -110,17 +111,12 @@ const Faction: React.FC = () => {
   return (
     <AppLayout title="Faction">
       <div className="flex flex-col gap-4">
-        {/* Mobile Back Button */}
-        <div className="md:hidden">
-          <Link
-            to="/factions"
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
-            aria-label="Back to Factions"
-          >
-            <ArrowLeft size={16} />
-            <span className="font-medium">Factions</span>
-          </Link>
-        </div>
+        <BackButton
+          to="/factions"
+          label="Factions"
+          ariaLabel="Back to Factions"
+          className="md:hidden"
+        />
 
         {/* Desktop Breadcrumbs */}
         <div className="hidden md:block">

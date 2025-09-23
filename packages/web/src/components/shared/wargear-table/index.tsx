@@ -30,18 +30,30 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
   return (
     <div className="flex flex-col gap-3">
       <div className="overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-xs table-fixed">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th className="text-left py-1 font-medium text-primary-600">{title}</th>
-              <th className="text-center py-1 font-medium text-primary-600">Range</th>
-              <th className="text-center py-1 font-medium text-primary-600">A</th>
-              <th className="text-center py-1 font-medium text-primary-600">
+              <th className="text-left py-1 font-medium text-primary-600 dark:text-primary-400 w-2/5 md:w-3/5">
+                {title}
+              </th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+                Range
+              </th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+                A
+              </th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
                 {type === 'Ranged' ? 'BS' : type === 'Melee' ? 'WS' : 'BS/WS'}
               </th>
-              <th className="text-center py-1 font-medium text-primary-600">S</th>
-              <th className="text-center py-1 font-medium text-primary-600">AP</th>
-              <th className="text-center py-1 font-medium text-primary-600">D</th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+                S
+              </th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+                AP
+              </th>
+              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+                D
+              </th>
             </tr>
           </thead>
           <tbody>

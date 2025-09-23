@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
@@ -23,11 +23,17 @@ import WargearSelectionContainer from './components/wargear-selection-container'
 import ModelCostSelection from './components/model-cost-selection';
 import EnhancementSelection from './components/enhancement-selection';
 import WarlordSelection from './components/warlord-selection';
-import DatasheetComposition from '@/components/shared/datasheet/datasheet-composition';
+import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
 
 const EditRosterUnitView: React.FC = () => {
-  const { state: roster, updateUnitWargear, applyEnhancement, removeEnhancement } = useRoster();
+  const {
+    state: roster,
+    updateUnitWargear,
+    updateUnitModelCost,
+    applyEnhancement,
+    removeEnhancement
+  } = useRoster();
   const { state: appState } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -108,6 +114,17 @@ const EditRosterUnitView: React.FC = () => {
     k.keyword.toLowerCase().includes('character')
   );
 
+  const shouldShowWargearOptions = useMemo(() => {
+    if (unit.datasheet.options.length === 0) return false;
+    if (
+      unit.datasheet.options.length === 1 &&
+      unit.datasheet.options[0].description.toLowerCase().trim() === 'none'
+    ) {
+      return false;
+    }
+    return true;
+  }, [unit.datasheet.options]);
+
   const handleSave = () => {
     if (!unitId) return;
 
@@ -127,10 +144,9 @@ const EditRosterUnitView: React.FC = () => {
         }
       });
 
-      // TODO: Implement model cost updating
-      // This requires adding UPDATE_UNIT_MODEL_COST action to the roster reducer
+      // Update model cost if changed
       if (selectedModelCost && selectedModelCost !== unit?.modelCost) {
-        console.warn('Model cost updating not yet implemented in roster context');
+        updateUnitModelCost(unitId, selectedModelCost);
       }
 
       // TODO: Implement warlord tracking
@@ -161,17 +177,12 @@ const EditRosterUnitView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4" data-testid="edit-unit-form">
-      {/* Mobile Back Button */}
-      <div className="md:hidden">
-        <Link
-          to={`/rosters/${rosterId}/edit`}
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
-          data-testid="mobile-back-button"
-        >
-          <ArrowLeft size={16} />
-          <span className="font-medium">Back to Roster</span>
-        </Link>
-      </div>
+      <BackButton
+        to={`/rosters/${rosterId}/edit`}
+        label="Back to Roster"
+        testId="mobile-back-button"
+        className="md:hidden"
+      />
 
       {/* Desktop Breadcrumbs */}
       <div className="hidden md:block">
@@ -224,7 +235,7 @@ const EditRosterUnitView: React.FC = () => {
         />
 
         {/* Wargear Options */}
-        {unit.datasheet.options.length > 0 && (
+        {shouldShowWargearOptions && (
           <Alert variant="info" title="Wargear Options" data-testid="wargear-options-section">
             <ul className="space-y-2 list-disc pl-4 text-sm">
               {unit.datasheet.options.map((option, index) => (
@@ -240,17 +251,19 @@ const EditRosterUnitView: React.FC = () => {
         )}
 
         {/* Wargear Selection */}
-        <div className="flex flex-col gap-4" data-testid="wargear-section">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Wargear</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Select wargear options for this unit
-          </p>
-          <WargearSelectionContainer
-            unit={unit}
-            selectedWargear={selectedWargear}
-            onWargearChange={setSelectedWargear}
-          />
-        </div>
+        <Card data-testid="wargear-section">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Wargear</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Select wargear options for this unit
+            </p>
+            <WargearSelectionContainer
+              unit={unit}
+              selectedWargear={selectedWargear}
+              onWargearChange={setSelectedWargear}
+            />
+          </div>
+        </Card>
 
         {/* Enhancement Selection for Characters */}
         {isCharacter && (

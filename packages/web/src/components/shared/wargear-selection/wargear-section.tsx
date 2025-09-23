@@ -51,13 +51,13 @@ const WargearSection: React.FC<WargearSectionProps> = ({
           return (
             <div
               key={`${weapon.line}-${weapon.name}`}
-              className={`flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg ${
+              className={`flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors ${
                 showSelectionColumn ? 'cursor-pointer' : ''
               }`}
               onClick={handleCardClick}
             >
               {showSelectionColumn && <div className="flex-shrink-0">{rowData.selected}</div>}
-              <div className="flex-grow flex flex-col gap-2">
+              <div className="flex-grow flex flex-col gap-1">
                 <div className="font-medium text-gray-900 dark:text-white capitalize">
                   {rowData.name}
                 </div>

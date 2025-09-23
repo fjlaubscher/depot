@@ -11,7 +11,7 @@ const PointsTag: React.FC<PointsTagProps> = ({ points, maxPoints, className }) =
   return (
     <span
       className={classNames(
-        'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200',
+        'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary-100 text-primary-600 dark:bg-primary-700 dark:text-white',
         className
       )}
     >

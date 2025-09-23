@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
 import { Tabs, PageHeader, ErrorState, Breadcrumbs } from '@/components/ui';
+import { BackButton } from '@/components/shared';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -95,17 +96,12 @@ const DatasheetPage: React.FC = () => {
   return (
     <AppLayout title="Datasheet">
       <div className="flex flex-col gap-4">
-        {/* Mobile Back Button */}
-        <div className="md:hidden">
-          <Link
-            to={`/faction/${faction.id}`}
-            className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md px-2 py-1 transition-colors text-sm"
-            aria-label={`Back to ${faction.name}`}
-          >
-            <ArrowLeft size={16} />
-            <span className="font-medium">{faction.name}</span>
-          </Link>
-        </div>
+        <BackButton
+          to={`/faction/${faction.id}`}
+          label={faction.name}
+          ariaLabel={`Back to ${faction.name}`}
+          className="md:hidden"
+        />
 
         {/* Desktop Breadcrumbs */}
         <div className="hidden md:block">

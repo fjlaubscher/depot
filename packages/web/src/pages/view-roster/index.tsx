@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Pencil, Share, Download } from 'lucide-react';
+import { Pencil, Share, Download } from 'lucide-react';
 import { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
@@ -10,7 +10,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
-import { RosterHeader, RosterSection } from '@/components/shared/roster';
+import { BackButton, RosterHeader, RosterSection } from '@/components/shared';
 import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
@@ -75,16 +75,7 @@ const RosterView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile Back Button */}
-      <div className="md:hidden">
-        <Link
-          to="/rosters"
-          className="flex items-center gap-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors text-sm"
-        >
-          <ArrowLeft size={16} />
-          <span className="font-medium">Rosters</span>
-        </Link>
-      </div>
+      <BackButton to="/rosters" label="Rosters" className="md:hidden" />
 
       {/* Desktop Breadcrumbs */}
       <div className="hidden md:block">

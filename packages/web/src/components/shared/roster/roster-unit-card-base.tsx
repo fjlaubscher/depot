@@ -1,6 +1,8 @@
 import type { FC, ReactNode } from 'react';
+import { useMemo } from 'react';
 import { depot } from '@depot/core';
 import { Card, Tag, TagGroup, PointsTag } from '@/components/ui';
+import { categorizeAbilities } from '@/pages/datasheet/utils/abilities';
 
 interface RosterUnitCardBaseProps {
   unit: depot.RosterUnit;
@@ -11,6 +13,11 @@ interface RosterUnitCardBaseProps {
 
 const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({ unit, actions, children, onClick }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
+
+  const inlineAbilities = useMemo(() => {
+    const { inline } = categorizeAbilities(unit.datasheet.abilities);
+    return inline;
+  }, [unit.datasheet.abilities]);
 
   return (
     <Card
@@ -33,10 +40,15 @@ const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({ unit, actions, childr
         <PointsTag points={unitPoints} className="whitespace-nowrap" />
       </div>
 
-      {unit.selectedWargear.length > 0 && (
+      {(inlineAbilities.length > 0 || unit.selectedWargear.length > 0) && (
         <TagGroup spacing="sm">
+          {inlineAbilities.map((ability, index) => (
+            <Tag key={`ability-${index}`} variant="primary" size="sm">
+              {ability.name}
+            </Tag>
+          ))}
           {unit.selectedWargear.map((wargear, index) => (
-            <Tag key={index} variant="secondary" size="sm" className="capitalize">
+            <Tag key={`wargear-${index}`} variant="secondary" size="sm" className="capitalize">
               {wargear.name}
             </Tag>
           ))}

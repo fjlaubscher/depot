@@ -1,8 +1,8 @@
 import type { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
 import { IconButton } from '@/components/ui';
-import { Trash2, Copy, Edit } from 'lucide-react';
+import { Trash2, Copy } from 'lucide-react';
 import RosterUnitCardBase from './roster-unit-card-base';
 
 interface RosterUnitCardEditProps {
@@ -10,28 +10,21 @@ interface RosterUnitCardEditProps {
   rosterId: string;
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
-  onUpdateWargear?: (unitId: string, wargear: depot.Wargear[]) => void;
 }
 
 const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   unit,
   rosterId,
   onRemove,
-  onDuplicate,
-  onUpdateWargear
+  onDuplicate
 }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/rosters/${rosterId}/units/${unit.id}/edit`);
+  };
   const actions = (
     <div className="flex items-center gap-1">
-      <Link to={`/rosters/${rosterId}/units/${unit.id}/edit`}>
-        <IconButton
-          aria-label="Edit unit wargear and enhancements"
-          variant="ghost"
-          size="sm"
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <Edit size={16} />
-        </IconButton>
-      </Link>
       <IconButton
         onClick={(e) => {
           e.stopPropagation();
@@ -59,7 +52,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
     </div>
   );
 
-  return <RosterUnitCardBase unit={unit} actions={actions} />;
+  return <RosterUnitCardBase unit={unit} actions={actions} onClick={handleCardClick} />;
 };
 
 export default RosterUnitCardEdit;

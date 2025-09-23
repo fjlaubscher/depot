@@ -4,13 +4,11 @@ import classNames from 'classnames';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'outlined';
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  hover?: boolean;
 }
 
 const Card: FC<CardProps> = ({
   variant = 'default',
   padding = 'md',
-  hover = false,
   className,
   children,
   ...props
@@ -30,15 +28,12 @@ const Card: FC<CardProps> = ({
     lg: 'p-6'
   };
 
-  const hoverClasses = hover ? 'hover:shadow-md cursor-pointer' : '';
-
   return (
     <div
       className={classNames(
         baseClasses,
         variantClasses[variant],
         paddingClasses[padding],
-        hoverClasses,
         className
       )}
       {...props}

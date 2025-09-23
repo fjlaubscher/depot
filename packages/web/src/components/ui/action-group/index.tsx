@@ -4,7 +4,7 @@ import IconButton from '../icon-button';
 
 export interface Action {
   icon: ReactNode;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   ariaLabel: string;
   variant?: 'primary' | 'secondary' | 'danger' | 'default' | 'ghost';
   size?: 'sm' | 'md' | 'lg';

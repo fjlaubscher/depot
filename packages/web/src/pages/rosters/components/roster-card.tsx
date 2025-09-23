@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Trash2, Eye } from 'lucide-react';
 import { Card, ActionGroup, PointsTag } from '@/components/ui';
 
 interface RosterCardProps {
@@ -17,7 +17,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
     navigate(`/rosters/${roster.id}`);
   };
 
-  const handleEdit = () => {
+  const handleCardClick = () => {
     navigate(`/rosters/${roster.id}/edit`);
   };
 
@@ -42,7 +42,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
   };
 
   return (
-    <Card className="relative" data-testid="roster-card">
+    <Card className="relative cursor-pointer" onClick={handleCardClick} data-testid="roster-card">
       <div className="flex flex-col gap-3">
         {/* Title row - full width */}
         <div>
@@ -67,19 +67,19 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
             actions={[
               {
                 icon: <Eye size={16} />,
-                onClick: handleView,
+                onClick: (e) => {
+                  e.stopPropagation();
+                  handleView();
+                },
                 ariaLabel: 'View roster',
                 variant: 'primary'
               },
               {
-                icon: <Edit size={16} />,
-                onClick: handleEdit,
-                ariaLabel: 'Edit roster',
-                variant: 'secondary'
-              },
-              {
                 icon: <Trash2 size={16} />,
-                onClick: handleDelete,
+                onClick: (e) => {
+                  e.stopPropagation();
+                  handleDelete();
+                },
                 ariaLabel: 'Delete roster',
                 variant: 'danger',
                 disabled: isDeleting,
