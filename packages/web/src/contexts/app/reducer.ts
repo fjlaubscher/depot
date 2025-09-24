@@ -1,4 +1,4 @@
-import { AppState, AppAction } from './types';
+import type { AppState, AppAction } from './types';
 import { APP_ACTIONS } from './constants';
 
 // Initial state

@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import ToastContext from './context';
-import { ToastContextType } from './types';
+import type { ToastContextType } from './types';
 
 // Hook to use the toast context
 export const useToast = (): ToastContextType => {

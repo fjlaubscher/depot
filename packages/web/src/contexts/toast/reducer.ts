@@ -1,4 +1,4 @@
-import { ToastState, ToastAction } from './types';
+import type { ToastState, ToastAction } from './types';
 import { TOAST_ACTIONS } from './constants';
 
 // Initial state

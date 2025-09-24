@@ -1,10 +1,11 @@
 import { readFileSync } from 'fs';
+import { join } from 'path';
 import { depot, wahapedia } from '@depot/core';
 
-const JSON_DIR = `${__dirname}/json`;
+const JSON_DIR = join(__dirname, 'json');
 
 const readFileAndParseToJSON = <T>(fileName: string): T[] =>
-  JSON.parse(readFileSync(`${JSON_DIR}/${fileName}`, { encoding: 'utf-8' }));
+  JSON.parse(readFileSync(join(JSON_DIR, fileName), { encoding: 'utf-8' }));
 
 const consolidateFiles = (): wahapedia.Data => {
   const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');

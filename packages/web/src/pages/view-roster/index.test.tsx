@@ -1,12 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TestWrapper } from '@/test/test-utils';
-import {
-  createMockRosterUnit,
-  createMockRoster,
-  mockEmptyRoster,
-  mockFullRoster
-} from '@/test/mock-data';
+import { createMockRosterUnit } from '@/test/mock-data';
 import ViewRosterPage from './index';
 
 // Mock AppLayout

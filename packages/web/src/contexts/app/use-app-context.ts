@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import AppContext from './context';
-import { AppContextType } from './types';
+import type { AppContextType } from './types';
 
 // Hook to use the context
 export const useAppContext = (): AppContextType => {

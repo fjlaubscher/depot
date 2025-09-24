@@ -1,10 +1,10 @@
-import React, { ReactNode } from 'react';
+import type { FC, ReactNode, MouseEvent } from 'react';
 import classNames from 'classnames';
 import IconButton from '../icon-button';
 
 export interface Action {
   icon: ReactNode;
-  onClick: (e: React.MouseEvent) => void;
+  onClick: (e: MouseEvent) => void;
   ariaLabel: string;
   variant?: 'primary' | 'secondary' | 'danger' | 'default' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -54,11 +54,7 @@ const getVariantClasses = (variant: Action['variant'] = 'ghost') => {
   return variantClasses[variant];
 };
 
-export const ActionGroup: React.FC<ActionGroupProps> = ({
-  actions,
-  className,
-  spacing = 'normal'
-}) => {
+export const ActionGroup: FC<ActionGroupProps> = ({ actions, className, spacing = 'normal' }) => {
   if (!actions || actions.length === 0) {
     return null;
   }

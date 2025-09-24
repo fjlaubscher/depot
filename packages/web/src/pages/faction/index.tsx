@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useMemo, startTransition } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Star } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader, Tabs, IconButton, ErrorState, Breadcrumbs } from '@/components/ui';
+import { PageHeader, Tabs, ErrorState, Breadcrumbs } from '@/components/ui';
 import { BackButton } from '@/components/shared';
 
 // Hooks

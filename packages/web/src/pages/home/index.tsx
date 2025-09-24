@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Star, Settings, List, Cog } from 'lucide-react';
-import { depot } from '@depot/core';
+import { Search, Star, Settings, List } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';

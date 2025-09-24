@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
-import { mockRoster, createMockRoster, mockEmptyRoster } from '@/test/mock-data';
+import { mockRoster, createMockRoster } from '@/test/mock-data';
 import Rosters from './index';
 
 // Mock AppLayout to avoid sidebar duplication

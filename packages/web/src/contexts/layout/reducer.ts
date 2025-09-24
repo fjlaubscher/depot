@@ -1,4 +1,4 @@
-import { LayoutState, LayoutAction } from './types';
+import type { LayoutState, LayoutAction } from './types';
 import { LAYOUT_ACTIONS } from './constants';
 
 // Initial state

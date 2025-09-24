@@ -1,5 +1,6 @@
-import React, { createContext, useReducer, useCallback } from 'react';
-import { ToastContextType, Toast } from './types';
+import type { FC, ReactNode } from 'react';
+import { createContext, useReducer, useCallback } from 'react';
+import type { ToastContextType, Toast } from './types';
 import { toastReducer, initialToastState } from './reducer';
 import { TOAST_ACTIONS } from './constants';
 
@@ -8,10 +9,10 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 // Provider component
 interface ToastProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
+export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(toastReducer, initialToastState);
 
   // Generate unique ID for toasts

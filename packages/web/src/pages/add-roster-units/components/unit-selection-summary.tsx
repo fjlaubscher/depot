@@ -1,6 +1,6 @@
-import React from 'react';
+import type { FC } from 'react';
 import { Button, Card } from '@/components/ui';
-import { SelectedUnit } from '@/hooks/use-roster-unit-selection';
+import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
 
 interface UnitSelectionSummaryProps {
   selectedUnits: SelectedUnit[];
@@ -9,7 +9,7 @@ interface UnitSelectionSummaryProps {
   onClearSelection: () => void;
 }
 
-export const UnitSelectionSummary: React.FC<UnitSelectionSummaryProps> = ({
+export const UnitSelectionSummary: FC<UnitSelectionSummaryProps> = ({
   selectedUnits,
   totalSelectedPoints,
   onAddToRoster,

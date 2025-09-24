@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode, FC } from 'react';
 import { depot } from '@depot/core';
 import { Search, Filters, CollapsibleSection, Grid, LinkCard } from '@/components/ui';
-import { useDatasheetSearch, DatasheetFilters } from '@/hooks/use-datasheet-search';
+import { useDatasheetSearch } from '@/hooks/use-datasheet-search';
+import type { DatasheetFilters } from '@/hooks/use-datasheet-search';
 
 interface DatasheetBrowserProps {
   datasheets: depot.Datasheet[];
@@ -12,7 +13,7 @@ interface DatasheetBrowserProps {
   filters?: DatasheetFilters;
 }
 
-export const DatasheetBrowser: React.FC<DatasheetBrowserProps> = ({
+export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
   datasheets,
   renderDatasheet,
   searchPlaceholder = 'Search datasheets...',

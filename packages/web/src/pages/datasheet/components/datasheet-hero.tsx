@@ -1,8 +1,8 @@
-import React from 'react';
+import type { FC } from 'react';
 import { depot } from '@depot/core';
 
 // components
-import { Card, Tag, TagGroup } from '@/components/ui';
+import { Tag, TagGroup } from '@/components/ui';
 import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
 
 // utils
@@ -12,7 +12,7 @@ interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
 }
 
-const DatasheetHero: React.FC<DatasheetHeroProps> = ({ datasheet }) => {
+const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
   const { models, keywords, unitComposition, loadout } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 

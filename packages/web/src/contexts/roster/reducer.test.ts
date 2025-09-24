@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
-import { RosterAction } from './types';
+import type { RosterAction } from './types';
 import { depot } from '@depot/core';
 import { mockFactionIndex } from '@/test/mock-data';
 

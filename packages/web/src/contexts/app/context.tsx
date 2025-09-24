@@ -1,6 +1,7 @@
-import React, { createContext, useReducer, useEffect, useCallback } from 'react';
+import type { FC, ReactNode } from 'react';
+import { createContext, useReducer, useEffect, useCallback } from 'react';
 import { depot } from '@depot/core';
-import { AppContextType } from './types';
+import type { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
@@ -11,10 +12,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 // Provider component
 interface AppProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Get faction data directly from IndexedDB with network fallback

@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import type { FC } from 'react';
+import { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
 
 // components
@@ -17,7 +18,7 @@ import DatasheetStratagems from './components/datasheet-stratagems';
 import DatasheetAbilitiesTab from './components/datasheet-abilities-tab';
 import Skeleton from './components/skeleton';
 
-const DatasheetPage: React.FC = () => {
+const DatasheetPage: FC = () => {
   const { factionId, id } = useParams<{ factionId: string; id: string }>();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);

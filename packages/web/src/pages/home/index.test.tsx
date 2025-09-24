@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import Home from './index';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
-import { AppContextType } from '@/contexts/app/types';
+import type { AppContextType } from '@/contexts/app/types';
 
 // Mock AppLayout to avoid sidebar duplication
 vi.mock('@/components/layout', () => ({

@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { RosterProvider } from './context';
 import { useRoster } from './use-roster-context';
-import { mockRoster, createMockRoster } from '@/test/mock-data';
+import { createMockRoster } from '@/test/mock-data';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -15,7 +16,7 @@ vi.mock('../../data/offline-storage', () => ({
 }));
 
 // Test component to consume the context
-const TestComponent = ({ rosterId }: { rosterId?: string }) => {
+const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
   const { state, createRoster } = useRoster();
 
   const handleCreateRoster = () => {
@@ -58,7 +59,7 @@ const TestComponent = ({ rosterId }: { rosterId?: string }) => {
 };
 
 // Test wrapper with RosterProvider
-const TestWrapper = ({ rosterId, children }: { rosterId?: string; children: React.ReactNode }) => (
+const TestWrapper = ({ rosterId, children }: { rosterId?: string; children: ReactNode }) => (
   <RosterProvider rosterId={rosterId}>{children}</RosterProvider>
 );
 

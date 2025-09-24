@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Factions from './index';
 import { depot } from '@depot/core';
-import { AppContextType } from '@/contexts/app/types';
+import type { AppContextType } from '@/contexts/app/types';
 import { TestWrapper } from '@/test/test-utils';
 
 // Mock the context with proper typing

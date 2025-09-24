@@ -23,7 +23,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
   );
 
   const currentWarlord = roster.units.find(
-    (u) =>
+    (_u) =>
       // TODO: This would need actual warlord tracking in the roster data structure
       // For now, we'll just use the isWarlord state
       false // placeholder

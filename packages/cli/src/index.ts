@@ -1,13 +1,13 @@
-import fetch from 'node-fetch';
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { join } from 'path';
 import { depot } from '@depot/core';
 
 import convertToJSON from './convert-to-json';
 import generateData from './generate-data';
 
-const JSON_DIR = `${__dirname}/json`;
-const DATA_DIR = `${__dirname}/data`;
-const SOURCE_DATA_DIR = `${__dirname}/source_data`;
+const JSON_DIR = join(__dirname, 'json');
+const DATA_DIR = join(__dirname, 'data');
+const SOURCE_DATA_DIR = join(__dirname, 'source_data');
 
 const getFileName = (input: string) =>
   input.toLowerCase().replace(/_/g, '-').replace('.csv', '.json');
@@ -76,14 +76,14 @@ const init = async () => {
 
     console.log('Saving raw CSV files for debugging');
     for (let i = 0; i < results.length; i++) {
-      const csvPath = `${SOURCE_DATA_DIR}/${csvFileNames[i]}`;
+      const csvPath = join(SOURCE_DATA_DIR, csvFileNames[i]);
       console.log(`Saving ${csvPath}`);
       writeFileSync(csvPath, results[i]);
     }
   } else {
     console.log('Using existing source data files');
     results = csvFileNames.map((fileName) => {
-      const csvPath = `${SOURCE_DATA_DIR}/${fileName}`;
+      const csvPath = join(SOURCE_DATA_DIR, fileName);
       console.log(`Reading ${csvPath}`);
       return readFileSync(csvPath, 'utf-8');
     });
@@ -92,8 +92,9 @@ const init = async () => {
   console.log('Parsing data from CSV');
   for (let i = 0; i < results.length; i++) {
     const parsedData = convertToJSON(results[i]);
-    console.log(`Creating ${JSON_DIR}/${fileNames[i]}`);
-    writeFileSync(`${JSON_DIR}/${fileNames[i]}`, JSON.stringify(parsedData));
+    const jsonPath = join(JSON_DIR, fileNames[i]);
+    console.log(`Creating ${jsonPath}`);
+    writeFileSync(jsonPath, JSON.stringify(parsedData));
   }
 
   console.log('Generating faction files');
@@ -103,7 +104,7 @@ const init = async () => {
   const data = generateData();
 
   data.forEach((faction) => {
-    const filePath = `${DATA_DIR}/${faction.id}.json`;
+    const filePath = join(DATA_DIR, `${faction.id}.json`);
 
     // Calculate metadata counts for the index
     const datasheetCount = faction.datasheets.length;
@@ -126,7 +127,7 @@ const init = async () => {
   });
 
   console.log('Generating index file');
-  writeFileSync(`${DATA_DIR}/index.json`, JSON.stringify(index));
+  writeFileSync(join(DATA_DIR, 'index.json'), JSON.stringify(index));
 };
 
 init()

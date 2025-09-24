@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AllFactionsTab from './all-factions-tab';
-import { GroupedFactions } from '../utils/faction';
+import type { GroupedFactions } from '../utils/faction';
 import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 

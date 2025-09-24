@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import classNames from 'classnames';
 import { X, Check, AlertTriangle, Info, AlertCircle } from 'lucide-react';
-import { Toast as ToastType } from '@/contexts/toast/types';
+import type { Toast as ToastType } from '@/contexts/toast/types';
 import IconButton from '../icon-button';
 
 interface ToastProps {

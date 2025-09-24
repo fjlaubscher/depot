@@ -1,7 +1,8 @@
-import React, { createContext, useReducer, ReactNode, useCallback, useEffect } from 'react';
+import type { FC, ReactNode } from 'react';
+import { createContext, useReducer, useCallback, useEffect } from 'react';
 import { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
-import { RosterState, RosterContextValue } from './types';
+import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
 
@@ -12,7 +13,7 @@ interface RosterProviderProps {
   rosterId?: string;
 }
 
-export const RosterProvider: React.FC<RosterProviderProps> = ({ children, rosterId }) => {
+export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) => {
   const [state, dispatch] = useReducer(rosterReducer, initialState);
 
   // Load roster on mount if rosterId is provided

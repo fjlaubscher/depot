@@ -1,5 +1,6 @@
-import React, { createContext, useReducer } from 'react';
-import { LayoutContextType } from './types';
+import type { FC, ReactNode } from 'react';
+import { createContext, useReducer } from 'react';
+import type { LayoutContextType } from './types';
 import { layoutReducer, initialLayoutState } from './reducer';
 import { LAYOUT_ACTIONS } from './constants';
 
@@ -8,10 +9,10 @@ const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 // Provider component
 interface LayoutProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
+export const LayoutProvider: FC<LayoutProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(layoutReducer, initialLayoutState);
 
   // Action creators

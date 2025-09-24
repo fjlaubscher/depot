@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import type { FC } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
 import { Eye, Plus } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
 import { BackButton } from '@/components/shared';
 import { RosterHeader, RosterSection, RosterUnitCardEdit } from '@/components/shared/roster';
-import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
+import { groupRosterUnitsByRole } from '@/utils/roster';
 
-const RosterView: React.FC = () => {
-  const { state: roster, duplicateUnit, removeUnit, updateUnitWargear } = useRoster();
+const RosterView: FC = () => {
+  const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const { state: appState } = useAppContext();
   const navigate = useNavigate();
 
@@ -115,7 +114,7 @@ const RosterView: React.FC = () => {
   );
 };
 
-const RosterPage: React.FC = () => {
+const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (

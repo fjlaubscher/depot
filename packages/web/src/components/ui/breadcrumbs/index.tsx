@@ -1,14 +1,16 @@
-import React from 'react';
+import type { FC } from 'react';
+import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
-import { BreadcrumbItem, generateBreadcrumbs } from '@/utils/breadcrumbs';
+import type { BreadcrumbItem } from '@/utils/breadcrumbs';
+import { generateBreadcrumbs } from '@/utils/breadcrumbs';
 
 interface BreadcrumbsProps {
   items?: BreadcrumbItem[];
   className?: string;
 }
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items = [], className = '' }) => {
+const Breadcrumbs: FC<BreadcrumbsProps> = ({ items = [], className = '' }) => {
   const location = useLocation();
 
   // Don't show breadcrumbs on home page
@@ -38,7 +40,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items = [], className = '' })
       </Link>
 
       {breadcrumbItems.map((item, index) => (
-        <React.Fragment key={item.path}>
+        <Fragment key={item.path}>
           <ChevronRight size={12} className="mx-2 text-gray-400 dark:text-gray-500" />
           {index === breadcrumbItems.length - 1 ? (
             <span className="text-gray-900 dark:text-white font-medium">{item.label}</span>
@@ -50,7 +52,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items = [], className = '' })
               {item.label}
             </Link>
           )}
-        </React.Fragment>
+        </Fragment>
       ))}
     </nav>
   );

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import useRosters from './use-rosters';
-import { createMockRoster, mockRoster, mockEmptyRoster } from '@/test/mock-data';
+import { createMockRoster, mockRoster } from '@/test/mock-data';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({

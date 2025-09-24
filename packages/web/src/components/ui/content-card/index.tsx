@@ -1,4 +1,5 @@
-import React, { ReactNode, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import classNames from 'classnames';
 import Card from '../card';
@@ -43,7 +44,7 @@ const getBadgeClasses = (variant: Badge['variant'] = 'primary', size: Badge['siz
   return classNames(baseClasses, sizeClasses[size], variantClasses[variant]);
 };
 
-export const ContentCard: React.FC<ContentCardProps> = ({
+export const ContentCard: FC<ContentCardProps> = ({
   title,
   subtitle,
   legend,

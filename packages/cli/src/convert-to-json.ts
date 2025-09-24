@@ -32,7 +32,7 @@ const stripHtml = (input: string) => {
 };
 
 const convertToCamelCase = (input: string) =>
-  input.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase());
+  input.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
 
 const getHeaders = (rows: string[]) => rows[0].split('|').map(convertToCamelCase);
 

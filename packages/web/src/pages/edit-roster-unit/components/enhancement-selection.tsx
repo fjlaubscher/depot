@@ -11,7 +11,7 @@ interface EnhancementSelectionProps {
 }
 
 const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
-  unit,
+  unit: _unit,
   roster,
   selectedEnhancements,
   onEnhancementChange

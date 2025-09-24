@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import LayoutContext from './context';
-import { LayoutContextType } from './types';
+import type { LayoutContextType } from './types';
 
 // Hook to use the layout context
 export const useLayoutContext = (): LayoutContextType => {

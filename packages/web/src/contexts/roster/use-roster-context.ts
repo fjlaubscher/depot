@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { RosterContext } from './context';
-import { RosterContextValue } from './types';
+import type { RosterContextValue } from './types';
 
 export const useRoster = (): RosterContextValue => {
   const context = useContext(RosterContext);

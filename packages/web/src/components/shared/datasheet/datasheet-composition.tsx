@@ -1,4 +1,4 @@
-import React from 'react';
+import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
 // components
@@ -10,14 +10,14 @@ interface DatasheetCompositionProps {
   'data-testid'?: string;
 }
 
-export const DatasheetComposition: React.FC<DatasheetCompositionProps> = ({
+export const DatasheetComposition: FC<DatasheetCompositionProps> = ({
   composition,
   loadout,
   'data-testid': testId
 }) => (
   <Card className="flex flex-col gap-2 p-4" data-testid={testId}>
     <ul className="space-y-2 list-disc pl-4">
-      {composition.map((comp, i) => (
+      {composition.map((comp) => (
         <li
           key={`composition-${comp.line}`}
           className="text-sm text-gray-700 dark:text-gray-300"

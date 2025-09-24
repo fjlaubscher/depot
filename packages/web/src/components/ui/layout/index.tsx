@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import type { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Home } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
 import { BREAKPOINTS } from '@/constants/breakpoints';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import IconButton from '../icon-button';
-import Loader from '../loader';
 import Logo from '@/components/logo';
 
 interface LayoutProps {

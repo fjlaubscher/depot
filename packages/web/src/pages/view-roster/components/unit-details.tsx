@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { depot } from '@depot/core';
 
 import ModelStatsRow from '@/components/shared/model-stats-row';
-import { Tag, TagGroup } from '@/components/ui';
 import { WargearTable } from '@/components/shared';
 import { categorizeAbilities } from '@/pages/datasheet/utils/abilities';
 

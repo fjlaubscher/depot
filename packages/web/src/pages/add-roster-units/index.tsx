@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import type { FC } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
@@ -12,23 +13,15 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Card } from '@/components/ui';
 import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared';
 
-const AddRosterUnitsView: React.FC = () => {
+const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
   const { getFaction } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [factionData, setFactionData] = useState<depot.Faction | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const {
-    selectedUnits,
-    totalSelectedPoints,
-    addToSelection,
-    removeLatestUnit,
-    getUnitCount,
-    clearSelection,
-    hasSelection
-  } = useRosterUnitSelection();
+  const { selectedUnits, totalSelectedPoints, addToSelection, clearSelection, hasSelection } =
+    useRosterUnitSelection();
 
   useEffect(() => {
     if (roster.id && roster.factionId) {
@@ -125,7 +118,7 @@ const AddRosterUnitsView: React.FC = () => {
   );
 };
 
-const AddRosterUnitsPage: React.FC = () => {
+const AddRosterUnitsPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
