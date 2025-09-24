@@ -82,6 +82,19 @@ const EditRosterUnitView: React.FC = () => {
     }
   }, [unitId, unit, roster.enhancements]);
 
+  // Memoized calculations (must be before early returns to maintain hook order)
+  const shouldShowWargearOptions = useMemo(() => {
+    if (!unit?.datasheet.options) return false;
+    if (unit.datasheet.options.length === 0) return false;
+    if (
+      unit.datasheet.options.length === 1 &&
+      unit.datasheet.options[0].description.toLowerCase().trim() === 'none'
+    ) {
+      return false;
+    }
+    return true;
+  }, [unit?.datasheet.options]);
+
   // Loading state while roster loads
   if (!roster.id) {
     return (
@@ -113,17 +126,6 @@ const EditRosterUnitView: React.FC = () => {
   const isCharacter = unit.datasheet.keywords.some((k) =>
     k.keyword.toLowerCase().includes('character')
   );
-
-  const shouldShowWargearOptions = useMemo(() => {
-    if (unit.datasheet.options.length === 0) return false;
-    if (
-      unit.datasheet.options.length === 1 &&
-      unit.datasheet.options[0].description.toLowerCase().trim() === 'none'
-    ) {
-      return false;
-    }
-    return true;
-  }, [unit.datasheet.options]);
 
   const handleSave = () => {
     if (!unitId) return;

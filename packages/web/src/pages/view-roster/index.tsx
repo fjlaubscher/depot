@@ -95,7 +95,8 @@ const RosterView: React.FC = () => {
         action={{
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/edit`),
-          ariaLabel: 'Edit roster'
+          ariaLabel: 'Edit roster',
+          testId: 'edit-roster-button'
         }}
       />
 
@@ -105,11 +106,17 @@ const RosterView: React.FC = () => {
           variant="secondary"
           onClick={handleExportMarkdown}
           className="flex items-center gap-2"
+          data-testid="export-button"
         >
           <Download size={16} />
           Export
         </Button>
-        <Button variant="secondary" onClick={handleShareRoster} className="flex items-center gap-2">
+        <Button
+          variant="secondary"
+          onClick={handleShareRoster}
+          className="flex items-center gap-2"
+          data-testid="share-button"
+        >
           <Share size={16} />
           Share
         </Button>
@@ -122,6 +129,7 @@ const RosterView: React.FC = () => {
             <RosterSection
               key={role}
               title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
+              data-testid="unit-role-section"
             >
               {groupedUnits[role].map((unit) => (
                 <ViewRosterUnitCard key={unit.id} unit={unit} />
@@ -130,7 +138,10 @@ const RosterView: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+        <div
+          className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
+          data-testid="empty-roster-message"
+        >
           <div className="flex flex-col gap-2">
             <p className="text-gray-500 dark:text-gray-400 text-lg">No units in this roster</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm">

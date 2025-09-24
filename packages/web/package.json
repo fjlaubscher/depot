@@ -10,7 +10,8 @@
     "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --reporter=basic",
+    "test:ci": "vitest run --reporter=verbose",
     "dev": "vite --host",
     "generate-pwa-assets": "pwa-assets-generator"
   },

@@ -8,6 +8,7 @@
     "format": "pnpm -r format",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
+    "typecheck": "pnpm -r typecheck",
     "dev": "pnpm --filter @depot/web dev"
   },
   "devDependencies": {

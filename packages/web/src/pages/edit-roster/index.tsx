@@ -68,7 +68,11 @@ const RosterView: React.FC = () => {
         }}
       />
 
-      <Button onClick={handleAddUnits} className="w-full flex items-center gap-2">
+      <Button
+        onClick={handleAddUnits}
+        className="w-full flex items-center gap-2"
+        data-testid="add-units-button"
+      >
         <Plus size={16} />
         Add Units to Roster
       </Button>
@@ -80,6 +84,7 @@ const RosterView: React.FC = () => {
             <RosterSection
               key={role}
               title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
+              data-testid="unit-role-section"
             >
               {groupedUnits[role].map((unit) => (
                 <RosterUnitCardEdit
@@ -94,11 +99,14 @@ const RosterView: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
+        <div
+          className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
+          data-testid="empty-roster-state"
+        >
           <div className="flex flex-col gap-2">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">No units added yet</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">No units in this roster</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm">
-              Use the "Add Units to Roster" button to start building your roster
+              Add units to start building your roster
             </p>
           </div>
         </div>

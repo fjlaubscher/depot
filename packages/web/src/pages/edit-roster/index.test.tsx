@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
-import { mockRoster } from '@/test/mock-data';
+import {
+  mockRoster,
+  createMockRoster,
+  createMockRosterUnit,
+  mockEmptyRoster
+} from '@/test/mock-data';
 import EditRosterPage from './index';
 
 // Mock AppLayout
@@ -30,12 +36,21 @@ const mockRosterContext = vi.hoisted(() => ({
     id: 'test-roster-id',
     name: 'Test Roster',
     factionId: 'space-marines',
-    faction: { id: 'space-marines', name: 'Space Marines' },
-    detachment: { name: 'Gladius Task Force' },
-    units: [],
+    faction: {
+      id: 'space-marines',
+      name: 'Space Marines',
+      path: '/data/space-marines.json'
+    } as depot.Index,
+    detachment: {
+      name: 'Gladius Task Force',
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    } as depot.Detachment,
+    units: [] as depot.RosterUnit[],
     enhancements: [],
     points: { current: 0, max: 2000 }
-  },
+  } as depot.Roster,
   duplicateUnit: vi.fn(),
   removeUnit: vi.fn(),
   updateUnitWargear: vi.fn()
@@ -54,7 +69,7 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   state: {
-    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }]
+    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }] as depot.Index[]
   }
 }));
 
@@ -73,9 +88,12 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 // Mock roster utils
 vi.mock('@/utils/roster', () => ({
   generateRosterMarkdown: vi.fn(() => 'mock markdown'),
-  groupRosterUnitsByRole: vi.fn(() => ({
-    HQ: [{ id: 'unit-1', datasheet: { name: 'Test Unit' } }]
-  }))
+  groupRosterUnitsByRole: vi.fn((units) => {
+    if (units.length === 0) return {};
+    return {
+      CHARACTER: units
+    };
+  })
 }));
 
 // Mock RosterUnitCardEdit
@@ -88,16 +106,16 @@ vi.mock('@/components/shared/roster', async () => {
       onDuplicate,
       onRemove
     }: {
-      unit: any;
-      onDuplicate: () => void;
-      onRemove: () => void;
+      unit: depot.RosterUnit;
+      onDuplicate: (unit: depot.RosterUnit) => void;
+      onRemove: (unitId: string) => void;
     }) => (
       <div data-testid="roster-unit-card-edit" data-unit-name={unit.datasheet.name}>
         <span>{unit.datasheet.name}</span>
-        <button onClick={onDuplicate} data-testid="duplicate-unit">
+        <button onClick={() => onDuplicate(unit)} data-testid="duplicate-unit">
           Duplicate
         </button>
-        <button onClick={onRemove} data-testid="remove-unit">
+        <button onClick={() => onRemove(unit.id)} data-testid="remove-unit">
           Remove
         </button>
       </div>
@@ -112,8 +130,17 @@ describe('EditRosterPage', () => {
       id: 'test-roster-id',
       name: 'Test Roster',
       factionId: 'space-marines',
-      faction: { id: 'space-marines', name: 'Space Marines' },
-      detachment: { name: 'Gladius Task Force' },
+      faction: {
+        id: 'space-marines',
+        name: 'Space Marines',
+        path: '/data/space-marines.json'
+      } as depot.Index,
+      detachment: {
+        name: 'Gladius Task Force',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      } as depot.Detachment,
       units: [],
       enhancements: [],
       points: { current: 0, max: 2000 }
@@ -154,5 +181,74 @@ describe('EditRosterPage', () => {
 
     const backLink = screen.getByText('Rosters');
     expect(backLink.closest('a')).toHaveAttribute('href', '/rosters');
+  });
+
+  it('displays empty state when roster has no units', () => {
+    mockRosterContext.state = mockEmptyRoster;
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('empty-roster-state')).toBeInTheDocument();
+    expect(screen.getByText('No units in this roster')).toBeInTheDocument();
+  });
+
+  it('shows add units button when roster is empty', () => {
+    mockRosterContext.state = mockEmptyRoster;
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('add-units-button')).toBeInTheDocument();
+  });
+
+  it('handles unit duplication correctly', () => {
+    const testUnit = createMockRosterUnit({ id: 'test-unit-1' });
+    mockRosterContext.state = createMockRoster({
+      units: [testUnit]
+    });
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    const duplicateButton = screen.getByTestId('duplicate-unit');
+    fireEvent.click(duplicateButton);
+
+    expect(mockRosterContext.duplicateUnit).toHaveBeenCalledWith(testUnit);
+  });
+
+  it('handles unit removal correctly', () => {
+    const testUnit = createMockRosterUnit({ id: 'test-unit-1' });
+    mockRosterContext.state = createMockRoster({
+      units: [testUnit]
+    });
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    const removeButton = screen.getByTestId('remove-unit');
+    fireEvent.click(removeButton);
+
+    expect(mockRosterContext.removeUnit).toHaveBeenCalledWith(testUnit.id);
+  });
+
+  it('displays correct points tracking', () => {
+    mockRosterContext.state = createMockRoster({
+      points: { current: 1500, max: 2000 }
+    });
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('points-display')).toHaveTextContent('1500/2000');
+  });
+
+  it('handles roster with multiple units', () => {
+    const unit1 = createMockRosterUnit({ id: 'unit-1' });
+    const unit2 = createMockRosterUnit({ id: 'unit-2' });
+    mockRosterContext.state = createMockRoster({
+      units: [unit1, unit2]
+    });
+
+    render(<EditRosterPage />, { wrapper: TestWrapper });
+
+    // Should show CHARACTER section with unit count
+    expect(screen.getByTestId('unit-role-section')).toBeInTheDocument();
+    expect(screen.getByText('CHARACTER (2)')).toBeInTheDocument();
   });
 });

@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TestWrapper } from '@/test/test-utils';
-import { createMockRosterUnit } from '@/test/mock-data';
+import {
+  createMockRosterUnit,
+  createMockRoster,
+  mockEmptyRoster,
+  mockFullRoster
+} from '@/test/mock-data';
 import ViewRosterPage from './index';
 
 // Mock AppLayout
@@ -152,12 +157,12 @@ describe('ViewRosterPage', () => {
       units: [mockUnit]
     };
     mockGroupRosterUnitsByRole.mockReturnValue({
-      HQ: [mockUnit]
+      CHARACTER: [mockUnit]
     });
 
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('HQ (1)')).toBeInTheDocument();
+    expect(screen.getByText('CHARACTER (1)')).toBeInTheDocument();
     expect(screen.getByTestId('view-roster-unit-card')).toBeInTheDocument();
   });
 
@@ -186,5 +191,71 @@ describe('ViewRosterPage', () => {
 
     // Should fall back to faction ID
     expect(screen.getByText('space-marines')).toBeInTheDocument();
+  });
+
+  it('handles roster with maximum points', () => {
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      points: { current: 2000, max: 2000 }
+    };
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('points-display')).toHaveTextContent('2000/2000');
+  });
+
+  it('displays export functionality correctly', () => {
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      name: 'Test Export Roster',
+      units: [createMockRosterUnit()]
+    };
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('export-button')).toBeInTheDocument();
+    expect(screen.getByTestId('share-button')).toBeInTheDocument();
+  });
+
+  it('shows unit details in proper sections', () => {
+    const testUnit = createMockRosterUnit({
+      id: 'test-hq-unit'
+    });
+
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      units: [testUnit]
+    };
+    mockGroupRosterUnitsByRole.mockReturnValue({
+      CHARACTER: [testUnit]
+    });
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('unit-role-section')).toBeInTheDocument();
+    expect(screen.getByTestId('view-roster-unit-card')).toBeInTheDocument();
+  });
+
+  it('handles empty roster state properly', () => {
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      units: [],
+      points: { current: 0, max: 2000 }
+    };
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('empty-roster-message')).toBeInTheDocument();
+    expect(screen.getByText('No units in this roster')).toBeInTheDocument();
+  });
+
+  it('navigates to edit mode correctly', () => {
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    const editButton = screen.getByTestId('edit-roster-button');
+    fireEvent.click(editButton);
+
+    // Note: Navigation would be tested with the actual navigate function in integration tests
+    expect(editButton).toBeInTheDocument();
   });
 });

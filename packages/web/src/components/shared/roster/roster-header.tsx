@@ -17,8 +17,8 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
     <div className="flex items-center gap-4 text-sm">
       <div className="flex items-center gap-2">
         <span className="text-gray-500 dark:text-gray-400">Points</span>
-        <span className={`font-semibold ${pointsColor}`}>
-          {roster.points.current} / {roster.points.max}
+        <span className={`font-semibold ${pointsColor}`} data-testid="points-display">
+          {roster.points.current}/{roster.points.max}
         </span>
       </div>
       <div className="flex items-center gap-2">

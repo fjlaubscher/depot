@@ -10,7 +10,7 @@ interface DatasheetCompositionProps {
   'data-testid'?: string;
 }
 
-const DatasheetComposition: React.FC<DatasheetCompositionProps> = ({
+export const DatasheetComposition: React.FC<DatasheetCompositionProps> = ({
   composition,
   loadout,
   'data-testid': testId
@@ -31,5 +31,3 @@ const DatasheetComposition: React.FC<DatasheetCompositionProps> = ({
     />
   </Card>
 );
-
-export default DatasheetComposition;

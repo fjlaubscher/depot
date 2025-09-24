@@ -6,6 +6,7 @@ import { AppProvider } from './contexts/app/context';
 import { LayoutProvider } from './contexts/layout/context';
 import { RosterProvider } from './contexts/roster/context';
 import { ToastProvider } from './contexts/toast/context';
+import { ErrorBoundary } from './components/shared';
 import { ToastContainer } from './components/ui';
 import Routes from './routes';
 
@@ -18,7 +19,14 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <LayoutProvider>
           <RosterProvider>
             <ToastProvider>
-              <Routes />
+              <ErrorBoundary
+                fallbackTitle="Application Error"
+                fallbackMessage="Something went wrong with the application. Please refresh the page or try again later."
+                homeUrl="/"
+                showRetry
+              >
+                <Routes />
+              </ErrorBoundary>
               <ToastContainer />
             </ToastProvider>
           </RosterProvider>

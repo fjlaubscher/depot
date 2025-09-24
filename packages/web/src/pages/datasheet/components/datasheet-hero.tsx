@@ -3,8 +3,7 @@ import { depot } from '@depot/core';
 
 // components
 import { Card, Tag, TagGroup } from '@/components/ui';
-import ModelStatsRow from '@/components/shared/model-stats-row';
-import DatasheetComposition from '@/components/shared/datasheet/datasheet-composition';
+import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
 
 // utils
 import { groupKeywords } from '@/utils/keywords';

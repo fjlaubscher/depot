@@ -29,13 +29,13 @@ jobs:
         run: pnpm install
         
       - name: Format check
-        run: pnpm --filter @depot/web run format
+        run: pnpm --filter web format
         
       - name: Lint check
-        run: pnpm --filter @depot/web run lint
+        run: pnpm --filter web lint
         
       - name: Type check
-        run: pnpm --filter @depot/web run typecheck
+        run: pnpm --filter web typecheck
         
       - name: Run tests
-        run: pnpm --filter @depot/web test
+        run: pnpm --filter web test:ci

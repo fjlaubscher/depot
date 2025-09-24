@@ -70,144 +70,138 @@ describe('Home', () => {
     mockUseAppContext.mockReturnValue(defaultAppContext);
   });
 
-  describe('Component Rendering', () => {
-    it('should render welcome section', () => {
-      render(<Home />, { wrapper: TestWrapper });
+  it('should render welcome section', () => {
+    render(<Home />, { wrapper: TestWrapper });
 
-      expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
-    });
-
-    it('should render browse factions card', () => {
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
-    });
-
-    it('should render settings card', () => {
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
-      expect(screen.getByTestId('settings-button')).toBeInTheDocument();
-    });
-
-    it('should render app info section', () => {
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByText(/Data sourced from/)).toBeInTheDocument();
-      expect(screen.getByText('Wahapedia')).toBeInTheDocument();
-    });
+    expect(screen.getByTestId('welcome-heading')).toBeInTheDocument();
   });
 
-  describe('My Factions Feature', () => {
-    it('should not render my factions card when no favorites', () => {
-      render(<Home />, { wrapper: TestWrapper });
+  it('should render browse factions card', () => {
+    render(<Home />, { wrapper: TestWrapper });
 
-      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
-    });
-
-    it('should render my factions card when favorites exist', () => {
-      const contextWithMyFactions = {
-        ...defaultAppContext,
-        state: {
-          ...defaultAppContext.state,
-          myFactions: mockFactions
-        }
-      };
-      mockUseAppContext.mockReturnValue(contextWithMyFactions);
-
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
-    });
-
-    it('should render quick access section when favorites exist', () => {
-      const contextWithMyFactions = {
-        ...defaultAppContext,
-        state: {
-          ...defaultAppContext.state,
-          myFactions: mockFactions
-        }
-      };
-      mockUseAppContext.mockReturnValue(contextWithMyFactions);
-
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
-      expect(screen.getByText('Quick Access')).toBeInTheDocument();
-      // Check that faction links exist without checking text due to sidebar conflicts
-      const quickAccessSection = screen.getByTestId('quick-access-section');
-      expect(quickAccessSection).toBeInTheDocument();
-      expect(quickAccessSection.querySelectorAll('a[href^="/faction/"]')).toHaveLength(2);
-    });
-
-    it('should handle singular faction count correctly', () => {
-      const contextWithOneFaction = {
-        ...defaultAppContext,
-        state: {
-          ...defaultAppContext.state,
-          myFactions: [mockFactions[0]]
-        }
-      };
-      mockUseAppContext.mockReturnValue(contextWithOneFaction);
-
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.getByText('1 favorite faction saved')).toBeInTheDocument();
-    });
-
-    it('should handle empty favorites array', () => {
-      const contextWithEmptyFactions = {
-        ...defaultAppContext,
-        state: {
-          ...defaultAppContext.state,
-          myFactions: []
-        }
-      };
-      mockUseAppContext.mockReturnValue(contextWithEmptyFactions);
-
-      render(<Home />, { wrapper: TestWrapper });
-
-      expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
-    });
+    expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
   });
 
-  describe('Navigation', () => {
-    it('should navigate to factions when browse button is clicked', async () => {
-      const user = userEvent.setup();
+  it('should render settings card', () => {
+    render(<Home />, { wrapper: TestWrapper });
 
-      render(<Home />, { wrapper: TestWrapper });
+    expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
+    expect(screen.getByTestId('settings-button')).toBeInTheDocument();
+  });
 
-      await user.click(screen.getByTestId('browse-factions-button'));
-      expect(mockNavigate).toHaveBeenCalledWith('/factions');
-    });
+  it('should render app info section', () => {
+    render(<Home />, { wrapper: TestWrapper });
 
-    it('should navigate to settings when settings button is clicked', async () => {
-      const user = userEvent.setup();
+    expect(screen.getByText(/Data sourced from/)).toBeInTheDocument();
+    expect(screen.getByText('Wahapedia')).toBeInTheDocument();
+  });
 
-      render(<Home />, { wrapper: TestWrapper });
+  it('should not render my factions card when no favorites', () => {
+    render(<Home />, { wrapper: TestWrapper });
 
-      await user.click(screen.getByTestId('settings-button'));
-      expect(mockNavigate).toHaveBeenCalledWith('/settings');
-    });
+    expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
+  });
 
-    it('should navigate to faction when quick access faction is clicked', async () => {
-      const contextWithMyFactions = {
-        ...defaultAppContext,
-        state: {
-          ...defaultAppContext.state,
-          myFactions: mockFactions
-        }
-      };
-      mockUseAppContext.mockReturnValue(contextWithMyFactions);
+  it('should render my factions card when favorites exist', () => {
+    const contextWithMyFactions = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: mockFactions
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithMyFactions);
 
-      render(<Home />, { wrapper: TestWrapper });
+    render(<Home />, { wrapper: TestWrapper });
 
-      // Find faction links within the quick access section only
-      const quickAccessSection = screen.getByTestId('quick-access-section');
-      const factionLinks = quickAccessSection.querySelectorAll('a[href^="/faction/"]');
-      expect(factionLinks[0]).toHaveAttribute('href', '/faction/SM');
-      expect(factionLinks[1]).toHaveAttribute('href', '/faction/CSM');
-    });
+    expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
+  });
+
+  it('should render quick access section when favorites exist', () => {
+    const contextWithMyFactions = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: mockFactions
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithMyFactions);
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
+    expect(screen.getByText('Quick Access')).toBeInTheDocument();
+    // Check that faction links exist without checking text due to sidebar conflicts
+    const quickAccessSection = screen.getByTestId('quick-access-section');
+    expect(quickAccessSection).toBeInTheDocument();
+    expect(quickAccessSection.querySelectorAll('a[href^="/faction/"]')).toHaveLength(2);
+  });
+
+  it('should handle singular faction count correctly', () => {
+    const contextWithOneFaction = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: [mockFactions[0]]
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithOneFaction);
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    expect(screen.getByText('1 favorite faction saved')).toBeInTheDocument();
+  });
+
+  it('should handle empty favorites array', () => {
+    const contextWithEmptyFactions = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: []
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithEmptyFactions);
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
+  });
+
+  it('should navigate to factions when browse button is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    await user.click(screen.getByTestId('browse-factions-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('/factions');
+  });
+
+  it('should navigate to settings when settings button is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    await user.click(screen.getByTestId('settings-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('/settings');
+  });
+
+  it('should navigate to faction when quick access faction is clicked', async () => {
+    const contextWithMyFactions = {
+      ...defaultAppContext,
+      state: {
+        ...defaultAppContext.state,
+        myFactions: mockFactions
+      }
+    };
+    mockUseAppContext.mockReturnValue(contextWithMyFactions);
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    // Find faction links within the quick access section only
+    const quickAccessSection = screen.getByTestId('quick-access-section');
+    const factionLinks = quickAccessSection.querySelectorAll('a[href^="/faction/"]');
+    expect(factionLinks[0]).toHaveAttribute('href', '/faction/SM');
+    expect(factionLinks[1]).toHaveAttribute('href', '/faction/CSM');
   });
 });

@@ -1,5 +1,6 @@
 // Navigation
 export { default as BackButton } from './back-button';
+export { ErrorBoundary } from './error-boundary';
 
 // Data display
 export * from './datasheet';

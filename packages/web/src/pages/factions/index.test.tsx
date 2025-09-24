@@ -108,111 +108,103 @@ describe('Factions', () => {
     mockAppContext.state.factionIndex = mockFactions;
   });
 
-  describe('Loading State', () => {
-    it('should render LoadingSkeleton when loading', () => {
-      mockAppContext.state.loading = true;
+  it('should render LoadingSkeleton when loading', () => {
+    mockAppContext.state.loading = true;
 
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
 
-      expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-    });
-
-    it('should not render main content when loading', () => {
-      mockAppContext.state.loading = true;
-
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByTestId('search-filters')).not.toBeInTheDocument();
-    });
+    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
   });
 
-  describe('Error State', () => {
-    it('should render ErrorState when there is an error', () => {
-      const errorMessage = 'Failed to load factions';
-      mockAppContext.state.error = errorMessage;
+  it('should not render main content when loading', () => {
+    mockAppContext.state.loading = true;
 
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
 
-      expect(screen.getByTestId('error-state')).toBeInTheDocument();
-    });
-
-    it('should not render main content when there is an error', () => {
-      mockAppContext.state.error = 'Some error';
-
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      expect(screen.queryByTestId('search-filters')).not.toBeInTheDocument();
-    });
+    expect(screen.queryByTestId('search-filters')).not.toBeInTheDocument();
   });
 
-  describe('Success State', () => {
-    it('should render the factions content when loaded successfully', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
+  it('should render ErrorState when there is an error', () => {
+    const errorMessage = 'Failed to load factions';
+    mockAppContext.state.error = errorMessage;
 
-      expect(screen.getByTestId('search-filters')).toBeInTheDocument();
-    });
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
 
-    it('should handle search functionality', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      const searchInput = screen.getByTestId('faction-search');
-      fireEvent.change(searchInput, { target: { value: 'Space' } });
-
-      expect(searchInput).toHaveValue('Space');
-    });
-
-    it('should clear search when clear button is clicked', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
-
-      const searchInput = screen.getByTestId('faction-search');
-      const clearButton = screen.getByTestId('clear-search');
-
-      fireEvent.change(searchInput, { target: { value: 'Space' } });
-      expect(searchInput).toHaveValue('Space');
-
-      fireEvent.click(clearButton);
-      expect(searchInput).toHaveValue('');
-    });
+    expect(screen.getByTestId('error-state')).toBeInTheDocument();
   });
 
-  describe('Page Title', () => {
-    it('should have correct title', () => {
-      render(
-        <TestWrapper>
-          <Factions />
-        </TestWrapper>
-      );
+  it('should not render main content when there is an error', () => {
+    mockAppContext.state.error = 'Some error';
 
-      // The title is set in AppLayout, check if the component renders without error
-      expect(screen.getByTestId('search-filters')).toBeInTheDocument();
-    });
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
+
+    expect(screen.queryByTestId('search-filters')).not.toBeInTheDocument();
+  });
+
+  it('should render the factions content when loaded successfully', () => {
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
+
+    expect(screen.getByTestId('search-filters')).toBeInTheDocument();
+  });
+
+  it('should handle search functionality', () => {
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
+
+    const searchInput = screen.getByTestId('faction-search');
+    fireEvent.change(searchInput, { target: { value: 'Space' } });
+
+    expect(searchInput).toHaveValue('Space');
+  });
+
+  it('should clear search when clear button is clicked', () => {
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
+
+    const searchInput = screen.getByTestId('faction-search');
+    const clearButton = screen.getByTestId('clear-search');
+
+    fireEvent.change(searchInput, { target: { value: 'Space' } });
+    expect(searchInput).toHaveValue('Space');
+
+    fireEvent.click(clearButton);
+    expect(searchInput).toHaveValue('');
+  });
+
+  it('should have correct title', () => {
+    render(
+      <TestWrapper>
+        <Factions />
+      </TestWrapper>
+    );
+
+    // The title is set in AppLayout, check if the component renders without error
+    expect(screen.getByTestId('search-filters')).toBeInTheDocument();
   });
 });
