@@ -49,6 +49,14 @@ pnpm test    # Run tests
 - TypeScript types are the source of truth
 - CLI output must match these interfaces exactly
 
+## Scripts
+
+### `scripts/copy-data.mjs`
+Utility script that copies generated data from CLI output to web app directory:
+- **Source**: `packages/cli/dist/data`
+- **Target**: `packages/web/public/data` (dev) or `packages/web/dist/data` (prod)
+- Automatically called by `start` and `build` commands
+
 ## Requirements
 - **Node.js**: >=22.0.0
 - **Package Manager**: pnpm >=8.0.0

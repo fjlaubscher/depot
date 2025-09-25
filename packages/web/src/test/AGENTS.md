@@ -34,6 +34,15 @@ const custom = createMockDatasheet({ name: 'Custom Unit' });
 const mockData = { id: 'test' };
 ```
 
+#### Available Mock Data
+- `mockDatasheet` / `createMockDatasheet()` - Unit cards
+- `mockFaction` / `createMockFaction()` - Faction data
+- `mockStratagem` / `createMockStratagem()` - Stratagems
+- `mockEnhancement` - Character upgrades
+- `mockRoster` / `createMockRoster()` - Roster data
+- `mockRosterUnit` / `createMockRosterUnit()` - Roster units
+- Specialized variants: `mockEmptyFaction`, `mockFullRoster`, etc.
+
 ### Prefer data-testid
 ```typescript
 // ✅ Reliable

@@ -10,6 +10,9 @@ Fundamental building blocks with no business logic:
 - Dark mode support
 - Accessible by default
 - TypeScript interfaces
+- **Exported via**: `@/components/ui` index file
+
+Key components: Button, Card, Alert, Table, Toast, Layout, Search, Filters, Tags, and more.
 
 ### `shared/` - Domain Components
 Reusable components with depot-specific logic:
@@ -17,11 +20,21 @@ Reusable components with depot-specific logic:
 - Contain domain rendering logic
 - Reusable across pages
 
+Examples: DatasheetCard, StratagemCard, ModelStatsRow, WargearRow, ErrorBoundary
+
 ### `shared/roster/` - Roster Components
 Roster-specific components for building/editing:
 - Handle `depot.Roster` and `depot.RosterUnit` types
 - Shared between roster pages
 - Complex roster business logic
+
+Examples: RosterHeader, RosterSection, RosterUnitCard variants
+
+### `layout/` - Layout Components
+Main application layout structure
+
+### `logo/` - Brand Components
+Depot branding and logo assets
 
 ## File Naming
 - **kebab-case** for directories and files

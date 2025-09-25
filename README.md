@@ -4,68 +4,30 @@ A Warhammer 40,000 companion app powered by [Wahapedia](https://wahapedia.ru) da
 
 *"Knowledge is power, guard it well."*
 
-Built as a modern monorepo with three packages:
-- **@depot/cli** - Processes Wahapedia CSV exports into structured JSON
-- **@depot/core** - Shared TypeScript types and utilities
-- **@depot/web** - React PWA with offline roster building
-
-## Requirements
-
-- **Node.js**: >=22.0.0
-- **Package Manager**: pnpm >=8.0.0
-
-## Installation
-
-```bash
-pnpm install
-```
-
 ## Quick Start
 
-```bash
-# Install dependencies
-pnpm install
+**Requirements**: Node.js >=22.0.0, pnpm >=8.0.0
 
-# Start development (generates data + dev server)
+```bash
+pnpm install
 pnpm start
 ```
 
-This downloads Wahapedia data, processes it, and starts the web development server.
-
-## Commands
-
-```bash
-# Generate fresh data only
-pnpm --filter @depot/cli start
-
-# Force re-download source data
-pnpm refresh-data
-
-# Production build
-pnpm build
-
-# Code quality (run before commits)
-pnpm format
-pnpm lint
-pnpm test
-```
+This installs dependencies, downloads Wahapedia data, processes it, and starts the web development server.
 
 ## Features
 
 - **Offline Roster Building** - Create and edit army lists without internet
 - **Comprehensive Data** - All factions, datasheets, stratagems, and wargear
 - **Progressive Web App** - Install on any device for native-like experience
-- **Dark Mode** - Perfect for plotting in the shadows
-- **Responsive Design** - Works on desktop, tablet, and mobile
+- **Dark Mode Support** - Perfect for plotting in the shadows
 
 ## Architecture
 
-```
-packages/
-├── cli/     # Data processing from Wahapedia CSV
-├── core/    # Shared TypeScript types
-└── web/     # React PWA with IndexedDB storage
-```
+Monorepo with three packages:
+- **@depot/cli** - Processes Wahapedia CSV exports into structured JSON
+- **@depot/core** - Shared TypeScript types and utilities
+- **@depot/web** - React PWA with IndexedDB storage
 
 Built with React 19, Vite 6, Tailwind CSS v4, and TypeScript 5.9+.
 

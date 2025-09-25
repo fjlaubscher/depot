@@ -44,7 +44,10 @@ pnpm test
 - **Roster Context**: Roster building state
 
 ### Data Flow
-```
+1. **Fetch**: Load JSON files from `/public/data/` or network
+2. **Cache**: Store in IndexedDB for offline access
+3. **Context**: Global state management with React contexts
+4. **Components**: Consume data through hooks and contexts
 
 ### Directory Structure
 ```
@@ -56,8 +59,34 @@ src/
 ├── pages/              # Route components
 ├── hooks/              # Custom React hooks
 ├── utils/              # Business logic utilities
-└── data/               # IndexedDB and data utilities
+├── data/               # IndexedDB and data utilities
+├── constants/          # App constants
+└── styles/             # Global styles
 ```
+
+## Key Utilities
+
+### `utils/`
+- `faction.ts` - Faction data processing utilities
+- `datasheet.ts` - Unit card data helpers
+- `roster.ts` - Roster building logic
+- `wargear.ts` - Wargear parsing and validation
+- `detachment.ts` - Detachment rule processing
+- `enhancement.ts` - Character upgrade utilities
+- `slugify.ts` - URL slug generation
+- `paths.ts` - Route path constants
+
+### `hooks/`
+- `use-factions.ts` - Faction data fetching and caching
+- `use-faction.ts` - Single faction data access
+- `use-rosters.ts` - Roster management state
+- `use-settings.ts` - User preferences persistence
+- `use-datasheet-search.ts` - Unit search functionality
+- `use-local-storage.ts` - localStorage wrapper
+
+### `data/`
+- `offline-storage.ts` - IndexedDB data persistence layer
+- `indexed-db.ts` - Database schema and operations
 
 ## Data Requirements
 
