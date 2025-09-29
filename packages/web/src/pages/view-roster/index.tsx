@@ -19,7 +19,9 @@ const RosterView: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const factionName = appState.factionIndex?.find((f: any) => f.id === roster.factionId)?.name;
+  const factionName = appState.factionIndex?.find(
+    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
+  )?.name;
 
   const groupedUnits = useMemo(() => groupRosterUnitsByRole(roster.units), [roster.units]);
   const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
@@ -70,7 +72,7 @@ const RosterView: React.FC = () => {
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionId;
+      : factionName || roster.factionSlug || roster.factionId;
 
   return (
     <div className="flex flex-col gap-4">

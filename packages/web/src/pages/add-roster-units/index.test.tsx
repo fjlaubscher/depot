@@ -29,8 +29,9 @@ const mockRosterContext = vi.hoisted(() => ({
   state: {
     id: 'test-roster-id',
     name: 'Test Roster',
-    factionId: 'space-marines',
-    faction: { id: 'space-marines', name: 'Space Marines' },
+    factionId: 'SM',
+    factionSlug: 'space-marines',
+    faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
     detachment: { name: 'Gladius Task Force' },
     units: [],
     enhancements: [],
@@ -52,7 +53,8 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   getFaction: vi.fn().mockResolvedValue({
-    id: 'space-marines',
+    id: 'SM',
+    slug: 'space-marines',
     name: 'Space Marines',
     datasheets: []
   })
@@ -124,8 +126,9 @@ describe('AddRosterUnitsPage', () => {
     mockRosterContext.state = {
       id: 'test-roster-id',
       name: 'Test Roster',
-      factionId: 'space-marines',
-      faction: { id: 'space-marines', name: 'Space Marines' },
+      factionId: 'SM',
+      factionSlug: 'space-marines',
+      faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
       detachment: { name: 'Gladius Task Force' },
       units: [],
       enhancements: [],
@@ -178,7 +181,7 @@ describe('AddRosterUnitsPage', () => {
     mockRosterContext.state = {
       ...mockRosterContext.state,
       id: 'test-roster-id',
-      faction: { id: 'space-marines', name: 'Space Marines' }
+      faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' }
     };
 
     await act(async () => {
@@ -228,7 +231,9 @@ describe('AddRosterUnitsPage', () => {
     mockRosterContext.state = {
       ...mockRosterContext.state,
       id: 'test-roster-id',
-      faction: { id: 'space-marines', name: '' }
+      factionId: 'SM',
+      factionSlug: 'space-marines',
+      faction: { id: 'SM', slug: 'space-marines', name: '' }
     };
 
     await act(async () => {

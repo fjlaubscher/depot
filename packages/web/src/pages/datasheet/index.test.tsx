@@ -36,7 +36,7 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useParams: () => ({ factionId: 'SM', id: 'captain' }),
+    useParams: () => ({ factionSlug: 'space-marines', datasheetSlug: 'captain' }),
     useNavigate: () => mockNavigate
   };
 });

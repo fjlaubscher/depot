@@ -4,8 +4,10 @@ export const initialState: depot.Roster = {
   id: '',
   name: '',
   factionId: '',
+  factionSlug: '',
   faction: {
     id: '',
+    slug: '',
     name: '',
     path: '',
     datasheetCount: 0,

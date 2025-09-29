@@ -114,7 +114,7 @@ describe('CreateRoster', () => {
     const nameInput = screen.getByTestId('roster-name-input');
     const factionSelect = screen.getByTestId('faction-field-select');
     await user.type(nameInput, '   '); // Whitespace only
-    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, 'space-marines');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -161,7 +161,7 @@ describe('CreateRoster', () => {
     const pointsInput = screen.getByTestId('max-points-input');
 
     await user.type(nameInput, 'Test Roster');
-    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, 'space-marines');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -192,7 +192,7 @@ describe('CreateRoster', () => {
     const factionSelect = screen.getByTestId('faction-field-select');
 
     await user.type(nameInput, '  Test Roster  ');
-    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, 'space-marines');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -207,8 +207,10 @@ describe('CreateRoster', () => {
     expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
       name: 'Test Roster',
       factionId: 'SM',
+      factionSlug: 'space-marines',
       faction: expect.objectContaining({
         id: 'SM',
+        slug: 'space-marines',
         name: 'Space Marines'
       }),
       maxPoints: 2000,
@@ -225,7 +227,7 @@ describe('CreateRoster', () => {
     const pointsInput = screen.getByTestId('max-points-input');
 
     await user.type(nameInput, 'My Awesome Roster');
-    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, 'space-marines');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -243,8 +245,10 @@ describe('CreateRoster', () => {
     expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
       name: 'My Awesome Roster',
       factionId: 'SM',
+      factionSlug: 'space-marines',
       faction: expect.objectContaining({
         id: 'SM',
+        slug: 'space-marines',
         name: 'Space Marines'
       }),
       maxPoints: 1500,
@@ -288,7 +292,7 @@ describe('CreateRoster', () => {
 
     // Still disabled with name and faction (no detachment)
     const factionSelect = screen.getByTestId('faction-field-select');
-    await user.selectOptions(factionSelect, 'SM');
+    await user.selectOptions(factionSelect, 'space-marines');
     expect(submitButton).toBeDisabled();
 
     // Enabled with name, faction, and detachment

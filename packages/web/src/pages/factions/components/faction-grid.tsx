@@ -22,7 +22,7 @@ const FactionGrid: React.FC<FactionGridProps> = ({ factions, loading = false }) 
   return (
     <Grid>
       {factions.map((faction) => (
-        <FactionCard key={faction.id} faction={faction} />
+        <FactionCard key={faction.slug} faction={faction} />
       ))}
     </Grid>
   );

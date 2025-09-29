@@ -9,6 +9,7 @@ export type RosterAction =
       payload: {
         id: string;
         factionId: string;
+        factionSlug: string;
         faction: depot.Index;
         maxPoints: number;
         name: string;
@@ -32,6 +33,7 @@ export interface RosterContextValue {
   state: RosterState;
   createRoster: (payload: {
     factionId: string;
+    factionSlug: string;
     faction: depot.Index;
     maxPoints: number;
     name: string;

@@ -47,15 +47,53 @@ const mockCursor = {
 
 // Mock data
 const mockFactionIndex: depot.Index[] = [
-  { id: 'space-marines', name: 'Space Marines', path: '/data/SM.json' },
-  { id: 'chaos-space-marines', name: 'Chaos Space Marines', path: '/data/CSM.json' }
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  }
 ];
 
 const mockFaction: depot.Faction = {
-  id: 'space-marines',
+  id: 'SM',
+  slug: 'space-marines',
   name: 'Space Marines',
   link: 'https://wahapedia.ru/wh40k10ed/factions/space-marines',
-  datasheets: [],
+  datasheets: [
+    {
+      id: 'captain',
+      slug: 'captain',
+      name: 'Captain',
+      factionId: 'SM',
+      factionSlug: 'space-marines',
+      sourceId: 'core',
+      legend: '',
+      role: 'HQ',
+      loadout: '',
+      transport: '',
+      virtual: false,
+      leaderHead: '',
+      leaderFooter: '',
+      damagedW: '',
+      damagedDescription: '',
+      link: '',
+      abilities: [],
+      keywords: [],
+      models: [],
+      options: [],
+      wargear: [],
+      unitComposition: [],
+      modelCosts: [],
+      stratagems: [],
+      enhancements: [],
+      detachmentAbilities: [],
+      leaders: [],
+      isForgeWorld: false,
+      isLegends: false
+    }
+  ],
   stratagems: [],
   enhancements: [],
   detachmentAbilities: []
@@ -258,7 +296,7 @@ describe('OfflineStorage', () => {
 
       const result = await offlineStorage.getAllCachedFactions();
 
-      expect(result).toEqual([{ id: 'space-marines', name: 'Space Marines' }]);
+      expect(result).toEqual([{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]);
     });
   });
 
@@ -330,14 +368,16 @@ describe('OfflineStorage', () => {
   });
 
   describe('Roster Operations', () => {
-    const mockRoster = {
+    const mockRoster: depot.Roster = {
       id: 'test-roster',
       name: 'Test Roster',
       factionId: 'SM',
+      factionSlug: 'space-marines',
       faction: {
         id: 'SM',
+        slug: 'space-marines',
         name: 'Space Marines',
-        path: 'SM.json',
+        path: '/data/space-marines.json',
         datasheetCount: 50,
         stratagemCount: 12,
         enhancementCount: 8,

@@ -8,14 +8,14 @@ interface UseFactionReturn {
   error: string | null;
 }
 
-const useFaction = (factionId?: string): UseFactionReturn => {
+const useFaction = (factionSlug?: string): UseFactionReturn => {
   const { getFaction } = useAppContext();
   const [data, setData] = useState<depot.Faction | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!factionId) {
+    if (!factionSlug) {
       setData(undefined);
       setLoading(false);
       setError(null);
@@ -27,11 +27,11 @@ const useFaction = (factionId?: string): UseFactionReturn => {
       setError(null);
 
       try {
-        const faction = await getFaction(factionId);
+        const faction = await getFaction(factionSlug);
         if (faction) {
           setData(faction);
         } else {
-          setError(`Failed to load faction ${factionId}`);
+          setError(`Failed to load faction ${factionSlug}`);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -41,7 +41,7 @@ const useFaction = (factionId?: string): UseFactionReturn => {
     };
 
     loadFactionData();
-  }, [factionId, getFaction]);
+  }, [factionSlug, getFaction]);
 
   return {
     data,

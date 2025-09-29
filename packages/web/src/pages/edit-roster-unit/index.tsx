@@ -122,7 +122,9 @@ const EditRosterUnitView: React.FC = () => {
     );
   }
 
-  const factionName = appState.factionIndex?.find((f: any) => f.id === roster.factionId)?.name;
+  const factionName = appState.factionIndex?.find(
+    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
+  )?.name;
   const isCharacter = unit.datasheet.keywords.some((k) =>
     k.keyword.toLowerCase().includes('character')
   );

@@ -44,6 +44,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
   const createRoster = useCallback(
     (payload: {
       factionId: string;
+      factionSlug: string;
       faction: depot.Index;
       maxPoints: number;
       name: string;

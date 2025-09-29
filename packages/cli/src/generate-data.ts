@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { depot, wahapedia } from '@depot/core';
+import { depot, wahapedia, slug as slugUtils } from '@depot/core';
 
 const JSON_DIR = join(__dirname, 'json');
 
@@ -70,7 +70,12 @@ const consolidateFiles = (): wahapedia.Data => {
   };
 };
 
-const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): depot.Datasheet => {
+const buildDatasheet = (
+  data: wahapedia.Data,
+  datasheet: wahapedia.Datasheet,
+  datasheetSlugs: Map<string, string>,
+  factionSlugs: Map<string, string>
+): depot.Datasheet => {
   const abilities = data.datasheetAbilities
     .filter((ability) => ability.datasheetId === datasheet.id)
     .map((a) => {
@@ -134,10 +139,33 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
 
   const leaders = data.datasheetLeaders
     .filter((dl) => dl.datasheetId === datasheet.id)
-    .map((dl) => dl.attachedDatasheetId);
+    .map((dl) => {
+      const leaderSlug = datasheetSlugs.get(dl.attachedDatasheetId);
+      if (!leaderSlug) {
+        return undefined;
+      }
+
+      return {
+        id: dl.attachedDatasheetId,
+        slug: leaderSlug
+      };
+    })
+    .filter((leader): leader is depot.DatasheetLeaderReference => Boolean(leader));
+
+  const factionSlug = factionSlugs.get(datasheet.factionId);
+  if (!factionSlug) {
+    throw new Error(`Missing slug for faction ${datasheet.factionId}`);
+  }
+
+  const datasheetSlug = datasheetSlugs.get(datasheet.id);
+  if (!datasheetSlug) {
+    throw new Error(`Missing slug for datasheet ${datasheet.id}`);
+  }
 
   return {
     ...datasheet,
+    slug: datasheetSlug,
+    factionSlug,
     virtual: datasheet.virtual === 'true',
     abilities,
     keywords,
@@ -155,10 +183,20 @@ const buildDatasheet = (data: wahapedia.Data, datasheet: wahapedia.Datasheet): d
   };
 };
 
-const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): depot.Faction => {
+const buildFactionData = (
+  data: wahapedia.Data,
+  faction: wahapedia.Faction,
+  datasheetSlugs: Map<string, string>,
+  factionSlugs: Map<string, string>
+): depot.Faction => {
+  const factionSlug = factionSlugs.get(faction.id);
+  if (!factionSlug) {
+    throw new Error(`Missing slug for faction ${faction.id}`);
+  }
+
   const datasheets = data.datasheets
     .filter((datasheet) => datasheet.factionId === faction.id && datasheet.virtual === 'false')
-    .map((datasheet) => buildDatasheet(data, datasheet));
+    .map((datasheet) => buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs));
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
   const enhancements = data.enhancements.filter(
@@ -168,6 +206,7 @@ const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): dep
 
   return {
     ...faction,
+    slug: factionSlug,
     datasheets,
     stratagems,
     enhancements,
@@ -178,7 +217,20 @@ const buildFactionData = (data: wahapedia.Data, faction: wahapedia.Faction): dep
 const generateData = () => {
   const data = consolidateFiles();
 
-  return data.factions.map((f) => buildFactionData(data, f));
+  const factionSlugGenerator = slugUtils.createSlugGenerator('faction');
+  const datasheetSlugGenerator = slugUtils.createSlugGenerator('datasheet');
+  const factionSlugs = new Map<string, string>();
+  const datasheetSlugs = new Map<string, string>();
+
+  data.factions.forEach((faction) => {
+    factionSlugs.set(faction.id, factionSlugGenerator(faction.name));
+  });
+
+  data.datasheets.forEach((datasheet) => {
+    datasheetSlugs.set(datasheet.id, datasheetSlugGenerator(datasheet.name));
+  });
+
+  return data.factions.map((f) => buildFactionData(data, f, datasheetSlugs, factionSlugs));
 };
 
 export default generateData;

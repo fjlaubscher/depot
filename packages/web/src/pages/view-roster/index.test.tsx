@@ -31,8 +31,9 @@ const mockRosterState = vi.hoisted(() => ({
   state: {
     id: 'test-roster-id',
     name: 'Test Roster',
-    factionId: 'space-marines',
-    faction: { id: 'space-marines', name: 'Space Marines' },
+    factionId: 'SM',
+    factionSlug: 'space-marines',
+    faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
     detachment: { name: 'Gladius Task Force' },
     units: [] as depot.RosterUnit[],
     enhancements: [],
@@ -55,7 +56,7 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   state: {
-    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }]
+    factionIndex: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
   }
 }));
 
@@ -93,8 +94,9 @@ describe('ViewRosterPage', () => {
     mockRosterState.state = {
       id: 'test-roster-id',
       name: 'Test Roster',
-      factionId: 'space-marines',
-      faction: { id: 'space-marines', name: 'Space Marines' },
+      factionId: 'SM',
+      factionSlug: 'space-marines',
+      faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
       detachment: { name: 'Gladius Task Force' },
       units: [],
       enhancements: [],

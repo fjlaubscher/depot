@@ -19,16 +19,16 @@ const CreateRoster: React.FC = () => {
   const { showToast } = useToast();
 
   const [name, setName] = useState('');
-  const [factionId, setFactionId] = useState<string | null>(null);
+  const [factionSlug, setFactionSlug] = useState<string | null>(null);
   const [detachmentName, setDetachmentName] = useState<string | null>(null);
   const [maxPoints, setMaxPoints] = useState(2000);
 
   const { factions, loading: factionsLoading } = useFactions();
-  const { data: selectedFaction, loading: factionLoading } = useFaction(factionId || undefined);
+  const { data: selectedFaction, loading: factionLoading } = useFaction(factionSlug || undefined);
 
   const factionOptions =
     factions
-      ?.map((f) => ({ value: f.id, label: f.name }))
+      ?.map((f) => ({ value: f.slug, label: f.name }))
       .sort((a, b) => a.label.localeCompare(b.label)) || [];
 
   // Group detachment data from selected faction
@@ -57,10 +57,10 @@ const CreateRoster: React.FC = () => {
 
   // Reset detachment when faction changes
   useEffect(() => {
-    if (factionId && detachmentName) {
+    if (factionSlug && detachmentName) {
       setDetachmentName(null);
     }
-  }, [factionId]);
+  }, [factionSlug]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ const CreateRoster: React.FC = () => {
       });
       return;
     }
-    if (!factionId) {
+    if (!factionSlug) {
       showToast({
         type: 'error',
         title: 'Validation Error',
@@ -116,7 +116,9 @@ const CreateRoster: React.FC = () => {
     };
 
     // Find the faction Index entry
-    const selectedFactionIndex = factions?.find((f) => f.id === factionId);
+    const selectedFactionIndex = factions?.find(
+      (f) => f.slug === factionSlug || f.id === factionSlug
+    );
     if (!selectedFactionIndex) {
       showToast({
         type: 'error',
@@ -128,7 +130,8 @@ const CreateRoster: React.FC = () => {
 
     const newId = createRoster({
       name: name.trim(),
-      factionId,
+      factionId: selectedFactionIndex.id,
+      factionSlug: selectedFactionIndex.slug,
       faction: selectedFactionIndex,
       maxPoints,
       detachment
@@ -167,8 +170,8 @@ const CreateRoster: React.FC = () => {
                 data-testid="faction-field"
                 label="Faction"
                 options={factionOptions}
-                value={factionId || ''}
-                onChange={(e) => setFactionId(e.target.value || null)}
+                value={factionSlug || ''}
+                onChange={(e) => setFactionSlug(e.target.value || null)}
                 placeholder="Select a Faction"
                 required
               />
@@ -176,7 +179,7 @@ const CreateRoster: React.FC = () => {
 
             {factionLoading ? (
               <FieldSkeleton />
-            ) : factionId && detachmentOptions.length > 0 ? (
+            ) : factionSlug && detachmentOptions.length > 0 ? (
               <SelectField
                 data-testid="detachment-field"
                 label="Detachment"
@@ -186,7 +189,7 @@ const CreateRoster: React.FC = () => {
                 placeholder="Select a Detachment"
                 required
               />
-            ) : factionId ? (
+            ) : factionSlug ? (
               <Field>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Detachment
@@ -227,7 +230,7 @@ const CreateRoster: React.FC = () => {
                 data-testid="submit-button"
                 type="submit"
                 disabled={
-                  !name || !factionId || !detachmentName || factionsLoading || factionLoading
+                  !name || !factionSlug || !detachmentName || factionsLoading || factionLoading
                 }
               >
                 Create Roster

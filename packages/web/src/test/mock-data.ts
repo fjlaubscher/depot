@@ -7,8 +7,10 @@ import { depot } from '@depot/core';
 
 export const mockDatasheet: depot.Datasheet = {
   id: 'captain',
+  slug: 'captain',
   name: 'Captain',
   factionId: 'SM',
+  factionSlug: 'space-marines',
   sourceId: 'core',
   legend: '',
   role: 'CHARACTER', // Updated for 10th edition
@@ -216,8 +218,9 @@ export const mockDetachmentAbility: depot.DetachmentAbility = {
 
 export const mockFaction: depot.Faction = {
   id: 'SM',
+  slug: 'space-marines',
   name: 'Space Marines',
-  link: '/faction/SM',
+  link: '/faction/space-marines',
   datasheets: [mockDatasheet],
   stratagems: [mockStratagem],
   enhancements: [mockEnhancement],
@@ -225,9 +228,14 @@ export const mockFaction: depot.Faction = {
 };
 
 export const mockFactionIndexes: depot.Index[] = [
-  { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-  { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' },
-  { id: 'IG', name: 'Astra Militarum', path: '/data/ig.json' }
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  },
+  { id: 'IG', slug: 'astra-militarum', name: 'Astra Militarum', path: '/data/astra-militarum.json' }
 ];
 
 /**
@@ -300,13 +308,15 @@ export const mockRosterUnit: depot.RosterUnit = {
   id: 'roster-unit-1',
   datasheet: mockDatasheet,
   modelCost: mockDatasheet.modelCosts[0],
-  selectedWargear: []
+  selectedWargear: [],
+  datasheetSlug: mockDatasheet.slug
 };
 
 export const mockFactionIndex: depot.Index = {
   id: 'SM',
+  slug: 'space-marines',
   name: 'Space Marines',
-  path: 'SM.json',
+  path: '/data/space-marines.json',
   datasheetCount: 50,
   stratagemCount: 12,
   enhancementCount: 8,
@@ -317,6 +327,7 @@ export const mockRoster: depot.Roster = {
   id: 'test-roster-1',
   name: 'Test Space Marines Roster',
   factionId: 'SM',
+  factionSlug: 'space-marines',
   faction: mockFactionIndex,
   detachment: mockDetachment,
   points: {

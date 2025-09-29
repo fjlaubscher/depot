@@ -5,8 +5,22 @@ import { calculateTotalPoints } from './utils';
 
 export const rosterReducer = (state: RosterState, action: RosterAction): RosterState => {
   switch (action.type) {
-    case 'SET_ROSTER':
-      return action.payload;
+    case 'SET_ROSTER': {
+      const fallbackSlug =
+        action.payload.factionSlug ?? action.payload.faction?.slug ?? action.payload.factionId;
+
+      return {
+        ...action.payload,
+        factionSlug: fallbackSlug,
+        faction: action.payload.faction
+          ? { ...action.payload.faction, slug: action.payload.faction.slug ?? fallbackSlug }
+          : action.payload.faction,
+        units: action.payload.units.map((unit) => ({
+          ...unit,
+          datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
+        }))
+      };
+    }
 
     case 'CREATE_ROSTER':
       return {
@@ -14,6 +28,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         id: action.payload.id,
         name: action.payload.name,
         factionId: action.payload.factionId,
+        factionSlug: action.payload.factionSlug,
         faction: action.payload.faction,
         detachment: action.payload.detachment,
         points: {
@@ -33,7 +48,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         id: crypto.randomUUID(),
         datasheet: action.payload.datasheet,
         modelCost: action.payload.modelCost,
-        selectedWargear: []
+        selectedWargear: [],
+        datasheetSlug: action.payload.datasheet.slug
       };
 
       const updatedState = {

@@ -17,6 +17,7 @@ describe('rosterReducer', () => {
         id: 'test-id',
         name: 'Test Roster',
         factionId: 'SM',
+        factionSlug: 'space-marines',
         faction: mockFactionIndex,
         detachment: {
           name: 'Test Detachment',
@@ -58,7 +59,13 @@ describe('rosterReducer', () => {
           id: 'new-roster-id',
           name: 'New Roster',
           factionId: 'CHAOS',
-          faction: { ...mockFactionIndex, id: 'CHAOS', name: 'Chaos Space Marines' },
+          factionSlug: 'chaos-space-marines',
+          faction: {
+            ...mockFactionIndex,
+            id: 'CHAOS',
+            slug: 'chaos-space-marines',
+            name: 'Chaos Space Marines'
+          },
           maxPoints: 1500,
           detachment: mockDetachment
         }
@@ -71,7 +78,13 @@ describe('rosterReducer', () => {
         id: 'new-roster-id',
         name: 'New Roster',
         factionId: 'CHAOS',
-        faction: { ...mockFactionIndex, id: 'CHAOS', name: 'Chaos Space Marines' },
+        factionSlug: 'chaos-space-marines',
+        faction: {
+          ...mockFactionIndex,
+          id: 'CHAOS',
+          slug: 'chaos-space-marines',
+          name: 'Chaos Space Marines'
+        },
         detachment: mockDetachment,
         points: {
           current: 0,
@@ -95,6 +108,7 @@ describe('rosterReducer', () => {
           id: 'roster-id',
           name: 'Test',
           factionId: 'SM',
+          factionSlug: 'space-marines',
           faction: mockFactionIndex,
           maxPoints: 2000,
           detachment: mockDetachment
@@ -113,7 +127,9 @@ describe('rosterReducer', () => {
         ...initialState,
         id: 'test-id',
         name: 'Test Roster',
-        factionId: 'SM'
+        factionId: 'SM',
+        factionSlug: 'space-marines',
+        faction: mockFactionIndex
       };
 
       const mockDetachment: depot.Detachment = {
@@ -149,6 +165,9 @@ describe('rosterReducer', () => {
       const currentState: depot.Roster = {
         ...initialState,
         id: 'test-id',
+        factionId: 'SM',
+        factionSlug: 'space-marines',
+        faction: mockFactionIndex,
         detachment: {
           name: 'Original Detachment',
           abilities: [],
@@ -188,6 +207,7 @@ describe('rosterReducer', () => {
             id: 'id',
             name: 'name',
             factionId: 'SM',
+            factionSlug: 'space-marines',
             faction: mockFactionIndex,
             maxPoints: 2000,
             detachment: { name: 'Test', abilities: [], enhancements: [], stratagems: [] }

@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noEmit": false,
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false
   }
 }

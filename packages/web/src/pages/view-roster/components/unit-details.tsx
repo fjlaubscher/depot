@@ -54,7 +54,9 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
         {/* Quick Link to Full Datasheet */}
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
           <Link
-            to={`/faction/${unit.datasheet.factionId}/datasheet/${unit.datasheet.id}`}
+            to={`/faction/${unit.datasheet.factionSlug}/datasheet/${
+              unit.datasheetSlug ?? unit.datasheet.slug
+            }`}
             className="inline-flex items-center text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
           >
             View Full Datasheet →

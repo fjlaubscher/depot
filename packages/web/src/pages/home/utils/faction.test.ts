@@ -9,11 +9,16 @@ import { depot } from '@depot/core';
 
 // Mock data for testing
 const mockFactions: depot.Index[] = [
-  { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-  { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' },
-  { id: 'ORK', name: 'Orks', path: '/data/orks.json' },
-  { id: 'TAU', name: "T'au Empire", path: '/data/tau.json' },
-  { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' }
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  },
+  { id: 'ORK', slug: 'orks', name: 'Orks', path: '/data/orks.json' },
+  { id: 'TAU', slug: 'tau-empire', name: "T'au Empire", path: '/data/tau-empire.json' },
+  { id: 'AM', slug: 'astra-militarum', name: 'Astra Militarum', path: '/data/astra-militarum.json' }
 ];
 
 describe('faction utilities', () => {
@@ -87,6 +92,7 @@ describe('faction utilities', () => {
     it('should handle factions with unrecognized IDs', () => {
       const unknownFaction: depot.Index = {
         id: 'UNKNOWN',
+        slug: 'unknown-faction',
         name: 'Unknown Faction',
         path: '/data/unknown.json'
       };

@@ -32,7 +32,7 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
   } = useDatasheetSearch(datasheets, filters);
 
   const defaultRenderDatasheet = (datasheet: depot.Datasheet) => (
-    <LinkCard to={`/faction/${datasheet.factionId}/datasheet/${datasheet.id}`}>
+    <LinkCard to={`/faction/${datasheet.factionSlug}/datasheet/${datasheet.slug}`}>
       {datasheet.name}
     </LinkCard>
   );
@@ -68,7 +68,7 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
               >
                 <Grid>
                   {groupedDatasheets[role].map((datasheet) => (
-                    <div key={datasheet.id}>{renderItem(datasheet)}</div>
+                    <div key={datasheet.slug}>{renderItem(datasheet)}</div>
                   ))}
                 </Grid>
               </CollapsibleSection>

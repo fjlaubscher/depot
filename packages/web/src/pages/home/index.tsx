@@ -108,9 +108,9 @@ const Home: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Quick Access</h2>
             <Grid>
               {state.myFactions?.slice(0, 6).map((faction) => (
-                <Card key={faction.id}>
+                <Card key={faction.slug}>
                   <Link
-                    to={`/faction/${faction.id}`}
+                    to={`/faction/${faction.slug}`}
                     className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   >
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">

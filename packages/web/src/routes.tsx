@@ -19,8 +19,8 @@ const AppRoutes = () => (
     {/* Primary application routes */}
     <Route path="/" element={<Home />} />
     <Route path="/factions" element={<Factions />} />
-    <Route path="/faction/:id" element={<Faction />} />
-    <Route path="/faction/:factionId/datasheet/:id" element={<Datasheet />} />
+    <Route path="/faction/:factionSlug" element={<Faction />} />
+    <Route path="/faction/:factionSlug/datasheet/:datasheetSlug" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
     <Route path="/rosters" element={<Rosters />} />
     <Route path="/rosters/:rosterId/edit" element={<EditRoster />} />

@@ -23,10 +23,12 @@ const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
     const newId = createRoster({
       name: 'Test Roster',
       factionId: 'SM',
+      factionSlug: 'space-marines',
       faction: {
         id: 'SM',
+        slug: 'space-marines',
         name: 'Space Marines',
-        path: 'SM.json',
+        path: '/data/space-marines.json',
         datasheetCount: 50,
         stratagemCount: 12,
         enhancementCount: 8,
@@ -175,6 +177,7 @@ describe('RosterProvider', () => {
     expect(savedRoster).toMatchObject({
       name: 'Test Roster',
       factionId: 'SM',
+      factionSlug: 'space-marines',
       points: { current: 0, max: 2000 }
     });
   });

@@ -15,7 +15,7 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
   ].filter((stat) => stat.value > 0);
 
   return (
-    <LinkCard to={`/faction/${faction.id}`}>
+    <LinkCard to={`/faction/${faction.slug}`}>
       <div className="flex flex-col gap-3">
         <h3 className="font-semibold text-primary-600 dark:text-primary-400 text-lg">
           {faction.name}

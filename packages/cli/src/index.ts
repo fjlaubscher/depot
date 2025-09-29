@@ -104,7 +104,7 @@ const init = async () => {
   const data = generateData();
 
   data.forEach((faction) => {
-    const filePath = join(DATA_DIR, `${faction.id}.json`);
+    const filePath = join(DATA_DIR, `${faction.slug}.json`);
 
     // Calculate metadata counts for the index
     const datasheetCount = faction.datasheets.length;
@@ -114,8 +114,9 @@ const init = async () => {
 
     index.push({
       id: faction.id,
+      slug: faction.slug,
       name: faction.name,
-      path: `/data/${faction.id}.json`,
+      path: `/data/${faction.slug}.json`,
       datasheetCount,
       stratagemCount,
       enhancementCount,

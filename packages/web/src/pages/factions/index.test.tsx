@@ -95,9 +95,19 @@ vi.mock('./components/no-results', () => ({
 }));
 
 const mockFactions: depot.Index[] = [
-  { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' },
-  { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-  { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
+  {
+    id: 'AM',
+    slug: 'astra-militarum',
+    name: 'Astra Militarum',
+    path: '/data/astra-militarum.json'
+  },
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  }
 ];
 
 describe('Factions', () => {

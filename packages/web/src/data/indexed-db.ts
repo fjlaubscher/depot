@@ -3,7 +3,7 @@ import { depot } from '@depot/core';
 const DB_NAME = 'depot';
 const FACTIONS_OBJECT_STORE_NAME = 'factions';
 const ROSTERS_OBJECT_STORE_NAME = 'rosters';
-const VERSION = 11; // Increment version to trigger onupgradeneeded
+const VERSION = 12; // Increment version for slug-based storage
 
 const getDBConnection = (): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
@@ -12,11 +12,16 @@ const getDBConnection = (): Promise<IDBDatabase> =>
     request.onerror = () => reject(request.error);
     request.onupgradeneeded = () => {
       const db = request.result;
+      const upgradeTransaction = request.transaction;
       if (!db.objectStoreNames.contains(FACTIONS_OBJECT_STORE_NAME)) {
         db.createObjectStore(FACTIONS_OBJECT_STORE_NAME);
+      } else {
+        upgradeTransaction?.objectStore(FACTIONS_OBJECT_STORE_NAME).clear();
       }
       if (!db.objectStoreNames.contains(ROSTERS_OBJECT_STORE_NAME)) {
         db.createObjectStore(ROSTERS_OBJECT_STORE_NAME, { keyPath: 'id' });
+      } else {
+        upgradeTransaction?.objectStore(ROSTERS_OBJECT_STORE_NAME).clear();
       }
     };
   });
@@ -25,7 +30,7 @@ export const createFaction = async (faction: depot.Faction) => {
   const connection = await getDBConnection();
   const transaction = connection.transaction(FACTIONS_OBJECT_STORE_NAME, 'readwrite');
   const objectStore = transaction.objectStore(FACTIONS_OBJECT_STORE_NAME);
-  objectStore.add(faction, faction.id);
+  objectStore.put(faction, faction.slug);
   connection.close();
 };
 
@@ -36,10 +41,10 @@ export const destroy = () =>
     request.onerror = () => reject(request.error);
   });
 
-export const getFaction = (factionId?: string): Promise<depot.Faction> =>
+export const getFaction = (factionSlug?: string): Promise<depot.Faction> =>
   new Promise(async (resolve, reject) => {
-    if (!factionId) {
-      return reject('Invalid factionId provided');
+    if (!factionSlug) {
+      return reject('Invalid faction slug provided');
     }
 
     const connection = await getDBConnection();
@@ -50,7 +55,7 @@ export const getFaction = (factionId?: string): Promise<depot.Faction> =>
     };
 
     const objectStore = transaction.objectStore(FACTIONS_OBJECT_STORE_NAME);
-    const request = objectStore.get(factionId);
+    const request = objectStore.get(factionSlug);
     request.onsuccess = () => {
       connection.close();
       return resolve(request.result as depot.Faction);
@@ -76,7 +81,7 @@ export const getFactions = (): Promise<depot.Option[]> =>
     cursor.onsuccess = () => {
       const result = cursor.result;
       if (result) {
-        factions.push({ id: result.value.id, name: result.value.name });
+        factions.push({ id: result.value.id, slug: result.value.slug, name: result.value.name });
         cursor.result.continue();
       } else {
         return resolve(factions);
