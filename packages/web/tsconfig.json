@@ -9,7 +9,9 @@
     "esModuleInterop": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@depot/core": ["../core/src/index.ts"],
+      "@depot/core/*": ["../core/src/*"]
     }
   },
   "types": [
