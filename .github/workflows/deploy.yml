@@ -39,8 +39,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build all packages
-        run: pnpm -r build
+      - name: Build core package
+        run: pnpm --filter @depot/core build
+
+      - name: Build CLI package
+        run: pnpm --filter @depot/cli build
+
+      - name: Build web app
+        run: pnpm --filter @depot/web build
 
       - name: Generate fresh data
         run: pnpm --filter @depot/cli start -- --force-download
