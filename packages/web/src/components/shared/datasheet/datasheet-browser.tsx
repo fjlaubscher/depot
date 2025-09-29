@@ -1,5 +1,5 @@
 import type { ReactNode, FC } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Search, Filters, CollapsibleSection, Grid, LinkCard } from '@/components/ui';
 import { useDatasheetSearch } from '@/hooks/use-datasheet-search';
 import type { DatasheetFilters } from '@/hooks/use-datasheet-search';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 import ModelStatsRow from '@/components/shared/model-stats-row';
 import { WargearTable } from '@/components/shared';

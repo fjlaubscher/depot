@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Eye, Plus } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';

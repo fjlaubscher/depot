@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from './index';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import type { AppContextType } from '@/contexts/app/types';
 

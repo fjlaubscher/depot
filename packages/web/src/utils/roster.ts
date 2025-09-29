@@ -1,4 +1,21 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
+
+const stripHtml = (html?: string): string => {
+  if (!html) return '';
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<li>/gi, '- ')
+    .replace(/<\/(p|div|ul|ol|h[1-6])>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+};
 
 export const groupRosterUnitsByRole = (units: depot.RosterUnit[]) => {
   let dictionary: { [role: string]: depot.RosterUnit[] } = {};
@@ -78,10 +95,67 @@ export const generateRosterMarkdown = (roster: depot.Roster, factionName?: strin
       const enhancementCost = parseInt(enhancement.cost, 10) || 0;
       lines.push(`- **${enhancement.name}** (${enhancementCost} pts)`);
       if (enhancement.description) {
-        lines.push(`  - ${enhancement.description}`);
+        lines.push(`  - ${stripHtml(enhancement.description)}`);
       }
     });
 
+    lines.push('');
+  }
+
+  return lines.join('\n');
+};
+
+export const generateRosterShareText = (roster: depot.Roster, factionName?: string): string => {
+  const lines: string[] = [];
+
+  // Title (no heading syntax)
+  lines.push(`*${roster.name}*`);
+  lines.push('');
+
+  // Basic info
+  if (factionName) {
+    lines.push(`*Faction:* ${factionName}`);
+  }
+  if (roster.detachment?.name) {
+    lines.push(`*Detachment:* ${roster.detachment.name}`);
+  }
+  lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
+  lines.push('');
+
+  // Units grouped by role
+  const unitsByRole: { [role: string]: depot.RosterUnit[] } = {};
+  roster.units.forEach((unit) => {
+    const role = unit.datasheet.role;
+    if (!unitsByRole[role]) unitsByRole[role] = [];
+    unitsByRole[role].push(unit);
+  });
+
+  const sortedRoles = Object.keys(unitsByRole).sort();
+  sortedRoles.forEach((role) => {
+    lines.push(`*${role}*`);
+    unitsByRole[role].forEach((unit) => {
+      const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
+      lines.push(`- ${unit.datasheet.name} - ${unit.modelCost.description} (${unitCost} pts)`);
+      if (unit.selectedWargear.length > 0) {
+        unit.selectedWargear.forEach((wargear) => {
+          lines.push(`  - ${wargear.name}`);
+        });
+      }
+    });
+    lines.push('');
+  });
+
+  // Enhancements
+  if (roster.enhancements.length > 0) {
+    lines.push('*Enhancements*');
+    roster.enhancements.forEach(({ enhancement }) => {
+      const enhancementCost = parseInt(enhancement.cost, 10) || 0;
+      lines.push(`- ${enhancement.name} (${enhancementCost} pts)`);
+      const desc = stripHtml(enhancement.description);
+      if (desc) {
+        lines.push(`  - ${desc}`);
+      }
+    });
     lines.push('');
   }
 

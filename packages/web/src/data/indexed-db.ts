@@ -1,4 +1,4 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 const DB_NAME = 'depot';
 const FACTIONS_OBJECT_STORE_NAME = 'factions';

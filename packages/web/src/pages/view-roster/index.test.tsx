@@ -24,7 +24,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Mock RosterProvider and useRoster
 const mockRosterState = vi.hoisted(() => ({
@@ -76,6 +76,7 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 const mockGroupRosterUnitsByRole = vi.hoisted(() => vi.fn());
 vi.mock('@/utils/roster', () => ({
   generateRosterMarkdown: vi.fn(() => 'mock markdown'),
+  generateRosterShareText: vi.fn(() => 'mock share text'),
   groupRosterUnitsByRole: mockGroupRosterUnitsByRole
 }));
 

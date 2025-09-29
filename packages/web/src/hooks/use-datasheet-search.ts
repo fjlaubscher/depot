@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { groupDatasheetsByRole } from '@/utils/datasheet';
 import useDebounce from './use-debounce';
 

@@ -21,7 +21,7 @@ import FactionDatasheets from './components/faction-datasheets';
 import FactionDetachments from './components/faction-detachments';
 
 // Types
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();

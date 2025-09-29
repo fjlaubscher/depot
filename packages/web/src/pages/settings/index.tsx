@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // UI Components
 import AppLayout from '@/components/layout';

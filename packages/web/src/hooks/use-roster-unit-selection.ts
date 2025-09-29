@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 export interface SelectedUnit {
   datasheet: depot.Datasheet;

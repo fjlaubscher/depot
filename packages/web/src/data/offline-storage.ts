@@ -1,4 +1,4 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Database configuration constants
 const DB_CONFIG = {

@@ -1,4 +1,4 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 export interface CategorizedAbilities {
   inline: depot.Ability[]; // Short, unit-specific (Datasheet, Wargear types)

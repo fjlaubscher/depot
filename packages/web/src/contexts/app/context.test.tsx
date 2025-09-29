@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({

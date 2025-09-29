@@ -1,5 +1,5 @@
 import React from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { getAbilityTypeBadge } from '../utils/abilities';
 
 interface DatasheetInlineAbilitiesProps {

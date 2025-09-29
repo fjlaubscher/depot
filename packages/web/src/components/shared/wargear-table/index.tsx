@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Tag, TagGroup } from '@/components/ui';
 import { parseWargearKeywords } from '@/utils/wargear';
 

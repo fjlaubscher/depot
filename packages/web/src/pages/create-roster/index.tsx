@@ -5,7 +5,7 @@ import useFactions from '@/hooks/use-factions';
 import useFaction from '@/hooks/use-faction';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 import { groupFactionDataByDetachment } from '@/utils/faction';
 

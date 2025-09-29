@@ -1,4 +1,4 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
 import { calculateTotalPoints } from './utils';
