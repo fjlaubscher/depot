@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { IconButton } from '@/components/ui';
 import { Trash2, Copy } from 'lucide-react';
 import RosterUnitCardBase from './roster-unit-card-base';

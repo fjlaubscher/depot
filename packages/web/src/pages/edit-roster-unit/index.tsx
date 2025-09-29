@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save } from 'lucide-react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
@@ -122,7 +122,9 @@ const EditRosterUnitView: React.FC = () => {
     );
   }
 
-  const factionName = appState.factionIndex?.find((f: any) => f.id === roster.factionId)?.name;
+  const factionName = appState.factionIndex?.find(
+    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
+  )?.name;
   const isCharacter = unit.datasheet.keywords.some((k) =>
     k.keyword.toLowerCase().includes('character')
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import {
   groupDetachmentAbilitiesByDetachment,
   filterDetachmentAbilities,

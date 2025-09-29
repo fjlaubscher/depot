@@ -1,5 +1,6 @@
 export interface Option {
   id: string;
+  slug: string;
   name: string;
 }
 
@@ -40,6 +41,11 @@ export interface DatasheetOption {
   line: string;
   button: string;
   description: string;
+}
+
+export interface DatasheetLeaderReference {
+  id: string;
+  slug: string;
 }
 
 export interface Stratagem {
@@ -105,8 +111,10 @@ export interface DetachmentAbility {
 
 export interface Datasheet {
   id: string;
+  slug: string;
   name: string;
   factionId: string;
+  factionSlug: string;
   sourceId: string;
   legend: string;
   role: string;
@@ -128,13 +136,14 @@ export interface Datasheet {
   stratagems: Stratagem[];
   enhancements: Enhancement[];
   detachmentAbilities: DetachmentAbility[];
-  leaders: string[];
+  leaders: DatasheetLeaderReference[];
   isForgeWorld: boolean;
   isLegends: boolean;
 }
 
 export interface Faction {
   id: string;
+  slug: string;
   name: string;
   link: string;
   datasheets: Datasheet[];
@@ -145,6 +154,7 @@ export interface Faction {
 
 export interface Index {
   id: string;
+  slug: string;
   name: string;
   path: string;
   datasheetCount?: number;
@@ -174,6 +184,7 @@ export interface RosterUnit {
   datasheet: Datasheet;
   modelCost: ModelCost; // The selected model/unit count and its point cost
   selectedWargear: Wargear[];
+  datasheetSlug?: string;
 }
 
 // The main roster object that represents a user's army list.
@@ -181,6 +192,7 @@ export interface Roster {
   id: string; // A unique ID for this roster
   name: string;
   factionId: string;
+  factionSlug?: string;
   faction?: Index; // Faction metadata from the index (name, path, counts, etc.)
   detachment: Detachment;
   points: {

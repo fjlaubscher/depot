@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Factions from './index';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import type { AppContextType } from '@/contexts/app/types';
 import { TestWrapper } from '@/test/test-utils';
 
@@ -95,9 +95,19 @@ vi.mock('./components/no-results', () => ({
 }));
 
 const mockFactions: depot.Index[] = [
-  { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' },
-  { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-  { id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }
+  {
+    id: 'AM',
+    slug: 'astra-militarum',
+    name: 'Astra Militarum',
+    path: '/data/astra-militarum.json'
+  },
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  }
 ];
 
 describe('Factions', () => {

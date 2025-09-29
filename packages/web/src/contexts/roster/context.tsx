@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { createContext, useReducer, useCallback, useEffect } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
@@ -44,6 +44,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
   const createRoster = useCallback(
     (payload: {
       factionId: string;
+      factionSlug: string;
       faction: depot.Index;
       maxPoints: number;
       name: string;

@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { createContext, useReducer, useEffect, useCallback } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import type { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
@@ -19,37 +19,47 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   // Get faction data directly from IndexedDB with network fallback
-  const getFaction = useCallback(async (id: string): Promise<depot.Faction | null> => {
-    try {
-      // First, try to load from IndexedDB
-      const cachedFaction = await offlineStorage.getFaction(id);
-      if (cachedFaction) {
-        return cachedFaction;
-      }
-
-      // If not cached, fetch from network
-      const response = await fetch(getDataUrl(`${id}.json`));
-      if (!response.ok) {
-        throw new Error(`Failed to load faction ${id}`);
-      }
-      const faction = await response.json();
-
-      // Cache the faction in IndexedDB for offline use
+  const getFaction = useCallback(
+    async (key: string): Promise<depot.Faction | null> => {
       try {
-        await offlineStorage.setFaction(id, faction);
-        // Update offline factions list
-        const offlineFactions = await offlineStorage.getAllCachedFactions();
-        dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
-      } catch (cacheError) {
-        console.warn('Failed to cache faction in IndexedDB:', cacheError);
-      }
+        const indexEntry = state.factionIndex?.find(
+          (entry) => entry.slug === key || entry.id === key
+        );
+        const slug = indexEntry?.slug ?? key;
 
-      return faction;
-    } catch (error) {
-      console.error(`Failed to load faction ${id}:`, error);
-      return null;
-    }
-  }, []);
+        // First, try to load from IndexedDB
+        const cachedFaction = await offlineStorage.getFaction(slug);
+        if (cachedFaction) {
+          return cachedFaction;
+        }
+
+        const path = indexEntry?.path ?? `/data/${slug}.json`;
+
+        // If not cached, fetch from network
+        const response = await fetch(getDataUrl(path));
+        if (!response.ok) {
+          throw new Error(`Failed to load faction ${slug}`);
+        }
+        const faction = (await response.json()) as depot.Faction;
+
+        // Cache the faction in IndexedDB for offline use
+        try {
+          await offlineStorage.setFaction(slug, faction);
+          // Update offline factions list
+          const offlineFactions = await offlineStorage.getAllCachedFactions();
+          dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+        } catch (cacheError) {
+          console.warn('Failed to cache faction in IndexedDB:', cacheError);
+        }
+
+        return faction;
+      } catch (error) {
+        console.error(`Failed to load faction ${key}:`, error);
+        return null;
+      }
+    },
+    [state.factionIndex]
+  );
 
   // Clear all offline data
   const clearOfflineData = async () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Trash2, Eye } from 'lucide-react';
 import { Card, ActionGroup, PointsTag } from '@/components/ui';
 

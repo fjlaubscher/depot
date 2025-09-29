@@ -21,28 +21,30 @@ import FactionDatasheets from './components/faction-datasheets';
 import FactionDetachments from './components/faction-detachments';
 
 // Types
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 const Faction: React.FC = () => {
-  const { id } = useParams();
+  const { factionSlug } = useParams<{ factionSlug: string }>();
   const { showToast } = useToast();
-  const { data: faction, loading, error } = useFaction(id);
+  const { data: faction, loading, error } = useFaction(factionSlug);
   const { state, updateMyFactions } = useAppContext();
   const [activeTab, setActiveTab] = useState(0);
 
   const isMyFaction = useMemo(() => {
-    if (state.myFactions && id) {
-      return state.myFactions.some((f) => f.id === id);
+    if (state.myFactions && factionSlug) {
+      return state.myFactions.some((f) => f.slug === factionSlug || f.id === factionSlug);
     }
     return false;
-  }, [id, state.myFactions]);
+  }, [factionSlug, state.myFactions]);
 
   const toggleMyFaction = useCallback(async () => {
-    if (!faction || !id) return;
+    if (!faction || !factionSlug) return;
 
     try {
       if (state.myFactions && isMyFaction) {
-        await updateMyFactions(state.myFactions.filter((f) => f.id !== id));
+        await updateMyFactions(
+          state.myFactions.filter((f) => f.slug !== factionSlug && f.id !== factionSlug)
+        );
         startTransition(() => {
           showToast({
             type: 'success',
@@ -51,7 +53,11 @@ const Faction: React.FC = () => {
           });
         });
       } else {
-        const myFaction: depot.Option = { id: faction.id, name: faction.name };
+        const myFaction: depot.Option = {
+          id: faction.id,
+          slug: faction.slug,
+          name: faction.name
+        };
         await updateMyFactions(state.myFactions ? [...state.myFactions, myFaction] : [myFaction]);
         startTransition(() => {
           showToast({
@@ -70,7 +76,7 @@ const Faction: React.FC = () => {
         });
       });
     }
-  }, [isMyFaction, faction, state.myFactions, updateMyFactions, showToast, id]);
+  }, [isMyFaction, faction, state.myFactions, updateMyFactions, showToast, factionSlug]);
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
 
@@ -123,7 +129,7 @@ const Faction: React.FC = () => {
           <Breadcrumbs
             items={[
               { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: `/faction/${faction.id}` }
+              { label: faction.name, path: `/faction/${faction.slug}` }
             ]}
           />
         </div>

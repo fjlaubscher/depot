@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,10 +30,7 @@ jobs:
           cache: 'pnpm'
           
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
         
-      - name: Build web app
-        run: pnpm --filter web build
-        
-      - name: Build CLI
-        run: pnpm --filter cli build
+      - name: Build all packages
+        run: pnpm -r build

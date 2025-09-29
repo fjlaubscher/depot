@@ -1,4 +1,4 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 /**
  * Splits a comma-separated string of weapon keywords and trims whitespace

@@ -10,7 +10,11 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
 import { BackButton, RosterHeader, RosterSection } from '@/components/shared';
-import { generateRosterMarkdown, groupRosterUnitsByRole } from '@/utils/roster';
+import {
+  generateRosterMarkdown,
+  generateRosterShareText,
+  groupRosterUnitsByRole
+} from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
 const RosterView: React.FC = () => {
@@ -19,7 +23,9 @@ const RosterView: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const factionName = appState.factionIndex?.find((f: any) => f.id === roster.factionId)?.name;
+  const factionName = appState.factionIndex?.find(
+    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
+  )?.name;
 
   const groupedUnits = useMemo(() => groupRosterUnitsByRole(roster.units), [roster.units]);
   const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
@@ -37,27 +43,27 @@ const RosterView: React.FC = () => {
   };
 
   const handleShareRoster = async () => {
-    const markdown = generateRosterMarkdown(roster, factionName);
+    const shareText = generateRosterShareText(roster, factionName);
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: roster.name,
-          text: markdown
+          text: shareText
         });
         showToast({ title: 'Roster shared', type: 'success' });
       } catch (err) {
-        await copyToClipboard(markdown);
+        await copyToClipboard(shareText);
       }
     } else {
-      await copyToClipboard(markdown);
+      await copyToClipboard(shareText);
     }
   };
 
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast({ title: 'Copied to clipboard', type: 'success' });
+      showToast({ title: 'Roster copied to clipboard', type: 'success' });
     } catch (err) {
       showToast({ title: 'Failed to copy', type: 'error' });
     }
@@ -70,7 +76,7 @@ const RosterView: React.FC = () => {
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionId;
+      : factionName || roster.factionSlug || roster.factionId;
 
   return (
     <div className="flex flex-col gap-4">

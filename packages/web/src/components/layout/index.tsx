@@ -73,8 +73,8 @@ const AppLayout = ({ children, title }: Props) => {
               <div className="ml-4 space-y-1">
                 {state.myFactions.map((faction) => (
                   <Link
-                    key={faction.id}
-                    to={`/faction/${faction.id}`}
+                    key={faction.slug}
+                    to={`/faction/${faction.slug}`}
                     onClick={closeSidebar}
                     className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
 import { useAppContext } from '@/contexts/app/use-app-context';
 

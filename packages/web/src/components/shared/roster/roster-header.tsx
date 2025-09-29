@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 interface RosterHeaderProps {
   roster: depot.Roster;

@@ -1,9 +1,9 @@
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 3 // Increment version to trigger onupgradeneeded
+  VERSION: 4 // Increment version to invalidate legacy id-based caches
 } as const;
 
 const STORES = {
@@ -20,6 +20,22 @@ const KEYS = {
   MY_FACTIONS: 'my-factions'
 } as const;
 
+const normalizeRoster = (roster: depot.Roster): depot.Roster => {
+  const factionSlug = roster.factionSlug ?? roster.faction?.slug ?? roster.factionId;
+
+  return {
+    ...roster,
+    factionSlug,
+    faction: roster.faction
+      ? { ...roster.faction, slug: roster.faction.slug ?? factionSlug }
+      : roster.faction,
+    units: roster.units.map((unit) => ({
+      ...unit,
+      datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
+    }))
+  };
+};
+
 // Database connection with proper error handling
 class OfflineStorage {
   private dbPromise: Promise<IDBDatabase> | null = null;
@@ -34,30 +50,39 @@ class OfflineStorage {
 
         request.onupgradeneeded = () => {
           const db = request.result;
+          const upgradeTransaction = request.transaction;
 
-          // Create faction index store
+          // Create or reset faction index store
           if (!db.objectStoreNames.contains(STORES.FACTION_INDEX)) {
             db.createObjectStore(STORES.FACTION_INDEX);
+          } else {
+            upgradeTransaction?.objectStore(STORES.FACTION_INDEX).clear();
           }
 
-          // Create factions store with faction ID as key
+          // Create or reset factions store keyed by slug
           if (!db.objectStoreNames.contains(STORES.FACTIONS)) {
             db.createObjectStore(STORES.FACTIONS);
+          } else {
+            upgradeTransaction?.objectStore(STORES.FACTIONS).clear();
           }
 
-          // Create settings store
+          // Create settings store (preserve existing data)
           if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
             db.createObjectStore(STORES.SETTINGS);
           }
 
-          // Create user data store for my-factions and other user preferences
+          // Create or reset user data store (my factions etc.)
           if (!db.objectStoreNames.contains(STORES.USER_DATA)) {
             db.createObjectStore(STORES.USER_DATA);
+          } else {
+            upgradeTransaction?.objectStore(STORES.USER_DATA).clear();
           }
 
-          // Create rosters store
+          // Create or reset rosters store (schema change for slug support)
           if (!db.objectStoreNames.contains(STORES.ROSTERS)) {
             db.createObjectStore(STORES.ROSTERS, { keyPath: 'id' });
+          } else {
+            upgradeTransaction?.objectStore(STORES.ROSTERS).clear();
           }
         };
       });
@@ -102,36 +127,36 @@ class OfflineStorage {
   }
 
   // Faction Data Operations
-  async getFaction(factionId: string): Promise<depot.Faction | null> {
+  async getFaction(factionSlug: string): Promise<depot.Faction | null> {
     try {
       const db = await this.getDB();
       const transaction = db.transaction([STORES.FACTIONS], 'readonly');
       const store = transaction.objectStore(STORES.FACTIONS);
 
       return new Promise((resolve, reject) => {
-        const request = store.get(factionId);
+        const request = store.get(factionSlug);
         request.onsuccess = () => resolve(request.result || null);
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error(`Failed to get faction ${factionId} from IndexedDB:`, error);
+      console.error(`Failed to get faction ${factionSlug} from IndexedDB:`, error);
       return null;
     }
   }
 
-  async setFaction(factionId: string, faction: depot.Faction): Promise<void> {
+  async setFaction(factionSlug: string, faction: depot.Faction): Promise<void> {
     try {
       const db = await this.getDB();
       const transaction = db.transaction([STORES.FACTIONS], 'readwrite');
       const store = transaction.objectStore(STORES.FACTIONS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(faction, factionId);
+        const request = store.put(faction, factionSlug);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error(`Failed to set faction ${factionId} in IndexedDB:`, error);
+      console.error(`Failed to set faction ${factionSlug} in IndexedDB:`, error);
       throw error;
     }
   }
@@ -150,7 +175,7 @@ class OfflineStorage {
           const cursor = request.result;
           if (cursor) {
             const faction = cursor.value as depot.Faction;
-            factions.push({ id: faction.id, name: faction.name });
+            factions.push({ id: faction.id, slug: faction.slug, name: faction.name });
             cursor.continue();
           } else {
             resolve(factions);
@@ -165,19 +190,19 @@ class OfflineStorage {
     }
   }
 
-  async deleteFaction(factionId: string): Promise<void> {
+  async deleteFaction(factionSlug: string): Promise<void> {
     try {
       const db = await this.getDB();
       const transaction = db.transaction([STORES.FACTIONS], 'readwrite');
       const store = transaction.objectStore(STORES.FACTIONS);
 
       return new Promise((resolve, reject) => {
-        const request = store.delete(factionId);
+        const request = store.delete(factionSlug);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error(`Failed to delete faction ${factionId} from IndexedDB:`, error);
+      console.error(`Failed to delete faction ${factionSlug} from IndexedDB:`, error);
       throw error;
     }
   }
@@ -226,7 +251,20 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.get(KEYS.MY_FACTIONS);
-        request.onsuccess = () => resolve(request.result || null);
+        request.onsuccess = () => {
+          const result = request.result as depot.Option[] | undefined;
+          if (!result) {
+            resolve(null);
+            return;
+          }
+
+          const normalized = result.map((option) => ({
+            ...option,
+            slug: option.slug ?? option.id
+          }));
+
+          resolve(normalized);
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
@@ -260,7 +298,7 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.ROSTERS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(roster);
+        const request = store.put(normalizeRoster(roster));
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
@@ -278,7 +316,10 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.get(rosterId);
-        request.onsuccess = () => resolve(request.result || null);
+        request.onsuccess = () => {
+          const result = request.result as depot.Roster | undefined;
+          resolve(result ? normalizeRoster(result) : null);
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
@@ -295,7 +336,10 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.getAll();
-        request.onsuccess = () => resolve(request.result || []);
+        request.onsuccess = () => {
+          const result = (request.result as depot.Roster[] | undefined)?.map(normalizeRoster) || [];
+          resolve(result);
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {

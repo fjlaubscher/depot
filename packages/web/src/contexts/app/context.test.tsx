@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -53,15 +53,53 @@ const TestComponent = () => {
 };
 
 const mockFactionIndex: depot.Index[] = [
-  { id: 'space-marines', name: 'Space Marines', path: '/data/SM.json' },
-  { id: 'chaos-marines', name: 'Chaos Space Marines', path: '/data/CSM.json' }
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'CSM',
+    slug: 'chaos-space-marines',
+    name: 'Chaos Space Marines',
+    path: '/data/chaos-space-marines.json'
+  }
 ];
 
 const mockFaction: depot.Faction = {
   id: 'test-faction',
+  slug: 'test-faction',
   name: 'Test Faction',
   link: 'https://wahapedia.ru/wh40k10ed/factions/test-faction',
-  datasheets: [],
+  datasheets: [
+    {
+      id: 'test-datasheet',
+      slug: 'test-datasheet',
+      name: 'Test Datasheet',
+      factionId: 'test-faction',
+      factionSlug: 'test-faction',
+      sourceId: 'core',
+      legend: '',
+      role: 'Battleline',
+      loadout: '',
+      transport: '',
+      virtual: false,
+      leaderHead: '',
+      leaderFooter: '',
+      damagedW: '',
+      damagedDescription: '',
+      link: '',
+      abilities: [],
+      keywords: [],
+      models: [],
+      options: [],
+      wargear: [],
+      unitComposition: [],
+      modelCosts: [],
+      stratagems: [],
+      enhancements: [],
+      detachmentAbilities: [],
+      leaders: [],
+      isForgeWorld: false,
+      isLegends: false
+    }
+  ],
   stratagems: [],
   enhancements: [],
   detachmentAbilities: []
@@ -155,7 +193,9 @@ describe('AppProvider with IndexedDB Integration', () => {
     });
 
     it('should load offline factions list on initialization', async () => {
-      const offlineFactions = [{ id: 'cached-faction', name: 'Cached Faction' }];
+      const offlineFactions = [
+        { id: 'cached-faction', slug: 'cached-faction', name: 'Cached Faction' }
+      ];
       mockOfflineStorage.getAllCachedFactions.mockResolvedValue(offlineFactions);
 
       render(

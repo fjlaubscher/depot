@@ -45,9 +45,20 @@ pnpm test    # Run tests
 5. IndexedDB caching for offline-first functionality
 
 ### Type System
-- All data structures defined in `@depot/core/src/types/depot.ts`
+- All data structures defined in `@depot/core/src/types/depot.ts` and `@depot/core/src/types/wahapedia.ts`
 - TypeScript types are the source of truth
 - CLI output must match these interfaces exactly
+
+### CLI (ESM) Notes
+- `@depot/cli` uses ESM with NodeNext resolution.
+- Use explicit `.js` extensions for relative imports inside `@depot/cli/src`.
+- Prefer type-only imports from core: `import type { wahapedia, depot } from '@depot/core'`.
+- Runtime imports from core should be explicit (e.g., `import { slug } from '@depot/core'`).
+- The CLI reads/writes from `packages/cli/dist/{json,data,source_data}` at runtime.
+
+### Monorepo Type Checking
+- Lint/Typecheck runs across the workspace with `pnpm lint`/`pnpm typecheck`.
+- `@depot/cli` resolves `@depot/core` types via TS path mapping, so core does not need to be prebuilt for typechecking.
 
 ## Scripts
 

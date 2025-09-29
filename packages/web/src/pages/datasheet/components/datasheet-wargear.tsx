@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { CollapsibleSection, Card } from '@/components/ui';
 import WargearTable from '@/components/shared/wargear-table';
 import { separateWargearByType } from '@/utils/wargear';

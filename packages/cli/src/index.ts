@@ -1,13 +1,18 @@
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { depot } from '@depot/core';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import type { depot } from '@depot/core';
 
-import convertToJSON from './convert-to-json';
-import generateData from './generate-data';
+import convertToJSON from './convert-to-json.js';
+import generateData from './generate-data.js';
 
-const JSON_DIR = join(__dirname, 'json');
-const DATA_DIR = join(__dirname, 'data');
-const SOURCE_DATA_DIR = join(__dirname, 'source_data');
+// Types only; runtime from core is used for slug utils in generate-data
+
+const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+const DIST_DIR = join(PKG_ROOT, 'dist');
+const JSON_DIR = join(DIST_DIR, 'json');
+const DATA_DIR = join(DIST_DIR, 'data');
+const SOURCE_DATA_DIR = join(DIST_DIR, 'source_data');
 
 const getFileName = (input: string) =>
   input.toLowerCase().replace(/_/g, '-').replace('.csv', '.json');
@@ -104,7 +109,7 @@ const init = async () => {
   const data = generateData();
 
   data.forEach((faction) => {
-    const filePath = join(DATA_DIR, `${faction.id}.json`);
+    const filePath = join(DATA_DIR, `${faction.slug}.json`);
 
     // Calculate metadata counts for the index
     const datasheetCount = faction.datasheets.length;
@@ -114,8 +119,9 @@ const init = async () => {
 
     index.push({
       id: faction.id,
+      slug: faction.slug,
       name: faction.name,
-      path: `/data/${faction.id}.json`,
+      path: `/data/${faction.slug}.json`,
       datasheetCount,
       stratagemCount,
       enhancementCount,

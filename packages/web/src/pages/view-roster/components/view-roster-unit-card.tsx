@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { RosterUnitCardBase } from '@/components/shared/roster';
 import UnitDetails from './unit-details';
 

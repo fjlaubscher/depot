@@ -1,6 +1,6 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import useSettings from './use-settings';
 import { offlineStorage } from '../data/offline-storage';
 

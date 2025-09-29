@@ -19,17 +19,20 @@ import DatasheetAbilitiesTab from './components/datasheet-abilities-tab';
 import Skeleton from './components/skeleton';
 
 const DatasheetPage: FC = () => {
-  const { factionId, id } = useParams<{ factionId: string; id: string }>();
+  const { factionSlug, datasheetSlug } = useParams<{
+    factionSlug: string;
+    datasheetSlug: string;
+  }>();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
-  const { data: faction, loading, error } = useFaction(factionId);
+  const { data: faction, loading, error } = useFaction(factionSlug);
 
   const datasheet = useMemo(() => {
-    if (faction && id) {
-      return faction.datasheets.find((ds) => ds.id === id);
+    if (faction && datasheetSlug) {
+      return faction.datasheets.find((ds) => ds.slug === datasheetSlug || ds.id === datasheetSlug);
     }
     return undefined;
-  }, [faction, id]);
+  }, [faction, datasheetSlug]);
 
   const datasheetCost = useMemo(() => {
     if (datasheet) {
@@ -87,7 +90,7 @@ const DatasheetPage: FC = () => {
           title="Datasheet not found"
           message="The datasheet you're looking for doesn't exist or may have been removed."
           showRetry={false}
-          homeUrl={factionId ? `/faction/${factionId}` : '/'}
+          homeUrl={factionSlug ? `/faction/${factionSlug}` : '/'}
           data-testid="datasheet-not-found"
         />
       </AppLayout>
@@ -98,7 +101,7 @@ const DatasheetPage: FC = () => {
     <AppLayout title="Datasheet">
       <div className="flex flex-col gap-4">
         <BackButton
-          to={`/faction/${faction.id}`}
+          to={`/faction/${faction.slug}`}
           label={faction.name}
           ariaLabel={`Back to ${faction.name}`}
           className="md:hidden"
@@ -109,8 +112,11 @@ const DatasheetPage: FC = () => {
           <Breadcrumbs
             items={[
               { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: `/faction/${faction.id}` },
-              { label: datasheet.name, path: `/faction/${faction.id}/datasheet/${datasheet.id}` }
+              { label: faction.name, path: `/faction/${faction.slug}` },
+              {
+                label: datasheet.name,
+                path: `/faction/${faction.slug}/datasheet/${datasheet.slug}`
+              }
             ]}
           />
         </div>

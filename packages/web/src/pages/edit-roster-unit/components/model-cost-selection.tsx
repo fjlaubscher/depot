@@ -1,5 +1,5 @@
 import React from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { SelectField } from '@/components/ui';
 
 interface ModelCostSelectionProps {

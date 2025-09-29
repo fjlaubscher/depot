@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockRoster, createMockRosterUnit, mockEmptyRoster } from '@/test/mock-data';
 import EditRosterPage from './index';
@@ -30,9 +30,11 @@ const mockRosterContext = vi.hoisted(() => ({
   state: {
     id: 'test-roster-id',
     name: 'Test Roster',
-    factionId: 'space-marines',
+    factionId: 'SM',
+    factionSlug: 'space-marines',
     faction: {
-      id: 'space-marines',
+      id: 'SM',
+      slug: 'space-marines',
       name: 'Space Marines',
       path: '/data/space-marines.json'
     } as depot.Index,
@@ -64,7 +66,7 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
   state: {
-    factionIndex: [{ id: 'space-marines', name: 'Space Marines' }] as depot.Index[]
+    factionIndex: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }] as depot.Index[]
   }
 }));
 
@@ -124,9 +126,11 @@ describe('EditRosterPage', () => {
     mockRosterContext.state = {
       id: 'test-roster-id',
       name: 'Test Roster',
-      factionId: 'space-marines',
+      factionId: 'SM',
+      factionSlug: 'space-marines',
       faction: {
-        id: 'space-marines',
+        id: 'SM',
+        slug: 'space-marines',
         name: 'Space Marines',
         path: '/data/space-marines.json'
       } as depot.Index,

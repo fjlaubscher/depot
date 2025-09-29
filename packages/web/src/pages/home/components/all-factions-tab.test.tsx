@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AllFactionsTab from './all-factions-tab';
 import type { GroupedFactions } from '../utils/faction';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 
 // Mock child components
@@ -52,13 +52,25 @@ vi.mock('./no-results', () => ({
 
 const mockGroupedFactions: GroupedFactions = {
   imperium: [
-    { id: 'SM', name: 'Space Marines', path: '/data/sm.json' },
-    { id: 'AM', name: 'Astra Militarum', path: '/data/am.json' }
+    { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+    {
+      id: 'AM',
+      slug: 'astra-militarum',
+      name: 'Astra Militarum',
+      path: '/data/astra-militarum.json'
+    }
   ],
-  chaos: [{ id: 'CSM', name: 'Chaos Space Marines', path: '/data/csm.json' }],
+  chaos: [
+    {
+      id: 'CSM',
+      slug: 'chaos-space-marines',
+      name: 'Chaos Space Marines',
+      path: '/data/chaos-space-marines.json'
+    }
+  ],
   xenos: [
-    { id: 'ORK', name: 'Orks', path: '/data/ork.json' },
-    { id: 'TAU', name: "T'au Empire", path: '/data/tau.json' }
+    { id: 'ORK', slug: 'orks', name: 'Orks', path: '/data/orks.json' },
+    { id: 'TAU', slug: 'tau-empire', name: "T'au Empire", path: '/data/tau-empire.json' }
   ]
 };
 

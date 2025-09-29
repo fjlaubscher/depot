@@ -1,9 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import Faction from './index';
 import { TestWrapper } from '@/test/test-utils';
 import type { AppContextType } from '@/contexts/app/types';
+import { createMockFaction, createMockDatasheet } from '@/test/mock-data';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -31,56 +32,20 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useParams: () => ({ id: 'SM' })
+    useParams: () => ({ factionSlug: 'space-marines' })
   };
 });
 
-const mockFaction: depot.Faction = {
-  id: 'SM',
-  name: 'Space Marines',
-  link: '/faction/SM',
+const mockFaction: depot.Faction = createMockFaction({
   datasheets: [
-    {
+    createMockDatasheet({
       id: 'captain',
+      slug: 'captain',
       name: 'Captain',
-      factionId: 'SM',
-      role: 'HQ',
-      isForgeWorld: false,
-      isLegends: false
-    } as depot.Datasheet
-  ],
-  stratagems: [
-    {
-      id: 'rapid-fire',
-      name: 'Rapid Fire',
-      factionId: 'SM',
-      type: 'Battle Tactic',
-      cpCost: '1',
-      description: 'Rapid fire stratagem'
-    } as depot.Stratagem
-  ],
-  enhancements: [
-    {
-      id: 'artificer-armour',
-      name: 'Artificer Armour',
-      factionId: 'SM',
-      cost: '10',
-      description: 'Enhanced armor',
-      legend: '',
-      detachment: 'Gladius'
-    }
-  ],
-  detachmentAbilities: [
-    {
-      id: 'combat-doctrines',
-      name: 'Combat Doctrines',
-      factionId: 'SM',
-      description: 'Space Marines doctrines',
-      legend: '',
-      detachment: 'Gladius'
-    }
+      role: 'HQ'
+    })
   ]
-};
+});
 
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
@@ -198,7 +163,9 @@ describe('Faction Page', () => {
     fireEvent.click(favouriteButton);
 
     await waitFor(() => {
-      expect(mockUpdateMyFactions).toHaveBeenCalledWith([{ id: 'SM', name: 'Space Marines' }]);
+      expect(mockUpdateMyFactions).toHaveBeenCalledWith([
+        { id: 'SM', slug: 'space-marines', name: 'Space Marines' }
+      ]);
     });
     expect(mockShowToast).toHaveBeenCalledWith({
       type: 'success',
@@ -213,7 +180,7 @@ describe('Faction Page', () => {
       ...defaultAppContext,
       state: {
         ...defaultAppContext.state,
-        myFactions: [{ id: 'SM', name: 'Space Marines' }]
+        myFactions: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
       }
     };
     mockUseAppContext.mockReturnValue(contextWithMyFaction);
@@ -255,7 +222,7 @@ describe('Faction Page', () => {
       ...defaultAppContext,
       state: {
         ...defaultAppContext.state,
-        myFactions: [{ id: 'SM', name: 'Space Marines' }]
+        myFactions: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
       }
     };
     mockUseAppContext.mockReturnValue(contextWithMyFaction);

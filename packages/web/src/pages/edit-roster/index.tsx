@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Eye, Plus } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
@@ -26,13 +26,13 @@ const RosterView: FC = () => {
   }
 
   const factionName = appState.factionIndex?.find(
-    (f: depot.Index) => f.id === roster.factionId
+    (f: depot.Index) => f.slug === roster.factionSlug || f.id === roster.factionId
   )?.name;
 
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionId;
+      : factionName || roster.factionSlug || roster.factionId;
 
   const handleViewRoster = () => {
     navigate(`/rosters/${roster.id}`);

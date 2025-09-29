@@ -10,5 +10,9 @@ const getBasePath = (): string => {
  */
 export const getDataUrl = (path: string): string => {
   const basePath = getBasePath();
+  if (path.startsWith('/')) {
+    return `${basePath}${path}`;
+  }
+
   return `${basePath}/data/${path}`;
 };

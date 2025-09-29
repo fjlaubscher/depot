@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from './index';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import type { AppContextType } from '@/contexts/app/types';
 
@@ -44,8 +44,8 @@ vi.mock('@/contexts/app/use-app-context', () => ({
 }));
 
 const mockFactions: depot.Option[] = [
-  { id: 'SM', name: 'Space Marines' },
-  { id: 'CSM', name: 'Chaos Space Marines' }
+  { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
+  { id: 'CSM', slug: 'chaos-space-marines', name: 'Chaos Space Marines' }
 ];
 
 describe('Home', () => {
@@ -201,7 +201,7 @@ describe('Home', () => {
     // Find faction links within the quick access section only
     const quickAccessSection = screen.getByTestId('quick-access-section');
     const factionLinks = quickAccessSection.querySelectorAll('a[href^="/faction/"]');
-    expect(factionLinks[0]).toHaveAttribute('href', '/faction/SM');
-    expect(factionLinks[1]).toHaveAttribute('href', '/faction/CSM');
+    expect(factionLinks[0]).toHaveAttribute('href', '/faction/space-marines');
+    expect(factionLinks[1]).toHaveAttribute('href', '/faction/chaos-space-marines');
   });
 });

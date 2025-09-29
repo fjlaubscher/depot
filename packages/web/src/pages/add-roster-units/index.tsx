@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
@@ -24,10 +24,11 @@ const AddRosterUnitsView: FC = () => {
     useRosterUnitSelection();
 
   useEffect(() => {
-    if (roster.id && roster.factionId) {
-      getFaction(roster.factionId).then(setFactionData);
+    if (roster.id && (roster.factionSlug || roster.factionId)) {
+      const key = roster.factionSlug || roster.factionId;
+      getFaction(key).then(setFactionData);
     }
-  }, [roster.id, roster.factionId, getFaction]);
+  }, [roster.id, roster.factionSlug, roster.factionId, getFaction]);
 
   if (!roster.id) {
     return <Loader />;
@@ -37,7 +38,7 @@ const AddRosterUnitsView: FC = () => {
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionId;
+      : factionName || roster.factionSlug || roster.factionId;
 
   const handleAddSelectedUnits = () => {
     selectedUnits.forEach(({ datasheet, modelCost }) => {

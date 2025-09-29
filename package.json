@@ -9,6 +9,7 @@
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
     "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
     "dev": "pnpm --filter @depot/web dev"
   },
   "devDependencies": {

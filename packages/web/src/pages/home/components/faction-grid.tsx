@@ -1,5 +1,5 @@
 import React from 'react';
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 import { Grid, SkeletonCard, LinkCard } from '@/components/ui';
 
 interface FactionGridProps {
@@ -21,7 +21,7 @@ const FactionGrid: React.FC<FactionGridProps> = ({ factions, loading = false }) 
   return (
     <Grid>
       {factions.map((faction) => (
-        <LinkCard key={faction.id} to={`/faction/${faction.id}`}>
+        <LinkCard key={faction.slug} to={`/faction/${faction.slug}`}>
           {faction.name}
         </LinkCard>
       ))}

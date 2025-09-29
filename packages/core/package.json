@@ -2,8 +2,26 @@
   "name": "@depot/core",
   "version": "1.0.0",
   "description": "Shared core functionality and types for depot packages",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types/depot": {
+      "types": "./dist/types/depot.d.ts",
+      "default": "./dist/types/depot.js"
+    },
+    "./types/wahapedia": {
+      "types": "./dist/types/wahapedia.d.ts",
+      "default": "./dist/types/wahapedia.js"
+    },
+    "./utils/slug": {
+      "types": "./dist/utils/slug.d.ts",
+      "default": "./dist/utils/slug.js"
+    }
+  },
   "files": [
     "dist"
   ],

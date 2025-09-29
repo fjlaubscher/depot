@@ -1,15 +1,21 @@
 {
   "extends": "../core/tsconfig.json",
   "compilerOptions": {
+    // Inherit most settings from core; only override what's needed for CLI runtime build
     "lib": ["ES2020"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": "../../",
+    "paths": {
+      "@depot/core": ["packages/core/src/index.ts"],
+      "@depot/core/*": ["packages/core/src/*"]
+    },
     "verbatimModuleSyntax": false,
     "noEmit": false,
     "outDir": "./dist",
     "declaration": true,
     "sourceMap": true,
-    "types": ["node"]
+    "types": ["node", "vitest"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
