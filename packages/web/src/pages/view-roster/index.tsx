@@ -10,7 +10,11 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
 import { BackButton, RosterHeader, RosterSection } from '@/components/shared';
-import { generateRosterMarkdown, generateRosterShareText, groupRosterUnitsByRole } from '@/utils/roster';
+import {
+  generateRosterMarkdown,
+  generateRosterShareText,
+  groupRosterUnitsByRole
+} from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
 const RosterView: React.FC = () => {

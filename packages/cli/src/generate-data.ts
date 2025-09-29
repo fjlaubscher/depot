@@ -1,8 +1,11 @@
 import { readFileSync } from 'fs';
-import { join } from 'path';
-import { depot, wahapedia, slug as slugUtils } from '@depot/core';
-
-const JSON_DIR = join(__dirname, 'json');
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { slug as slugUtils } from '@depot/core';
+import type { wahapedia, depot } from '@depot/core';
+const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
+const DIST_DIR = join(PKG_ROOT, 'dist');
+const JSON_DIR = join(DIST_DIR, 'json');
 
 const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(join(JSON_DIR, fileName), { encoding: 'utf-8' }));
@@ -76,12 +79,14 @@ const buildDatasheet = (
   datasheetSlugs: Map<string, string>,
   factionSlugs: Map<string, string>
 ): depot.Datasheet => {
-  const abilities = data.datasheetAbilities
-    .filter((ability) => ability.datasheetId === datasheet.id)
-    .map((a) => {
+  const abilities: depot.Ability[] = data.datasheetAbilities
+    .filter((ability: wahapedia.DatasheetAbility) => ability.datasheetId === datasheet.id)
+    .map((a: wahapedia.DatasheetAbility): depot.Ability | undefined => {
       // If ability has an abilityId, look it up in the abilities table
       if (a.abilityId) {
-        const referencedAbility = data.abilities.filter((ability) => ability.id === a.abilityId)[0];
+        const referencedAbility = data.abilities.filter(
+          (ability: wahapedia.Ability) => ability.id === a.abilityId
+        )[0];
         if (referencedAbility) {
           return {
             ...referencedAbility,
@@ -104,42 +109,63 @@ const buildDatasheet = (
       // Skip empty entries
       return undefined;
     })
-    .filter((ability) => ability !== undefined);
+    .filter((ability): ability is depot.Ability => ability !== undefined);
 
   const isForgeWorld = data.sources
-    .filter((s) => s.name.includes('Imperial Armour:'))
-    .map((s) => s.id)
+    .filter((s: wahapedia.Source) => s.name.includes('Imperial Armour:'))
+    .map((s: wahapedia.Source) => s.id)
     .includes(datasheet.sourceId);
 
   const isLegends = data.sources
-    .filter((s) => s.name.includes('Legends:'))
-    .map((s) => s.id)
+    .filter((s: wahapedia.Source) => s.name.includes('Legends:'))
+    .map((s: wahapedia.Source) => s.id)
     .includes(datasheet.sourceId);
 
-  const keywords = data.datasheetKeywords.filter((keyword) => keyword.datasheetId === datasheet.id);
-  const models = data.datasheetModels.filter((model) => model.datasheetId === datasheet.id);
-  const options = data.datasheetOptions.filter((option) => option.datasheetId === datasheet.id);
-  const wargear = data.datasheetWargear.filter((wargear) => wargear.datasheetId === datasheet.id);
-  const unitComposition = data.datasheetUnitComposition.filter(
-    (uc) => uc.datasheetId === datasheet.id
+  const keywords = data.datasheetKeywords.filter(
+    (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
   );
-  const modelCosts = data.datasheetModelCosts.filter((mc) => mc.datasheetId === datasheet.id);
+  const models = data.datasheetModels.filter(
+    (model: wahapedia.DatasheetModel) => model.datasheetId === datasheet.id
+  );
+  const options = data.datasheetOptions.filter(
+    (option: wahapedia.DatasheetOption) => option.datasheetId === datasheet.id
+  );
+  const wargear = data.datasheetWargear.filter(
+    (wargear: wahapedia.DatasheetWargear) => wargear.datasheetId === datasheet.id
+  );
+  const unitComposition = data.datasheetUnitComposition.filter(
+    (uc: wahapedia.DatasheetUnitComposition) => uc.datasheetId === datasheet.id
+  );
+  const modelCosts = data.datasheetModelCosts.filter(
+    (mc: wahapedia.DatasheetModelCost) => mc.datasheetId === datasheet.id
+  );
 
   const stratagems = data.datasheetStratagems
-    .filter((ds) => ds.datasheetId === datasheet.id)
-    .map((ds) => data.stratagems.filter((s) => s.id === ds.stratagemId)[0]);
+    .filter((ds: wahapedia.DatasheetStratagem) => ds.datasheetId === datasheet.id)
+    .map(
+      (ds: wahapedia.DatasheetStratagem) =>
+        data.stratagems.filter((s: wahapedia.Stratagem) => s.id === ds.stratagemId)[0]
+    );
 
   const enhancements = data.datasheetEnhancements
-    .filter((de) => de.datasheetId === datasheet.id)
-    .map((de) => data.enhancements.filter((e) => e.id === de.enhancementId)[0]);
+    .filter((de: wahapedia.DatasheetEnhancement) => de.datasheetId === datasheet.id)
+    .map(
+      (de: wahapedia.DatasheetEnhancement) =>
+        data.enhancements.filter((e: wahapedia.Enhancement) => e.id === de.enhancementId)[0]
+    );
 
   const detachmentAbilities = data.datasheetDetachmentAbilities
-    .filter((dda) => dda.datasheetId === datasheet.id)
-    .map((dda) => data.detachmentAbilities.filter((da) => da.id === dda.detachmentAbilityId)[0]);
+    .filter((dda: wahapedia.DatasheetDetachmentAbility) => dda.datasheetId === datasheet.id)
+    .map(
+      (dda: wahapedia.DatasheetDetachmentAbility) =>
+        data.detachmentAbilities.filter(
+          (da: wahapedia.DetachmentAbility) => da.id === dda.detachmentAbilityId
+        )[0]
+    );
 
   const leaders = data.datasheetLeaders
-    .filter((dl) => dl.datasheetId === datasheet.id)
-    .map((dl) => {
+    .filter((dl: wahapedia.DatasheetLeader) => dl.datasheetId === datasheet.id)
+    .map((dl: wahapedia.DatasheetLeader) => {
       const leaderSlug = datasheetSlugs.get(dl.attachedDatasheetId);
       if (!leaderSlug) {
         return undefined;
