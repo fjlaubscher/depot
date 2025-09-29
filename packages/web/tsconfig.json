@@ -5,8 +5,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
-    "allowJs": false,
-    "esModuleInterop": false,
+    
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],

@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  // Base tsconfig for the monorepo. Extended by @depot/web and @depot/cli.
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["ES2020", "DOM"],
