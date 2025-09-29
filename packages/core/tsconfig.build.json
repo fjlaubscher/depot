@@ -4,8 +4,7 @@
     "noEmit": false,
     "declaration": true,
     "outDir": "./dist",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "verbatimModuleSyntax": false
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
   }
 }
