@@ -24,12 +24,6 @@ vi.mock('./components/datasheet-profile', () => ({
   )
 }));
 
-vi.mock('./components/datasheet-stratagems', () => ({
-  default: ({ stratagems }: { stratagems: any[] }) => (
-    <div data-testid="datasheet-stratagems">Stratagems: {stratagems.length}</div>
-  )
-}));
-
 // Mock react-router-dom params and navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -71,19 +65,10 @@ describe('DatasheetPage', () => {
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
   });
 
-  it('renders tabs', () => {
-    render(<DatasheetPage />, { wrapper: TestWrapper });
-
-    expect(screen.getByTestId('datasheet-tabs')).toBeInTheDocument();
-  });
-
   it('renders child components with correct data', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    // Only the first tab's content is shown by default
     expect(screen.getByTestId('datasheet-profile')).toBeInTheDocument();
-    // Second tab content is not visible initially
-    expect(screen.queryByTestId('datasheet-stratagems')).not.toBeInTheDocument();
   });
 
   it('renders loading state', () => {

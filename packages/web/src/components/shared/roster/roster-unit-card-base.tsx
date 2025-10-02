@@ -2,7 +2,7 @@ import type { FC, ReactNode } from 'react';
 import { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { Card, Tag, TagGroup, PointsTag } from '@/components/ui';
-import { categorizeAbilities } from '@/pages/datasheet/utils/abilities';
+import { categorizeAbilities } from '@/utils/abilities';
 
 interface RosterUnitCardBaseProps {
   unit: depot.RosterUnit;

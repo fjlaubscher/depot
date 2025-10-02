@@ -1,6 +1,7 @@
 import type { ReactNode, FC } from 'react';
 import type { depot } from '@depot/core';
 import { Search, Filters, CollapsibleSection, Grid, LinkCard } from '@/components/ui';
+import Tag from '@/components/ui/tag';
 import { useDatasheetSearch } from '@/hooks/use-datasheet-search';
 import type { DatasheetFilters } from '@/hooks/use-datasheet-search';
 
@@ -33,7 +34,18 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
 
   const defaultRenderDatasheet = (datasheet: depot.Datasheet) => (
     <LinkCard to={`/faction/${datasheet.factionSlug}/datasheet/${datasheet.slug}`}>
-      {datasheet.name}
+      <div className="flex flex-col gap-1">
+        <span>{datasheet.name}</span>
+        {datasheet.isLegends || datasheet.isForgeWorld ? (
+          <Tag
+            size="sm"
+            variant={datasheet.isLegends ? 'warning' : 'secondary'}
+            className="self-start"
+          >
+            {datasheet.isLegends ? 'Warhammer Legends' : 'Forge World'}
+          </Tag>
+        ) : null}
+      </div>
     </LinkCard>
   );
 

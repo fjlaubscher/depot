@@ -1,15 +1,14 @@
 import type { depot } from '@depot/core';
 
+type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+
 export interface CategorizedAbilities {
-  inline: depot.Ability[]; // Short, unit-specific (Datasheet, Wargear types)
-  referenced: depot.Ability[]; // Long, core rules (Core, Faction types)
+  inline: depot.Ability[];
+  referenced: depot.Ability[];
 }
 
 /**
- * Categorizes abilities into inline (unit-specific) and referenced (core rules)
- * Based on ability type from the source data:
- * - Inline: "Datasheet" and "Wargear" types (short, unit-specific)
- * - Referenced: "Core" and "Faction" types (long, detailed rules)
+ * Categorizes abilities into inline (unit-specific) and referenced (core/faction) groups.
  */
 export const categorizeAbilities = (abilities: depot.Ability[]): CategorizedAbilities => {
   const inline: depot.Ability[] = [];
@@ -18,18 +17,23 @@ export const categorizeAbilities = (abilities: depot.Ability[]): CategorizedAbil
   abilities.forEach((ability) => {
     if (ability.type === 'Datasheet' || ability.type === 'Wargear') {
       inline.push(ability);
-    } else if (ability.type === 'Core' || ability.type === 'Faction') {
+      return;
+    }
+
+    if (ability.type === 'Core' || ability.type === 'Faction') {
       referenced.push(ability);
-    } else if (ability.type.includes('Special') || ability.type.includes('Fortification')) {
-      // Special and Fortification types are typically unit-specific
+      return;
+    }
+
+    if (ability.type.includes('Special') || ability.type.includes('Fortification')) {
       inline.push(ability);
+      return;
+    }
+
+    if (ability.id) {
+      referenced.push(ability);
     } else {
-      // Fallback to ID-based categorization for any unknown types
-      if (ability.id) {
-        referenced.push(ability);
-      } else {
-        inline.push(ability);
-      }
+      inline.push(ability);
     }
   });
 
@@ -37,7 +41,7 @@ export const categorizeAbilities = (abilities: depot.Ability[]): CategorizedAbil
 };
 
 /**
- * Gets a user-friendly badge color for the ability type
+ * Maps ability type to pill badge styles used across the app.
  */
 export const getAbilityTypeBadge = (type: string): { text: string; color: string } => {
   switch (type) {
@@ -76,4 +80,37 @@ export const getAbilityTypeBadge = (type: string): { text: string; color: string
     default:
       return { text: type, color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' };
   }
+};
+
+/**
+ * Converts ability type to a Tag variant for consistent styling.
+ */
+export const getAbilityTagVariant = (type: string): TagVariant => {
+  const normalized = type.toLowerCase();
+
+  if (normalized.includes('core')) {
+    return 'primary';
+  }
+
+  if (normalized.includes('faction')) {
+    return 'secondary';
+  }
+
+  if (normalized.includes('datasheet')) {
+    return 'success';
+  }
+
+  if (normalized.includes('wargear')) {
+    return 'warning';
+  }
+
+  if (normalized.includes('special')) {
+    return 'danger';
+  }
+
+  if (normalized.includes('fortification')) {
+    return 'warning';
+  }
+
+  return 'default';
 };

@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
 import ModelStatsRow from '@/components/shared/model-stats-row';
-import { WargearTable } from '@/components/shared';
-import { categorizeAbilities } from '@/pages/datasheet/utils/abilities';
+import { WargearTable, DatasheetAbilities } from '@/components/shared';
+import { categorizeAbilities } from '@/utils/abilities';
 
 interface UnitDetailsProps {
   unit: depot.RosterUnit;
@@ -32,24 +32,11 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
         )}
 
         {/* Unit Abilities */}
-        {inlineAbilities.length > 0 && (
-          <>
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">Unit Abilities</h4>
-            <div className="space-y-2">
-              {inlineAbilities.map((ability, index) => (
-                <div key={index} className="text-sm bg-white dark:bg-gray-800 p-3 rounded">
-                  <div className="font-medium text-primary-600 dark:text-primary-400 mb-1">
-                    {ability.name}
-                  </div>
-                  <div
-                    className="text-gray-700 dark:text-gray-300"
-                    dangerouslySetInnerHTML={{ __html: ability.description }}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        <DatasheetAbilities
+          title="Unit Abilities"
+          abilities={inlineAbilities}
+          dataTestId="roster-unit-abilities"
+        />
 
         {/* Quick Link to Full Datasheet */}
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">

@@ -21,11 +21,11 @@
   "author": "Francois Laubscher",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.11.0",
-    "vitest": "^3.2.4",
+    "@types/node": "^20.19.19",
     "prettier": "^3.4.0",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@depot/core": "workspace:*"

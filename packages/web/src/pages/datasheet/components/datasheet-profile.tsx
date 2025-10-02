@@ -4,26 +4,35 @@ import type { depot } from '@depot/core';
 // components
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
-import DatasheetInlineAbilities from './datasheet-inline-abilities';
+import { DatasheetAbilities } from '@/components/shared/datasheet';
 
 // utils
-import { categorizeAbilities } from '../utils/abilities';
+import { categorizeAbilities } from '@/utils/abilities';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet }) => {
-  // Extract only inline abilities for this tab
-  const inlineAbilities = useMemo(() => {
-    const { inline } = categorizeAbilities(datasheet.abilities);
-    return inline;
+  const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
+    return categorizeAbilities(datasheet.abilities);
   }, [datasheet.abilities]);
 
   return (
-    <div className="flex flex-col gap-4" data-testid="datasheet-profile">
-      <DatasheetHero datasheet={datasheet} />
-      <DatasheetInlineAbilities abilities={inlineAbilities} />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2" data-testid="datasheet-profile">
+        <DatasheetHero datasheet={datasheet} />
+        <DatasheetAbilities
+          title="Core Abilities"
+          abilities={coreAbilities}
+          dataTestId="core-abilities"
+        />
+        <DatasheetAbilities
+          title="Unit Abilities"
+          abilities={inlineAbilities}
+          dataTestId="unit-abilities"
+        />
+      </div>
       <DatasheetWargear datasheet={datasheet} />
     </div>
   );

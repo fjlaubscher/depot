@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs",
-    "start": "pnpm --filter @depot/cli build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
-    "refresh-data": "pnpm --filter @depot/cli build && pnpm --filter @depot/cli start -- --force-download && node scripts/copy-data.mjs",
+    "start": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
+    "refresh-data": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start -- --force-download && node scripts/copy-data.mjs",
     "format": "pnpm -r format",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean",
@@ -16,7 +16,7 @@
     "@fjlaubscher/agent-rules-mcp": "^0.4.1",
     "prettier": "^2.8.8",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=22.0.0",

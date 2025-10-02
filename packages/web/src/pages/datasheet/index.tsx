@@ -1,11 +1,11 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
-import { Tabs, PageHeader, ErrorState, Breadcrumbs } from '@/components/ui';
+import { PageHeader, ErrorState, Breadcrumbs } from '@/components/ui';
 import { BackButton } from '@/components/shared';
 
 // hooks
@@ -14,8 +14,6 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 // page components
 import DatasheetProfile from './components/datasheet-profile';
-import DatasheetStratagems from './components/datasheet-stratagems';
-import DatasheetAbilitiesTab from './components/datasheet-abilities-tab';
 import Skeleton from './components/skeleton';
 
 const DatasheetPage: FC = () => {
@@ -24,7 +22,6 @@ const DatasheetPage: FC = () => {
     datasheetSlug: string;
   }>();
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState(0);
   const { data: faction, loading, error } = useFaction(factionSlug);
 
   const datasheet = useMemo(() => {
@@ -135,17 +132,7 @@ const DatasheetPage: FC = () => {
           data-testid="datasheet-header"
         />
 
-        {/* Tabs */}
-        <Tabs
-          tabs={['Datasheet', 'Abilities', 'Stratagems']}
-          active={activeTab}
-          onChange={setActiveTab}
-          data-testid="datasheet-tabs"
-        >
-          <DatasheetProfile datasheet={datasheet} />
-          <DatasheetAbilitiesTab abilities={datasheet.abilities} />
-          <DatasheetStratagems stratagems={datasheet.stratagems} />
-        </Tabs>
+        <DatasheetProfile datasheet={datasheet} />
       </div>
     </AppLayout>
   );

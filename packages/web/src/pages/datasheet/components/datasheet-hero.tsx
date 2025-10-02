@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
 // components
-import { Tag, TagGroup } from '@/components/ui';
+import { Tag, TagSection } from '@/components/ui';
 import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
 
 // utils
@@ -21,11 +21,9 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
   return (
     <div className="flex flex-col gap-4">
       {/* Model Stats Rows */}
-      <div className="flex flex-col gap-4">
-        {models.map((model) => (
-          <ModelStatsRow key={model.line} model={model} />
-        ))}
-      </div>
+      {models.map((model) => (
+        <ModelStatsRow key={model.line} model={model} />
+      ))}
 
       <DatasheetComposition
         composition={unitComposition}
@@ -35,34 +33,24 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
 
       {/* Keywords */}
       <div className="flex flex-col gap-2">
-        {groupedKeywords.datasheet.length > 0 && (
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
-              Keywords
-            </span>
-            <TagGroup spacing="sm">
-              {groupedKeywords.datasheet.map((keyword, i) => (
-                <Tag key={`keyword-${i}`} variant="default" size="sm">
-                  {keyword}
-                </Tag>
-              ))}
-            </TagGroup>
-          </div>
-        )}
-        {groupedKeywords.faction.length > 0 && (
-          <div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 block">
-              Faction Keywords
-            </span>
-            <TagGroup spacing="sm">
-              {groupedKeywords.faction.map((keyword, i) => (
-                <Tag key={`faction-keyword-${i}`} variant="primary" size="sm">
-                  {keyword}
-                </Tag>
-              ))}
-            </TagGroup>
-          </div>
-        )}
+        {groupedKeywords.datasheet.length > 0 ? (
+          <TagSection title="Keywords" spacing="sm">
+            {groupedKeywords.datasheet.map((keyword, i) => (
+              <Tag key={`keyword-${i}`} variant="default" size="sm">
+                {keyword}
+              </Tag>
+            ))}
+          </TagSection>
+        ) : null}
+        {groupedKeywords.faction.length > 0 ? (
+          <TagSection title="Faction Keywords" spacing="sm">
+            {groupedKeywords.faction.map((keyword, i) => (
+              <Tag key={`faction-keyword-${i}`} variant="primary" size="sm">
+                {keyword}
+              </Tag>
+            ))}
+          </TagSection>
+        ) : null}
       </div>
     </div>
   );

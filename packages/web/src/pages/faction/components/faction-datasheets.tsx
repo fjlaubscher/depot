@@ -3,23 +3,14 @@ import type { depot } from '@depot/core';
 
 // Components
 import { DatasheetBrowser } from '@/components/shared/datasheet';
-
-// Hooks
-import { useAppContext } from '@/contexts/app/use-app-context';
+import type { DatasheetFilters } from '@/hooks/use-datasheet-search';
 
 interface FactionDatasheetsProps {
   datasheets: depot.Datasheet[];
+  filters: DatasheetFilters;
 }
 
-const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets }) => {
-  const { state } = useAppContext();
-  const { settings } = state;
-
-  const filters = {
-    showLegends: settings?.showLegends,
-    showForgeWorld: settings?.showForgeWorld
-  };
-
+const FactionDatasheets: React.FC<FactionDatasheetsProps> = ({ datasheets, filters }) => {
   return (
     <div data-testid="faction-datasheets">
       <DatasheetBrowser

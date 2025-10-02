@@ -73,6 +73,10 @@ export const groupFactionDataByDetachment = (
 
   // Initialize each detachment
   detachmentNames.forEach((name) => {
+    if (!name) {
+      return;
+    }
+
     detachments[name] = {
       abilities: [],
       enhancements: [],
@@ -80,17 +84,37 @@ export const groupFactionDataByDetachment = (
     };
   });
 
+  const addToDetachment = (
+    detachment: string,
+    type: 'abilities' | 'enhancements' | 'stratagems',
+    item: depot.DetachmentAbility | depot.Enhancement | depot.Stratagem
+  ) => {
+    if (!detachment) {
+      return;
+    }
+
+    if (!detachments[detachment]) {
+      detachments[detachment] = {
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      };
+    }
+
+    detachments[detachment][type].push(item as never);
+  };
+
   // Group data by detachment
   detachmentAbilities.forEach((ability) => {
-    detachments[ability.detachment].abilities.push(ability);
+    addToDetachment(ability.detachment, 'abilities', ability);
   });
 
   enhancements.forEach((enhancement) => {
-    detachments[enhancement.detachment].enhancements.push(enhancement);
+    addToDetachment(enhancement.detachment, 'enhancements', enhancement);
   });
 
   stratagems.forEach((stratagem) => {
-    detachments[stratagem.detachment].stratagems.push(stratagem);
+    addToDetachment(stratagem.detachment, 'stratagems', stratagem);
   });
 
   return detachments;

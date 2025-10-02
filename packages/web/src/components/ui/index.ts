@@ -24,7 +24,7 @@ export { default as StatCard } from './stat-card';
 export { default as StatsRow } from './stats-row';
 export { default as Table } from './table';
 export { default as Tabs } from './tabs';
-export { Tag, TagGroup } from './tag';
+export { Tag, TagGroup, TagSection } from './tag';
 export { default as Toast } from './toast';
 export { default as ToastContainer } from './toast-container';
 export { default as ToggleSwitch } from './toggle-switch';

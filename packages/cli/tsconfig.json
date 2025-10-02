@@ -13,8 +13,11 @@
         "packages/core/src/*"
       ]
     },
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noEmit": false,
     "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "sourceMap": true,
     "types": ["node", "vitest"]

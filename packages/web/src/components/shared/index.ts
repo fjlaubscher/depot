@@ -3,6 +3,7 @@ export { default as BackButton } from './back-button';
 export { ErrorBoundary } from './error-boundary';
 
 // Data display
+export { default as AbilityModal } from './ability-modal';
 export * from './datasheet';
 export * from './roster';
 export { default as WargearRow } from './wargear-row';

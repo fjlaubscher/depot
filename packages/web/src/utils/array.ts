@@ -1,33 +1,33 @@
-export const sortByName = (items: Required<{ name: string }>[]) => {
-  return items
-    .filter((item) => !!item)
+export const sortByName = <T extends { name: string }>(items: T[]): T[] => {
+  return [...items]
+    .filter((item): item is T => !!item)
     .sort((a, b) => {
       const nameA = a.name.toLowerCase();
       const nameB = b.name.toLowerCase();
 
       if (nameA < nameB) {
         return -1;
-      } else if (nameA > nameB) {
-        return 1;
-      } else {
-        return 0;
       }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
     });
 };
 
-export const sortByType = (items: Required<{ type: string }>[]) => {
-  return items
-    .filter((item) => !!item)
+export const sortByType = <T extends { type: string }>(items: T[]): T[] => {
+  return [...items]
+    .filter((item): item is T => !!item)
     .sort((a, b) => {
-      const nameA = a.type.toLowerCase();
-      const nameB = b.type.toLowerCase();
+      const typeA = a.type.toLowerCase();
+      const typeB = b.type.toLowerCase();
 
-      if (nameA < nameB) {
+      if (typeA < typeB) {
         return -1;
-      } else if (nameA > nameB) {
-        return 1;
-      } else {
-        return 0;
       }
+      if (typeA > typeB) {
+        return 1;
+      }
+      return 0;
     });
 };

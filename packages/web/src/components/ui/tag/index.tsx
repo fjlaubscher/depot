@@ -55,5 +55,37 @@ const TagGroup: FC<TagGroupProps> = ({ spacing = 'md', className, children, ...p
   );
 };
 
-export { Tag, TagGroup };
+interface TagSectionProps extends HTMLAttributes<HTMLElement> {
+  title: string;
+  description?: string;
+  spacing?: 'sm' | 'md' | 'lg';
+  groupClassName?: string;
+}
+
+const TagSection: FC<TagSectionProps> = ({
+  title,
+  description,
+  spacing = 'sm',
+  className,
+  groupClassName,
+  children,
+  ...props
+}) => {
+  return (
+    <section className={classNames('flex flex-col gap-2', className)} {...props}>
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">{title}</span>
+        {description ? (
+          <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
+        ) : null}
+      </div>
+
+      <TagGroup spacing={spacing} className={groupClassName}>
+        {children}
+      </TagGroup>
+    </section>
+  );
+};
+
+export { Tag, TagGroup, TagSection };
 export default Tag;
