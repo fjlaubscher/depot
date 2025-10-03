@@ -1,27 +1,29 @@
 {
-  "extends": "../core/tsconfig.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    // Inherit most settings from core; only override what's needed for CLI runtime build
-    "baseUrl": "../../",
-    "paths": {
-      "@depot/core": [
-        "packages/core/dist/index.d.ts",
-        "packages/core/src/index.ts"
-      ],
-      "@depot/core/*": [
-        "packages/core/dist/*",
-        "packages/core/src/*"
-      ]
-    },
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "noEmit": false,
-    "outDir": "./dist",
     "rootDir": "./src",
+    "outDir": "./dist",
+    "composite": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "types": ["node", "vitest"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["dist", "node_modules"],
+  "references": [
+    { "path": "../core" }
+  ]
 }

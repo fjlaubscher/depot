@@ -31,9 +31,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -b",
     "clean": "rimraf dist",
-    "dev": "tsc --watch",
+    "dev": "tsc -b --watch",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",

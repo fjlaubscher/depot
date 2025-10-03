@@ -9,14 +9,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b",
     "clean": "rimraf dist",
     "start": "node ./dist/index.js",
     "test": "vitest run",
-    "dev": "tsc --watch",
+    "dev": "tsc -b --watch",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "lint": "tsc -b && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
+    "typecheck": "tsc -b"
   },
   "author": "Francois Laubscher",
   "license": "MIT",
