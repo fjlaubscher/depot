@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { TestWrapper } from '@/test/test-utils';
-import { createMockRosterUnit } from '@/test/mock-data';
+import { createMockRosterUnit, createMockDatasheet } from '@/test/mock-data';
 import AddRosterUnitsPage from './index';
 
 // Mock AppLayout
@@ -52,12 +52,22 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 
 // Mock useAppContext
 const mockAppState = vi.hoisted(() => ({
+  state: {
+    settings: {
+      showLegends: false,
+      showForgeWorld: false
+    }
+  },
   getFaction: vi.fn().mockResolvedValue({
     id: 'SM',
     slug: 'space-marines',
     name: 'Space Marines',
     datasheets: []
-  })
+  }),
+  updateSettings: vi.fn(),
+  updateMyFactions: vi.fn(),
+  clearOfflineData: vi.fn(),
+  dispatch: vi.fn()
 }));
 
 vi.mock('@/contexts/app/use-app-context', () => ({
@@ -90,35 +100,30 @@ vi.mock('@/hooks/use-roster-unit-selection', () => ({
 }));
 
 // Mock DatasheetBrowser component
-vi.mock('@/components/shared/datasheet', () => ({
-  DatasheetBrowser: ({
-    datasheets,
-    renderDatasheet
-  }: {
-    datasheets: any[];
-    renderDatasheet?: (datasheet: any) => React.ReactNode;
-  }) => (
-    <div data-testid="datasheet-browser">
-      {datasheets.map((datasheet) => (
-        <div key={datasheet.id} data-testid="datasheet-item">
-          {renderDatasheet ? renderDatasheet(datasheet) : datasheet.name}
-        </div>
-      ))}
-    </div>
-  ),
-  DatasheetSelectionCard: ({
-    datasheet,
-    onAdd
-  }: {
-    datasheet: any;
-    onAdd: (datasheet: any, modelCost: any) => void;
-  }) => (
-    <div data-testid="datasheet-selection-card" data-datasheet-name={datasheet.name}>
-      <span>{datasheet.name}</span>
-      <button onClick={() => onAdd(datasheet, datasheet.modelCosts[0])}>Add</button>
-    </div>
-  )
-}));
+vi.mock('@/components/shared/datasheet', async () => {
+  const actual = await vi.importActual<typeof import('@/components/shared/datasheet')>(
+    '@/components/shared/datasheet'
+  );
+
+  return {
+    ...actual,
+    DatasheetBrowser: ({
+      datasheets,
+      renderDatasheet
+    }: {
+      datasheets: any[];
+      renderDatasheet?: (datasheet: any) => React.ReactNode;
+    }) => (
+      <div data-testid="datasheet-browser">
+        {datasheets.map((datasheet) => (
+          <div key={datasheet.id} data-testid="datasheet-item">
+            {renderDatasheet ? renderDatasheet(datasheet) : datasheet.name}
+          </div>
+        ))}
+      </div>
+    )
+  };
+});
 
 describe('AddRosterUnitsPage', () => {
   beforeEach(() => {
@@ -137,6 +142,18 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.selectedUnits = [];
     mockUnitSelection.hasSelection = false;
     mockUnitSelection.totalSelectedPoints = 0;
+    mockAppState.state = {
+      settings: {
+        showLegends: false,
+        showForgeWorld: false
+      }
+    };
+    mockAppState.getFaction.mockResolvedValue({
+      id: 'SM',
+      slug: 'space-marines',
+      name: 'Space Marines',
+      datasheets: []
+    });
   });
 
   it('renders loading state when roster has no id', async () => {
@@ -242,5 +259,102 @@ describe('AddRosterUnitsPage', () => {
 
     // Should fall back to faction ID
     expect(screen.getByText('space-marines')).toBeInTheDocument();
+  });
+
+  it('filters out legends and forge world datasheets when disabled in settings', async () => {
+    const regularUnit = createMockDatasheet({
+      id: 'regular-unit',
+      slug: 'regular-unit',
+      name: 'Regular Unit',
+      isLegends: false,
+      isForgeWorld: false
+    });
+
+    const legendsUnit = createMockDatasheet({
+      id: 'legends-unit',
+      slug: 'legends-unit',
+      name: 'Legends Unit',
+      isLegends: true,
+      isForgeWorld: false
+    });
+
+    const forgeWorldUnit = createMockDatasheet({
+      id: 'forge-world-unit',
+      slug: 'forge-world-unit',
+      name: 'Forge World Unit',
+      isLegends: false,
+      isForgeWorld: true
+    });
+
+    mockAppState.state = {
+      settings: {
+        showLegends: false,
+        showForgeWorld: false
+      }
+    };
+
+    mockAppState.getFaction.mockResolvedValue({
+      id: 'SM',
+      slug: 'space-marines',
+      name: 'Space Marines',
+      datasheets: [regularUnit, legendsUnit, forgeWorldUnit]
+    });
+
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('datasheet-item')).toHaveLength(1);
+    });
+
+    expect(screen.getByText('Regular Unit')).toBeInTheDocument();
+    expect(screen.queryByText('Legends Unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Forge World Unit')).not.toBeInTheDocument();
+  });
+
+  it('renders legends and forge world tags when enabled in settings', async () => {
+    const legendsUnit = createMockDatasheet({
+      id: 'legends-unit',
+      slug: 'legends-unit',
+      name: 'Legends Unit',
+      isLegends: true,
+      isForgeWorld: false
+    });
+
+    const forgeWorldUnit = createMockDatasheet({
+      id: 'forge-world-unit',
+      slug: 'forge-world-unit',
+      name: 'Forge World Unit',
+      isLegends: false,
+      isForgeWorld: true
+    });
+
+    mockAppState.state = {
+      settings: {
+        showLegends: true,
+        showForgeWorld: true
+      }
+    };
+
+    mockAppState.getFaction.mockResolvedValue({
+      id: 'SM',
+      slug: 'space-marines',
+      name: 'Space Marines',
+      datasheets: [legendsUnit, forgeWorldUnit]
+    });
+
+    await act(async () => {
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId('datasheet-item')).toHaveLength(2);
+    });
+
+    expect(screen.getByText('Legends Unit')).toBeInTheDocument();
+    expect(screen.getByText('Forge World Unit')).toBeInTheDocument();
+    expect(screen.getByText('Warhammer Legends')).toBeInTheDocument();
+    expect(screen.getByText('Forge World')).toBeInTheDocument();
   });
 });

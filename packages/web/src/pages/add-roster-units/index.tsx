@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
@@ -15,7 +15,7 @@ import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/componen
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
-  const { getFaction } = useAppContext();
+  const { state: appState, getFaction } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [factionData, setFactionData] = useState<depot.Faction | null>(null);
@@ -29,6 +29,27 @@ const AddRosterUnitsView: FC = () => {
       getFaction(key).then(setFactionData);
     }
   }, [roster.id, roster.factionSlug, roster.factionId, getFaction]);
+
+  const showLegends = appState.settings?.showLegends ?? false;
+  const showForgeWorld = appState.settings?.showForgeWorld ?? false;
+
+  const filteredDatasheets = useMemo(() => {
+    if (!factionData) {
+      return [];
+    }
+
+    return factionData.datasheets.filter((sheet) => {
+      if (!showLegends && sheet.isLegends) {
+        return false;
+      }
+
+      if (!showForgeWorld && sheet.isForgeWorld) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [factionData, showLegends, showForgeWorld]);
 
   if (!roster.id) {
     return <Loader />;
@@ -108,7 +129,7 @@ const AddRosterUnitsView: FC = () => {
 
       {/* Units Browser */}
       <DatasheetBrowser
-        datasheets={factionData?.datasheets || []}
+        datasheets={filteredDatasheets}
         searchPlaceholder="Search by unit name..."
         emptyStateMessage="No units available for this faction."
         renderDatasheet={(datasheet) => (
