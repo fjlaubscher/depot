@@ -9,9 +9,16 @@ interface RosterUnitCardBaseProps {
   actions?: ReactNode;
   children?: ReactNode;
   onClick?: () => void;
+  showTags?: boolean;
 }
 
-const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({ unit, actions, children, onClick }) => {
+const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({
+  unit,
+  actions,
+  children,
+  onClick,
+  showTags = true
+}) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
 
   const inlineAbilities = useMemo(() => {
@@ -40,8 +47,8 @@ const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({ unit, actions, childr
         <PointsTag points={unitPoints} className="whitespace-nowrap" />
       </div>
 
-      {(inlineAbilities.length > 0 || unit.selectedWargear.length > 0) && (
-        <TagGroup spacing="sm">
+      {showTags && (inlineAbilities.length > 0 || unit.selectedWargear.length > 0) && (
+        <TagGroup spacing="sm" data-testid="roster-unit-tags">
           {inlineAbilities.map((ability, index) => (
             <Tag key={`ability-${index}`} variant="primary" size="sm">
               {ability.name}
