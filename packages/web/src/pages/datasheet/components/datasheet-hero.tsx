@@ -13,7 +13,7 @@ interface DatasheetHeroProps {
 }
 
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
-  const { models, keywords, unitComposition, loadout } = datasheet;
+  const { models, keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 
   if (models.length === 0) return null;
@@ -28,6 +28,7 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
       <DatasheetComposition
         composition={unitComposition}
         loadout={loadout}
+        transport={transport}
         data-testid="unit-composition"
       />
 

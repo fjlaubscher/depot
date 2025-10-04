@@ -132,7 +132,7 @@ const DatasheetPage: FC = () => {
           data-testid="datasheet-header"
         />
 
-        <DatasheetProfile datasheet={datasheet} />
+        <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>
     </AppLayout>
   );

@@ -12,6 +12,10 @@ vi.mock('./datasheet-wargear', () => ({
   default: () => <div data-testid="datasheet-wargear">Wargear</div>
 }));
 
+vi.mock('./datasheet-leader-rules', () => ({
+  default: () => <div data-testid="datasheet-leader-rules">Leader Rules</div>
+}));
+
 describe('DatasheetProfile', () => {
   it('renders core and unit abilities as tags', () => {
     const datasheet = createMockDatasheet({
@@ -35,7 +39,7 @@ describe('DatasheetProfile', () => {
       ]
     });
 
-    render(<DatasheetProfile datasheet={datasheet} />);
+    render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.getAllByText(/click a tag to view full rules/i)).toHaveLength(2);
     expect(screen.getByTestId('core-abilities')).toBeInTheDocument();
@@ -59,7 +63,7 @@ describe('DatasheetProfile', () => {
       ]
     });
 
-    render(<DatasheetProfile datasheet={datasheet} />);
+    render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.queryByTestId('core-abilities')).not.toBeInTheDocument();
     expect(screen.getByTestId('unit-abilities')).toBeInTheDocument();
