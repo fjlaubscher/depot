@@ -103,3 +103,16 @@ export function parseLoadoutWargear(loadout: string, wargear: depot.Wargear[]): 
 
   return foundWargear;
 }
+
+export function getDefaultWargearSelection(datasheet: depot.Datasheet): depot.Wargear[] {
+  if (!datasheet.loadout || datasheet.wargear.length === 0) {
+    return [];
+  }
+
+  const loadoutLines = parseLoadoutWargear(datasheet.loadout, datasheet.wargear);
+  if (loadoutLines.length === 0) {
+    return [];
+  }
+
+  return datasheet.wargear.filter((wargear) => loadoutLines.includes(wargear.line));
+}

@@ -118,7 +118,7 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
         )}
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="app-content" className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">{children}</div>
         </main>
       </div>

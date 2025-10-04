@@ -3,7 +3,7 @@ import { rosterReducer } from './reducer';
 import { initialState } from './constants';
 import type { RosterAction } from './types';
 import type { depot } from '@depot/core';
-import { mockFactionIndex } from '@/test/mock-data';
+import { mockFactionIndex, createMockDatasheet } from '@/test/mock-data';
 
 describe('rosterReducer', () => {
   it('should return initial state for unknown action', () => {
@@ -192,6 +192,27 @@ describe('rosterReducer', () => {
 
       expect(currentState.detachment.name).toBe('Original Detachment');
       expect(result.detachment.name).toBe('New Detachment');
+    });
+  });
+
+  describe('ADD_UNIT', () => {
+    it('should preselect wargear based on datasheet loadout', () => {
+      const datasheet = createMockDatasheet({
+        loadout: 'Every model is equipped with: Bolt pistol; Power sword.'
+      });
+
+      const action: RosterAction = {
+        type: 'ADD_UNIT',
+        payload: {
+          datasheet,
+          modelCost: datasheet.modelCosts[0]
+        }
+      };
+
+      const result = rosterReducer(initialState, action);
+
+      expect(result.units).toHaveLength(1);
+      expect(result.units[0].selectedWargear).toEqual([datasheet.wargear[0], datasheet.wargear[2]]);
     });
   });
 

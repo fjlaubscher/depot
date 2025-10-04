@@ -26,7 +26,6 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
           </div>
         )}
 
-        {/* Selected Wargear */}
         {unit.selectedWargear.length > 0 && (
           <WargearTable wargear={unit.selectedWargear} title="Selected Wargear" type="Mixed" />
         )}

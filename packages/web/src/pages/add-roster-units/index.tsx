@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
@@ -10,8 +10,10 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button, Card } from '@/components/ui';
+import { PageHeader, Loader, Breadcrumbs } from '@/components/ui';
 import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared';
+import SelectionSummary from './components/selection-summary';
+import type { SelectionGroup } from './components/selection-summary';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -20,8 +22,117 @@ const AddRosterUnitsView: FC = () => {
   const navigate = useNavigate();
   const [factionData, setFactionData] = useState<depot.Faction | null>(null);
 
-  const { selectedUnits, totalSelectedPoints, addToSelection, clearSelection, hasSelection } =
-    useRosterUnitSelection();
+  const {
+    selectedUnits,
+    totalSelectedPoints,
+    addToSelection,
+    removeLatestUnit,
+    getUnitCount,
+    clearSelection
+  } = useRosterUnitSelection();
+
+  const topSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  const scrollToTop = useCallback(() => {
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [scrollContainer]);
+
+  const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
+    const groups = new Map<string, SelectionGroup>();
+
+    selectedUnits.forEach((unit) => {
+      const key = `${unit.datasheet.id}-${unit.modelCost.line}`;
+      const existing = groups.get(key);
+
+      if (existing) {
+        existing.count += 1;
+      } else {
+        groups.set(key, {
+          count: 1,
+          datasheet: unit.datasheet,
+          modelCost: unit.modelCost
+        });
+      }
+    });
+
+    return Array.from(groups.values());
+  }, [selectedUnits]);
+
+  const incrementUnit = useCallback(
+    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
+      addToSelection(datasheet, modelCost);
+    },
+    [addToSelection]
+  );
+
+  const decrementUnit = useCallback(
+    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
+      removeLatestUnit(datasheet, modelCost);
+    },
+    [removeLatestUnit]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const resolveScrollContainer = () => {
+      const sentinel = topSentinelRef.current;
+      return (document.getElementById('app-content') ??
+        sentinel?.closest('main')) as HTMLElement | null;
+    };
+
+    const existingContainer = resolveScrollContainer();
+    if (existingContainer) {
+      setScrollContainer(existingContainer);
+      return undefined;
+    }
+
+    let animationFrame: number | null = null;
+
+    const ensureContainer = () => {
+      const container = resolveScrollContainer();
+      if (container) {
+        setScrollContainer(container);
+        animationFrame = null;
+      } else {
+        animationFrame = window.requestAnimationFrame(ensureContainer);
+      }
+    };
+
+    animationFrame = window.requestAnimationFrame(ensureContainer);
+
+    return () => {
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!scrollContainer) {
+      return undefined;
+    }
+
+    const handleScroll = () => {
+      setIsAtTop(scrollContainer.scrollTop <= 1);
+    };
+
+    handleScroll();
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [scrollContainer]);
 
   useEffect(() => {
     if (roster.id && (roster.factionSlug || roster.factionId)) {
@@ -76,16 +187,16 @@ const AddRosterUnitsView: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col">
       <BackButton
         to={`/rosters/${roster.id}/edit`}
         label="Back to Roster"
         ariaLabel="Back to Edit Roster"
-        className="md:hidden"
+        className="md:hidden mb-4"
       />
 
       {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block">
+      <div className="hidden md:block md:mb-4">
         <Breadcrumbs
           items={[
             { label: 'Rosters', path: '/rosters' },
@@ -96,46 +207,38 @@ const AddRosterUnitsView: FC = () => {
         />
       </div>
 
-      <PageHeader title="Add Units" subtitle={subtitle} />
+      <PageHeader title="Add Units" subtitle={subtitle} className="mb-4" />
 
-      {/* Sticky Selection Summary */}
-      {hasSelection && (
-        <div className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 py-3 mb-4">
-          <Card
-            padding="sm"
-            className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-sm"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-blue-900 dark:text-blue-100">
-                  {selectedUnits.length} unit{selectedUnits.length === 1 ? '' : 's'} selected
-                </p>
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  Total: {totalSelectedPoints} pts
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="secondary" onClick={clearSelection}>
-                  Clear Selection
-                </Button>
-                <Button size="sm" onClick={handleAddSelectedUnits}>
-                  Add
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
+      <div ref={topSentinelRef} className="h-px" aria-hidden="true" />
+
+      <SelectionSummary
+        groups={aggregatedSelection}
+        selectedUnitsCount={selectedUnits.length}
+        totalPoints={totalSelectedPoints}
+        onClear={clearSelection}
+        onConfirm={handleAddSelectedUnits}
+        onIncrement={incrementUnit}
+        onDecrement={decrementUnit}
+        isExpanded={isAtTop}
+        className="mb-4"
+        onRequestExpand={scrollToTop}
+      />
 
       {/* Units Browser */}
-      <DatasheetBrowser
-        datasheets={filteredDatasheets}
-        searchPlaceholder="Search by unit name..."
-        emptyStateMessage="No units available for this faction."
-        renderDatasheet={(datasheet) => (
-          <DatasheetSelectionCard datasheet={datasheet} onAdd={addToSelection} />
-        )}
-      />
+      <div className="mb-4">
+        <DatasheetBrowser
+          datasheets={filteredDatasheets}
+          searchPlaceholder="Search by unit name..."
+          emptyStateMessage="No units available for this faction."
+          renderDatasheet={(datasheet) => (
+            <DatasheetSelectionCard
+              datasheet={datasheet}
+              onAdd={incrementUnit}
+              getUnitCount={getUnitCount}
+            />
+          )}
+        />
+      </div>
     </div>
   );
 };

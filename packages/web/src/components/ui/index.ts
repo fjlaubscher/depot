@@ -17,6 +17,7 @@ export { default as LinkCard } from './link-card';
 export { default as Loader } from './loader';
 export { default as PageHeader } from './page-header';
 export { default as PointsTag } from './points-tag';
+export { default as QuantityStepper } from './quantity-stepper';
 export { default as Search } from './search';
 export { default as SelectField } from './select-field';
 export { Skeleton, SkeletonCard, PageHeaderSkeleton, TabsSkeleton } from './skeleton';

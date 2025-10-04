@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import { getDefaultWargearSelection } from '@/utils/wargear';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
 import { calculateTotalPoints } from './utils';
@@ -44,11 +45,12 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
       };
 
     case 'ADD_UNIT': {
+      const defaultWargear = getDefaultWargearSelection(action.payload.datasheet);
       const newUnit: depot.RosterUnit = {
         id: crypto.randomUUID(),
         datasheet: action.payload.datasheet,
         modelCost: action.payload.modelCost,
-        selectedWargear: [],
+        selectedWargear: defaultWargear,
         datasheetSlug: action.payload.datasheet.slug
       };
 

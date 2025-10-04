@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Loader from '../loader';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'secondary' | 'error';
+  variant?: 'default' | 'secondary' | 'accent' | 'error';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   loading?: boolean;
@@ -47,6 +47,8 @@ const Button: FC<ButtonProps> = ({
     default: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
     secondary:
       'bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white dark:border-gray-600',
+    accent:
+      'bg-blue-100 hover:bg-blue-200 text-blue-800 border border-transparent dark:bg-blue-900/40 dark:hover:bg-blue-900/60 dark:text-blue-200',
     error: 'bg-red-600 hover:bg-red-700 text-white border border-red-600'
   };
 
