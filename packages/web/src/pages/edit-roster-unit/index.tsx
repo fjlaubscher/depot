@@ -235,6 +235,7 @@ const EditRosterUnitView: React.FC = () => {
         <DatasheetComposition
           composition={unit.datasheet.unitComposition}
           loadout={unit.datasheet.loadout}
+          transport={unit.datasheet.transport}
           data-testid="unit-composition"
         />
 
