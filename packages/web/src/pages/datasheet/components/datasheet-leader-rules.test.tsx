@@ -74,10 +74,7 @@ describe('DatasheetLeaderRules', () => {
 
     render(
       <MemoryRouter>
-        <DatasheetLeaderRules
-          datasheet={leaderDatasheet}
-          factionDatasheets={[leaderDatasheet]}
-        />
+        <DatasheetLeaderRules datasheet={leaderDatasheet} factionDatasheets={[leaderDatasheet]} />
       </MemoryRouter>
     );
 
