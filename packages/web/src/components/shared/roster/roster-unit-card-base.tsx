@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import { Card, Tag, TagGroup, PointsTag } from '@/components/ui';
+import { Card, Tag, TagGroup, PointsTag, TagSection } from '@/components/ui';
 import { categorizeAbilities } from '@/utils/abilities';
 
 interface RosterUnitCardBaseProps {
@@ -32,7 +32,7 @@ const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({
       onClick={onClick}
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
-      <div className="flex justify-between items-start gap-4">
+      <div className="flex justify-between items-start gap-2">
         <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate flex-1 min-w-0">
           {unit.datasheet.name}
         </h3>
@@ -47,20 +47,24 @@ const RosterUnitCardBase: FC<RosterUnitCardBaseProps> = ({
         <PointsTag points={unitPoints} className="whitespace-nowrap" />
       </div>
 
-      {showTags && (inlineAbilities.length > 0 || unit.selectedWargear.length > 0) && (
-        <TagGroup spacing="sm" data-testid="roster-unit-tags">
-          {inlineAbilities.map((ability, index) => (
-            <Tag key={`ability-${index}`} variant="primary" size="sm">
-              {ability.name}
-            </Tag>
-          ))}
-          {unit.selectedWargear.map((wargear, index) => (
-            <Tag key={`wargear-${index}`} variant="secondary" size="sm" className="capitalize">
-              {wargear.name}
-            </Tag>
-          ))}
-        </TagGroup>
-      )}
+      {showTags ? (
+        <div className="flex flex-col gap-2">
+          <TagSection title="Abilities">
+            {inlineAbilities.map((ability, index) => (
+              <Tag key={`ability-${index}`} variant="primary" size="sm" className="capitalize">
+                {ability.name.toLowerCase()}
+              </Tag>
+            ))}
+          </TagSection>
+          <TagSection title="Wargear">
+            {unit.selectedWargear.map((wargear, index) => (
+              <Tag key={`wargear-${index}`} variant="secondary" size="sm" className="capitalize">
+                {wargear.name.toLowerCase()}
+              </Tag>
+            ))}
+          </TagSection>
+        </div>
+      ) : null}
 
       {children}
     </Card>

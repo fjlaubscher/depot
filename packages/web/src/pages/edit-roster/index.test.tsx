@@ -63,17 +63,6 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
   useRoster: () => mockRosterContext
 }));
 
-// Mock useAppContext
-const mockAppState = vi.hoisted(() => ({
-  state: {
-    factionIndex: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }] as depot.Index[]
-  }
-}));
-
-vi.mock('@/contexts/app/use-app-context', () => ({
-  useAppContext: () => mockAppState
-}));
-
 // Mock toast context
 const mockShowToast = vi.fn();
 vi.mock('@/contexts/toast/use-toast-context', () => ({
@@ -83,15 +72,28 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 }));
 
 // Mock roster utils
-vi.mock('@/utils/roster', () => ({
-  generateRosterMarkdown: vi.fn(() => 'mock markdown'),
-  groupRosterUnitsByRole: vi.fn((units) => {
-    if (units.length === 0) return {};
+const mockGroupRosterUnitsByRole = vi.hoisted(() =>
+  vi.fn((units: depot.RosterUnit[]) => {
+    if (units.length === 0) {
+      return {};
+    }
     return {
       CHARACTER: units
     };
   })
-}));
+);
+
+const mockGenerateRosterMarkdown = vi.hoisted(() => vi.fn(() => 'mock markdown'));
+
+vi.mock('@/utils/roster', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/roster')>('@/utils/roster');
+
+  return {
+    ...actual,
+    groupRosterUnitsByRole: mockGroupRosterUnitsByRole,
+    generateRosterMarkdown: mockGenerateRosterMarkdown
+  };
+});
 
 // Mock RosterUnitCardEdit
 vi.mock('@/components/shared/roster', async () => {

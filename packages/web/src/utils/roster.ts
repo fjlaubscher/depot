@@ -37,6 +37,34 @@ export const groupRosterUnitsByRole = (units: depot.RosterUnit[]) => {
   return dictionary;
 };
 
+const titleCaseSlug = (slug?: string): string => {
+  if (!slug) {
+    return '';
+  }
+
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+};
+
+export const getRosterFactionName = (roster: depot.Roster): string => {
+  if (roster.faction?.name) {
+    return roster.faction.name;
+  }
+
+  if (roster.factionSlug) {
+    return titleCaseSlug(roster.factionSlug) || roster.factionSlug;
+  }
+
+  if (roster.faction?.slug) {
+    return titleCaseSlug(roster.faction.slug) || roster.faction.slug;
+  }
+
+  return '';
+};
+
 export const generateRosterMarkdown = (roster: depot.Roster, factionName?: string): string => {
   const lines: string[] = [];
 
@@ -105,7 +133,16 @@ export const generateRosterMarkdown = (roster: depot.Roster, factionName?: strin
   return lines.join('\n');
 };
 
-export const generateRosterShareText = (roster: depot.Roster, factionName?: string): string => {
+interface GenerateRosterShareTextOptions {
+  includeWargear?: boolean;
+}
+
+export const generateRosterShareText = (
+  roster: depot.Roster,
+  factionName?: string,
+  options: GenerateRosterShareTextOptions = {}
+): string => {
+  const { includeWargear = false } = options;
   const lines: string[] = [];
 
   // Title (no heading syntax)
@@ -136,7 +173,7 @@ export const generateRosterShareText = (roster: depot.Roster, factionName?: stri
     unitsByRole[role].forEach((unit) => {
       const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
       lines.push(`- ${unit.datasheet.name} - ${unit.modelCost.description} (${unitCost} pts)`);
-      if (unit.selectedWargear.length > 0) {
+      if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
           lines.push(`  - ${wargear.name}`);
         });

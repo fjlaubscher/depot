@@ -11,7 +11,9 @@ interface UnitDetailsProps {
 }
 
 const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
-  const { inline: inlineAbilities } = categorizeAbilities(unit.datasheet.abilities);
+  const { inline: inlineAbilities, referenced: coreAbilities } = categorizeAbilities(
+    unit.datasheet.abilities
+  );
   const models = unit.datasheet.models;
 
   return (
@@ -29,6 +31,13 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
         {unit.selectedWargear.length > 0 && (
           <WargearTable wargear={unit.selectedWargear} title="Selected Wargear" type="Mixed" />
         )}
+
+        {/* Core Abilities */}
+        <DatasheetAbilities
+          title="Core Abilities"
+          abilities={coreAbilities}
+          dataTestId="roster-unit-core-abilities"
+        />
 
         {/* Unit Abilities */}
         <DatasheetAbilities

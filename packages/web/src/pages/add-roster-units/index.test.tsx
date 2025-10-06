@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act, fireEvent, within } from '@testing-library/react';
+import type { MutableRefObject } from 'react';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockRosterUnit, createMockDatasheet } from '@/test/mock-data';
 import AddRosterUnitsPage from './index';
@@ -84,6 +85,18 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
 
+const mockUseFaction = vi.hoisted(() =>
+  vi.fn(() => ({
+    data: null,
+    loading: false,
+    error: null
+  }))
+);
+
+vi.mock('@/hooks/use-faction', () => ({
+  default: mockUseFaction
+}));
+
 // Mock useRosterUnitSelection hook
 const mockUnitSelection = vi.hoisted(() => ({
   selectedUnits: [] as SelectedUnit[],
@@ -97,6 +110,22 @@ const mockUnitSelection = vi.hoisted(() => ({
 
 vi.mock('@/hooks/use-roster-unit-selection', () => ({
   useRosterUnitSelection: () => mockUnitSelection
+}));
+
+// Mock useScrollCollapse hook
+const mockScrollState = vi.hoisted(() => ({
+  sentinelRef: { current: null } as MutableRefObject<HTMLDivElement | null>,
+  scrollToTop: vi.fn()
+}));
+
+let currentIsAtTop = true;
+
+vi.mock('@/hooks/use-scroll-collapse', () => ({
+  useScrollCollapse: () => ({
+    sentinelRef: mockScrollState.sentinelRef,
+    isAtTop: currentIsAtTop,
+    scrollToTop: mockScrollState.scrollToTop
+  })
 }));
 
 // Mock DatasheetBrowser component
@@ -128,15 +157,13 @@ vi.mock('@/components/shared/datasheet', async () => {
 describe('AddRosterUnitsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(window, 'scrollY', {
-      value: 0,
-      configurable: true,
-      writable: true
-    });
-    Object.defineProperty(window, 'pageYOffset', {
-      value: 0,
-      configurable: true,
-      writable: true
+    currentIsAtTop = true;
+    mockScrollState.scrollToTop = vi.fn();
+    mockScrollState.sentinelRef.current = null;
+    mockUseFaction.mockReturnValue({
+      data: null,
+      loading: false,
+      error: null
     });
     mockRosterContext.state = {
       id: 'test-roster-id',
@@ -159,12 +186,6 @@ describe('AddRosterUnitsPage', () => {
         showForgeWorld: false
       }
     };
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: []
-    });
   });
 
   it('renders loading state when roster has no id', async () => {
@@ -224,11 +245,15 @@ describe('AddRosterUnitsPage', () => {
 
   it('adds unit through datasheet card add button', async () => {
     const datasheet = createMockDatasheet();
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: [datasheet]
+    mockUseFaction.mockReturnValue({
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        datasheets: [datasheet]
+      } as any,
+      loading: false,
+      error: null
     });
 
     await act(async () => {
@@ -258,11 +283,15 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.totalSelectedPoints = 160;
     mockUnitSelection.getUnitCount.mockImplementation(() => 2);
 
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: [datasheet]
+    mockUseFaction.mockReturnValue({
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        datasheets: [datasheet]
+      } as any,
+      loading: false,
+      error: null
     });
 
     await act(async () => {
@@ -309,51 +338,46 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.totalSelectedPoints = 80;
     mockUnitSelection.getUnitCount.mockImplementation(() => 1);
 
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: [datasheet]
+    mockUseFaction.mockReturnValue({
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        datasheets: [datasheet]
+      } as any,
+      loading: false,
+      error: null
     });
+
+    let renderResult!: ReturnType<typeof render>;
+    await act(async () => {
+      renderResult = render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+    });
+
+    const rowTestId = `selection-item-${datasheet.id}-${datasheet.modelCosts[0].line}`;
+    const expandedSummary = await screen.findByTestId('unit-selection-summary');
+    expect(await within(expandedSummary).findByTestId(rowTestId)).toBeInTheDocument();
+    expect(
+      within(expandedSummary).getByLabelText(`Increase ${datasheet.name}`)
+    ).toBeInTheDocument();
+
+    currentIsAtTop = false;
 
     await act(async () => {
-      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+      renderResult!.rerender(<AddRosterUnitsPage />);
     });
 
-    const summary = await screen.findByTestId('unit-selection-summary');
-    const rowTestId = `selection-item-${datasheet.id}-${datasheet.modelCosts[0].line}`;
-    const initialRow = await within(summary).findByTestId(rowTestId);
-    expect(initialRow).toBeInTheDocument();
-    expect(initialRow).toHaveTextContent(`${datasheet.modelCosts[0].cost} pts`);
-    expect(within(summary).getByLabelText(`Increase ${datasheet.name}`)).toBeInTheDocument();
+    const collapsedSummary = await screen.findByTestId('unit-selection-summary');
+    expect(within(collapsedSummary).queryByTestId(rowTestId)).not.toBeInTheDocument();
+    expect(within(collapsedSummary).getByText(/click to adjust/i)).toBeInTheDocument();
 
-    const scrollContainer = document.getElementById('app-content') as HTMLElement;
-    const scrollSpy = vi.fn();
-    let currentScrollTop = 0;
-    Object.defineProperty(scrollContainer, 'scrollTop', {
-      configurable: true,
-      get: () => currentScrollTop,
-      set: (value) => {
-        currentScrollTop = value;
-      }
-    });
-    scrollContainer.scrollTo = scrollSpy;
-
-    currentScrollTop = 20;
-    scrollContainer.dispatchEvent(new Event('scroll'));
-
-    await waitFor(() => {
-      expect(within(summary).queryByTestId(rowTestId)).not.toBeInTheDocument();
-    });
-    expect(within(summary).getByText(/click to adjust/i)).toBeInTheDocument();
-
-    const totalButton = within(summary).getByRole('button', { name: /total/i });
+    const totalButton = within(collapsedSummary).getByRole('button', { name: /total/i });
 
     await act(async () => {
       fireEvent.click(totalButton);
     });
 
-    expect(scrollSpy).toHaveBeenCalledWith({ behavior: 'smooth', top: 0 });
+    expect(mockScrollState.scrollToTop).toHaveBeenCalled();
   });
 
   it('renders mobile back button', async () => {
@@ -440,11 +464,15 @@ describe('AddRosterUnitsPage', () => {
       }
     };
 
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: [regularUnit, legendsUnit, forgeWorldUnit]
+    mockUseFaction.mockReturnValue({
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        datasheets: [regularUnit, legendsUnit, forgeWorldUnit]
+      } as any,
+      loading: false,
+      error: null
     });
 
     await act(async () => {
@@ -484,11 +512,15 @@ describe('AddRosterUnitsPage', () => {
       }
     };
 
-    mockAppState.getFaction.mockResolvedValue({
-      id: 'SM',
-      slug: 'space-marines',
-      name: 'Space Marines',
-      datasheets: [legendsUnit, forgeWorldUnit]
+    mockUseFaction.mockReturnValue({
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        datasheets: [legendsUnit, forgeWorldUnit]
+      } as any,
+      loading: false,
+      error: null
     });
 
     await act(async () => {

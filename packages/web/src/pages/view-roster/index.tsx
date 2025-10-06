@@ -4,7 +4,6 @@ import { Pencil, Share, Download } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
@@ -13,19 +12,17 @@ import { BackButton, RosterHeader, RosterSection } from '@/components/shared';
 import {
   generateRosterMarkdown,
   generateRosterShareText,
+  getRosterFactionName,
   groupRosterUnitsByRole
 } from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
 const RosterView: React.FC = () => {
   const { state: roster } = useRoster();
-  const { state: appState } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const factionName = appState.factionIndex?.find(
-    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
-  )?.name;
+  const factionName = getRosterFactionName(roster);
 
   const groupedUnits = useMemo(() => groupRosterUnitsByRole(roster.units), [roster.units]);
   const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
@@ -76,7 +73,7 @@ const RosterView: React.FC = () => {
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionSlug || roster.factionId;
+      : factionName;
 
   return (
     <div className="flex flex-col gap-4">

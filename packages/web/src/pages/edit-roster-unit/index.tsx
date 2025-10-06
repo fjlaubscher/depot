@@ -5,7 +5,6 @@ import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
@@ -25,6 +24,7 @@ import EnhancementSelection from './components/enhancement-selection';
 import WarlordSelection from './components/warlord-selection';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
+import { getRosterFactionName } from '@/utils/roster';
 
 const EditRosterUnitView: React.FC = () => {
   const {
@@ -34,7 +34,6 @@ const EditRosterUnitView: React.FC = () => {
     applyEnhancement,
     removeEnhancement
   } = useRoster();
-  const { state: appState } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
@@ -122,9 +121,7 @@ const EditRosterUnitView: React.FC = () => {
     );
   }
 
-  const factionName = appState.factionIndex?.find(
-    (f: any) => f.slug === roster.factionSlug || f.id === roster.factionId
-  )?.name;
+  const factionName = getRosterFactionName(roster);
   const isCharacter = unit.datasheet.keywords.some((k) =>
     k.keyword.toLowerCase().includes('character')
   );

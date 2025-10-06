@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
@@ -8,6 +8,8 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
+import useFaction from '@/hooks/use-faction';
+import { useScrollCollapse } from '@/hooks/use-scroll-collapse';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs } from '@/components/ui';
@@ -17,10 +19,11 @@ import type { SelectionGroup } from './components/selection-summary';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
-  const { state: appState, getFaction } = useAppContext();
+  const { state: appState } = useAppContext();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [factionData, setFactionData] = useState<depot.Faction | null>(null);
+  const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
+  const { data: factionData } = useFaction(rosterFactionSlug);
 
   const {
     selectedUnits,
@@ -31,18 +34,7 @@ const AddRosterUnitsView: FC = () => {
     clearSelection
   } = useRosterUnitSelection();
 
-  const topSentinelRef = useRef<HTMLDivElement | null>(null);
-  const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null);
-  const [isAtTop, setIsAtTop] = useState(true);
-
-  const scrollToTop = useCallback(() => {
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [scrollContainer]);
+  const { sentinelRef, isAtTop, scrollToTop } = useScrollCollapse();
 
   const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
     const groups = new Map<string, SelectionGroup>();
@@ -79,68 +71,6 @@ const AddRosterUnitsView: FC = () => {
     [removeLatestUnit]
   );
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const resolveScrollContainer = () => {
-      const sentinel = topSentinelRef.current;
-      return (document.getElementById('app-content') ??
-        sentinel?.closest('main')) as HTMLElement | null;
-    };
-
-    const existingContainer = resolveScrollContainer();
-    if (existingContainer) {
-      setScrollContainer(existingContainer);
-      return undefined;
-    }
-
-    let animationFrame: number | null = null;
-
-    const ensureContainer = () => {
-      const container = resolveScrollContainer();
-      if (container) {
-        setScrollContainer(container);
-        animationFrame = null;
-      } else {
-        animationFrame = window.requestAnimationFrame(ensureContainer);
-      }
-    };
-
-    animationFrame = window.requestAnimationFrame(ensureContainer);
-
-    return () => {
-      if (animationFrame !== null) {
-        window.cancelAnimationFrame(animationFrame);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!scrollContainer) {
-      return undefined;
-    }
-
-    const handleScroll = () => {
-      setIsAtTop(scrollContainer.scrollTop <= 1);
-    };
-
-    handleScroll();
-    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      scrollContainer.removeEventListener('scroll', handleScroll);
-    };
-  }, [scrollContainer]);
-
-  useEffect(() => {
-    if (roster.id && (roster.factionSlug || roster.factionId)) {
-      const key = roster.factionSlug || roster.factionId;
-      getFaction(key).then(setFactionData);
-    }
-  }, [roster.id, roster.factionSlug, roster.factionId, getFaction]);
-
   const showLegends = appState.settings?.showLegends ?? false;
   const showForgeWorld = appState.settings?.showForgeWorld ?? false;
 
@@ -170,7 +100,7 @@ const AddRosterUnitsView: FC = () => {
   const subtitle =
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionSlug || roster.factionId;
+      : factionName || roster.factionSlug;
 
   const handleAddSelectedUnits = () => {
     selectedUnits.forEach(({ datasheet, modelCost }) => {
@@ -209,7 +139,7 @@ const AddRosterUnitsView: FC = () => {
 
       <PageHeader title="Add Units" subtitle={subtitle} className="mb-4" />
 
-      <div ref={topSentinelRef} className="h-px" aria-hidden="true" />
+      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
 
       <SelectionSummary
         groups={aggregatedSelection}

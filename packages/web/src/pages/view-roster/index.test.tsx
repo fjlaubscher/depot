@@ -26,22 +26,43 @@ vi.mock('react-router-dom', async () => {
 
 import type { depot } from '@depot/core';
 
-// Mock RosterProvider and useRoster
-const mockRosterState = vi.hoisted(() => ({
-  state: {
+function createMockRosterState(): depot.Roster {
+  return {
     id: 'test-roster-id',
     name: 'Test Roster',
     factionId: 'SM',
     factionSlug: 'space-marines',
-    faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
-    detachment: { name: 'Gladius Task Force' },
+    faction: {
+      id: 'SM',
+      slug: 'space-marines',
+      name: 'Space Marines',
+      path: '/indices/space-marines'
+    },
+    detachment: {
+      name: 'Gladius Task Force',
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    },
     units: [] as depot.RosterUnit[],
     enhancements: [],
     points: { current: 0, max: 2000 }
-  },
-  loading: false,
-  error: null
-}));
+  };
+}
+
+// Mock RosterProvider and useRoster
+const mockRosterState = vi.hoisted(
+  () =>
+    ({
+      state: createMockRosterState(),
+      loading: false,
+      error: null
+    }) as {
+      state: depot.Roster;
+      loading: boolean;
+      error: unknown;
+    }
+);
 
 vi.mock('@/contexts/roster/context', () => ({
   RosterProvider: ({ children }: { children: React.ReactNode }) => (
@@ -51,17 +72,6 @@ vi.mock('@/contexts/roster/context', () => ({
 
 vi.mock('@/contexts/roster/use-roster-context', () => ({
   useRoster: () => mockRosterState
-}));
-
-// Mock useAppContext
-const mockAppState = vi.hoisted(() => ({
-  state: {
-    factionIndex: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
-  }
-}));
-
-vi.mock('@/contexts/app/use-app-context', () => ({
-  useAppContext: () => mockAppState
 }));
 
 // Mock toast context
@@ -74,11 +84,19 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 
 // Mock roster utils
 const mockGroupRosterUnitsByRole = vi.hoisted(() => vi.fn());
-vi.mock('@/utils/roster', () => ({
-  generateRosterMarkdown: vi.fn(() => 'mock markdown'),
-  generateRosterShareText: vi.fn(() => 'mock share text'),
-  groupRosterUnitsByRole: mockGroupRosterUnitsByRole
-}));
+const mockGenerateRosterMarkdown = vi.hoisted(() => vi.fn(() => 'mock markdown'));
+const mockGenerateRosterShareText = vi.hoisted(() => vi.fn(() => 'mock share text'));
+
+vi.mock('@/utils/roster', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/roster')>('@/utils/roster');
+
+  return {
+    ...actual,
+    groupRosterUnitsByRole: mockGroupRosterUnitsByRole,
+    generateRosterMarkdown: mockGenerateRosterMarkdown,
+    generateRosterShareText: mockGenerateRosterShareText
+  };
+});
 
 // Mock ViewRosterUnitCard
 vi.mock('./components/view-roster-unit-card', () => ({
@@ -92,17 +110,7 @@ vi.mock('./components/view-roster-unit-card', () => ({
 describe('ViewRosterPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRosterState.state = {
-      id: 'test-roster-id',
-      name: 'Test Roster',
-      factionId: 'SM',
-      factionSlug: 'space-marines',
-      faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
-      detachment: { name: 'Gladius Task Force' },
-      units: [],
-      enhancements: [],
-      points: { current: 0, max: 2000 }
-    };
+    mockRosterState.state = createMockRosterState();
     mockRosterState.loading = false;
     mockRosterState.error = null;
 
@@ -183,12 +191,15 @@ describe('ViewRosterPage', () => {
   });
 
   it('handles missing faction name gracefully', () => {
-    mockAppState.state.factionIndex = [];
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      faction: undefined
+    };
 
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
-    // Should fall back to faction ID
-    expect(screen.getByText('space-marines')).toBeInTheDocument();
+    // Should fall back to faction slug in title case
+    expect(screen.getByText(/space marines/i)).toBeInTheDocument();
   });
 
   it('handles roster with maximum points', () => {

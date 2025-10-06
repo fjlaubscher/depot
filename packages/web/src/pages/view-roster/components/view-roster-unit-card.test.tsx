@@ -33,10 +33,12 @@ describe('ViewRosterUnitCard', () => {
 
     render(<ViewRosterUnitCard unit={unit} />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('roster-unit-tags')).toBeInTheDocument();
+    expect(screen.getByText('Abilities')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));
 
-    expect(screen.queryByTestId('roster-unit-tags')).not.toBeInTheDocument();
+    expect(screen.queryByText('Abilities')).not.toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-core-abilities')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
   });
 });
