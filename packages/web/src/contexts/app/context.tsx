@@ -61,33 +61,12 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     [state.factionIndex]
   );
 
-  // Clear all offline data
+  // Clear cached faction data
   const clearOfflineData = async () => {
     try {
-      await offlineStorage.clearAllData();
-      // Reset the state by reloading faction index and clearing cache
-      dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
-
-      // Load fresh index from network (since IndexedDB was cleared)
-      const response = await fetch(getDataUrl('index.json'));
-      if (!response.ok) {
-        throw new Error('Failed to reload faction index after clearing cache');
-      }
-      const index = await response.json();
-
-      // Cache the fresh index
-      if (index) {
-        await offlineStorage.setFactionIndex(index);
-        dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
-      }
-
-      // Reset the offline factions list
+      await offlineStorage.clearFactionData();
       dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
     } catch (error) {
-      dispatch({
-        type: APP_ACTIONS.LOAD_INDEX_ERROR,
-        payload: error instanceof Error ? error.message : 'Failed to clear offline data'
-      });
       throw error;
     }
   };

@@ -334,6 +334,22 @@ describe('OfflineStorage', () => {
     });
   });
 
+  describe('clearFactionData', () => {
+    it('should clear cached factions from store', async () => {
+      mockObjectStore.clear.mockClear();
+      mockObjectStore.clear.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.clearFactionData()).resolves.toBeUndefined();
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('clearAllData', () => {
     it('should clear all data from all stores', async () => {
       mockObjectStore.clear.mockImplementation(() => {

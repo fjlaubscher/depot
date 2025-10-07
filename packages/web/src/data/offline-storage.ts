@@ -366,6 +366,23 @@ class OfflineStorage {
   }
 
   // Database Management
+  async clearFactionData(): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.FACTIONS], 'readwrite');
+      const store = transaction.objectStore(STORES.FACTIONS);
+
+      await new Promise<void>((resolve, reject) => {
+        const request = store.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to clear faction cache from IndexedDB:', error);
+      throw error;
+    }
+  }
+
   async clearAllData(): Promise<void> {
     try {
       const db = await this.getDB();

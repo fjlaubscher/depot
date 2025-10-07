@@ -3,7 +3,7 @@ import type { depot } from '@depot/core';
 
 // Components
 import { DatasheetBrowser } from '@/components/shared/datasheet';
-import type { DatasheetFilters } from '@/hooks/use-datasheet-search';
+import type { DatasheetFilters } from '@/hooks/use-datasheet-browser';
 
 interface FactionDatasheetsProps {
   datasheets: depot.Datasheet[];

@@ -33,10 +33,10 @@ const Settings = () => {
   const handleReset = useCallback(async () => {
     try {
       await clearOfflineData();
-      showToast({ type: 'success', title: 'Success', message: 'Offline data deleted.' });
+      showToast({ type: 'success', title: 'Success', message: 'Cached faction data deleted.' });
     } catch (error) {
       console.error('Failed to delete offline data:', error);
-      showToast({ type: 'error', title: 'Error', message: 'Failed to delete offline data.' });
+      showToast({ type: 'error', title: 'Error', message: 'Failed to delete cached factions.' });
     }
   }, [clearOfflineData, showToast]);
 
@@ -131,7 +131,7 @@ const Settings = () => {
                       </div>
                     </div>
                     <Button variant="error" onClick={handleReset} size="sm" fullWidth>
-                      Clear All Offline Data
+                      Clear Cached Factions
                     </Button>
                   </>
                 ) : (

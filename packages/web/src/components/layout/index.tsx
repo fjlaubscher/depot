@@ -16,6 +16,7 @@ const AppLayout = ({ children, title }: Props) => {
   const { state } = useAppContext();
   const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
   const { closeSidebar } = useLayoutContext();
+  const appVersion = import.meta.env.VITE_APP_VERSION?.trim() || 'dev';
 
   const hasMyFactions = state.myFactions && state.myFactions.length > 0;
 
@@ -87,6 +88,11 @@ const AppLayout = ({ children, title }: Props) => {
           </div>
         </>
       )}
+
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+        <span className="font-semibold text-gray-600 dark:text-gray-300">depot </span>
+        <span>v{appVersion}</span>
+      </div>
     </div>
   );
 

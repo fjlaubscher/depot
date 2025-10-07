@@ -1,6 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, beforeEach, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, vi } from 'vitest';
+
+beforeAll(() => {
+  if (!import.meta.env.VITE_APP_VERSION) {
+    (import.meta.env as Record<string, string>).VITE_APP_VERSION = 'test';
+  }
+});
 
 // Mock IndexedDB globally for all tests
 const mockIDBDatabase = {

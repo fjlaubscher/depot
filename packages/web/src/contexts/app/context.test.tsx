@@ -13,6 +13,7 @@ const mockOfflineStorage = vi.hoisted(() => ({
   getSettings: vi.fn(),
   setSettings: vi.fn(),
   getAllCachedFactions: vi.fn(),
+  clearFactionData: vi.fn(),
   clearAllData: vi.fn(),
   destroy: vi.fn(),
   isDataStale: vi.fn()
@@ -126,6 +127,7 @@ describe('AppProvider with IndexedDB Integration', () => {
     mockOfflineStorage.setFactionIndex.mockResolvedValue(undefined);
     mockOfflineStorage.setFaction.mockResolvedValue(undefined);
     mockOfflineStorage.setSettings.mockResolvedValue(undefined);
+    mockOfflineStorage.clearFactionData.mockResolvedValue(undefined);
     mockOfflineStorage.clearAllData.mockResolvedValue(undefined);
 
     // Mock fetch for network requests
@@ -307,27 +309,33 @@ describe('AppProvider with IndexedDB Integration', () => {
   });
 
   describe('clearOfflineData', () => {
-    it('should clear IndexedDB and reload faction index from network', async () => {
+    it('should clear cached factions and update state', async () => {
       render(
         <AppProvider>
           <TestComponent />
         </AppProvider>
       );
 
+      await waitFor(() => {
+        expect(mockOfflineStorage.setFactionIndex.mock.calls.length).toBeGreaterThanOrEqual(1);
+      });
+
       const clearButton = screen.getByTestId('clear-data');
+      const initialSetIndexCalls = mockOfflineStorage.setFactionIndex.mock.calls.length;
 
       await act(async () => {
         clearButton.click();
       });
 
       await waitFor(() => {
-        expect(mockOfflineStorage.clearAllData).toHaveBeenCalled();
-        expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
-        expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
+        expect(mockOfflineStorage.clearFactionData).toHaveBeenCalled();
       });
 
       // Check that the offline factions list is reset
       expect(screen.getByTestId('offline-count')).toHaveTextContent('0');
+
+      // Ensure clearing factions does not trigger index rewrite
+      expect(mockOfflineStorage.setFactionIndex.mock.calls.length).toBe(initialSetIndexCalls);
     });
   });
 });
