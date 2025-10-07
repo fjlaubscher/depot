@@ -11,7 +11,7 @@ import { BackButton } from '@/components/shared';
 import { RosterHeader, RosterSection, RosterUnitCardEdit } from '@/components/shared/roster';
 import { getRosterFactionName, groupRosterUnitsByRole } from '@/utils/roster';
 
-const RosterView: FC = () => {
+const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
@@ -115,7 +115,7 @@ const RosterPage: FC = () => {
   return (
     <AppLayout title="Roster">
       <RosterProvider rosterId={rosterId}>
-        <RosterView />
+        <RosterEdit />
       </RosterProvider>
     </AppLayout>
   );

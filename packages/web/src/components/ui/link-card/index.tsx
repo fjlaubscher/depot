@@ -1,21 +1,23 @@
-import type { FC, ReactNode } from 'react';
+import type { AnchorHTMLAttributes, FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import classNames from 'classnames';
 import Card from '../card';
 
-interface LinkCardProps {
+interface LinkCardProps
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'children' | 'className'> {
   to: string;
   children: ReactNode;
   className?: string;
 }
 
-const LinkCard: FC<LinkCardProps> = ({ to, children, className }) => {
+const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
   return (
     <Link
       to={to}
       className={classNames('block text-decoration-none', className)}
       data-testid="link-card"
+      {...rest}
     >
       <Card className="dark:bg-gray-800 dark:border-gray-700 h-full">
         <div className="flex items-center justify-between gap-2">

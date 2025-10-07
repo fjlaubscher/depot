@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 
 interface UseScrollCollapseOptions {
   /**
@@ -9,7 +10,7 @@ interface UseScrollCollapseOptions {
 
 interface UseScrollCollapseResult {
   /** Attach to an empty element near the top of the scroll content. */
-  sentinelRef: MutableRefObject<HTMLDivElement | null>;
+  sentinelRef: RefObject<HTMLDivElement | null>;
   /** True while the scroll position is still at the top of the container. */
   isAtTop: boolean;
   /** Smoothly scrolls the resolved container (or window as a fallback) back to the top. */

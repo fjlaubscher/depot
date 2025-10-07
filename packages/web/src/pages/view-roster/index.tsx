@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
+import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Pencil, Share, Download } from 'lucide-react';
 
@@ -17,7 +18,7 @@ import {
 } from '@/utils/roster';
 import ViewRosterUnitCard from './components/view-roster-unit-card';
 
-const RosterView: React.FC = () => {
+const RosterView: FC = () => {
   const { state: roster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -156,7 +157,7 @@ const RosterView: React.FC = () => {
   );
 };
 
-const RosterPage: React.FC = () => {
+const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
