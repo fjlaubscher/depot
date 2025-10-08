@@ -17,8 +17,14 @@ This file provides guidance to Agents when working with code in this repository.
 # Install dependencies
 pnpm install
 
+# Clean all packages
+pnpm clean
+
 # Start development (generates data + dev server)
 pnpm start
+
+# Start web app dev server only
+pnpm dev
 
 # Generate fresh data only
 pnpm --filter @depot/cli start
@@ -32,6 +38,7 @@ pnpm build
 # Code quality
 pnpm format  # ALWAYS run before commits
 pnpm lint    # TypeScript + formatting checks
+pnpm typecheck # Type check all packages
 pnpm test    # Run tests
 ```
 
@@ -52,7 +59,7 @@ pnpm test    # Run tests
 ### CLI (ESM) Notes
 - `@depot/cli` uses ESM with NodeNext resolution.
 - Use explicit `.js` extensions for relative imports inside `@depot/cli/src`.
-- Prefer type-only imports from core: `import type { wahapedia, depot } from '@depot/core'`.
+- Prefer type-only imports from core: `import type { wahapedia, depot } from '@depot/core'`
 - Runtime imports from core should be explicit (e.g., `import { slug } from '@depot/core'`).
 - The CLI reads/writes from `packages/cli/dist/{json,data,source_data}` at runtime.
 
@@ -63,10 +70,17 @@ pnpm test    # Run tests
 ## Scripts
 
 ### `scripts/copy-data.mjs`
-Utility script that copies generated data from CLI output to web app directory:
+This utility script is responsible for copying the generated data from the `@depot/cli` package to the `@depot/web` package. This is a crucial step to ensure the web app has access to the latest data.
+
 - **Source**: `packages/cli/dist/data`
-- **Target**: `packages/web/public/data` (dev) or `packages/web/dist/data` (prod)
-- Automatically called by `start` and `build` commands
+- **Target**: `packages/web/public/data`
+
+It is automatically called by the root `pnpm start` and `pnpm build` commands, so you rarely need to run it manually.
+
+**Implementation Details:**
+- The script uses Node.js's `fs/promises` module to recursively copy the directory.
+- It first deletes the existing `packages/web/public/data` directory to ensure a clean copy.
+- It then copies the `packages/cli/dist/data` directory to `packages/web/public/data`.
 
 ## Requirements
 - **Node.js**: >=22.0.0

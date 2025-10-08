@@ -9,13 +9,28 @@ Fetches Warhammer 40K data from Wahapedia CSV exports and converts to structured
 pnpm start
 
 # Force re-download source data
-pnpm start --force-download
+pnpm start -- --force-download
 
 # Build TypeScript
 pnpm build
 
 # Watch mode
 pnpm dev
+
+# Run tests
+pnpm test
+
+# Format code
+pnpm format
+
+# Lint code
+pnpm lint
+
+# Type check
+pnpm typecheck
+
+# Clean dist folder
+pnpm clean
 ```
 
 ## Processing Pipeline

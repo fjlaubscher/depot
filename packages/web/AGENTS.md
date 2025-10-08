@@ -14,9 +14,31 @@ pnpm dev
 # Production build
 pnpm build
 
+# Preview production build
+pnpm preview
+
 # Run tests
 pnpm test
+
+# Run tests in CI mode
+pnpm test:ci
+
+# Format code
+pnpm format
+
+# Lint code
+pnpm lint
+
+# Type check
+pnpm typecheck
+
+# Clean dist folder
+pnpm clean
+
+# Generate PWA assets
+pnpm generate-pwa-assets
 ```
+
 ## Technology Stack
 
 - **React 19** + React Router DOM v7

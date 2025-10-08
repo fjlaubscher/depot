@@ -12,7 +12,7 @@ Fundamental building blocks with no business logic:
 - TypeScript interfaces
 - **Exported via**: `@/components/ui` index file
 
-Key components: Button, Card, Alert, Table, Toast, Layout, Search, Filters, Tags, and more.
+Key components: `Button`, `Card`, `Alert`, `Table`, `Toast`, `Layout`, `Search`, `Filters`, `Tag`, `SelectField`, `QuantityStepper`, `CollapsibleSection`, `ContentCard`, `DashboardCard`, `ErrorState`, `Field`, `Grid`, `IconButton`, `LinkCard`, `Loader`, `PageHeader`, `PointsTag`, `Skeleton`, `StatCard`, `StatsRow`, `Tabs`, `ToastContainer`, `ToggleSwitch`.
 
 ### `shared/` - Domain Components
 Reusable components with depot-specific logic:
@@ -20,15 +20,13 @@ Reusable components with depot-specific logic:
 - Contain domain rendering logic
 - Reusable across pages
 
-Examples: DatasheetCard, StratagemCard, ModelStatsRow, WargearRow, ErrorBoundary
+Examples: `AbilityModal`, `ModelStatsRow`, `StratagemCard`, `BackButton`, `Datasheet`, `ErrorBoundary`, `Roster`, `WargearRow`, `WargearSelection`, `WargearTable`.
 
 ### `shared/roster/` - Roster Components
 Roster-specific components for building/editing:
 - Handle `depot.Roster` and `depot.RosterUnit` types
 - Shared between roster pages
 - Complex roster business logic
-
-Examples: RosterHeader, RosterSection, RosterUnitCard variants
 
 ### `layout/` - Layout Components
 Main application layout structure
@@ -40,6 +38,7 @@ Depot branding and logo assets
 - **kebab-case** for directories and files
 - **PascalCase** for component exports
 - Optional `.test.tsx` for unit tests
+
 ## Props Pattern
 
 ```typescript
@@ -65,6 +64,6 @@ export { default as Button } from './button';
 
 ### Shared Components
 ```typescript
-import DatasheetCard from '@/components/shared/datasheet-card';
-import { RosterHeader } from '@/components/shared/roster';
+import { Datasheet } from '@/components/shared/datasheet';
+import { Roster } from '@/components/shared/roster';
 ```

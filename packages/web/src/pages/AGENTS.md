@@ -2,6 +2,21 @@
 
 React page components with consistent architecture patterns.
 
+## Available Pages
+
+- `add-roster-units`: Add units to a roster
+- `create-roster`: Create a new roster
+- `datasheet`: View a unit's datasheet
+- `edit-roster`: Edit a roster
+- `edit-roster-unit`: Edit a unit in a roster
+- `faction`: View a faction's details
+- `factions`: View all factions
+- `home`: Home page
+- `not-found`: 404 page
+- `rosters`: View all rosters
+- `settings`: View and edit user settings
+- `view-roster`: View a roster
+
 ## Structure Pattern
 
 ```

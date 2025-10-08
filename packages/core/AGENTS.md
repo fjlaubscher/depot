@@ -2,6 +2,28 @@
 
 Shared TypeScript types and utilities. Single source of truth for all data structures.
 
+## Key Commands
+
+```bash
+# Build TypeScript
+pnpm build
+
+# Watch mode
+pnpm dev
+
+# Format code
+pnpm format
+
+# Lint code
+pnpm lint
+
+# Type check
+pnpm typecheck
+
+# Clean dist folder
+pnpm clean
+```
+
 ## File Structure
 
 ```
