@@ -5,6 +5,7 @@ import type { AppContextType } from './types';
 import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
+import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { getDataUrl } from '@/utils/paths';
 
 // Create context
@@ -74,12 +75,13 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   // Update settings with offline storage
   const updateSettings = async (settings: depot.Settings) => {
     try {
-      await offlineStorage.setSettings(settings);
-      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: settings });
+      const mergedSettings = mergeSettingsWithDefaults(settings);
+      await offlineStorage.setSettings(mergedSettings);
+      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: mergedSettings });
     } catch (error) {
       console.error('Failed to save settings to IndexedDB:', error);
       // Still update in-memory state even if offline save fails
-      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: settings });
+      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: mergeSettingsWithDefaults(settings) });
     }
   };
 
@@ -138,7 +140,11 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       try {
         const settings = await offlineStorage.getSettings();
         if (settings) {
-          dispatch({ type: APP_ACTIONS.LOAD_SETTINGS_SUCCESS, payload: settings });
+          const resolvedSettings = mergeSettingsWithDefaults(settings);
+          dispatch({
+            type: APP_ACTIONS.LOAD_SETTINGS_SUCCESS,
+            payload: resolvedSettings
+          });
         }
       } catch (error) {
         console.warn('Failed to load settings from IndexedDB:', error);

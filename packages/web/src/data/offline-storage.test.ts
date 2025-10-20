@@ -101,7 +101,11 @@ const mockFaction: depot.Faction = {
 
 const mockSettings: depot.Settings = {
   showForgeWorld: false,
-  showLegends: true
+  showLegends: true,
+  showUnaligned: false,
+  showFluff: true,
+  includeWargearOnExport: true,
+  useNativeShare: true
 };
 
 describe('OfflineStorage', () => {

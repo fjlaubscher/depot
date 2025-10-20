@@ -1,4 +1,5 @@
 import type { AppState, AppAction } from './types';
+import { DEFAULT_SETTINGS } from '@/constants/settings';
 import { APP_ACTIONS } from './constants';
 
 // Initial state
@@ -8,7 +9,7 @@ export const initialState: AppState = {
   myFactions: [],
   loading: false,
   error: null,
-  settings: null
+  settings: DEFAULT_SETTINGS
 };
 
 // Reducer

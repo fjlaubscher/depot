@@ -65,7 +65,16 @@ export const getRosterFactionName = (roster: depot.Roster): string => {
   return '';
 };
 
-export const generateRosterMarkdown = (roster: depot.Roster, factionName?: string): string => {
+interface GenerateRosterMarkdownOptions {
+  includeWargear?: boolean;
+}
+
+export const generateRosterMarkdown = (
+  roster: depot.Roster,
+  factionName?: string,
+  options: GenerateRosterMarkdownOptions = {}
+): string => {
+  const { includeWargear = true } = options;
   const lines: string[] = [];
 
   // Header
@@ -104,7 +113,7 @@ export const generateRosterMarkdown = (roster: depot.Roster, factionName?: strin
       lines.push(`- **${unit.datasheet.name}** - ${unit.modelCost.description} (${unitCost} pts)`);
 
       // Add wargear if present
-      if (unit.selectedWargear.length > 0) {
+      if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
           lines.push(`  - ${wargear.name}`);
         });
@@ -122,9 +131,6 @@ export const generateRosterMarkdown = (roster: depot.Roster, factionName?: strin
     roster.enhancements.forEach(({ enhancement }) => {
       const enhancementCost = parseInt(enhancement.cost, 10) || 0;
       lines.push(`- **${enhancement.name}** (${enhancementCost} pts)`);
-      if (enhancement.description) {
-        lines.push(`  - ${stripHtml(enhancement.description)}`);
-      }
     });
 
     lines.push('');

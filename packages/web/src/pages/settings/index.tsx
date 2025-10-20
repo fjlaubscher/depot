@@ -88,6 +88,27 @@ const Settings = () => {
             </div>
           </SettingsCard>
 
+          {/* Roster Preferences Card */}
+          <SettingsCard
+            title="Roster Preferences"
+            description="Control how rosters are exported or shared"
+          >
+            <div className="flex flex-col gap-4">
+              <SettingToggleItem
+                title="Include Wargear in Exports"
+                description="Add selected wargear to exported markdown or shared text"
+                enabled={state.settings?.includeWargearOnExport ?? true}
+                onChange={(value) => handleSettingsChange('includeWargearOnExport', value)}
+              />
+              <SettingToggleItem
+                title="Use Native Sharing"
+                description="Attempt to use the device share sheet when available; otherwise copy to clipboard"
+                enabled={state.settings?.useNativeShare ?? true}
+                onChange={(value) => handleSettingsChange('useNativeShare', value)}
+              />
+            </div>
+          </SettingsCard>
+
           {/* Offline Data Card */}
           <SettingsCard
             title="Offline Data"

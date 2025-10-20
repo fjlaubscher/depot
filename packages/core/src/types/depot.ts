@@ -168,6 +168,8 @@ export interface Settings {
   showLegends?: boolean;
   showUnaligned?: boolean;
   showFluff?: boolean;
+  includeWargearOnExport?: boolean;
+  useNativeShare?: boolean;
 }
 
 // Detachment, composed from other types

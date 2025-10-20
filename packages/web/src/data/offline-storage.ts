@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import { mergeSettingsWithDefaults } from '@/constants/settings';
 
 // Database configuration constants
 const DB_CONFIG = {
@@ -216,15 +217,14 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.get(KEYS.SETTINGS);
-        request.onsuccess = () =>
-          resolve(
-            request.result || {
-              showFluff: true,
-              showForgeWorld: false,
-              showLegends: false,
-              showUnaligned: false
-            }
-          );
+        request.onsuccess = () => {
+          const storedSettings = request.result as depot.Settings | undefined;
+          if (!storedSettings) {
+            resolve(null);
+            return;
+          }
+          resolve(mergeSettingsWithDefaults(storedSettings));
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
@@ -240,7 +240,7 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.SETTINGS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(settings, KEYS.SETTINGS);
+        const request = store.put(mergeSettingsWithDefaults(settings), KEYS.SETTINGS);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });

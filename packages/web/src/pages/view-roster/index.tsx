@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Pencil, Share, Download } from 'lucide-react';
+import { Copy, Download, Pencil, Share } from 'lucide-react';
 
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
@@ -22,14 +23,28 @@ const RosterView: FC = () => {
   const { state: roster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { state: appState } = useAppContext();
 
   const factionName = getRosterFactionName(roster);
+  const includeWargearOnExport = appState.settings?.includeWargearOnExport ?? true;
+  const useNativeShare = appState.settings?.useNativeShare ?? true;
+  const canUseNativeShare =
+    useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  const shareText = useMemo(
+    () =>
+      generateRosterShareText(roster, factionName, {
+        includeWargear: includeWargearOnExport
+      }),
+    [factionName, includeWargearOnExport, roster]
+  );
 
   const groupedUnits = useMemo(() => groupRosterUnitsByRole(roster.units), [roster.units]);
   const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
 
   const handleExportMarkdown = () => {
-    const markdown = generateRosterMarkdown(roster, factionName);
+    const markdown = generateRosterMarkdown(roster, factionName, {
+      includeWargear: includeWargearOnExport
+    });
     const blob = new Blob([markdown], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -41,9 +56,7 @@ const RosterView: FC = () => {
   };
 
   const handleShareRoster = async () => {
-    const shareText = generateRosterShareText(roster, factionName);
-
-    if (navigator.share) {
+    if (useNativeShare && navigator.share) {
       try {
         await navigator.share({
           title: roster.name,
@@ -56,6 +69,10 @@ const RosterView: FC = () => {
     } else {
       await copyToClipboard(shareText);
     }
+  };
+
+  const handleCopyRoster = async () => {
+    await copyToClipboard(shareText);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -104,25 +121,42 @@ const RosterView: FC = () => {
       />
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-4">
-        <Button
-          variant="secondary"
-          onClick={handleExportMarkdown}
-          className="flex items-center gap-2"
-          data-testid="export-button"
-        >
-          <Download size={16} />
-          Export
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={handleShareRoster}
-          className="flex items-center gap-2"
-          data-testid="share-button"
-        >
-          <Share size={16} />
-          Share
-        </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-4">
+          <Button
+            variant="secondary"
+            onClick={handleExportMarkdown}
+            className="flex items-center gap-2"
+            data-testid="export-button"
+          >
+            <Download size={16} />
+            Export
+          </Button>
+          {canUseNativeShare ? (
+            <Button
+              variant="secondary"
+              onClick={handleShareRoster}
+              className="flex items-center gap-2"
+              data-testid="share-button"
+            >
+              <Share size={16} />
+              Share
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={handleCopyRoster}
+              className="flex items-center gap-2"
+              data-testid="copy-button"
+            >
+              <Copy size={16} />
+              Copy
+            </Button>
+          )}
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Exports and sharing follow your Settings preferences (wargear visibility, sharing method).
+        </p>
       </div>
 
       {/* Units List */}

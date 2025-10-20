@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
 import type { depot } from '@depot/core';
+import { DEFAULT_SETTINGS } from '@/constants/settings';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -108,7 +109,11 @@ const mockFaction: depot.Faction = {
 
 const mockSettings: depot.Settings = {
   showForgeWorld: false,
-  showLegends: true
+  showLegends: true,
+  showUnaligned: false,
+  showFluff: true,
+  includeWargearOnExport: true,
+  useNativeShare: true
 };
 
 describe('AppProvider with IndexedDB Integration', () => {
@@ -188,7 +193,9 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('settings')).toHaveTextContent(JSON.stringify(mockSettings));
+        expect(screen.getByTestId('settings')).toHaveTextContent(
+          JSON.stringify({ ...DEFAULT_SETTINGS, ...mockSettings })
+        );
       });
 
       expect(mockOfflineStorage.getSettings).toHaveBeenCalled();
@@ -290,21 +297,26 @@ describe('AppProvider with IndexedDB Integration', () => {
         </AppProvider>
       );
 
+      await waitFor(() => {
+        expect(screen.getByTestId('settings')).toHaveTextContent(JSON.stringify(DEFAULT_SETTINGS));
+      });
+
       const updateButton = screen.getByTestId('update-settings');
       await act(async () => {
         updateButton.click();
       });
 
+      const expectedSettings = {
+        ...DEFAULT_SETTINGS,
+        showForgeWorld: true,
+        showLegends: false
+      };
+
       await waitFor(() => {
-        expect(mockOfflineStorage.setSettings).toHaveBeenCalledWith({
-          showForgeWorld: true,
-          showLegends: false
-        });
+        expect(mockOfflineStorage.setSettings).toHaveBeenCalledWith(expectedSettings);
       });
 
-      expect(screen.getByTestId('settings')).toHaveTextContent(
-        JSON.stringify({ showForgeWorld: true, showLegends: false })
-      );
+      expect(screen.getByTestId('settings')).toHaveTextContent(JSON.stringify(expectedSettings));
     });
   });
 

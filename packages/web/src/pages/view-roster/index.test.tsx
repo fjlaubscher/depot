@@ -116,6 +116,10 @@ describe('ViewRosterPage', () => {
 
     // Default mock for empty roster
     mockGroupRosterUnitsByRole.mockReturnValue({});
+
+    Object.assign(navigator, {
+      share: vi.fn().mockResolvedValue(undefined)
+    });
   });
 
   it('renders loading state when roster has no id', () => {
@@ -153,6 +157,17 @@ describe('ViewRosterPage', () => {
 
     expect(screen.getByText('Export')).toBeInTheDocument();
     expect(screen.getByText('Share')).toBeInTheDocument();
+  });
+
+  it('falls back to copy button when native share is unavailable', () => {
+    Object.assign(navigator, {
+      share: undefined
+    });
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.getByText('Export')).toBeInTheDocument();
+    expect(screen.getByText('Copy')).toBeInTheDocument();
   });
 
   it('displays units in sections by role', () => {
