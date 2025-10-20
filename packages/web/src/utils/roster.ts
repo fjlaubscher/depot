@@ -194,10 +194,6 @@ export const generateRosterShareText = (
     roster.enhancements.forEach(({ enhancement }) => {
       const enhancementCost = parseInt(enhancement.cost, 10) || 0;
       lines.push(`- ${enhancement.name} (${enhancementCost} pts)`);
-      const desc = stripHtml(enhancement.description);
-      if (desc) {
-        lines.push(`  - ${desc}`);
-      }
     });
     lines.push('');
   }
