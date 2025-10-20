@@ -4,7 +4,6 @@ import type { depot } from '@depot/core';
 // components
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
-import DatasheetLeaderRules from './datasheet-leader-rules';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
 
 // utils
@@ -23,8 +22,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet, factionD
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2" data-testid="datasheet-profile">
-        <DatasheetHero datasheet={datasheet} />
-        <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+        <DatasheetHero datasheet={datasheet} factionDatasheets={factionDatasheets} />
         <DatasheetAbilities
           title="Core Abilities"
           abilities={coreAbilities}

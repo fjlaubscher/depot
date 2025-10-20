@@ -117,8 +117,8 @@ export interface DatasheetDetachmentAbility {
 }
 
 export interface DatasheetLeader {
-  datasheetId: string;
-  attachedDatasheetId: string;
+  leaderId: string;
+  attachedId: string;
 }
 
 export interface Stratagem {

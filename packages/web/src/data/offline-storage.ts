@@ -216,7 +216,15 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.get(KEYS.SETTINGS);
-        request.onsuccess = () => resolve(request.result || null);
+        request.onsuccess = () =>
+          resolve(
+            request.result || {
+              showFluff: true,
+              showForgeWorld: false,
+              showLegends: false,
+              showUnaligned: false
+            }
+          );
         request.onerror = () => reject(request.error);
       });
     } catch (error) {

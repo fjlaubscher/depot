@@ -3,6 +3,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { slug as slugUtils } from '@depot/core';
 import type { wahapedia, depot } from '@depot/core';
+
 const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = join(PKG_ROOT, 'dist');
 const JSON_DIR = join(DIST_DIR, 'json');
@@ -164,16 +165,12 @@ const buildDatasheet = (
     );
 
   const leaders = data.datasheetLeaders
-    .filter((dl: wahapedia.DatasheetLeader) => dl.datasheetId === datasheet.id)
+    .filter((dl: wahapedia.DatasheetLeader) => dl.leaderId === datasheet.id)
     .map((dl: wahapedia.DatasheetLeader) => {
-      const leaderSlug = datasheetSlugs.get(dl.attachedDatasheetId);
-      if (!leaderSlug) {
-        return undefined;
-      }
-
+      const attachedUnitSlug = datasheetSlugs.get(dl.attachedId);
       return {
-        id: dl.attachedDatasheetId,
-        slug: leaderSlug
+        id: dl.attachedId,
+        slug: attachedUnitSlug ?? 'Unknown'
       };
     })
     .filter((leader): leader is depot.DatasheetLeaderReference => Boolean(leader));

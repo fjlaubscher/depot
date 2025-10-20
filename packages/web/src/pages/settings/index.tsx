@@ -67,7 +67,7 @@ const Settings = () => {
               <SettingToggleItem
                 title="Unaligned Factions"
                 description="Show factions without specific allegiances"
-                enabled={state.settings?.showUnaligned ?? true}
+                enabled={state.settings?.showUnaligned ?? false}
                 onChange={(value) => handleSettingsChange('showUnaligned', value)}
               />
             </div>

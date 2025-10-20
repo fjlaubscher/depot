@@ -29,7 +29,9 @@ const formatLeaderName = (slug: string, fallback: string) => {
 };
 
 const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factionDatasheets }) => {
-  const { leaderHead, leaderFooter, leaders } = datasheet;
+  const { leaderFooter, leaders } = datasheet;
+  const leaderHead =
+    datasheet.leaderHead?.trim() || 'This model can be attached to the following units:';
 
   const leaderTargets = useMemo<LeaderTarget[]>(() => {
     if (!leaders.length) {
@@ -62,25 +64,24 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
     return Array.from(targets.values());
   }, [datasheet.factionSlug, factionDatasheets, leaders]);
 
-  const hasLeaderContent = Boolean(
-    leaderHead?.trim() || leaderFooter?.trim() || leaderTargets.length
-  );
+  const hasLeaderContent = Boolean(leaderTargets.length);
 
   if (!hasLeaderContent) {
     return null;
   }
 
   return (
-    <Card className="flex flex-col gap-3 p-4" data-testid="datasheet-leader-rules">
-      {leaderHead?.trim() ? (
+    <section className="flex flex-col gap-2" data-testid="datasheet-leader-rules">
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">Leader</span>
         <div
-          className="text-sm text-gray-700 dark:text-gray-300 [&_p]:m-0"
+          className="text-xs text-gray-700 dark:text-gray-300 [&_p]:m-0"
           dangerouslySetInnerHTML={{ __html: leaderHead }}
         />
-      ) : null}
+      </div>
 
       {leaderTargets.length ? (
-        <ul className="list-disc space-y-1 pl-5">
+        <ul className="list-disc pl-5">
           {leaderTargets.map((target) => (
             <li
               key={target.key}
@@ -104,11 +105,11 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
 
       {leaderFooter?.trim() ? (
         <div
-          className="text-sm text-gray-700 dark:text-gray-300 [&_p]:m-0"
+          className="text-xs text-gray-700 dark:text-gray-300 [&_p]:m-0"
           dangerouslySetInnerHTML={{ __html: leaderFooter }}
         />
       ) : null}
-    </Card>
+    </section>
   );
 };
 

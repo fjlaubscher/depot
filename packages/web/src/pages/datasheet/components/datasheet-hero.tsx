@@ -4,15 +4,17 @@ import type { depot } from '@depot/core';
 // components
 import { Tag, TagSection } from '@/components/ui';
 import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
+import DatasheetLeaderRules from './datasheet-leader-rules';
 
 // utils
 import { groupKeywords } from '@/utils/keywords';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
+  factionDatasheets: depot.Datasheet[];
 }
 
-const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
+const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets }) => {
   const { models, keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
 
@@ -31,6 +33,8 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet }) => {
         transport={transport}
         data-testid="unit-composition"
       />
+
+      <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
 
       {/* Keywords */}
       <div className="flex flex-col gap-2">

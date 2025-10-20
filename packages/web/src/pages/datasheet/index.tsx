@@ -11,6 +11,7 @@ import { BackButton } from '@/components/shared';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import { useToast } from '@/contexts/toast/use-toast-context';
+import { useAppContext } from '@/contexts/app/use-app-context';
 
 // page components
 import DatasheetProfile from './components/datasheet-profile';
@@ -23,6 +24,8 @@ const DatasheetPage: FC = () => {
   }>();
   const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(factionSlug);
+  const { state } = useAppContext();
+  const settings = state.settings;
 
   const datasheet = useMemo(() => {
     if (faction && datasheetSlug) {
@@ -132,6 +135,11 @@ const DatasheetPage: FC = () => {
           data-testid="datasheet-header"
         />
 
+        {settings?.showFluff ? (
+          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
+            {datasheet.legend}
+          </p>
+        ) : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>
     </AppLayout>
