@@ -3,6 +3,8 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { slug as slugUtils } from '@depot/core';
 import type { wahapedia, depot } from '@depot/core';
+import { buildSourceClassifier } from './utils/source-classification.js';
+import type { SourceClassifier } from './utils/source-classification.js';
 
 const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = join(PKG_ROOT, 'dist');
@@ -78,7 +80,8 @@ const buildDatasheet = (
   data: wahapedia.Data,
   datasheet: wahapedia.Datasheet,
   datasheetSlugs: Map<string, string>,
-  factionSlugs: Map<string, string>
+  factionSlugs: Map<string, string>,
+  classifySource: SourceClassifier
 ): depot.Datasheet => {
   const abilities: depot.Ability[] = data.datasheetAbilities
     .filter((ability: wahapedia.DatasheetAbility) => ability.datasheetId === datasheet.id)
@@ -112,15 +115,7 @@ const buildDatasheet = (
     })
     .filter((ability): ability is depot.Ability => ability !== undefined);
 
-  const isForgeWorld = data.sources
-    .filter((s: wahapedia.Source) => s.name.includes('Imperial Armour:'))
-    .map((s: wahapedia.Source) => s.id)
-    .includes(datasheet.sourceId);
-
-  const isLegends = data.sources
-    .filter((s: wahapedia.Source) => s.name.includes('Legends:'))
-    .map((s: wahapedia.Source) => s.id)
-    .includes(datasheet.sourceId);
+  const { isForgeWorld, isLegends } = classifySource(datasheet.sourceId);
 
   const keywords = data.datasheetKeywords.filter(
     (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
@@ -210,7 +205,8 @@ const buildFactionData = (
   data: wahapedia.Data,
   faction: wahapedia.Faction,
   datasheetSlugs: Map<string, string>,
-  factionSlugs: Map<string, string>
+  factionSlugs: Map<string, string>,
+  classifySource: SourceClassifier
 ): depot.Faction => {
   const factionSlug = factionSlugs.get(faction.id);
   if (!factionSlug) {
@@ -219,7 +215,9 @@ const buildFactionData = (
 
   const datasheets = data.datasheets
     .filter((datasheet) => datasheet.factionId === faction.id && datasheet.virtual === 'false')
-    .map((datasheet) => buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs));
+    .map((datasheet) =>
+      buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs, classifySource)
+    );
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
   const enhancements = data.enhancements.filter(
@@ -239,6 +237,7 @@ const buildFactionData = (
 
 const generateData = () => {
   const data = consolidateFiles();
+  const classifySource = buildSourceClassifier(data.sources);
 
   const factionSlugGenerator = slugUtils.createSlugGenerator('faction');
   const datasheetSlugGenerator = slugUtils.createSlugGenerator('datasheet');
@@ -253,7 +252,9 @@ const generateData = () => {
     datasheetSlugs.set(datasheet.id, datasheetSlugGenerator(datasheet.name));
   });
 
-  return data.factions.map((f) => buildFactionData(data, f, datasheetSlugs, factionSlugs));
+  return data.factions.map((f) =>
+    buildFactionData(data, f, datasheetSlugs, factionSlugs, classifySource)
+  );
 };
 
 export default generateData;
