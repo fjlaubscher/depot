@@ -38,6 +38,8 @@ jobs:
         with:
           node-version: 22
           cache: 'pnpm'
+      - name: Configure base path
+        run: echo "VITE_APP_BASE_PATH=/depot" >> $GITHUB_ENV
           
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

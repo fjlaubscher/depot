@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
-import { getDataUrl } from '@/utils/paths';
+import { getDataPath, getDataUrl } from '@/utils/paths';
 
 interface UseFactions {
   factions: depot.Index[] | undefined;
@@ -23,7 +23,8 @@ function useFactions(): UseFactions {
       let index = await offlineStorage.getFactionIndex();
 
       if (!index) {
-        const response = await fetch(getDataUrl('index.json'));
+        const indexPath = getDataPath('index.json');
+        const response = await fetch(getDataUrl(indexPath));
         if (!response.ok) {
           throw new Error('Failed to load faction index');
         }

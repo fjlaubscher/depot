@@ -9,12 +9,13 @@ import { ToastProvider } from './contexts/toast/context';
 import { ErrorBoundary } from './components/shared';
 import { ToastContainer } from './components/ui';
 import Routes from './routes';
+import { getRouterBasePath } from './utils/paths';
 
 import './styles/main.css';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter basename={process.env.NODE_ENV === 'production' ? '/depot' : undefined}>
+    <BrowserRouter basename={getRouterBasePath()}>
       <AppProvider>
         <LayoutProvider>
           <RosterProvider>
