@@ -123,7 +123,8 @@ describe('RosterProvider', () => {
       expect(screen.getByTestId('roster-id')).toHaveTextContent('test-roster-id');
       expect(screen.getByTestId('roster-name')).toHaveTextContent('Test Roster');
       expect(screen.getByTestId('roster-faction')).toHaveTextContent('Space Marines');
-      expect(screen.getByTestId('roster-points')).toHaveTextContent('500/2000');
+      // persisted total should be normalised via calculateTotalPoints
+      expect(screen.getByTestId('roster-points')).toHaveTextContent('80/2000');
     });
 
     expect(mockOfflineStorage.getRoster).toHaveBeenCalledWith('test-roster-id');

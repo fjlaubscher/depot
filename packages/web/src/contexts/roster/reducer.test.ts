@@ -3,7 +3,12 @@ import { rosterReducer } from './reducer';
 import { initialState } from './constants';
 import type { RosterAction } from './types';
 import type { depot } from '@depot/core';
-import { mockFactionIndex, createMockDatasheet } from '@/test/mock-data';
+import {
+  mockFactionIndex,
+  mockRosterUnit,
+  mockEnhancement,
+  createMockDatasheet
+} from '@/test/mock-data';
 
 describe('rosterReducer', () => {
   it('should return initial state for unknown action', () => {
@@ -13,6 +18,14 @@ describe('rosterReducer', () => {
 
   describe('SET_ROSTER', () => {
     it('should set the entire roster state', () => {
+      const rosterUnit: depot.RosterUnit = {
+        ...mockRosterUnit,
+        modelCost: {
+          ...mockRosterUnit.modelCost,
+          cost: '500'
+        }
+      };
+
       const mockRoster: depot.Roster = {
         id: 'test-id',
         name: 'Test Roster',
@@ -29,7 +42,7 @@ describe('rosterReducer', () => {
           current: 500,
           max: 2000
         },
-        units: [],
+        units: [rosterUnit],
         enhancements: []
       };
 
@@ -41,6 +54,40 @@ describe('rosterReducer', () => {
       const result = rosterReducer(initialState, action);
       expect(result).toEqual(mockRoster);
       expect(result).not.toBe(initialState); // Ensure immutability
+    });
+
+    it('should recalculate points when persisted total is stale', () => {
+      const rosterUnit: depot.RosterUnit = {
+        ...mockRosterUnit,
+        modelCost: {
+          ...mockRosterUnit.modelCost,
+          cost: '80'
+        }
+      };
+
+      const action: RosterAction = {
+        type: 'SET_ROSTER',
+        payload: {
+          ...initialState,
+          points: {
+            current: 999,
+            max: 2000
+          },
+          units: [rosterUnit],
+          enhancements: [
+            {
+              enhancement: mockEnhancement,
+              unitId: rosterUnit.id
+            }
+          ]
+        }
+      };
+
+      const result = rosterReducer(initialState, action);
+
+      // 80 (unit cost) + 10 (enhancement cost)
+      expect(result.points.current).toBe(90);
+      expect(result.points.max).toBe(2000);
     });
   });
 
