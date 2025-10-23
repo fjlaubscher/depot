@@ -99,7 +99,7 @@ vi.mock('@/utils/roster', async () => {
 });
 
 // Mock ViewRosterUnitCard
-vi.mock('./components/view-roster-unit-card', () => ({
+vi.mock('./_components/view-roster-unit-card', () => ({
   default: ({ unit }: { unit: any }) => (
     <div data-testid="view-roster-unit-card" data-unit-name={unit.datasheet.name}>
       {unit.datasheet.name}

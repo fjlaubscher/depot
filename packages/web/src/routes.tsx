@@ -1,18 +1,18 @@
 import { Routes, Route } from 'react-router-dom';
 
-// pages
-import NotFound from './pages/not-found';
-import Home from './pages/home';
-import Factions from './pages/factions';
-import Faction from './pages/faction';
-import Datasheet from './pages/datasheet';
-import Settings from './pages/settings';
-import Rosters from './pages/rosters';
-import CreateRoster from './pages/create-roster';
-import EditRoster from './pages/edit-roster';
-import ViewRoster from './pages/view-roster';
-import AddRosterUnits from './pages/add-roster-units';
-import EditRosterUnit from './pages/edit-roster-unit';
+// routes
+import NotFound from './routes/not-found';
+import Home from './routes/home';
+import Factions from './routes/factions';
+import Faction from './routes/factions/[factionSlug]';
+import Datasheet from './routes/factions/[factionSlug]/datasheet/[datasheetSlug]';
+import Settings from './routes/settings';
+import Rosters from './routes/rosters';
+import CreateRoster from './routes/rosters/create';
+import EditRoster from './routes/rosters/[rosterId]/edit';
+import ViewRoster from './routes/rosters/[rosterId]';
+import AddRosterUnits from './routes/rosters/[rosterId]/add-units';
+import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
 
 const AppRoutes = () => (
   <Routes>

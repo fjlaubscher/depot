@@ -15,13 +15,13 @@ vi.mock('@/utils/faction', () => ({
 }));
 
 // Mock child components
-vi.mock('./components/faction-datasheets', () => ({
+vi.mock('./_components/faction-datasheets', () => ({
   default: ({ datasheets }: { datasheets: depot.Datasheet[] }) => (
     <div data-testid="faction-datasheets">Datasheets: {datasheets.length}</div>
   )
 }));
 
-vi.mock('./components/faction-detachments', () => ({
+vi.mock('./_components/faction-detachments', () => ({
   default: ({ detachmentAbilities }: { detachmentAbilities: depot.DetachmentAbility[] }) => (
     <div data-testid="faction-detachments">Detachments: {detachmentAbilities.length}</div>
   )
