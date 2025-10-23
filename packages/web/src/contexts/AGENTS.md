@@ -76,11 +76,16 @@ export const ACTIONS = {
 // Provider in app root
 <AppProvider>
   <LayoutProvider>
-    <App />
+    <RosterProvider>
+      <ToastProvider>
+        <App />
+      </ToastProvider>
+    </RosterProvider>
   </LayoutProvider>
 </AppProvider>
 
 // Consumer in components
-const { factions, loadFaction } = useAppContext();
+const { state, getFaction } = useAppContext();
 const { showToast } = useToastContext();
+const { state: roster, addUnit } = useRoster();
 ```

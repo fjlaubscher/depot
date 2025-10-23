@@ -55,7 +55,7 @@ pages/
 
 ### Context Integration
 ```typescript
-const { factions, loadFaction } = useAppContext();
+const { state, getFaction, updateMyFactions } = useAppContext();
 const { showToast } = useToastContext();
 ```
 

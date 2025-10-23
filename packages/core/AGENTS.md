@@ -32,6 +32,8 @@ src/
 ├── types/
 │   ├── depot.ts         # Application-ready types
 │   └── wahapedia.ts     # Raw CSV data types
+├── utils/
+│   └── slug.ts          # Shared slug helper used by CLI/web
 ```
 
 ## Type System
