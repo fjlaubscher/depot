@@ -31,6 +31,16 @@ Monorepo with three packages:
 
 Built with React 19, Vite 6, Tailwind CSS v4, and TypeScript 5.9+.
 
+## Sentry
+
+The web client can report unhandled errors to Sentry. Configure the following environment variables:
+
+- `VITE_SENTRY_DSN` – Sentry client DSN (frontend)
+- `VITE_SENTRY_ENVIRONMENT` (optional) – display environment name, defaults to build mode
+- `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` – required in CI for source map upload
+
+When deploying via GitHub Pages, set the matching GitHub Action secrets (`SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`) so the deployment workflow can inject them during the build.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE.md)

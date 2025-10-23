@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import AppLayout from '@/components/layout';
 import { ErrorState } from '@/components/ui';
+import { Sentry } from '@/sentry';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -31,6 +32,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
+    if (Sentry && typeof Sentry.captureException === 'function') {
+      Sentry.captureException(error, {
+        extra: {
+          componentStack: errorInfo.componentStack
+        }
+      });
+    }
   }
 
   render() {

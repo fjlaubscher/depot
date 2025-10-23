@@ -2,11 +2,16 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { getViteBasePath } from './src/utils/paths';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { getAppBasePath, getViteBasePath } from './src/utils/paths';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const enableSentryUpload =
+    !!env.SENTRY_AUTH_TOKEN && !!env.SENTRY_ORG && !!env.SENTRY_PROJECT;
+  const basePath = getAppBasePath(env.VITE_APP_BASE_PATH);
+  const urlPrefix = basePath ? `~${basePath}/` : '~/';
 
   return {
     base: getViteBasePath(env.VITE_APP_BASE_PATH),
@@ -51,7 +56,23 @@ export default defineConfig(({ mode }) => {
             }
           ]
         }
-      })
-    ]
+      }),
+      ...(enableSentryUpload
+        ? [
+            sentryVitePlugin({
+              org: env.SENTRY_ORG,
+              project: env.SENTRY_PROJECT,
+              authToken: env.SENTRY_AUTH_TOKEN,
+              release: env.VITE_SENTRY_RELEASE ?? env.VITE_APP_VERSION ?? env.GITHUB_SHA,
+              include: './packages/web/dist',
+              rewrite: true,
+              urlPrefix
+            })
+          ]
+        : [])
+    ],
+    build: {
+      sourcemap: true
+    }
   };
 });

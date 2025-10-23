@@ -12,14 +12,15 @@ import Routes from './routes';
 import { getRouterBasePath } from './utils/paths';
 
 import './styles/main.css';
+import './sentry';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter basename={getRouterBasePath()}>
       <AppProvider>
-        <LayoutProvider>
-          <RosterProvider>
-            <ToastProvider>
+        <ToastProvider>
+          <LayoutProvider>
+            <RosterProvider>
               <ErrorBoundary
                 fallbackTitle="Application Error"
                 fallbackMessage="Something went wrong with the application. Please refresh the page or try again later."
@@ -29,9 +30,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 <Routes />
               </ErrorBoundary>
               <ToastContainer />
-            </ToastProvider>
-          </RosterProvider>
-        </LayoutProvider>
+            </RosterProvider>
+          </LayoutProvider>
+        </ToastProvider>
       </AppProvider>
     </BrowserRouter>
   </React.StrictMode>
