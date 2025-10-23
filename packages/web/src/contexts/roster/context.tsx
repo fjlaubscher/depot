@@ -1,7 +1,8 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useReducer, useCallback, useEffect } from 'react';
+import { createContext, useReducer, useCallback, useEffect, useRef } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
+import { useToast } from '@/contexts/toast/use-toast-context';
 import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
@@ -15,6 +16,8 @@ interface RosterProviderProps {
 
 export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) => {
   const [state, dispatch] = useReducer(rosterReducer, initialState);
+  const { showToast } = useToast();
+  const saveQueueRef = useRef<Promise<void>>(Promise.resolve()); // Serialise roster saves
 
   // Load roster on mount if rosterId is provided
   useEffect(() => {
@@ -37,9 +40,35 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
   useEffect(() => {
     // Don't save the initial empty state
     if (state.id) {
-      offlineStorage.saveRoster(state);
+      let isCancelled = false;
+
+      const enqueueSave = async () => {
+        const performSave = async () => {
+          try {
+            await offlineStorage.saveRoster(state);
+          } catch (error) {
+            console.error(`Failed to auto-save roster ${state.id}:`, error);
+            if (!isCancelled) {
+              showToast({
+                type: 'error',
+                title: 'Failed to save roster',
+                message: 'Changes may not be saved. Please try again.'
+              });
+            }
+          }
+        };
+
+        saveQueueRef.current = saveQueueRef.current.catch(() => undefined).then(performSave);
+        await saveQueueRef.current;
+      };
+
+      void enqueueSave();
+
+      return () => {
+        isCancelled = true;
+      };
     }
-  }, [state]);
+  }, [state, showToast]);
 
   const createRoster = useCallback(
     (payload: {
