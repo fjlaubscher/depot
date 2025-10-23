@@ -92,8 +92,6 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       dispatch({ type: APP_ACTIONS.UPDATE_MY_FACTIONS, payload: factions });
     } catch (error) {
       console.error('Failed to save my factions to IndexedDB:', error);
-      // Still update in-memory state even if offline save fails
-      dispatch({ type: APP_ACTIONS.UPDATE_MY_FACTIONS, payload: factions });
       throw error;
     }
   };
