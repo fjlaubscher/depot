@@ -1,16 +1,28 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getAppBasePath, getDataUrl, getRouterBasePath, getViteBasePath } from './paths';
+import {
+  getAppBasePath,
+  getDataPath,
+  getDataUrl,
+  getRouterBasePath,
+  getViteBasePath
+} from './paths';
 
 const setBasePath = (value?: string) => {
   if (typeof value === 'string') {
+    if (!import.meta.env) {
+      (import.meta as { env: Record<string, string> }).env = {} as Record<string, string>;
+    }
+
     process.env.VITE_APP_BASE_PATH = value;
     (import.meta.env as Record<string, string>).VITE_APP_BASE_PATH = value;
     return;
   }
 
   delete process.env.VITE_APP_BASE_PATH;
-  delete (import.meta.env as Record<string, string | undefined>).VITE_APP_BASE_PATH;
+  if (import.meta.env) {
+    delete (import.meta.env as Record<string, string | undefined>).VITE_APP_BASE_PATH;
+  }
 };
 
 describe('paths helpers', () => {
@@ -33,6 +45,8 @@ describe('paths helpers', () => {
     setBasePath();
 
     expect(getAppBasePath()).toBe('');
+    expect(getDataPath('index.json')).toBe('/data/index.json');
+    expect(getDataPath('/data/index.json')).toBe('/data/index.json');
     expect(getRouterBasePath()).toBeUndefined();
     expect(getViteBasePath()).toBe('/');
     expect(getDataUrl('units.json')).toBe('/data/units.json');
@@ -42,6 +56,7 @@ describe('paths helpers', () => {
     setBasePath('/depot/');
 
     expect(getAppBasePath()).toBe('/depot');
+    expect(getDataPath('/depot/data/units.json')).toBe('/data/units.json');
     expect(getRouterBasePath()).toBe('/depot');
     expect(getViteBasePath()).toBe('/depot/');
     expect(getDataUrl('units.json')).toBe('/depot/data/units.json');
@@ -50,7 +65,8 @@ describe('paths helpers', () => {
   it('handles leading slashes when building data URLs', () => {
     setBasePath('/depot/');
 
+    expect(getDataPath('//units.json')).toBe('/data/units.json');
     expect(getDataUrl('/data/units.json')).toBe('/depot/data/units.json');
-    expect(getDataUrl('//units.json')).toBe('/depot/units.json');
+    expect(getDataUrl('//units.json')).toBe('/depot/data/units.json');
   });
 });

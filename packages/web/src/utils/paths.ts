@@ -14,6 +14,36 @@ const normalizeBasePath = (value?: string | null): string => {
   return withoutLeadingSlashes ? `/${withoutLeadingSlashes}` : '';
 };
 
+const DATA_ROOT = '/data';
+
+const normalizeDataSuffix = (value: string): string => value.replace(/^\/+/, '');
+
+export const getDataPath = (path: string): string => {
+  const trimmed = path.trim();
+  if (!trimmed) {
+    return DATA_ROOT;
+  }
+
+  const normalized = trimmed.replace(/\\/g, '/');
+  const dataSegmentIndex = normalized.indexOf(DATA_ROOT);
+  if (dataSegmentIndex !== -1) {
+    const suffix = normalized.slice(dataSegmentIndex + DATA_ROOT.length);
+    const sanitizedSuffix = normalizeDataSuffix(suffix);
+    return sanitizedSuffix ? `${DATA_ROOT}/${sanitizedSuffix}` : DATA_ROOT;
+  }
+
+  let remainder = normalizeDataSuffix(normalized);
+
+  if (remainder.toLowerCase().startsWith('data/')) {
+    remainder = remainder.slice('data/'.length);
+  } else if (remainder.toLowerCase() === 'data') {
+    remainder = '';
+  }
+
+  const sanitizedRemainder = normalizeDataSuffix(remainder);
+  return sanitizedRemainder ? `${DATA_ROOT}/${sanitizedRemainder}` : DATA_ROOT;
+};
+
 const readConfiguredBasePath = (): string => {
   const fromImportMeta =
     typeof import.meta !== 'undefined'
@@ -47,16 +77,12 @@ export const getViteBasePath = (basePath?: string): string => {
   return normalizedBasePath ? `${normalizedBasePath}/` : '/';
 };
 
-const withSingleLeadingSlash = (value: string): string => `/${value.replace(/^\/+/, '')}`;
-
 /**
  * Constructs a data URL with the correct base path.
  */
 export const getDataUrl = (path: string, basePath?: string): string => {
   const normalizedBasePath = getAppBasePath(basePath);
-  const normalizedPath = path.startsWith('/')
-    ? withSingleLeadingSlash(path)
-    : `/data/${path.replace(/^\/+/, '')}`;
+  const normalizedPath = getDataPath(path);
 
   return `${normalizedBasePath}${normalizedPath}`;
 };

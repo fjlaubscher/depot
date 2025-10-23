@@ -6,7 +6,7 @@ import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
-import { getDataUrl } from '@/utils/paths';
+import { getDataPath, getDataUrl } from '@/utils/paths';
 
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,7 +34,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
           return cachedFaction;
         }
 
-        const path = indexEntry?.path ?? `/data/${slug}.json`;
+        const path = getDataPath(indexEntry?.path ?? `${slug}.json`);
 
         // If not cached, fetch from network
         const response = await fetch(getDataUrl(path));
@@ -108,7 +108,8 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
 
         if (!index) {
           // Fallback to network
-          const response = await fetch(getDataUrl('index.json'));
+          const indexPath = getDataPath('index.json');
+          const response = await fetch(getDataUrl(indexPath));
           if (!response.ok) {
             throw new Error('Failed to load faction index');
           }
