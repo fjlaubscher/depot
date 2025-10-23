@@ -16,9 +16,9 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { getFactionAlliance } from '@/utils/faction';
 
 // Components
-import Skeleton from './components/skeleton';
-import FactionDatasheets from './components/faction-datasheets';
-import FactionDetachments from './components/faction-detachments';
+import Skeleton from './_components/skeleton';
+import FactionDatasheets from './_components/faction-datasheets';
+import FactionDetachments from './_components/faction-detachments';
 
 // Types
 import type { depot } from '@depot/core';

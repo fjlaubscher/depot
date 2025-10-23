@@ -7,7 +7,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, ErrorState } from '@/components/ui';
-import { RosterCard } from './components/roster-card';
+import { RosterCard } from './_components/roster-card';
 
 const Rosters: React.FC = () => {
   const navigate = useNavigate();

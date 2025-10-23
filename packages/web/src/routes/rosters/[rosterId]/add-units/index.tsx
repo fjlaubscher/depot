@@ -14,8 +14,8 @@ import { useScrollCollapse } from '@/hooks/use-scroll-collapse';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs } from '@/components/ui';
 import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared';
-import SelectionSummary from './components/selection-summary';
-import type { SelectionGroup } from './components/selection-summary';
+import SelectionSummary from './_components/selection-summary';
+import type { SelectionGroup } from './_components/selection-summary';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();

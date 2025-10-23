@@ -18,7 +18,7 @@ vi.mock('@/hooks/use-faction');
 vi.mock('@/contexts/toast/use-toast-context');
 
 // Mock child components
-vi.mock('./components/datasheet-profile', () => ({
+vi.mock('./_components/datasheet-profile', () => ({
   default: ({ datasheet }: { datasheet: any }) => (
     <div data-testid="datasheet-profile">Profile for {datasheet.name}</div>
   )

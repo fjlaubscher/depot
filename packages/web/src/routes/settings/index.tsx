@@ -6,8 +6,8 @@ import AppLayout from '@/components/layout';
 import { Button, Loader, PageHeader } from '@/components/ui';
 
 // Components
-import SettingsCard from './components/settings-card';
-import SettingToggleItem from './components/setting-toggle-item';
+import SettingsCard from './_components/settings-card';
+import SettingToggleItem from './_components/setting-toggle-item';
 
 // Hooks and Context
 import { useAppContext } from '@/contexts/app/use-app-context';

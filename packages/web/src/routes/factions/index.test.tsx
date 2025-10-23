@@ -43,7 +43,7 @@ vi.mock('@/hooks/use-debounce', () => ({
 }));
 
 // Mock child components
-vi.mock('./components/skeleton', () => ({
+vi.mock('./_components/skeleton', () => ({
   default: () => <div data-testid="skeleton">Loading...</div>
 }));
 
@@ -61,7 +61,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
   };
 });
 
-vi.mock('./components/search-filters', () => ({
+vi.mock('./_components/search-filters', () => ({
   default: ({ query, onQueryChange, onClear }: any) => (
     <div data-testid="search-filters">
       <input
@@ -77,7 +77,7 @@ vi.mock('./components/search-filters', () => ({
   )
 }));
 
-vi.mock('./components/alliance-section', () => ({
+vi.mock('./_components/alliance-section', () => ({
   default: ({ alliance, factions }: any) => (
     <div data-testid="alliance-section">
       <h3>{alliance}</h3>
@@ -90,7 +90,7 @@ vi.mock('./components/alliance-section', () => ({
   )
 }));
 
-vi.mock('./components/no-results', () => ({
+vi.mock('./_components/no-results', () => ({
   default: ({ query }: any) => <div data-testid="no-results">No results for: {query}</div>
 }));
 

@@ -84,7 +84,7 @@ src/
 │   ├── ui/             # Base UI library
 │   └── shared/         # Domain-specific components
 ├── contexts/           # React contexts for state
-├── pages/              # Route components
+├── routes/             # Route-aligned views + colocated logic
 ├── hooks/              # Custom React hooks
 ├── utils/              # Business logic utilities
 ├── data/               # IndexedDB and data utilities
@@ -109,16 +109,16 @@ src/
 - `use-debounce.ts` - Generic debounce helper
 - `use-faction.ts` - Single faction loader (context-backed)
 - `use-factions.ts` - Faction index loader with caching
-- `use-local-storage.ts` - Browser storage helper
-- `use-my-factions.ts` - Favourites loader/persistence (legacy)
 - `use-roster-unit-selection.ts` - Pending unit selection management
 - `use-rosters.ts` - IndexedDB-backed roster CRUD
 - `use-scroll-collapse.ts` - Sticky footer management for selection summary
 - `use-select.ts` - Headless select control helper
 
+### `routes/`
+- `AGENTS.md` - Route conventions, nested layout, `_components` & `_utils` usage
+
 ### `data/`
 - `offline-storage.ts` - IndexedDB data persistence layer
-- `indexed-db.ts` - Database schema and operations
 
 ## Data Requirements
 

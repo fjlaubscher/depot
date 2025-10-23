@@ -18,10 +18,10 @@ import {
   PageHeaderSkeleton,
   SkeletonCard
 } from '@/components/ui';
-import WargearSelectionContainer from './components/wargear-selection-container';
-import ModelCostSelection from './components/model-cost-selection';
-import EnhancementSelection from './components/enhancement-selection';
-import WarlordSelection from './components/warlord-selection';
+import WargearSelectionContainer from './_components/wargear-selection-container';
+import ModelCostSelection from './_components/model-cost-selection';
+import EnhancementSelection from './_components/enhancement-selection';
+import WarlordSelection from './_components/warlord-selection';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
 import { getRosterFactionName } from '@/utils/roster';

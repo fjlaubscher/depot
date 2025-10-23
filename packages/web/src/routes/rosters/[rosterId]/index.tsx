@@ -17,7 +17,7 @@ import {
   getRosterFactionName,
   groupRosterUnitsByRole
 } from '@/utils/roster';
-import ViewRosterUnitCard from './components/view-roster-unit-card';
+import ViewRosterUnitCard from './_components/view-roster-unit-card';
 
 const RosterView: FC = () => {
   const { state: roster } = useRoster();

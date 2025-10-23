@@ -2,7 +2,7 @@ import React from 'react';
 import AllianceSection from './alliance-section';
 import SearchFilters from './search-filters';
 import NoResults from './no-results';
-import type { GroupedFactions } from '../utils/faction';
+import type { GroupedFactions } from '../_utils/faction';
 
 interface AllFactionsTabProps {
   groupedFactions: GroupedFactions;

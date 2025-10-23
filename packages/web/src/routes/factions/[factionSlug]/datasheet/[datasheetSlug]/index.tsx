@@ -14,8 +14,8 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
 
 // page components
-import DatasheetProfile from './components/datasheet-profile';
-import Skeleton from './components/skeleton';
+import DatasheetProfile from './_components/datasheet-profile';
+import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
   const { factionSlug, datasheetSlug } = useParams<{

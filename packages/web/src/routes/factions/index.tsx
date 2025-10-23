@@ -8,16 +8,16 @@ import AppLayout from '@/components/layout';
 import { PageHeader, ErrorState } from '@/components/ui';
 
 // Page components
-import Skeleton from './components/skeleton';
-import AllianceSection from './components/alliance-section';
-import SearchFilters from './components/search-filters';
+import Skeleton from './_components/skeleton';
+import AllianceSection from './_components/alliance-section';
+import SearchFilters from './_components/search-filters';
 
 // Utilities
 import {
   filterFactionsByQuery,
   filterFactionsBySettings,
   groupFactionsByAlliance
-} from './utils/faction';
+} from './_utils/faction';
 
 // Custom hooks
 import useDebounce from '@/hooks/use-debounce';
