@@ -5,7 +5,7 @@ Fetches Warhammer 40K data from Wahapedia CSV exports and converts to structured
 ## Key Commands
 
 ```bash
-# Generate data from Wahapedia
+# Generate data from Wahapedia (requires `pnpm build` first)
 pnpm start
 
 # Force re-download source data

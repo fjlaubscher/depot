@@ -33,7 +33,7 @@ pnpm --filter @depot/cli start
 pnpm refresh-data
 
 # Production build
-pnpm build
+pnpm build  # Builds all packages, regenerates data, copies assets to @depot/web/public/data
 
 # Code quality
 pnpm format  # ALWAYS run before commits
@@ -46,7 +46,7 @@ pnpm test    # Run tests
 
 ### Data Flow
 1. CLI fetches CSV from Wahapedia URLs
-2. Converts CSV → JSON using `@depot/core` types
+2. Converts CSV -> JSON using `@depot/core` types
 3. Outputs to `packages/cli/dist/json/`
 4. Web app consumes JSON files from `public/data/`
 5. IndexedDB caching for offline-first functionality
