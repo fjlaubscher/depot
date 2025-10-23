@@ -11,8 +11,25 @@ const mockOfflineStorage = vi.hoisted(() => ({
   saveRoster: vi.fn()
 }));
 
+const mockToastContext = vi.hoisted(() => ({
+  dispatch: vi.fn(),
+  showToast: vi.fn(),
+  removeToast: vi.fn(),
+  clearAllToasts: vi.fn()
+}));
+
 vi.mock('../../data/offline-storage', () => ({
   offlineStorage: mockOfflineStorage
+}));
+
+vi.mock('@/contexts/toast/use-toast-context', () => ({
+  useToast: () => ({
+    state: { toasts: [] },
+    dispatch: mockToastContext.dispatch,
+    showToast: mockToastContext.showToast,
+    removeToast: mockToastContext.removeToast,
+    clearAllToasts: mockToastContext.clearAllToasts
+  })
 }));
 
 // Test component to consume the context
@@ -191,5 +208,37 @@ describe('RosterProvider', () => {
 
     // Should not save immediately since state.id is empty
     expect(mockOfflineStorage.saveRoster).not.toHaveBeenCalled();
+  });
+
+  it('should surface auto-save failures via toast notifications', async () => {
+    const error = new Error('IndexedDB write failure');
+    mockOfflineStorage.saveRoster.mockRejectedValueOnce(error);
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(
+      <TestWrapper>
+        <TestComponent />
+      </TestWrapper>
+    );
+
+    act(() => {
+      screen.getByTestId('create-roster').click();
+    });
+
+    await waitFor(() => {
+      expect(mockToastContext.showToast).toHaveBeenCalledWith({
+        type: 'error',
+        title: 'Failed to save roster',
+        message: 'Changes may not be saved. Please try again.'
+      });
+    });
+
+    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledTimes(1);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to auto-save roster'),
+      error
+    );
+
+    consoleSpy.mockRestore();
   });
 });
