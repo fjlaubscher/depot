@@ -8,7 +8,12 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
 import { BackButton } from '@/components/shared';
-import { RosterHeader, RosterSection, RosterUnitCardEdit } from '@/components/shared/roster';
+import {
+  RosterHeader,
+  RosterSection,
+  RosterUnitCardEdit,
+  RosterEmptyState
+} from '@/components/shared/roster';
 import { getRosterFactionName, groupRosterUnitsByRole } from '@/utils/roster';
 
 const RosterEdit: FC = () => {
@@ -93,17 +98,11 @@ const RosterEdit: FC = () => {
           ))}
         </div>
       ) : (
-        <div
-          className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
-          data-testid="empty-roster-state"
-        >
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">No units in this roster</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm">
-              Add units to start building your roster
-            </p>
-          </div>
-        </div>
+        <RosterEmptyState
+          title="No units in this roster"
+          description="Add units to start building your roster"
+          dataTestId="empty-roster-state"
+        />
       )}
     </div>
   );

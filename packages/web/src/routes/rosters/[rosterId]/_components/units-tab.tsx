@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import { RosterSection } from '@/components/shared';
+import { RosterEmptyState, RosterSection } from '@/components/shared';
 import { groupRosterUnitsByRole } from '@/utils/roster';
 import ViewRosterUnitCard from './view-roster-unit-card';
 
@@ -14,17 +14,11 @@ const UnitsTab: React.FC<UnitsTabProps> = ({ units }) => {
 
   if (units.length === 0) {
     return (
-      <div
-        className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
-        data-testid="empty-roster-message"
-      >
-        <div className="flex flex-col gap-2">
-          <p className="text-gray-500 dark:text-gray-400 text-lg">No units in this roster</p>
-          <p className="text-gray-400 dark:text-gray-500 text-sm">
-            Use the edit button to start building your roster
-          </p>
-        </div>
-      </div>
+      <RosterEmptyState
+        title="No units in this roster"
+        description="Use the edit button to start building your roster"
+        dataTestId="empty-roster-message"
+      />
     );
   }
 
