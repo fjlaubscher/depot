@@ -20,7 +20,12 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        includeAssets: [
+          'favicon.ico',
+          'apple-touch-icon-180x180.png',
+          'mask-icon.svg',
+          'images/depot-hero.jpg'
+        ],
         manifest: {
           name: 'depot',
           short_name: 'depot',
