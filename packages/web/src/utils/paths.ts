@@ -15,6 +15,7 @@ const normalizeBasePath = (value?: string | null): string => {
 };
 
 const DATA_ROOT = '/data';
+const IMAGE_ROOT = '/images';
 
 const normalizeDataSuffix = (value: string): string => value.replace(/^\/+/, '');
 
@@ -42,6 +43,16 @@ export const getDataPath = (path: string): string => {
 
   const sanitizedRemainder = normalizeDataSuffix(remainder);
   return sanitizedRemainder ? `${DATA_ROOT}/${sanitizedRemainder}` : DATA_ROOT;
+};
+
+export const getImagePath = (path: string): string => {
+  const trimmed = path.trim();
+  if (!trimmed) {
+    return IMAGE_ROOT;
+  }
+
+  const normalizedPath = trimmed.replace(/\\/g, '/');
+  return `${IMAGE_ROOT}/${normalizedPath}`;
 };
 
 const readConfiguredBasePath = (): string => {
@@ -83,6 +94,13 @@ export const getViteBasePath = (basePath?: string): string => {
 export const getDataUrl = (path: string, basePath?: string): string => {
   const normalizedBasePath = getAppBasePath(basePath);
   const normalizedPath = getDataPath(path);
+
+  return `${normalizedBasePath}${normalizedPath}`;
+};
+
+export const getImageUrl = (path: string, basePath?: string): string => {
+  const normalizedBasePath = getAppBasePath(basePath);
+  const normalizedPath = getImagePath(path);
 
   return `${normalizedBasePath}${normalizedPath}`;
 };

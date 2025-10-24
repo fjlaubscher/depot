@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { Search, Star, Settings, List, Users, ClipboardList } from 'lucide-react';
 
+import { getImageUrl } from '@/utils/paths';
+
 // UI Components
 import AppLayout from '@/components/layout';
 import { Card, Grid, Button } from '@/components/ui';
@@ -52,7 +54,7 @@ const Home: React.FC = () => {
       <div className="flex flex-col gap-12">
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
           <img
-            src="/images/depot-hero.jpg"
+            src={getImageUrl('depot-hero.jpg')}
             alt="Servitors preparing a cogitator in the depths of a forge world"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
             loading="lazy"
