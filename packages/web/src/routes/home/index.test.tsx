@@ -15,18 +15,6 @@ vi.mock('@/components/layout', () => ({
   )
 }));
 
-// Mock DashboardCard to avoid responsive button duplication
-vi.mock('@/components/ui/dashboard-card', () => ({
-  default: ({ icon, title, description, action, titleTestId, ...props }: any) => (
-    <div data-testid="dashboard-card" {...props}>
-      {icon}
-      <h3 data-testid={titleTestId}>{title}</h3>
-      <p>{description}</p>
-      {action}
-    </div>
-  )
-}));
-
 // Mock react-router-dom
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -82,11 +70,11 @@ describe('Home', () => {
     expect(screen.getByTestId('browse-factions-button')).toBeInTheDocument();
   });
 
-  it('should render settings card', () => {
+  it('should render settings action', () => {
     render(<Home />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('settings-card-heading')).toBeInTheDocument();
     expect(screen.getByTestId('settings-button')).toBeInTheDocument();
+    expect(screen.getByText('Adjust settings')).toBeInTheDocument();
   });
 
   it('should render app info section', () => {
@@ -99,11 +87,10 @@ describe('Home', () => {
   it('should not render my factions card when no favorites', () => {
     render(<Home />, { wrapper: TestWrapper });
 
-    expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
     expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
   });
 
-  it('should render my factions card when favorites exist', () => {
+  it('should render quick access heading when favorites exist', () => {
     const contextWithMyFactions = {
       ...defaultAppContext,
       state: {
@@ -115,7 +102,9 @@ describe('Home', () => {
 
     render(<Home />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('my-factions-card-heading')).toBeInTheDocument();
+    expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
+    expect(screen.getByText('Your factions, one tap away')).toBeInTheDocument();
+    expect(screen.getByText('Jump back in')).toBeInTheDocument();
   });
 
   it('should render quick access section when favorites exist', () => {
@@ -131,10 +120,8 @@ describe('Home', () => {
     render(<Home />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('quick-access-section')).toBeInTheDocument();
-    expect(screen.getByText('Quick Access')).toBeInTheDocument();
-    // Check that faction links exist without checking text due to sidebar conflicts
     const quickAccessSection = screen.getByTestId('quick-access-section');
-    expect(quickAccessSection).toBeInTheDocument();
+    expect(screen.getByText('Your factions, one tap away')).toBeInTheDocument();
     expect(quickAccessSection.querySelectorAll('a[href^="/faction/"]')).toHaveLength(2);
   });
 
@@ -150,7 +137,9 @@ describe('Home', () => {
 
     render(<Home />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('1 favorite faction saved')).toBeInTheDocument();
+    const quickAccessSection = screen.getByTestId('quick-access-section');
+    expect(quickAccessSection.querySelectorAll('a[href^="/faction/"]')).toHaveLength(1);
+    expect(screen.getByText('Space Marines')).toBeInTheDocument();
   });
 
   it('should handle empty favorites array', () => {
@@ -165,7 +154,7 @@ describe('Home', () => {
 
     render(<Home />, { wrapper: TestWrapper });
 
-    expect(screen.queryByText('My Factions')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('quick-access-section')).not.toBeInTheDocument();
   });
 
   it('should navigate to factions when browse button is clicked', async () => {

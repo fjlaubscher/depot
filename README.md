@@ -41,6 +41,10 @@ The web client can report unhandled errors to Sentry. Configure the following en
 
 When deploying via GitHub Pages, set the matching GitHub Action secrets (`SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`) so the deployment workflow can inject them during the build.
 
+## Privacy
+
+The published app exposes a privacy policy at `/privacy`. Update the content in `packages/web/src/routes/privacy/index.tsx` if data practices change.
+
 ## License
 
 MIT License - see [LICENSE](LICENSE.md)
