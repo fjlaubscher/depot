@@ -5,7 +5,7 @@ import { createMockRosterUnit, createMockDatasheet, mockDatasheet } from '@/test
 import ViewRosterUnitCard from './view-roster-unit-card';
 
 describe('ViewRosterUnitCard', () => {
-  it('toggles tag visibility when expanded', () => {
+  it('expands to show detailed ability sections', () => {
     const datasheetWithInlineAbility = createMockDatasheet({
       abilities: [
         ...mockDatasheet.abilities,
@@ -33,12 +33,42 @@ describe('ViewRosterUnitCard', () => {
 
     render(<ViewRosterUnitCard unit={unit} />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('Abilities')).toBeInTheDocument();
+    expect(screen.getByText('relic blade')).toBeInTheDocument();
+    expect(screen.queryByText('Abilities')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));
 
-    expect(screen.queryByText('Abilities')).not.toBeInTheDocument();
     expect(screen.getByTestId('roster-unit-core-abilities')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
+  });
+
+  it('keeps the card expanded when interacting within details', () => {
+    const datasheetWithInlineAbility = createMockDatasheet({
+      abilities: [
+        ...mockDatasheet.abilities,
+        {
+          id: 'battle-focus',
+          name: 'Battle Focus',
+          legend: '',
+          factionId: 'SM',
+          description: 'Unit ability description',
+          type: 'Datasheet'
+        }
+      ]
+    });
+
+    const unit = createMockRosterUnit({
+      datasheet: datasheetWithInlineAbility,
+      modelCost: datasheetWithInlineAbility.modelCosts[0]
+    });
+
+    render(<ViewRosterUnitCard unit={unit} />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));
+    expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('roster-unit-abilities-tag-battle-focus'));
+
     expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
   });
 });

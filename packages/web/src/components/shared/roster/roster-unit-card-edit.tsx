@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import { IconButton } from '@/components/ui';
 import { Trash2, Copy } from 'lucide-react';
-import RosterUnitCardBase from './roster-unit-card-base';
+import RosterUnitCardCompact from './roster-unit-card-compact';
 
 interface RosterUnitCardEditProps {
   unit: depot.RosterUnit;
@@ -52,7 +52,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
     </div>
   );
 
-  return <RosterUnitCardBase unit={unit} actions={actions} onClick={handleCardClick} />;
+  return <RosterUnitCardCompact unit={unit} actions={actions} onClick={handleCardClick} />;
 };
 
 export default RosterUnitCardEdit;

@@ -9,15 +9,15 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
-import { BackButton, RosterHeader, RosterSection } from '@/components/shared';
+import { PageHeader, Loader, Breadcrumbs, Button, Tabs } from '@/components/ui';
+import { BackButton, RosterHeader } from '@/components/shared';
 import {
   generateRosterMarkdown,
   generateRosterShareText,
-  getRosterFactionName,
-  groupRosterUnitsByRole
+  getRosterFactionName
 } from '@/utils/roster';
-import ViewRosterUnitCard from './_components/view-roster-unit-card';
+import UnitsTab from './_components/units-tab';
+import DetachmentTab from './_components/detachment-overview';
 
 const RosterView: FC = () => {
   const { state: roster } = useRoster();
@@ -37,9 +37,6 @@ const RosterView: FC = () => {
       }),
     [factionName, includeWargearOnExport, roster]
   );
-
-  const groupedUnits = useMemo(() => groupRosterUnitsByRole(roster.units), [roster.units]);
-  const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
 
   const handleExportMarkdown = () => {
     const markdown = generateRosterMarkdown(roster, factionName, {
@@ -159,33 +156,18 @@ const RosterView: FC = () => {
         </p>
       </div>
 
-      {/* Units List */}
-      {roster.units.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          {roleKeys.map((role) => (
-            <RosterSection
-              key={role}
-              title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
-              data-testid="unit-role-section"
-            >
-              {groupedUnits[role].map((unit) => (
-                <ViewRosterUnitCard key={unit.id} unit={unit} />
-              ))}
-            </RosterSection>
-          ))}
-        </div>
+      {/* Units & Detachment */}
+      {roster.detachment ? (
+        <Tabs tabs={['Units', 'Detachment']} data-testid="roster-tabs">
+          <UnitsTab units={roster.units} />
+          <DetachmentTab
+            detachment={roster.detachment}
+            rosterEnhancements={roster.enhancements}
+            units={roster.units}
+          />
+        </Tabs>
       ) : (
-        <div
-          className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
-          data-testid="empty-roster-message"
-        >
-          <div className="flex flex-col gap-2">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">No units in this roster</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm">
-              Use the edit button to start building your roster
-            </p>
-          </div>
-        </div>
+        <UnitsTab units={roster.units} />
       )}
     </div>
   );

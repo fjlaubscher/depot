@@ -183,6 +183,8 @@ describe('ViewRosterPage', () => {
 
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
+    expect(screen.getByRole('button', { name: 'Units' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: 'Detachment' })).toBeInTheDocument();
     expect(screen.getByText('CHARACTER (1)')).toBeInTheDocument();
     expect(screen.getByTestId('view-roster-unit-card')).toBeInTheDocument();
   });
@@ -196,6 +198,64 @@ describe('ViewRosterPage', () => {
     expect(
       screen.getByText('Use the edit button to start building your roster')
     ).toBeInTheDocument();
+  });
+
+  it('renders detachment overview when tab selected', () => {
+    const mockUnit = createMockRosterUnit();
+    mockRosterState.state = {
+      ...mockRosterState.state,
+      units: [mockUnit],
+      detachment: {
+        name: 'Gladius Task Force',
+        abilities: [
+          {
+            id: 'ability-1',
+            name: 'Oath of Moment',
+            legend: '',
+            description: '<p>Test ability</p>'
+          } as depot.DetachmentAbility
+        ],
+        enhancements: [],
+        stratagems: []
+      },
+      enhancements: [
+        {
+          enhancement: {
+            id: 'enhancement-1',
+            name: 'Artificer Armour',
+            legend: '',
+            description: '<p>Improve save by 1</p>',
+            cost: '25',
+            detachment: 'Gladius Task Force',
+            factionId: 'SM'
+          } as depot.Enhancement,
+          unitId: mockUnit.id
+        }
+      ]
+    };
+    mockGroupRosterUnitsByRole.mockReturnValue({
+      CHARACTER: [mockUnit]
+    });
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Detachment' }));
+
+    expect(screen.getByTestId('detachment-overview')).toBeInTheDocument();
+    expect(screen.getByText('Oath of Moment')).toBeInTheDocument();
+    expect(screen.getByText('Artificer Armour')).toBeInTheDocument();
+    expect(screen.getByText(/Assigned to/i)).toHaveTextContent('Assigned to Captain');
+  });
+
+  it('omits detachment tab when roster has no detachment', () => {
+    const rosterWithoutDetachment = { ...mockRosterState.state };
+    (rosterWithoutDetachment as unknown as { detachment?: depot.Detachment }).detachment =
+      undefined;
+    mockRosterState.state = rosterWithoutDetachment as depot.Roster;
+
+    render(<ViewRosterPage />, { wrapper: TestWrapper });
+
+    expect(screen.queryByRole('button', { name: 'Detachment' })).not.toBeInTheDocument();
   });
 
   it('renders mobile back button', () => {
