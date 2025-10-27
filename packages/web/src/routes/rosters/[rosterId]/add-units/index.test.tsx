@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, act, fireEvent, within } from '@testing-library/react';
 import type { MutableRefObject } from 'react';
+import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockRosterUnit, createMockDatasheet } from '@/test/mock-data';
+import { filterDatasheetsBySettings } from '@/utils/datasheet-filters';
 import AddRosterUnitsPage from './index';
 
 // Mock AppLayout
@@ -138,19 +140,25 @@ vi.mock('@/components/shared/datasheet', async () => {
     ...actual,
     DatasheetBrowser: ({
       datasheets,
-      renderDatasheet
+      renderDatasheet,
+      filters
     }: {
-      datasheets: any[];
-      renderDatasheet?: (datasheet: any) => React.ReactNode;
-    }) => (
-      <div data-testid="datasheet-browser">
-        {datasheets.map((datasheet) => (
-          <div key={datasheet.id} data-testid="datasheet-item">
-            {renderDatasheet ? renderDatasheet(datasheet) : datasheet.name}
-          </div>
-        ))}
-      </div>
-    )
+      datasheets: depot.Datasheet[];
+      renderDatasheet?: (datasheet: depot.Datasheet) => React.ReactNode;
+      filters?: { showLegends?: boolean; showForgeWorld?: boolean };
+    }) => {
+      const filteredDatasheets = filterDatasheetsBySettings(datasheets, filters);
+
+      return (
+        <div data-testid="datasheet-browser">
+          {filteredDatasheets.map((datasheet) => (
+            <div key={datasheet.id} data-testid="datasheet-item">
+              {renderDatasheet ? renderDatasheet(datasheet) : datasheet.name}
+            </div>
+          ))}
+        </div>
+      );
+    }
   };
 });
 

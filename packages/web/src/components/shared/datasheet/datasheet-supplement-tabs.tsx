@@ -1,45 +1,39 @@
 import type { FC } from 'react';
 import classNames from 'classnames';
-import type { DatasheetRoleTab } from '@/hooks/use-datasheet-browser';
 import ScrollableTabRow from './scrollable-tab-row';
 
-interface DatasheetRoleTabsProps {
-  tabs: DatasheetRoleTab[];
-  activeRole: string | null;
-  onChange: (role: string | null) => void;
+export interface SupplementTab {
+  value: string;
+  label: string;
+  count: number;
+}
+
+interface DatasheetSupplementTabsProps {
+  tabs: SupplementTab[];
+  activeValue: string;
+  onChange: (value: string) => void;
   className?: string;
 }
 
-const formatLabel = (label: string) =>
-  label
-    .split(' ')
-    .map((word) =>
-      word
-        .split('-')
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
-        .join('-')
-    )
-    .join(' ');
-
-export const DatasheetRoleTabs: FC<DatasheetRoleTabsProps> = ({
+export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
   tabs,
-  activeRole,
+  activeValue,
   onChange,
   className
 }) => {
-  if (tabs.length === 0) {
+  if (tabs.length <= 1) {
     return null;
   }
 
   return (
     <ScrollableTabRow
       className={className}
-      label="Roles"
-      containerProps={{ role: 'tablist', 'aria-label': 'Datasheet roles' }}
+      label="Supplements"
+      containerProps={{ role: 'tablist', 'aria-label': 'Datasheet supplements' }}
     >
       {tabs.map((tab) => {
-        const isActive = tab.role === activeRole;
-        const tabId = tab.role ? `datasheet-role-${tab.role}` : 'datasheet-role-all';
+        const isActive = tab.value === activeValue;
+        const tabId = `datasheet-supplement-${tab.value}`;
 
         return (
           <button
@@ -48,7 +42,7 @@ export const DatasheetRoleTabs: FC<DatasheetRoleTabsProps> = ({
             role="tab"
             aria-selected={isActive}
             aria-controls="datasheet-results"
-            onClick={() => onChange(tab.role)}
+            onClick={() => onChange(tab.value)}
             className={classNames(
               'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
               isActive
@@ -56,7 +50,7 @@ export const DatasheetRoleTabs: FC<DatasheetRoleTabsProps> = ({
                 : 'border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white'
             )}
           >
-            <span>{formatLabel(tab.label)}</span>
+            <span>{tab.label}</span>
             <span
               className={classNames(
                 'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
@@ -74,4 +68,4 @@ export const DatasheetRoleTabs: FC<DatasheetRoleTabsProps> = ({
   );
 };
 
-export default DatasheetRoleTabs;
+export default DatasheetSupplementTabs;
