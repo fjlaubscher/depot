@@ -5,6 +5,7 @@ import { slug as slugUtils } from '@depot/core';
 import type { wahapedia, depot } from '@depot/core';
 import { buildSourceClassifier } from './utils/source-classification.js';
 import type { SourceClassifier } from './utils/source-classification.js';
+import { getSupplementInfo } from './config/supplements.js';
 
 const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = join(PKG_ROOT, 'dist');
@@ -116,6 +117,7 @@ const buildDatasheet = (
     .filter((ability): ability is depot.Ability => ability !== undefined);
 
   const { isForgeWorld, isLegends } = classifySource(datasheet.sourceId);
+  const supplementInfo = getSupplementInfo(datasheet.factionId, datasheet.sourceId);
 
   const keywords = data.datasheetKeywords.filter(
     (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
@@ -196,6 +198,8 @@ const buildDatasheet = (
     enhancements,
     detachmentAbilities,
     leaders,
+    supplementSlug: supplementInfo?.slug,
+    supplementName: supplementInfo?.name,
     isForgeWorld,
     isLegends
   };

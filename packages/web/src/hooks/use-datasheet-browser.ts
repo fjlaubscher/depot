@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 import { groupDatasheetsByRole } from '@/utils/datasheet';
+import {
+  type DatasheetVisibilityFilters,
+  filterDatasheetsBySettings
+} from '@/utils/datasheet-filters';
 import { sortByName } from '@/utils/array';
 import useDebounce from './use-debounce';
 
-export interface DatasheetFilters {
-  showLegends?: boolean;
-  showForgeWorld?: boolean;
-}
+export type DatasheetFilters = DatasheetVisibilityFilters;
 
 export interface DatasheetRoleTab {
   role: string | null;
@@ -48,23 +49,10 @@ export const useDatasheetBrowser = (
   const debouncedQuery = useDebounce(query, debounceMs);
   const normalizedQuery = normalizeQuery(debouncedQuery);
 
-  const filteredBySettings = useMemo(() => {
-    if (!filters) {
-      return datasheets;
-    }
-
-    return datasheets.filter((sheet) => {
-      if (filters.showLegends === false && sheet.isLegends) {
-        return false;
-      }
-
-      if (filters.showForgeWorld === false && sheet.isForgeWorld) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [datasheets, filters]);
+  const filteredBySettings = useMemo(
+    () => filterDatasheetsBySettings(datasheets, filters),
+    [datasheets, filters]
+  );
 
   const { roleTabs, totalCount } = useMemo(() => {
     const grouped = groupDatasheetsByRole(filteredBySettings);

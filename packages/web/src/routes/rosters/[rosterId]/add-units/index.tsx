@@ -74,23 +74,13 @@ const AddRosterUnitsView: FC = () => {
   const showLegends = appState.settings?.showLegends ?? false;
   const showForgeWorld = appState.settings?.showForgeWorld ?? false;
 
-  const filteredDatasheets = useMemo(() => {
-    if (!factionData) {
-      return [];
-    }
-
-    return factionData.datasheets.filter((sheet) => {
-      if (!showLegends && sheet.isLegends) {
-        return false;
-      }
-
-      if (!showForgeWorld && sheet.isForgeWorld) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [factionData, showLegends, showForgeWorld]);
+  const datasheetFilters = useMemo(
+    () => ({
+      showLegends,
+      showForgeWorld
+    }),
+    [showLegends, showForgeWorld]
+  );
 
   if (!roster.id) {
     return <Loader />;
@@ -157,9 +147,10 @@ const AddRosterUnitsView: FC = () => {
       {/* Units Browser */}
       <div className="mb-4">
         <DatasheetBrowser
-          datasheets={filteredDatasheets}
+          datasheets={factionData?.datasheets ?? []}
           searchPlaceholder="Search by unit name..."
           emptyStateMessage="No units available for this faction."
+          filters={datasheetFilters}
           renderDatasheet={(datasheet) => (
             <DatasheetSelectionCard
               datasheet={datasheet}

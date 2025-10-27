@@ -41,21 +41,6 @@ const Faction: React.FC = () => {
     [showLegends, showForgeWorld]
   );
 
-  const datasheets = faction?.datasheets ?? [];
-  const filteredDatasheets = useMemo(() => {
-    return datasheets.filter((sheet) => {
-      if (!showLegends && sheet.isLegends) {
-        return false;
-      }
-
-      if (!showForgeWorld && sheet.isForgeWorld) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [datasheets, showLegends, showForgeWorld]);
-
   const isMyFaction = useMemo(() => {
     if (state.myFactions && factionSlug) {
       return state.myFactions.some((f) => f.slug === factionSlug || f.id === factionSlug);
@@ -175,7 +160,7 @@ const Faction: React.FC = () => {
         />
 
         <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
-          <FactionDatasheets datasheets={filteredDatasheets} filters={datasheetFilters} />
+          <FactionDatasheets datasheets={faction.datasheets} filters={datasheetFilters} />
           <FactionDetachments
             detachmentAbilities={faction.detachmentAbilities}
             enhancements={faction.enhancements}
