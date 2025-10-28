@@ -56,10 +56,11 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
       padding="sm"
     >
       <div className="flex items-start justify-between gap-2">
-        <div className="flex flex-col gap-2">
+        <div className="flex min-w-0 flex-col gap-2">
           {datasheet.modelCosts.length > 1 ? (
             <SelectField
               fullWidth={false}
+              className="max-w-xs md:max-w-sm"
               options={modelCostOptions}
               value={selectedModelCost?.line ?? ''}
               onChange={(event) => setSelectedCostLine(event.target.value)}

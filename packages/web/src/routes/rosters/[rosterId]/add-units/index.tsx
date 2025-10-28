@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
@@ -9,11 +9,16 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import useFaction from '@/hooks/use-faction';
-import { useScrollCollapse } from '@/hooks/use-scroll-collapse';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs } from '@/components/ui';
-import { BackButton, DatasheetBrowser, DatasheetSelectionCard } from '@/components/shared';
+import { PageHeader, Loader, Breadcrumbs, Alert } from '@/components/ui';
+import {
+  BackButton,
+  DatasheetBrowser,
+  DatasheetSelectionCard,
+  DatasheetBrowserSkeleton,
+  RosterHeader
+} from '@/components/shared';
 import SelectionSummary from './_components/selection-summary';
 import type { SelectionGroup } from './_components/selection-summary';
 
@@ -23,7 +28,11 @@ const AddRosterUnitsView: FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
-  const { data: factionData } = useFaction(rosterFactionSlug);
+  const {
+    data: factionData,
+    loading: factionLoading,
+    error: factionError
+  } = useFaction(rosterFactionSlug);
 
   const {
     selectedUnits,
@@ -34,7 +43,7 @@ const AddRosterUnitsView: FC = () => {
     clearSelection
   } = useRosterUnitSelection();
 
-  const { sentinelRef, isAtTop, scrollToTop } = useScrollCollapse();
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
   const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
     const groups = new Map<string, SelectionGroup>();
@@ -74,6 +83,14 @@ const AddRosterUnitsView: FC = () => {
   const showLegends = appState.settings?.showLegends ?? false;
   const showForgeWorld = appState.settings?.showForgeWorld ?? false;
 
+  const hasSelections = selectedUnits.length > 0;
+
+  useEffect(() => {
+    if (selectedUnits.length === 0) {
+      setIsSummaryOpen(false);
+    }
+  }, [selectedUnits.length]);
+
   const datasheetFilters = useMemo(
     () => ({
       showLegends,
@@ -100,23 +117,25 @@ const AddRosterUnitsView: FC = () => {
     showToast({
       type: 'success',
       title: 'Units Added',
-      message: `Added ${selectedUnits.length} unit${selectedUnits.length === 1 ? '' : 's'} to roster`
+      message: `Added ${selectedUnits.length} unit${
+        selectedUnits.length === 1 ? '' : 's'
+      } to roster`
     });
 
     navigate(`/rosters/${roster.id}/edit`);
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
       <BackButton
         to={`/rosters/${roster.id}/edit`}
         label="Back to Roster"
         ariaLabel="Back to Edit Roster"
-        className="md:hidden mb-4"
+        className="md:hidden"
       />
 
       {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block md:mb-4">
+      <div className="hidden md:block">
         <Breadcrumbs
           items={[
             { label: 'Rosters', path: '/rosters' },
@@ -127,37 +146,52 @@ const AddRosterUnitsView: FC = () => {
         />
       </div>
 
-      <PageHeader title="Add Units" subtitle={subtitle} className="mb-4" />
-
-      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
-
-      <SelectionSummary
-        groups={aggregatedSelection}
-        selectedUnitsCount={selectedUnits.length}
-        totalPoints={totalSelectedPoints}
-        onClear={clearSelection}
-        onConfirm={handleAddSelectedUnits}
-        onIncrement={incrementUnit}
-        onDecrement={decrementUnit}
-        isExpanded={isAtTop}
-        className="mb-4"
-        onRequestExpand={scrollToTop}
+      <PageHeader
+        title={roster.name}
+        subtitle={subtitle}
+        stats={<RosterHeader roster={roster} />}
       />
 
-      {/* Units Browser */}
-      <div className="mb-4">
-        <DatasheetBrowser
-          datasheets={factionData?.datasheets ?? []}
-          searchPlaceholder="Search by unit name..."
-          emptyStateMessage="No units available for this faction."
-          filters={datasheetFilters}
-          renderDatasheet={(datasheet) => (
-            <DatasheetSelectionCard
-              datasheet={datasheet}
-              onAdd={incrementUnit}
-              getUnitCount={getUnitCount}
-            />
-          )}
+      <Alert variant="info" title="Add Units">
+        Browse the datasheets below and queue units for your roster. Use the summary drawer to
+        review quantities before confirming your additions.
+      </Alert>
+
+      {factionError ? (
+        <Alert variant="error" title="Unable to load datasheets">
+          {factionError}
+        </Alert>
+      ) : null}
+
+      <div className="flex flex-col gap-4">
+        {factionLoading ? (
+          <DatasheetBrowserSkeleton />
+        ) : (
+          <DatasheetBrowser
+            datasheets={factionData?.datasheets ?? []}
+            searchPlaceholder="Search by unit name..."
+            emptyStateMessage="No units available for this faction."
+            filters={datasheetFilters}
+            renderDatasheet={(datasheet) => (
+              <DatasheetSelectionCard
+                datasheet={datasheet}
+                onAdd={incrementUnit}
+                getUnitCount={getUnitCount}
+              />
+            )}
+          />
+        )}
+
+        <SelectionSummary
+          groups={aggregatedSelection}
+          selectedUnitsCount={selectedUnits.length}
+          totalPoints={totalSelectedPoints}
+          onClear={clearSelection}
+          onConfirm={handleAddSelectedUnits}
+          onIncrement={incrementUnit}
+          onDecrement={decrementUnit}
+          isOpen={isSummaryOpen}
+          onOpenChange={setIsSummaryOpen}
         />
       </div>
     </div>

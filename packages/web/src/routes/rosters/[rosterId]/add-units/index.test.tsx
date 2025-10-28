@@ -168,6 +168,26 @@ describe('AddRosterUnitsPage', () => {
     currentIsAtTop = true;
     mockScrollState.scrollToTop = vi.fn();
     mockScrollState.sentinelRef.current = null;
+    if (!window.matchMedia) {
+      Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockImplementation((query: string) => ({
+          matches: query.includes('min-width: 768px'),
+          media: query,
+          onchange: null,
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn()
+        }))
+      });
+    }
+
+    Object.defineProperty(window.HTMLElement.prototype, 'scrollTo', {
+      writable: true,
+      value: vi.fn()
+    });
     mockUseFaction.mockReturnValue({
       data: null,
       loading: false,
@@ -220,8 +240,9 @@ describe('AddRosterUnitsPage', () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
-    expect(screen.getByText('Add Units')).toBeInTheDocument();
+    expect(screen.getByText('Test Roster')).toBeInTheDocument();
     expect(screen.getByText('Space Marines • Gladius Task Force')).toBeInTheDocument();
+    expect(screen.getByText('Add Units')).toBeInTheDocument();
   });
 
   it('renders page header with back navigation', async () => {
@@ -229,8 +250,9 @@ describe('AddRosterUnitsPage', () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
-    expect(screen.getByTestId('page-header')).toBeInTheDocument();
-    expect(screen.getByText('Add Units')).toBeInTheDocument();
+    const pageHeader = screen.getByTestId('page-header');
+    expect(within(pageHeader).getByText('Test Roster')).toBeInTheDocument();
+    expect(within(pageHeader).getByText('Space Marines • Gladius Task Force')).toBeInTheDocument();
   });
 
   it('renders datasheet browser when faction data is loaded', async () => {
@@ -279,7 +301,7 @@ describe('AddRosterUnitsPage', () => {
     );
   });
 
-  it('renders aggregated selection summary with quantity controls', async () => {
+  it('opens selection summary drawer with quantity controls', async () => {
     const datasheet = createMockDatasheet();
     const rosterUnit = createMockRosterUnit({
       datasheet,
@@ -306,35 +328,34 @@ describe('AddRosterUnitsPage', () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /review selection/i }));
+    });
+
     const summary = await screen.findByTestId('unit-selection-summary');
     const rowTestId = `selection-item-${datasheet.id}-${datasheet.modelCosts[0].line}`;
 
-    expect(
-      within(summary).getByText(`${mockUnitSelection.selectedUnits.length} units selected`)
-    ).toBeInTheDocument();
+    expect(within(summary).getByText('Selection Summary')).toBeInTheDocument();
+    expect(within(summary).getByText('2 units • 160 pts')).toBeInTheDocument();
+
     const summaryRow = await within(summary).findByTestId(rowTestId);
     expect(summaryRow).toHaveTextContent(datasheet.name);
     expect(summaryRow).toHaveTextContent(`${datasheet.modelCosts[0].cost} pts`);
-    expect(within(summary).getByText('Total: 160 pts')).toBeInTheDocument();
 
-    const increaseButton = within(summary).getByLabelText(`Increase ${datasheet.name}`);
-    fireEvent.click(increaseButton);
-
+    fireEvent.click(within(summary).getByLabelText(`Increase ${datasheet.name}`));
     expect(mockUnitSelection.addToSelection).toHaveBeenCalledWith(
       datasheet,
       datasheet.modelCosts[0]
     );
 
-    const decreaseButton = within(summary).getByLabelText(`Decrease ${datasheet.name}`);
-    fireEvent.click(decreaseButton);
-
+    fireEvent.click(within(summary).getByLabelText(`Decrease ${datasheet.name}`));
     expect(mockUnitSelection.removeLatestUnit).toHaveBeenCalledWith(
       datasheet,
       datasheet.modelCosts[0]
     );
   });
 
-  it('hides summary quantity controls when scrolling away from top', async () => {
+  it('keeps summary hidden until review button is clicked', async () => {
     const datasheet = createMockDatasheet();
     const rosterUnit = createMockRosterUnit({
       datasheet,
@@ -357,35 +378,19 @@ describe('AddRosterUnitsPage', () => {
       error: null
     });
 
-    let renderResult!: ReturnType<typeof render>;
     await act(async () => {
-      renderResult = render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
+      render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
+    expect(screen.queryByTestId('unit-selection-summary')).not.toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /review selection/i }));
+    });
+
+    const summary = await screen.findByTestId('unit-selection-summary');
     const rowTestId = `selection-item-${datasheet.id}-${datasheet.modelCosts[0].line}`;
-    const expandedSummary = await screen.findByTestId('unit-selection-summary');
-    expect(await within(expandedSummary).findByTestId(rowTestId)).toBeInTheDocument();
-    expect(
-      within(expandedSummary).getByLabelText(`Increase ${datasheet.name}`)
-    ).toBeInTheDocument();
-
-    currentIsAtTop = false;
-
-    await act(async () => {
-      renderResult!.rerender(<AddRosterUnitsPage />);
-    });
-
-    const collapsedSummary = await screen.findByTestId('unit-selection-summary');
-    expect(within(collapsedSummary).queryByTestId(rowTestId)).not.toBeInTheDocument();
-    expect(within(collapsedSummary).getByText(/click to adjust/i)).toBeInTheDocument();
-
-    const totalButton = within(collapsedSummary).getByRole('button', { name: /total/i });
-
-    await act(async () => {
-      fireEvent.click(totalButton);
-    });
-
-    expect(mockScrollState.scrollToTop).toHaveBeenCalled();
+    expect(await within(summary).findByTestId(rowTestId)).toBeInTheDocument();
   });
 
   it('renders mobile back button', async () => {
@@ -407,10 +412,15 @@ describe('AddRosterUnitsPage', () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
-    const summary = await screen.findByTestId('unit-selection-summary');
+    expect(screen.queryByTestId('unit-selection-summary')).not.toBeInTheDocument();
 
-    expect(within(summary).getByText('1 unit selected')).toBeInTheDocument();
-    expect(within(summary).getByText('Total: 100 pts')).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /review selection/i }));
+    });
+
+    const summary = await screen.findByTestId('unit-selection-summary');
+    expect(within(summary).getByText('Selection Summary')).toBeInTheDocument();
+    expect(within(summary).getByText('1 unit • 100 pts')).toBeInTheDocument();
   });
 
   it('hides unit selection summary when no units selected', async () => {
@@ -420,6 +430,7 @@ describe('AddRosterUnitsPage', () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
     });
 
+    expect(screen.queryByRole('button', { name: /review selection/i })).not.toBeInTheDocument();
     expect(screen.queryByTestId('unit-selection-summary')).not.toBeInTheDocument();
   });
 
