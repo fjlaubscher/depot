@@ -7,6 +7,7 @@ import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { getDataPath, getDataUrl } from '@/utils/paths';
+import { DATA_VERSION } from '@/constants/data-version';
 
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -103,6 +104,30 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
 
       try {
+        try {
+          const storedVersion = await offlineStorage.getDataVersion();
+          if (storedVersion !== DATA_VERSION) {
+            console.info('Resetting offline cache due to data version change', {
+              storedVersion,
+              dataVersion: DATA_VERSION
+            });
+            await offlineStorage.destroy();
+          }
+        } catch (versionError) {
+          console.warn('Failed to verify cached data version, forcing reset.', versionError);
+          try {
+            await offlineStorage.destroy();
+          } catch (destroyError) {
+            console.error('Failed to reset offline storage.', destroyError);
+          }
+        }
+
+        try {
+          await offlineStorage.setDataVersion(DATA_VERSION);
+        } catch (persistError) {
+          console.warn('Failed to persist data version marker.', persistError);
+        }
+
         // Try IndexedDB first for index
         let index = await offlineStorage.getFactionIndex();
 

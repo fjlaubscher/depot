@@ -19,7 +19,7 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
       data-testid="link-card"
       {...rest}
     >
-      <Card className="dark:bg-gray-800 dark:border-gray-700 h-full">
+      <Card interactive className="h-full">
         <div className="flex items-center justify-between gap-2">
           <div className="text-gray-900 dark:text-gray-100 font-medium">{children}</div>
           <ChevronRight className="text-hint flex-shrink-0" size={20} />

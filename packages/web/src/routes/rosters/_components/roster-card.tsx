@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
-import { Trash2, Eye } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import { Card, ActionGroup, PointsTag } from '@/components/ui';
 
 interface RosterCardProps {
@@ -17,7 +17,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
     navigate(`/rosters/${roster.id}`);
   };
 
-  const handleCardClick = () => {
+  const handleEdit = () => {
     navigate(`/rosters/${roster.id}/edit`);
   };
 
@@ -42,7 +42,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
   };
 
   return (
-    <Card className="relative cursor-pointer" onClick={handleCardClick} data-testid="roster-card">
+    <Card className="relative cursor-pointer" onClick={handleView} data-testid="roster-card">
       <div className="flex flex-col gap-3">
         {/* Title row - full width */}
         <div>
@@ -62,12 +62,12 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
           <ActionGroup
             actions={[
               {
-                icon: <Eye size={16} />,
+                icon: <Pencil size={16} />,
                 onClick: (e) => {
                   e.stopPropagation();
-                  handleView();
+                  handleEdit();
                 },
-                ariaLabel: 'View roster',
+                ariaLabel: 'Edit roster',
                 variant: 'primary'
               },
               {

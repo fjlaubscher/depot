@@ -53,11 +53,10 @@ const Home: React.FC = () => {
     <AppLayout title="Home">
       <div className="flex flex-col gap-12">
         <Alert title="Heads up!" variant="warning">
-          The current Wahapedia exports (as of 2025-10-29) do not include wargear for all
-          datasheets.
+          Wahapedia&apos;s latest export (2025-10-29) is missing wargear for some datasheets.
           <br />
-          Existing rosters on your device should still work as expected, but new rosters will not
-          include wargear information until Wahapedia has updated its exports.
+          Your existing rosters keep their wargear, but freshly generated ones will be missing those
+          entries until Wahapedia publishes an updated dump.
         </Alert>
 
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">

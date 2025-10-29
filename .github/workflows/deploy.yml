@@ -40,6 +40,9 @@ jobs:
           cache: 'pnpm'
       - name: Configure base path
         run: echo "VITE_APP_BASE_PATH=/depot/" >> $GITHUB_ENV
+
+      - name: Stamp data version
+        run: echo "VITE_DATA_VERSION=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
       
       - name: Configure Sentry environment variables
         run: |

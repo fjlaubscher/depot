@@ -18,7 +18,8 @@ const STORES = {
 const KEYS = {
   INDEX: 'index',
   SETTINGS: 'settings',
-  MY_FACTIONS: 'my-factions'
+  MY_FACTIONS: 'my-factions',
+  DATA_VERSION: 'data-version'
 } as const;
 
 const normalizeRoster = (roster: depot.Roster): depot.Roster => {
@@ -294,6 +295,40 @@ class OfflineStorage {
       });
     } catch (error) {
       console.error('Failed to set my factions in IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async getDataVersion(): Promise<string | null> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.USER_DATA], 'readonly');
+      const store = transaction.objectStore(STORES.USER_DATA);
+
+      return new Promise((resolve, reject) => {
+        const request = store.get(KEYS.DATA_VERSION);
+        request.onsuccess = () => resolve((request.result as string | undefined) ?? null);
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to get data version from IndexedDB:', error);
+      return null;
+    }
+  }
+
+  async setDataVersion(version: string): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.USER_DATA], 'readwrite');
+      const store = transaction.objectStore(STORES.USER_DATA);
+
+      return new Promise((resolve, reject) => {
+        const request = store.put(version, KEYS.DATA_VERSION);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to set data version in IndexedDB:', error);
       throw error;
     }
   }

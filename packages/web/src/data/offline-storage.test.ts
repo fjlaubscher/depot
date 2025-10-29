@@ -370,6 +370,69 @@ describe('OfflineStorage', () => {
     });
   });
 
+  describe('data version operations', () => {
+    it('should retrieve stored data version', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          request.result = 'legacy-version';
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const version = await offlineStorage.getDataVersion();
+
+      expect(version).toBe('legacy-version');
+      expect(mockObjectStore.get).toHaveBeenCalledWith('data-version');
+    });
+
+    it('should return null when data version is not set', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          request.result = undefined;
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const version = await offlineStorage.getDataVersion();
+
+      expect(version).toBeNull();
+    });
+
+    it('should persist data version marker', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.setDataVersion('next-version')).resolves.toBeUndefined();
+      expect(mockObjectStore.put).toHaveBeenCalledWith('next-version', 'data-version');
+    });
+
+    it('should handle data version retrieval errors gracefully', async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockTransaction.objectStore.mockImplementation(() => {
+        throw new Error('Read failure');
+      });
+
+      const version = await offlineStorage.getDataVersion();
+      expect(version).toBeNull();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to get data version from IndexedDB:',
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+      mockTransaction.objectStore.mockImplementation(() => mockObjectStore);
+    });
+  });
+
   describe('destroy', () => {
     it('should delete the database', async () => {
       mockIndexedDB.deleteDatabase.mockImplementation(() => {

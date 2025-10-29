@@ -5,6 +5,7 @@ import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
 import type { depot } from '@depot/core';
 import { DEFAULT_SETTINGS } from '@/constants/settings';
+import { DATA_VERSION } from '@/constants/data-version';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -19,6 +20,8 @@ const mockOfflineStorage = vi.hoisted(() => ({
   setMyFactions: vi.fn(),
   clearFactionData: vi.fn(),
   clearAllData: vi.fn(),
+  getDataVersion: vi.fn(),
+  setDataVersion: vi.fn(),
   destroy: vi.fn(),
   isDataStale: vi.fn()
 }));
@@ -163,6 +166,9 @@ describe('AppProvider with IndexedDB Integration', () => {
     mockOfflineStorage.setMyFactions.mockResolvedValue(undefined);
     mockOfflineStorage.clearFactionData.mockResolvedValue(undefined);
     mockOfflineStorage.clearAllData.mockResolvedValue(undefined);
+    mockOfflineStorage.getDataVersion.mockResolvedValue(DATA_VERSION);
+    mockOfflineStorage.setDataVersion.mockResolvedValue(undefined);
+    mockOfflineStorage.destroy.mockResolvedValue(undefined);
 
     // Mock fetch for network requests
     (global.fetch as any).mockResolvedValue({
@@ -247,6 +253,22 @@ describe('AppProvider with IndexedDB Integration', () => {
       });
 
       expect(mockOfflineStorage.getAllCachedFactions).toHaveBeenCalled();
+    });
+
+    it('should reset offline storage when data version changes', async () => {
+      mockOfflineStorage.getDataVersion.mockResolvedValue('legacy-version');
+      mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+
+      render(
+        <AppProvider>
+          <TestComponent />
+        </AppProvider>
+      );
+
+      await waitFor(() => {
+        expect(mockOfflineStorage.destroy).toHaveBeenCalledTimes(1);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+      });
     });
   });
 
