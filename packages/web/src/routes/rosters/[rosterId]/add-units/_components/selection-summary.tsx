@@ -183,7 +183,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
             aria-modal="true"
             aria-labelledby={desktopDrawerTitleId}
             padding="md"
-            className="flex h-full flex-col gap-4 rounded-r-none border-info surface-info shadow-xl"
+            className="flex h-full flex-col gap-4 rounded-r-none shadow-xl"
             data-testid="unit-selection-summary"
           >
             <div className="flex items-start justify-between gap-4">
