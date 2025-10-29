@@ -18,18 +18,13 @@ export const UnitSelectionSummary: FC<UnitSelectionSummaryProps> = ({
   return (
     <>
       {/* Desktop Summary */}
-      <Card
-        padding="sm"
-        className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
-      >
+      <Card padding="sm" className="surface-info border-info">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-blue-900 dark:text-blue-100">
+            <p className="font-medium text-info-strong">
               {selectedUnits.length} unit{selectedUnits.length === 1 ? '' : 's'} selected
             </p>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Total: {totalSelectedPoints} pts
-            </p>
+            <p className="text-sm text-info">Total: {totalSelectedPoints} pts</p>
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="secondary" onClick={onClearSelection}>

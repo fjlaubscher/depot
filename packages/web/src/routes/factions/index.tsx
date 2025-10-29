@@ -80,9 +80,7 @@ const Factions: React.FC = () => {
           </div>
         ) : debouncedQuery ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">
-              No factions found matching "{debouncedQuery}"
-            </p>
+            <p className="text-subtle">No factions found matching "{debouncedQuery}"</p>
           </div>
         ) : null}
       </div>

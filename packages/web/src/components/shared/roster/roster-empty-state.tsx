@@ -12,8 +12,8 @@ const RosterEmptyState: FC<RosterEmptyStateProps> = ({ title, description, dataT
     data-testid={dataTestId}
   >
     <div className="flex flex-col gap-2">
-      <p className="text-gray-500 dark:text-gray-400 text-lg">{title}</p>
-      <p className="text-gray-400 dark:text-gray-500 text-sm">{description}</p>
+      <p className="text-subtle text-lg">{title}</p>
+      <p className="text-hint text-sm">{description}</p>
     </div>
   </div>
 );

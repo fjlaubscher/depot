@@ -40,7 +40,7 @@ const WargearRow = ({
         data-testid={`wargear-checkbox-${weapon.name.replace(/\s+/g, '-').toLowerCase()}`}
       />
     ) : undefined,
-    name: <div className="font-medium text-gray-900 dark:text-white">{weapon.name}</div>,
+    name: <div className="font-medium text-foreground">{weapon.name}</div>,
     range: isRanged && weapon.range ? `${weapon.range}"` : '–',
     a: weapon.a || '–',
     skill: weapon.bsWs === 'N/A' ? weapon.bsWs : `${weapon.bsWs}+`,

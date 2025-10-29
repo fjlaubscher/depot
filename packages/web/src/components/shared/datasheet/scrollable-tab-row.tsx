@@ -85,9 +85,7 @@ const ScrollableTabRow: FC<ScrollableTabRowProps> = ({
       {...restContainerProps}
       className={classNames('flex flex-col gap-2', className, containerClassName)}
     >
-      {label ? (
-        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{label}</span>
-      ) : null}
+      {label ? <span className="text-sm font-medium text-secondary">{label}</span> : null}
 
       <div className="relative">
         <div
@@ -133,9 +131,7 @@ const ScrollableTabRow: FC<ScrollableTabRowProps> = ({
         </button>
       </div>
 
-      {description ? (
-        <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>
-      ) : null}
+      {description ? <span className="text-xs text-subtle">{description}</span> : null}
     </div>
   );
 };

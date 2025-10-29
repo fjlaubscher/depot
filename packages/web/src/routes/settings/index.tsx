@@ -124,10 +124,8 @@ const Settings = () => {
                   <>
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          Cached Factions
-                        </span>
-                        <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">
+                        <span className="text-sm font-medium text-foreground">Cached Factions</span>
+                        <span className="text-xs surface-success-strong text-success-strong px-2 py-1 rounded-full">
                           {state.offlineFactions.length}
                         </span>
                       </div>
@@ -136,7 +134,7 @@ const Settings = () => {
                         {state.offlineFactions.slice(0, 4).map((f) => (
                           <div
                             key={`faction-${f.id}`}
-                            className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded px-3"
+                            className="flex items-center gap-2 text-sm text-body surface-soft rounded px-3"
                           >
                             <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
                             <span className="truncate">{f.name}</span>
@@ -144,7 +142,7 @@ const Settings = () => {
                         ))}
                         {state.offlineFactions.length > 4 && (
                           <div className="text-center">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                            <span className="text-xs text-subtle">
                               +{state.offlineFactions.length - 4} more factions cached
                             </span>
                           </div>
@@ -157,10 +155,8 @@ const Settings = () => {
                   </>
                 ) : (
                   <div className="text-center py-6">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      No offline data cached
-                    </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500">
+                    <div className="text-sm text-subtle">No offline data cached</div>
+                    <div className="text-xs text-hint">
                       Visit faction pages to cache data offline
                     </div>
                   </div>

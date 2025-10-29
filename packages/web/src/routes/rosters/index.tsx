@@ -91,7 +91,7 @@ const Rosters: React.FC = () => {
             data-testid="empty-state"
             className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
           >
-            <p className="text-gray-500 dark:text-gray-400">You haven't created any rosters yet.</p>
+            <p className="text-subtle">You haven't created any rosters yet.</p>
           </div>
         ) : (
           <div

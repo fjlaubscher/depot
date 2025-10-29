@@ -24,7 +24,7 @@ const TableHeader: FC<HTMLAttributes<HTMLTableSectionElement>> = ({
   children,
   ...props
 }) => (
-  <thead className={classNames('bg-gray-50 dark:bg-gray-800', className)} {...props}>
+  <thead className={classNames('surface-soft', className)} {...props}>
     {children}
   </thead>
 );
@@ -58,7 +58,7 @@ const TableHead: FC<ThHTMLAttributes<HTMLTableHeaderCellElement>> = ({
 }) => (
   <th
     className={classNames(
-      'px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
+      'px-3 py-3 text-left text-xs font-medium text-subtle uppercase tracking-wider',
       className
     )}
     scope="col"

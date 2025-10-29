@@ -136,9 +136,7 @@ const DatasheetPage: FC = () => {
         />
 
         {settings?.showFluff ? (
-          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
-            {datasheet.legend}
-          </p>
+          <p className="text-sm text-muted font-medium italic">{datasheet.legend}</p>
         ) : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>

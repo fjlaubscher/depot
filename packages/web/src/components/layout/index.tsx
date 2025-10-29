@@ -23,35 +23,19 @@ const AppLayout = ({ children, title }: Props) => {
   const sidebar = (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Link
-          to="/"
-          onClick={closeSidebar}
-          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-        >
+        <Link to="/" onClick={closeSidebar} className="sidebar-item">
           <Home size={16} />
           <span>Home</span>
         </Link>
-        <Link
-          to="/factions"
-          onClick={closeSidebar}
-          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-        >
+        <Link to="/factions" onClick={closeSidebar} className="sidebar-item">
           <Users size={16} />
           <span>Factions</span>
         </Link>
-        <Link
-          to="/rosters"
-          onClick={closeSidebar}
-          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-        >
+        <Link to="/rosters" onClick={closeSidebar} className="sidebar-item">
           <List size={16} />
           <span>Rosters</span>
         </Link>
-        <Link
-          to="/settings"
-          onClick={closeSidebar}
-          className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-        >
+        <Link to="/settings" onClick={closeSidebar} className="sidebar-item">
           <Settings size={16} />
           <span>Settings</span>
         </Link>
@@ -64,7 +48,7 @@ const AppLayout = ({ children, title }: Props) => {
           <div className="space-y-2">
             <button
               onClick={() => setIsMyFactionsExpanded(!isMyFactionsExpanded)}
-              className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              className="sidebar-item w-full justify-between font-medium text-foreground"
             >
               <span>My Factions</span>
               {isMyFactionsExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
@@ -77,7 +61,7 @@ const AppLayout = ({ children, title }: Props) => {
                     key={faction.slug}
                     to={`/faction/${faction.slug}`}
                     onClick={closeSidebar}
-                    className="flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="sidebar-sub-item"
                   >
                     <Star size={12} className="text-yellow-500 fill-current" />
                     <span>{faction.name}</span>
@@ -89,16 +73,12 @@ const AppLayout = ({ children, title }: Props) => {
         </>
       )}
 
-      <div className="pt-4 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex flex-col gap-2">
+      <div className="pt-4 border-t border-subtle text-xs text-subtle flex flex-col gap-2">
         <span>
-          <span className="font-semibold text-gray-600 dark:text-gray-300">depot </span>
+          <span className="font-semibold text-muted">depot </span>
           <span>v{appVersion}</span>
         </span>
-        <Link
-          to="/privacy"
-          onClick={closeSidebar}
-          className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 underline"
-        >
+        <Link to="/privacy" onClick={closeSidebar} className="link-subtle">
           Privacy Policy
         </Link>
       </div>

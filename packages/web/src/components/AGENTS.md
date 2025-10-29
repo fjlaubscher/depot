@@ -11,6 +11,7 @@ Fundamental building blocks with no business logic:
 - Accessible by default
 - TypeScript interfaces
 - **Exported via**: `@/components/ui` index file
+- Styling should lean on shared utilities from `src/styles/main.css` (`text-foreground`, `surface-card`, `focus-ring-*`, status tokens like `surface-success-strong`) before reaching for raw Tailwind colour classes.
 
 Key components: `Button`, `Card`, `Alert`, `Table`, `Toast`, `Layout`, `Search`, `Filters`, `Tag`, `SelectField`, `QuantityStepper`, `CollapsibleSection`, `ContentCard`, `DashboardCard`, `ErrorState`, `Field`, `Grid`, `IconButton`, `LinkCard`, `Loader`, `PageHeader`, `PointsTag`, `Skeleton`, `StatCard`, `StatsRow`, `Tabs`, `ToastContainer`, `ToggleSwitch`.
 

@@ -15,35 +15,35 @@ const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
   const typeConfig = {
     success: {
       icon: <Check size={16} />,
-      bgColor: 'bg-green-50 dark:bg-green-800',
-      borderColor: 'border-green-200 dark:border-green-700',
-      iconColor: 'text-green-500 dark:text-green-400',
-      titleColor: 'text-green-800 dark:text-green-100',
-      messageColor: 'text-green-700 dark:text-green-200'
+      bgColor: 'surface-success',
+      borderColor: 'border-success',
+      iconColor: 'text-success',
+      titleColor: 'text-success-strong',
+      messageColor: 'text-success'
     },
     error: {
       icon: <AlertCircle size={16} />,
-      bgColor: 'bg-red-50 dark:bg-red-800',
-      borderColor: 'border-red-200 dark:border-red-700',
-      iconColor: 'text-red-500 dark:text-red-400',
-      titleColor: 'text-red-800 dark:text-red-100',
-      messageColor: 'text-red-700 dark:text-red-200'
+      bgColor: 'surface-danger',
+      borderColor: 'border-danger',
+      iconColor: 'text-danger',
+      titleColor: 'text-danger-strong',
+      messageColor: 'text-danger'
     },
     warning: {
       icon: <AlertTriangle size={16} />,
-      bgColor: 'bg-yellow-50 dark:bg-yellow-800',
-      borderColor: 'border-yellow-200 dark:border-yellow-700',
-      iconColor: 'text-yellow-500 dark:text-yellow-400',
-      titleColor: 'text-yellow-800 dark:text-yellow-100',
-      messageColor: 'text-yellow-700 dark:text-yellow-200'
+      bgColor: 'surface-warning',
+      borderColor: 'border-warning',
+      iconColor: 'text-warning',
+      titleColor: 'text-warning-strong',
+      messageColor: 'text-warning'
     },
     info: {
       icon: <Info size={16} />,
-      bgColor: 'bg-blue-50 dark:bg-blue-800',
-      borderColor: 'border-blue-200 dark:border-blue-700',
-      iconColor: 'text-blue-500 dark:text-blue-400',
-      titleColor: 'text-blue-800 dark:text-blue-100',
-      messageColor: 'text-blue-700 dark:text-blue-200'
+      bgColor: 'surface-info',
+      borderColor: 'border-info',
+      iconColor: 'text-info',
+      titleColor: 'text-info-strong',
+      messageColor: 'text-info'
     }
   };
 

@@ -215,10 +215,8 @@ const EditRosterUnitView: React.FC = () => {
         {unit.datasheet.modelCosts.length > 1 && (
           <Card data-testid="model-cost-section">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Unit Size</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Choose the number of models for this unit
-              </p>
+              <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
+              <p className="text-sm text-muted">Choose the number of models for this unit</p>
               <ModelCostSelection
                 unit={unit}
                 selectedModelCost={selectedModelCost || unit.modelCost}
@@ -255,10 +253,8 @@ const EditRosterUnitView: React.FC = () => {
         {/* Wargear Selection */}
         <Card data-testid="wargear-section">
           <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Wargear</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Select wargear options for this unit
-            </p>
+            <h3 className="text-lg font-semibold text-foreground">Wargear</h3>
+            <p className="text-sm text-muted">Select wargear options for this unit</p>
             <WargearSelectionContainer
               unit={unit}
               selectedWargear={selectedWargear}
@@ -271,10 +267,8 @@ const EditRosterUnitView: React.FC = () => {
         {isCharacter && (
           <Card data-testid="enhancement-section">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Enhancements</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Select enhancements for this character
-              </p>
+              <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
+              <p className="text-sm text-muted">Select enhancements for this character</p>
               <EnhancementSelection
                 unit={unit}
                 roster={roster}
@@ -289,10 +283,8 @@ const EditRosterUnitView: React.FC = () => {
         {isCharacter && (
           <Card data-testid="warlord-section">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Warlord</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Nominate this character as your warlord
-              </p>
+              <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
+              <p className="text-sm text-muted">Nominate this character as your warlord</p>
               <WarlordSelection
                 unit={unit}
                 roster={roster}

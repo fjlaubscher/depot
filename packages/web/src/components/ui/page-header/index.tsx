@@ -37,8 +37,8 @@ const PageHeader: FC<PageHeaderProps> = ({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1 flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
-          {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
 
         {action && (

@@ -30,7 +30,7 @@ const WargearSelectionContainer: React.FC<WargearSelectionContainerProps> = ({
   if (!hasWargear) {
     return (
       <div className="text-center py-8" data-testid="no-wargear-available">
-        <p className="text-gray-500 dark:text-gray-400">No wargear available for this unit.</p>
+        <p className="text-subtle">No wargear available for this unit.</p>
       </div>
     );
   }

@@ -28,7 +28,7 @@ const Tabs: FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, 
 
   return (
     <div className={classNames('w-full flex flex-col gap-4', className)} {...props}>
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-subtle">
         <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (
             <button
@@ -39,7 +39,7 @@ const Tabs: FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, 
                 {
                   'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400':
                     activeTab === index,
-                  'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600':
+                  'border-transparent text-subtle hover:text-foreground hover:border-subtle':
                     activeTab !== index
                 }
               )}

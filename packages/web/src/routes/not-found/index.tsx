@@ -21,22 +21,15 @@ const NotFound: React.FC = () => {
             {/* Large 404 Display */}
             <div className="space-y-2">
               <div className="text-6xl font-bold text-gray-300 dark:text-gray-600">404</div>
-              <Search
-                size={64}
-                className="mx-auto text-gray-400 dark:text-gray-500"
-                data-testid="not-found-icon"
-              />
+              <Search size={64} className="mx-auto text-hint" data-testid="not-found-icon" />
             </div>
 
             {/* Error Message */}
             <div className="space-y-2">
-              <h2
-                className="text-xl font-semibold text-gray-900 dark:text-white"
-                data-testid="page-heading"
-              >
+              <h2 className="text-xl font-semibold text-foreground" data-testid="page-heading">
                 Page Not Found
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-muted">
                 The page you're looking for has been moved, deleted, or doesn't exist.
               </p>
             </div>

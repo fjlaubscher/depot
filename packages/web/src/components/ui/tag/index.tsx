@@ -13,9 +13,9 @@ const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, childr
     default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
     primary: 'bg-primary-100 text-primary-600 dark:bg-primary-700 dark:text-white',
     secondary: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    success: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    danger: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+    success: 'surface-success-strong text-success-strong',
+    warning: 'surface-warning-strong text-warning-strong',
+    danger: 'surface-danger-strong text-danger-strong'
   };
 
   const sizeClasses = {
@@ -74,10 +74,8 @@ const TagSection: FC<TagSectionProps> = ({
   return (
     <section className={classNames('flex flex-col gap-2', className)} {...props}>
       <div className="flex flex-col">
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">{title}</span>
-        {description ? (
-          <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
-        ) : null}
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+        {description ? <p className="text-xs text-subtle">{description}</p> : null}
       </div>
 
       <TagGroup spacing={spacing} className={groupClassName}>

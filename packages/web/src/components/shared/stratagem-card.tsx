@@ -16,7 +16,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
     <Card className="p-4 h-full">
       <div className="flex flex-col gap-2 h-full">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-gray-900 dark:text-white capitalize text-sm leading-tight">
+          <h3 className="font-semibold text-foreground capitalize text-sm leading-tight">
             {stratagem.name.toLowerCase()}
           </h3>
           <Tag variant="primary" size="sm">
@@ -25,9 +25,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
         </div>
 
         {showFluff && stratagem.legend ? (
-          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
-            {stratagem.legend}
-          </div>
+          <div className="text-sm text-muted font-medium italic">{stratagem.legend}</div>
         ) : null}
 
         <div className="text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-300">
@@ -35,7 +33,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
         </div>
 
         <div
-          className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+          className="text-sm text-body leading-relaxed"
           dangerouslySetInnerHTML={{ __html: stratagem.description }}
         />
       </div>

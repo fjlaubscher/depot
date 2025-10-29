@@ -7,7 +7,7 @@ import { getImageUrl } from '@/utils/paths';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Card, Grid, Button } from '@/components/ui';
+import { Card, Grid, Button, Alert } from '@/components/ui';
 
 // Custom hooks
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -52,6 +52,14 @@ const Home: React.FC = () => {
   return (
     <AppLayout title="Home">
       <div className="flex flex-col gap-12">
+        <Alert title="Heads up!" variant="warning">
+          The current Wahapedia exports (as of 2025-10-29) do not include wargear for all
+          datasheets.
+          <br />
+          Existing rosters on your device should still work as expected, but new rosters will not
+          include wargear information until Wahapedia has updated its exports.
+        </Alert>
+
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
           <img
             src={getImageUrl('depot-hero.jpg')}
@@ -140,7 +148,7 @@ const Home: React.FC = () => {
                       {title}
                     </h3>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-secondary">
                     {description}{' '}
                     {link && linkLabel && (
                       <a
@@ -166,9 +174,7 @@ const Home: React.FC = () => {
               <span className="text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400">
                 Jump back in
               </span>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Your factions, one tap away
-              </h2>
+              <h2 className="text-xl font-semibold text-foreground">Your factions, one tap away</h2>
             </div>
             <Grid cols={1} className="md:grid-cols-2 lg:grid-cols-3">
               {state.myFactions?.slice(0, 6).map((faction) => (
@@ -177,12 +183,8 @@ const Home: React.FC = () => {
                     to={`/faction/${faction.slug}`}
                     className="block p-4 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
                   >
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                      {faction.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      View datasheets and rules
-                    </p>
+                    <h3 className="text-lg font-medium text-foreground">{faction.name}</h3>
+                    <p className="text-sm text-muted">View datasheets and rules</p>
                   </Link>
                 </Card>
               ))}
@@ -191,7 +193,7 @@ const Home: React.FC = () => {
         )}
 
         <section className="flex flex-col items-center gap-2 py-6 text-center">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-subtle">
             Data sourced from{' '}
             <a
               href="https://wahapedia.ru"

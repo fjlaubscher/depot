@@ -73,9 +73,9 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
   return (
     <section className="flex flex-col gap-2" data-testid="datasheet-leader-rules">
       <div className="flex flex-col">
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">Leader</span>
+        <span className="text-sm font-semibold text-foreground">Leader</span>
         <div
-          className="text-xs text-gray-700 dark:text-gray-300 [&_p]:m-0"
+          className="text-xs text-body [&_p]:m-0"
           dangerouslySetInnerHTML={{ __html: leaderHead }}
         />
       </div>
@@ -83,11 +83,7 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
       {leaderTargets.length ? (
         <ul className="list-disc pl-5">
           {leaderTargets.map((target) => (
-            <li
-              key={target.key}
-              className="text-sm text-gray-700 dark:text-gray-300"
-              data-testid="leader-target"
-            >
+            <li key={target.key} className="text-sm text-body" data-testid="leader-target">
               {target.path ? (
                 <Link
                   to={target.path}
@@ -105,7 +101,7 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
 
       {leaderFooter?.trim() ? (
         <div
-          className="text-xs text-gray-700 dark:text-gray-300 [&_p]:m-0"
+          className="text-xs text-body [&_p]:m-0"
           dangerouslySetInnerHTML={{ __html: leaderFooter }}
         />
       ) : null}

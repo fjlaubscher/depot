@@ -23,13 +23,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
         <div className="flex items-center gap-4">
           {icon}
           <div className="flex-1">
-            <h3
-              className="text-lg font-semibold text-gray-900 dark:text-white"
-              data-testid={titleTestId}
-            >
+            <h3 className="text-lg font-semibold text-foreground" data-testid={titleTestId}>
               {title}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+            <p className="text-sm text-muted">{description}</p>
           </div>
           {action && <div className="lg:hidden">{action}</div>}
         </div>

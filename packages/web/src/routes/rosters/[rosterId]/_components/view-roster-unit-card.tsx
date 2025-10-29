@@ -12,7 +12,7 @@ const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const actions = (
-    <div className="text-gray-400 dark:text-gray-500 cursor-pointer">
+    <div className="text-hint cursor-pointer">
       {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
     </div>
   );

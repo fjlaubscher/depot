@@ -12,11 +12,9 @@ const StatsRow: FC<StatsRowProps> = ({ title, subtitle, children, variant = 'def
 
   return (
     <div className={`flex flex-col ${gap}`}>
-      <div className={`flex ${gap} items-center text-sm font-medium text-gray-900 dark:text-white`}>
+      <div className={`flex ${gap} items-center text-sm font-medium text-foreground`}>
         {title}
-        {subtitle && (
-          <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">[{subtitle}]</span>
-        )}
+        {subtitle && <span className="text-xs text-subtle capitalize">[{subtitle}]</span>}
       </div>
       <div className={`flex ${gap}`}>{children}</div>
     </div>

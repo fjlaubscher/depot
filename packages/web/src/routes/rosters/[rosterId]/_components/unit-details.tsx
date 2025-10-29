@@ -17,7 +17,7 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
   const models = unit.datasheet.models;
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="border-t border-subtle surface-muted p-4">
       <div className="flex flex-col gap-2">
         {/* Models Section */}
         {models.length > 0 && (
@@ -47,7 +47,7 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
         />
 
         {/* Quick Link to Full Datasheet */}
-        <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+        <div className="pt-2 border-t border-subtle">
           <Link
             to={`/faction/${unit.datasheet.factionSlug}/datasheet/${
               unit.datasheetSlug ?? unit.datasheet.slug

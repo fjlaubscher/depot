@@ -57,10 +57,8 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
           className="flex items-center justify-between gap-2"
         >
           <div className="flex flex-col gap-1">
-            <span className="font-medium text-blue-900 dark:text-blue-100">{datasheet.name}</span>
-            <span className="text-sm text-blue-700 dark:text-blue-300">
-              {subtitleParts.join(' • ')}
-            </span>
+            <span className="font-medium text-info-strong">{datasheet.name}</span>
+            <span className="text-sm text-info">{subtitleParts.join(' • ')}</span>
           </div>
           <QuantityStepper
             size="sm"
@@ -163,7 +161,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
         <button
           ref={triggerButtonRef}
           type="button"
-          className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-2xl bg-primary-500 px-4 py-4 text-white shadow-lg shadow-primary-900/30 transition hover:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-200 md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-full md:px-5 md:py-3 md:text-sm dark:bg-primary-600 dark:hover:bg-primary-500 dark:focus-visible:outline-primary-300"
+          className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-2xl bg-primary-500 px-4 py-4 text-white shadow-lg shadow-primary-900/30 transition hover:bg-primary-600 focus-ring-primary md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-full md:px-5 md:py-3 md:text-sm dark:bg-primary-600 dark:hover:bg-primary-500"
           onClick={openSummary}
         >
           <span className="flex flex-col text-left md:flex-row md:items-center md:gap-2">
@@ -185,7 +183,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
             aria-modal="true"
             aria-labelledby={desktopDrawerTitleId}
             padding="md"
-            className="flex h-full flex-col gap-4 rounded-r-none border-blue-200 bg-blue-50 shadow-xl dark:border-blue-800 dark:bg-blue-900/20"
+            className="flex h-full flex-col gap-4 rounded-r-none border-info surface-info shadow-xl"
             data-testid="unit-selection-summary"
           >
             <div className="flex items-start justify-between gap-4">
@@ -196,14 +194,14 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
                 >
                   Selection Summary
                 </h2>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
+                <p className="text-sm text-info">
                   {selectedUnitsCount} unit{selectedUnitsCount === 1 ? '' : 's'} • {totalPoints} pts
                 </p>
               </div>
               <button
                 ref={desktopCloseButtonRef}
                 type="button"
-                className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-100 focus-ring-info dark:text-blue-200 dark:hover:bg-blue-900/30"
                 onClick={closeSummary}
               >
                 Close
@@ -215,9 +213,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Total: {totalPoints} pts
-              </span>
+              <span className="text-sm font-medium text-info-strong">Total: {totalPoints} pts</span>
               <div className="flex gap-2">
                 <Button size="sm" variant="secondary" onClick={onClear}>
                   Clear
@@ -252,7 +248,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
                 <button
                   ref={mobileCloseButtonRef}
                   type="button"
-                  className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 dark:text-blue-200 dark:hover:bg-blue-900/30"
+                  className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-blue-700 transition hover:bg-blue-50 focus-ring-info dark:text-blue-200 dark:hover:bg-blue-900/30"
                   onClick={closeSummary}
                 >
                   Close
@@ -268,7 +264,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
               </div>
 
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-between">
-                <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                <span className="text-sm font-medium text-info-strong">
                   Total: {totalPoints} pts
                 </span>
 

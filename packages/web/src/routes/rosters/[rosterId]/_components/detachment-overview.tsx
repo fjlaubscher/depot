@@ -35,15 +35,13 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
   }, [rosterEnhancements, unitLookup]);
 
   const renderEmpty = (label: string) => (
-    <p className="text-sm text-gray-500 dark:text-gray-400">
-      No {label} available for this detachment.
-    </p>
+    <p className="text-sm text-subtle">No {label} available for this detachment.</p>
   );
 
   return (
     <div className="flex flex-col gap-4" data-testid="detachment-overview">
       <section className="flex flex-col gap-2" data-testid="detachment-abilities-section">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
           Detachment Abilities
         </h3>
         {sortedAbilities.length > 0 ? (
@@ -59,7 +57,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
 
       {selectedEnhancements.length > 0 ? (
         <section className="flex flex-col gap-2" data-testid="detachment-enhancements-section">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
             Selected Enhancements
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
@@ -70,9 +68,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
               >
                 <EnhancementCard enhancement={enhancement} />
                 {unitName ? (
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Assigned to {unitName}
-                  </span>
+                  <span className="text-xs text-subtle">Assigned to {unitName}</span>
                 ) : null}
               </div>
             ))}
@@ -81,9 +77,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
       ) : null}
 
       <section className="flex flex-col gap-2" data-testid="detachment-stratagems-section">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
-          Stratagems
-        </h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-body">Stratagems</h3>
         {sortedStratagems.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2">
             {sortedStratagems.map((stratagem) => (

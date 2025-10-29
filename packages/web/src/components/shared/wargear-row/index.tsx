@@ -13,7 +13,7 @@ const WargearRow: React.FC<WargearRowProps> = ({ name, range, keywords, children
     <div className="flex flex-col gap-2">
       {/* Weapon name and range */}
       <div className="flex flex-col gap-1">
-        <div className="flex justify-between items-center text-sm font-medium text-gray-900 dark:text-white">
+        <div className="flex justify-between items-center text-sm font-medium text-foreground">
           <span className="font-bold">{name}</span>
           {range && (
             <span className="text-xs font-medium text-primary-600 dark:text-primary-400">

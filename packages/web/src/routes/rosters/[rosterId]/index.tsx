@@ -151,7 +151,7 @@ const RosterView: FC = () => {
             </Button>
           )}
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-subtle">
           Exports and sharing follow your Settings preferences (wargear visibility, sharing method).
         </p>
       </div>

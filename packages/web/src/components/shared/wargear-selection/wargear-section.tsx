@@ -28,7 +28,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
       className="flex flex-col gap-3"
       data-testid={`${title.toLowerCase().replace(/\s+/g, '-')}-section`}
     >
-      <h4 className="text-base font-semibold text-gray-900 dark:text-white">{title}</h4>
+      <h4 className="text-base font-semibold text-foreground">{title}</h4>
       <div className="flex flex-col gap-2">
         {wargear.map((weapon) => {
           const rowData = WargearRow({
@@ -58,12 +58,10 @@ const WargearSection: React.FC<WargearSectionProps> = ({
             >
               {showSelectionColumn && <div className="flex-shrink-0">{rowData.selected}</div>}
               <div className="flex-grow flex flex-col gap-1">
-                <div className="font-medium text-gray-900 dark:text-white capitalize">
-                  {rowData.name}
-                </div>
+                <div className="font-medium text-foreground capitalize">{rowData.name}</div>
                 {!isSimplified && (
                   <div
-                    className={`grid gap-2 text-xs text-gray-500 dark:text-gray-400 ${isRanged ? 'grid-cols-6' : 'grid-cols-5'}`}
+                    className={`grid gap-2 text-xs text-subtle ${isRanged ? 'grid-cols-6' : 'grid-cols-5'}`}
                   >
                     {isRanged && (
                       <div className="text-center">
@@ -94,7 +92,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
                   </div>
                 )}
                 {rowData.keywords && (
-                  <div className="text-sm text-gray-600 dark:text-gray-300">{rowData.keywords}</div>
+                  <div className="text-sm text-secondary">{rowData.keywords}</div>
                 )}
               </div>
             </div>

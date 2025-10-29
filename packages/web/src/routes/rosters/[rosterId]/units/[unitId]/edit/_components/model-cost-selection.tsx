@@ -18,9 +18,7 @@ const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
   if (availableModelCosts.length === 0) {
     return (
       <div className="text-center py-8" data-testid="no-model-costs-available">
-        <p className="text-gray-500 dark:text-gray-400">
-          No unit size options available for this unit.
-        </p>
+        <p className="text-subtle">No unit size options available for this unit.</p>
       </div>
     );
   }
@@ -29,13 +27,11 @@ const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
     const singleCost = availableModelCosts[0];
     return (
       <div className="flex flex-col gap-2" data-testid="single-model-cost">
-        <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-          <span className="text-gray-900 dark:text-white">{singleCost.description}</span>
-          <span className="font-medium text-gray-900 dark:text-white">{singleCost.cost} pts</span>
+        <div className="flex items-center justify-between p-3 border border-subtle rounded-lg surface-soft">
+          <span className="text-foreground">{singleCost.description}</span>
+          <span className="font-medium text-foreground">{singleCost.cost} pts</span>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          This unit has only one size option available.
-        </p>
+        <p className="text-sm text-subtle">This unit has only one size option available.</p>
       </div>
     );
   }

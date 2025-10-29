@@ -359,15 +359,12 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
           showClear={showClear}
         />
         {supplementSummary ? (
-          <span
-            className="text-xs text-gray-500 dark:text-gray-400"
-            data-testid="supplement-summary"
-          >
+          <span className="text-xs text-subtle" data-testid="supplement-summary">
             {supplementSummary}
           </span>
         ) : null}
         {showItemCount ? (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-subtle">
             Showing {visibleDatasheets.length} of {totalCount} datasheets
             {isSupplementFiltered ? ` (from ${datasheets.length} total)` : ''}
           </span>

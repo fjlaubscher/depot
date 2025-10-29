@@ -19,7 +19,7 @@ const ModelProfileTable: React.FC<ModelProfileTableProps> = ({ models }) => {
 
   return (
     <div>
-      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Unit Profile</h4>
+      <h4 className="text-lg font-semibold text-foreground mb-3">Unit Profile</h4>
       <Table>
         <TableHeader>
           <TableRow>

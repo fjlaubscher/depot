@@ -24,11 +24,9 @@ const StatCard: FC<StatCardProps> = ({ label, value, size = 'default' }) => {
 
   return (
     <div
-      className={`bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white rounded text-center ${classes.container}`}
+      className={`bg-gray-200 dark:bg-gray-800 text-foreground rounded text-center ${classes.container}`}
     >
-      <div className={`${classes.label} font-semibold text-gray-600 dark:text-gray-300`}>
-        {label}
-      </div>
+      <div className={`${classes.label} font-semibold text-secondary`}>{label}</div>
       <div className={`${classes.value} font-bold tabular-nums`}>{value}</div>
     </div>
   );

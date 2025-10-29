@@ -15,9 +15,7 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
   return (
     <Card className="p-4 space-y-2 h-full">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight">
-          {ability.name}
-        </h3>
+        <h3 className="font-semibold text-foreground text-sm leading-tight">{ability.name}</h3>
         {ability.detachment && (
           <Tag variant="secondary" size="sm">
             {ability.detachment}
@@ -26,13 +24,11 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
       </div>
 
       {showFluff && ability.legend && (
-        <div className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
-          {ability.legend}
-        </div>
+        <div className="text-sm text-muted font-medium italic">{ability.legend}</div>
       )}
 
       <div
-        className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"
+        className="text-sm text-body leading-relaxed"
         dangerouslySetInnerHTML={{ __html: ability.description }}
       />
     </Card>

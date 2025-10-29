@@ -7,7 +7,7 @@ const About = () => (
       <PageHeader title="About depot" subtitle="Notes on a hobby project for the 41st millennium" />
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Why depot exists</h2>
+        <h2 className="text-lg font-semibold text-foreground">Why depot exists</h2>
         <blockquote className="rounded-md border border-primary-500/40 bg-gray-50 p-4 text-sm italic text-gray-800 dark:border-primary-400/40 dark:bg-gray-900/40 dark:text-gray-200">
           I'm Francois, a software engineer who never really left the grimdark. depot started as a
           weekend experiment so I could plan games without juggling spreadsheets, ads, or logins. It
@@ -19,10 +19,8 @@ const About = () => (
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          What depot tries to do
-        </h2>
-        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300">
+        <h2 className="text-lg font-semibold text-foreground">What depot tries to do</h2>
+        <ul className="list-disc list-inside text-sm text-body">
           <li>Let you sketch and tweak rosters without losing track of points or wargear.</li>
           <li>Make Wahapedia datasheets easy to browse on a phone during game night.</li>
           <li>Keep working when you are travelling or the venue Wi-Fi drops out.</li>
@@ -31,14 +29,14 @@ const About = () => (
       </section>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Contributing</h2>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
+        <h2 className="text-lg font-semibold text-foreground">Contributing</h2>
+        <p className="text-sm text-body">
           depot lives on spare-evening energy, so thoughtful bug reports and playtest notes go a
           long way. If something feels rough or you have a gentle quality-of-life idea, please open
           an issue and share how you bumped into it. Pull requests are welcome too—the repository
           docs outline the patterns that keep things tidy.
         </p>
-        <div className="flex flex-col gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <div className="flex flex-col gap-2 text-sm text-body">
           <a
             href="https://github.com/fjlaubscher/depot/issues/new/choose"
             target="_blank"

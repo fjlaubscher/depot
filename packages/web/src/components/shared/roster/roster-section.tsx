@@ -15,7 +15,7 @@ const RosterSection: FC<RosterSectionProps> = ({
 }) => {
   return (
     <div className={`flex flex-col gap-2 ${className}`} data-testid={dataTestId}>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   );

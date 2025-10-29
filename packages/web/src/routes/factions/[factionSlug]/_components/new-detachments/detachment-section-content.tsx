@@ -24,9 +24,7 @@ const DetachmentSectionContent: React.FC<DetachmentSectionContentProps> = ({
   const sortedStratagems = useMemo(() => sortByName(stratagems), [stratagems]);
 
   const renderEmpty = (label: string) => (
-    <div className="text-sm text-gray-500 dark:text-gray-400">
-      No {label} available for this detachment.
-    </div>
+    <div className="text-sm text-subtle">No {label} available for this detachment.</div>
   );
 
   if (activeKey === 'abilities') {

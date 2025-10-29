@@ -33,7 +33,7 @@ const Breadcrumbs: FC<BreadcrumbsProps> = ({ items = [], className = '' }) => {
     >
       <Link
         to="/"
-        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+        className="text-subtle hover:text-foreground transition-colors"
         aria-label="Home"
       >
         <Home size={16} />
@@ -41,14 +41,11 @@ const Breadcrumbs: FC<BreadcrumbsProps> = ({ items = [], className = '' }) => {
 
       {breadcrumbItems.map((item, index) => (
         <Fragment key={item.path}>
-          <ChevronRight size={12} className="mx-2 text-gray-400 dark:text-gray-500" />
+          <ChevronRight size={12} className="mx-2 text-hint" />
           {index === breadcrumbItems.length - 1 ? (
-            <span className="text-gray-900 dark:text-white font-medium">{item.label}</span>
+            <span className="text-foreground font-medium">{item.label}</span>
           ) : (
-            <Link
-              to={item.path}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-            >
+            <Link to={item.path} className="text-subtle hover:text-foreground transition-colors">
               {item.label}
             </Link>
           )}

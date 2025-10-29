@@ -26,25 +26,23 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   };
 
   return (
-    <div
-      className={classNames('border border-gray-200 dark:border-gray-700 rounded-lg', className)}
-    >
+    <div className={classNames('border border-subtle rounded-lg', className)}>
       <button
         onClick={toggleExpanded}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
         aria-expanded={isExpanded}
         aria-controls={contentId}
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         {isExpanded ? (
-          <ChevronUp size={20} className="text-gray-500 dark:text-gray-400" />
+          <ChevronUp size={20} className="text-subtle" />
         ) : (
-          <ChevronDown size={20} className="text-gray-500 dark:text-gray-400" />
+          <ChevronDown size={20} className="text-subtle" />
         )}
       </button>
 
       {isExpanded && (
-        <div id={contentId} className="border-t border-gray-200 dark:border-gray-700 p-4">
+        <div id={contentId} className="border-t border-subtle p-4">
           {children}
         </div>
       )}

@@ -36,3 +36,160 @@ span.kwb,
 span.kwbu {
   @apply text-orange-500 dark:text-orange-400 font-semibold;
 }
+
+/* Shared utility classes */
+@utility text-foreground {
+  @apply text-gray-900 dark:text-white;
+}
+
+@utility text-body {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+@utility text-muted {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+@utility text-secondary {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+@utility text-subtle {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+@utility text-hint {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+@utility surface-card {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg;
+}
+
+@utility surface-base {
+  @apply bg-white dark:bg-gray-800;
+}
+
+@utility surface-muted {
+  @apply bg-gray-50 dark:bg-gray-900;
+}
+
+@utility surface-soft {
+  @apply bg-gray-50 dark:bg-gray-800;
+}
+
+@utility sidebar-item {
+  @apply flex items-center gap-3 px-3 py-2 text-sm text-body hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200;
+}
+
+@utility sidebar-sub-item {
+  @apply flex items-center gap-3 px-3 py-2 text-sm text-muted hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200;
+}
+
+@utility border-subtle {
+  @apply border-gray-200 dark:border-gray-700;
+}
+
+@utility link-subtle {
+  @apply text-subtle hover:text-primary-600 dark:hover:text-primary-400 underline transition-colors duration-200;
+}
+
+@utility focus-ring-primary {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-200 dark:focus-visible:outline-primary-300;
+}
+
+@utility focus-ring-info {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400;
+}
+
+@utility focus-ring-success {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-400;
+}
+
+@utility focus-ring-warning {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400;
+}
+
+@utility focus-ring-danger {
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400;
+}
+
+@utility text-info-strong {
+  @apply text-blue-900 dark:text-blue-100;
+}
+
+@utility text-info {
+  @apply text-blue-700 dark:text-blue-300;
+}
+
+@utility surface-info {
+  @apply bg-blue-50 dark:bg-blue-900/20;
+}
+
+@utility surface-info-strong {
+  @apply bg-blue-100 dark:bg-blue-900;
+}
+
+@utility border-info {
+  @apply border-blue-200 dark:border-blue-800;
+}
+
+@utility text-success-strong {
+  @apply text-green-800 dark:text-green-200;
+}
+
+@utility text-success {
+  @apply text-green-600 dark:text-green-400;
+}
+
+@utility surface-success {
+  @apply bg-green-50 dark:bg-green-900/20;
+}
+
+@utility surface-success-strong {
+  @apply bg-green-100 dark:bg-green-900;
+}
+
+@utility border-success {
+  @apply border-green-200 dark:border-green-800;
+}
+
+@utility text-warning-strong {
+  @apply text-yellow-800 dark:text-yellow-200;
+}
+
+@utility text-warning {
+  @apply text-yellow-600 dark:text-yellow-400;
+}
+
+@utility surface-warning {
+  @apply bg-yellow-50 dark:bg-yellow-900/20;
+}
+
+@utility surface-warning-strong {
+  @apply bg-yellow-100 dark:bg-yellow-900;
+}
+
+@utility border-warning {
+  @apply border-yellow-200 dark:border-yellow-800;
+}
+
+@utility text-danger-strong {
+  @apply text-red-800 dark:text-red-200;
+}
+
+@utility text-danger {
+  @apply text-red-600 dark:text-red-400;
+}
+
+@utility surface-danger {
+  @apply bg-red-50 dark:bg-red-900/20;
+}
+
+@utility surface-danger-strong {
+  @apply bg-red-100 dark:bg-red-900;
+}
+
+@utility border-danger {
+  @apply border-red-200 dark:border-red-800;
+}

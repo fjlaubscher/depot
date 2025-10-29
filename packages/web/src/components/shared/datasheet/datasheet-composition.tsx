@@ -22,20 +22,17 @@ export const DatasheetComposition: FC<DatasheetCompositionProps> = ({
       {composition.map((comp) => (
         <li
           key={`composition-${comp.line}`}
-          className="text-sm text-gray-700 dark:text-gray-300"
+          className="text-sm text-body"
           dangerouslySetInnerHTML={{ __html: comp.description }}
         />
       ))}
     </ul>
     {loadout?.trim() ? (
-      <p
-        className="text-sm text-gray-700 dark:text-gray-300"
-        dangerouslySetInnerHTML={{ __html: loadout }}
-      />
+      <p className="text-sm text-body" dangerouslySetInnerHTML={{ __html: loadout }} />
     ) : null}
     {transport?.trim() ? (
       <p
-        className="text-sm text-gray-700 dark:text-gray-300"
+        className="text-sm text-body"
         dangerouslySetInnerHTML={{ __html: transport }}
         data-testid="transport-capacity"
       />

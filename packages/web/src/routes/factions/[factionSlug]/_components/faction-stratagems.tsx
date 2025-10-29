@@ -76,9 +76,7 @@ const FactionStratagems: React.FC<FactionStratagemProps> = ({ stratagems }) => {
 
       {filteredStratagems.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
-            No stratagems found matching your search criteria.
-          </p>
+          <p className="text-subtle">No stratagems found matching your search criteria.</p>
         </div>
       )}
     </div>

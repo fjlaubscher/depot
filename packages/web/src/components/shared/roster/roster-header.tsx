@@ -8,24 +8,22 @@ interface RosterHeaderProps {
 const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
   const pointsColor =
     roster.points.current > roster.points.max
-      ? 'text-red-500 dark:text-red-400'
+      ? 'text-danger'
       : roster.points.current === roster.points.max
-        ? 'text-yellow-500 dark:text-yellow-400'
-        : 'text-green-500 dark:text-green-400';
+        ? 'text-warning'
+        : 'text-success';
 
   return (
     <div className="flex items-center gap-4 text-sm">
       <div className="flex items-center gap-2">
-        <span className="text-gray-500 dark:text-gray-400">Points</span>
+        <span className="text-subtle">Points</span>
         <span className={`font-semibold ${pointsColor}`} data-testid="points-display">
           {roster.points.current}/{roster.points.max}
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-gray-500 dark:text-gray-400">Enhancements</span>
-        <span className="font-semibold text-gray-900 dark:text-white">
-          {roster.enhancements.length}
-        </span>
+        <span className="text-subtle">Enhancements</span>
+        <span className="font-semibold text-foreground">{roster.enhancements.length}</span>
       </div>
     </div>
   );

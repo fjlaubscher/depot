@@ -5,7 +5,7 @@ interface DatasheetEmptyStateProps {
 }
 
 export const DatasheetEmptyState: FC<DatasheetEmptyStateProps> = ({ message }) => (
-  <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500 dark:text-gray-400">
+  <div className="flex flex-col items-center justify-center py-12 text-center text-subtle">
     <p>{message}</p>
   </div>
 );

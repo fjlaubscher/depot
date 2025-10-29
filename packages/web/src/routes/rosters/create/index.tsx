@@ -146,17 +146,14 @@ const CreateRoster: React.FC = () => {
         <Card>
           <form data-testid="roster-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field data-testid="roster-name-field">
-              <label
-                htmlFor="roster-name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
+              <label htmlFor="roster-name" className="block text-sm font-medium text-body">
                 Roster Name
               </label>
               <input
                 data-testid="roster-name-input"
                 id="roster-name"
                 type="text"
-                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -191,27 +188,22 @@ const CreateRoster: React.FC = () => {
               />
             ) : factionSlug ? (
               <Field>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Detachment
-                </label>
-                <div className="text-sm text-gray-500 dark:text-gray-400 italic">
+                <label className="block text-sm font-medium text-body">Detachment</label>
+                <div className="text-sm text-subtle italic">
                   No detachments available for this faction
                 </div>
               </Field>
             ) : null}
 
             <Field data-testid="max-points-field">
-              <label
-                htmlFor="max-points"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
+              <label htmlFor="max-points" className="block text-sm font-medium text-body">
                 Max Points
               </label>
               <input
                 data-testid="max-points-input"
                 id="max-points"
                 type="number"
-                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
                 value={maxPoints.toString()}
                 onChange={(e) => setMaxPoints(parseInt(e.target.value, 10))}
                 required

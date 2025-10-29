@@ -70,10 +70,8 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
       {Object.keys(groupedEnhancements).map((key) =>
         groupedEnhancements[key].length > 0 ? (
           <div key={key} className="space-y-4">
-            <div className="border-b border-gray-200 dark:border-gray-700 pb-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white uppercase">
-                {key}
-              </h2>
+            <div className="border-b border-subtle pb-2">
+              <h2 className="text-lg font-semibold text-foreground uppercase">{key}</h2>
             </div>
             <Grid>
               {groupedEnhancements[key].map((enhancement) => (
@@ -86,9 +84,7 @@ const FactionEnhancements: React.FC<FactionEnhancementsProps> = ({ enhancements 
 
       {isEmpty && (
         <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">
-            No enhancements found matching your search criteria.
-          </p>
+          <p className="text-subtle">No enhancements found matching your search criteria.</p>
         </div>
       )}
     </div>

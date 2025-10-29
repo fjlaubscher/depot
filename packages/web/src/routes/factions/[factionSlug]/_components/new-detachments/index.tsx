@@ -24,7 +24,7 @@ const NewFactionDetachments: React.FC<NewFactionDetachmentsProps> = ({ detachmen
 
   if (detachmentEntries.length === 0) {
     return (
-      <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+      <div className="py-12 text-center text-subtle">
         No detachments available for this faction.
       </div>
     );

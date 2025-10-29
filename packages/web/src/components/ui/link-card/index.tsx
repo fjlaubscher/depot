@@ -22,7 +22,7 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
       <Card className="dark:bg-gray-800 dark:border-gray-700 h-full">
         <div className="flex items-center justify-between gap-2">
           <div className="text-gray-900 dark:text-gray-100 font-medium">{children}</div>
-          <ChevronRight className="text-gray-400 dark:text-gray-500 flex-shrink-0" size={20} />
+          <ChevronRight className="text-hint flex-shrink-0" size={20} />
         </div>
       </Card>
     </Link>

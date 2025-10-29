@@ -33,19 +33,19 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
     <div className="flex flex-col gap-4" data-testid="warlord-selection">
       <div className="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors">
         <div className="flex flex-col gap-2">
-          <h5 className="font-medium text-gray-900 dark:text-white">Nominate as Warlord</h5>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <h5 className="font-medium text-foreground">Nominate as Warlord</h5>
+          <p className="text-sm text-muted">
             Designate this character as your army's warlord. Only one character can be the warlord.
           </p>
 
           {currentWarlord && currentWarlord.id !== unit.id && (
-            <div className="text-sm text-yellow-600 dark:text-yellow-400">
+            <div className="text-sm text-warning">
               ⚠️ Current warlord: {currentWarlord.datasheet.name}
             </div>
           )}
 
           {otherCharacters.length > 0 && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-subtle">
               Other characters in roster: {otherCharacters.map((c) => c.datasheet.name).join(', ')}
             </div>
           )}
@@ -69,9 +69,9 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
 
       {/* Warning about changing warlord */}
       {isWarlord && currentWarlord && currentWarlord.id !== unit.id && (
-        <div className="flex flex-col gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-          <h5 className="font-medium text-yellow-900 dark:text-yellow-200">⚠️ Warlord Change</h5>
-          <p className="text-sm text-yellow-800 dark:text-yellow-300">
+        <div className="flex flex-col gap-2 p-3 surface-warning border-warning rounded-lg">
+          <h5 className="font-medium text-warning-strong">⚠️ Warlord Change</h5>
+          <p className="text-sm text-warning">
             Nominating this character as warlord will remove the warlord designation from{' '}
             {currentWarlord.datasheet.name}.
           </p>

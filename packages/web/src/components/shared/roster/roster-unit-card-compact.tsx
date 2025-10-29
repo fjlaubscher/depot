@@ -24,13 +24,9 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
     <Card padding="sm" className="relative flex flex-col gap-2" onClick={onClick}>
       <div className="flex flex-wrap items-start gap-2">
         <div className="flex flex-col gap-1 flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-            {unit.datasheet.name}
-          </h3>
+          <h3 className="text-sm font-semibold text-foreground truncate">{unit.datasheet.name}</h3>
           {unit.modelCost.description ? (
-            <span className="text-xs text-gray-600 dark:text-gray-300 truncate">
-              {unit.modelCost.description}
-            </span>
+            <span className="text-xs text-secondary truncate">{unit.modelCost.description}</span>
           ) : null}
           {unit.selectedWargear.length > 0 ? (
             <TagGroup spacing="sm" className="gap-1">

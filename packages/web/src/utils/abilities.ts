@@ -48,7 +48,7 @@ export const getAbilityTypeBadge = (type: string): { text: string; color: string
     case 'Core':
       return {
         text: 'Core',
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+        color: 'surface-info-strong text-info-strong'
       };
     case 'Faction':
       return {
@@ -58,7 +58,7 @@ export const getAbilityTypeBadge = (type: string): { text: string; color: string
     case 'Datasheet':
       return {
         text: 'Unit',
-        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+        color: 'surface-success-strong text-success-strong'
       };
     case 'Wargear':
       return {
@@ -69,13 +69,13 @@ export const getAbilityTypeBadge = (type: string): { text: string; color: string
     case 'Special':
       return {
         text: 'Special',
-        color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+        color: 'surface-danger-strong text-danger-strong'
       };
     case 'Fortification (левая колонка)':
     case 'Fortification':
       return {
         text: 'Fortification',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+        color: 'surface-warning-strong text-warning-strong'
       };
     default:
       return { text: type, color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' };

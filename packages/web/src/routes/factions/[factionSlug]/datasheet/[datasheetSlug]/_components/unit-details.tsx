@@ -20,13 +20,13 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ datasheet }) => {
       {/* Unit Options */}
       {hasOptions && (
         <div data-testid="unit-options">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Unit Options</h4>
+          <h4 className="text-lg font-semibold text-foreground mb-3">Unit Options</h4>
           <Card className="p-4">
             <ul className="space-y-2 list-disc pl-4">
               {options.map((option) => (
                 <li
                   key={`unit-option-${option.line}`}
-                  className="text-sm text-gray-700 dark:text-gray-300 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
+                  className="text-sm text-body [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
                   dangerouslySetInnerHTML={{ __html: option.description }}
                 />
               ))}

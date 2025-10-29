@@ -84,11 +84,9 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
             <X size={18} />
           </IconButton>
         </div>
-        <div className="flex max-h-[75vh] flex-col gap-4 overflow-y-auto p-4 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+        <div className="flex max-h-[75vh] flex-col gap-4 overflow-y-auto p-4 text-sm leading-relaxed text-body">
           {ability.legend ? (
-            <div className="text-gray-600 dark:text-gray-400 italic font-medium">
-              {ability.legend}
-            </div>
+            <div className="text-muted italic font-medium">{ability.legend}</div>
           ) : null}
           <div dangerouslySetInnerHTML={{ __html: ability.description }} />
         </div>

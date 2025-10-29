@@ -48,6 +48,12 @@ pnpm generate-pwa-assets
 - **Vite 6** for build tooling
 - **Vitest** + React Testing Library for testing
 
+### Styling Guidelines
+- Tailwind utilities are centralized in `src/styles/main.css`; prefer semantic helpers (`text-foreground`, `text-body`, `surface-card`, etc.) over raw color classes.
+- Status palette helpers are available for info/success/warning/danger states (`text-info[-strong]`, `surface-success[-strong]`, `border-warning`, `focus-ring-danger`, ...). Reuse these before introducing new colour combos.
+- When a layout/color/focus trio repeats twice, promote it to an `@utility` entry so JSX stays concise and align with the design system.
+- Group tailwind classes structural → colour → interaction to keep merges predictable and consistent with existing components.
+
 ## Key Routes
 
 - `/` - Home dashboard

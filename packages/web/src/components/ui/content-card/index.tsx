@@ -36,9 +36,9 @@ const getBadgeClasses = (variant: Badge['variant'] = 'primary', size: Badge['siz
   const variantClasses = {
     primary: 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200',
     secondary: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    success: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    danger: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+    success: 'surface-success-strong text-success-strong',
+    warning: 'surface-warning-strong text-warning-strong',
+    danger: 'surface-danger-strong text-danger-strong'
   };
 
   return classNames(baseClasses, sizeClasses[size], variantClasses[variant]);
@@ -83,12 +83,10 @@ export const ContentCard: FC<ContentCardProps> = ({
         {/* Header Section */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight truncate">
+            <h3 className="font-semibold text-foreground text-sm leading-tight truncate">
               {title}
             </h3>
-            {subtitle && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{subtitle}</p>
-            )}
+            {subtitle && <p className="text-sm text-secondary mt-1">{subtitle}</p>}
           </div>
 
           {/* Badges and Actions */}
@@ -107,11 +105,7 @@ export const ContentCard: FC<ContentCardProps> = ({
         </div>
 
         {/* Legend */}
-        {legend && (
-          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium italic">
-            {legend}
-          </div>
-        )}
+        {legend && <div className="text-sm text-muted font-medium italic">{legend}</div>}
 
         {/* Expandable Toggle */}
         {expandable && (
@@ -138,8 +132,8 @@ export const ContentCard: FC<ContentCardProps> = ({
         {(expandable ? isExpanded : true) && children && (
           <div
             className={classNames(
-              'text-sm text-gray-700 dark:text-gray-300 leading-relaxed',
-              expandable && 'border-t border-gray-200 dark:border-gray-700 pt-3'
+              'text-sm text-body leading-relaxed',
+              expandable && 'border-t border-subtle pt-3'
             )}
           >
             {children}

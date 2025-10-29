@@ -42,6 +42,7 @@ routes/
 - Route handling and context integration
 - State orchestration with minimal logic
 - Composition of child components
+- Prefer consuming shared Tailwind utilities (`text-foreground`, `text-muted`, status tokens like `surface-info`, `border-warning`, `focus-ring-primary`) when styling route-level components to keep visuals consistent with the UI library.
 
 ### `_components` Directory
 - Single responsibility

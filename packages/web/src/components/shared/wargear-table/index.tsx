@@ -32,7 +32,7 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
       <div className="overflow-x-auto">
         <table className="w-full text-xs table-fixed">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
+            <tr className="border-b border-subtle">
               <th className="text-left py-1 font-medium text-primary-600 dark:text-primary-400 w-2/5 md:w-3/5">
                 {title}
               </th>
@@ -83,7 +83,7 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
                     <td className={classNames(statCellClasses, 'text-center')}>{weapon.d}</td>
                   </tr>
                   {hasKeywords ? (
-                    <tr className="pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <tr className="pb-2 border-b border-subtle">
                       <td colSpan={7} className="py-1">
                         <TagGroup spacing="sm">
                           {keywords.map((keyword, keywordIndex) => (

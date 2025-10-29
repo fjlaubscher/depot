@@ -46,15 +46,11 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete }) => {
       <div className="flex flex-col gap-3">
         {/* Title row - full width */}
         <div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-            {roster.name}
-          </h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">{roster.name}</h3>
           <div className="flex flex-col gap-1 mt-1">
-            <span className="text-sm text-gray-600 dark:text-gray-300">{roster.faction?.name}</span>
+            <span className="text-sm text-secondary">{roster.faction?.name}</span>
             {roster.detachment?.name && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {roster.detachment.name}
-              </span>
+              <span className="text-xs text-subtle">{roster.detachment.name}</span>
             )}
           </div>
         </div>

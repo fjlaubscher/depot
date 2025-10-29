@@ -34,7 +34,7 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
   }, [sidebarOpen, closeSidebar]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen surface-muted">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -47,17 +47,17 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
       {sidebar && (
         <aside
           className={`
-            fixed top-0 right-0 z-50 w-64 h-full bg-white dark:bg-gray-800 shadow-lg border-l border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:hidden
+            fixed top-0 right-0 z-50 w-64 h-full surface-base shadow-lg border-l border-subtle transform transition-transform duration-300 ease-in-out lg:hidden
             ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
           `}
         >
           {/* Mobile sidebar header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b border-subtle">
             <Link to="/" className="flex items-center gap-2" onClick={closeSidebar}>
               <div className="w-10 h-10 text-white">
                 <Logo />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
+              <span className="text-xl font-bold text-foreground">depot</span>
             </Link>
             <IconButton
               onClick={closeSidebar}
@@ -87,7 +87,7 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
                 <div className="w-10 h-10 text-white">
                   <Logo />
                 </div>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">depot</span>
+                <span className="text-xl font-bold text-foreground">depot</span>
               </Link>
             </div>
 
@@ -112,7 +112,7 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         {sidebar && (
-          <aside className="hidden lg:block w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <aside className="hidden lg:block w-64 surface-base border-r border-subtle flex-shrink-0">
             <div className="p-4 overflow-y-auto h-full">{sidebar}</div>
           </aside>
         )}
