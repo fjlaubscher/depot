@@ -20,10 +20,10 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
       {...rest}
     >
       <Card interactive className="h-full">
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-gray-900 dark:text-gray-100 font-medium">{children}</div>
+        <Card.Header className="items-center gap-2">
+          <span className="truncate text-sm font-medium text-foreground">{children}</span>
           <ChevronRight className="text-hint flex-shrink-0" size={20} />
-        </div>
+        </Card.Header>
       </Card>
     </Link>
   );

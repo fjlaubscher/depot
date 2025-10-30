@@ -25,41 +25,39 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
   return (
     <Link
       to={`/faction/${faction.slug}`}
-      className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+      className="group block h-full focus-ring-primary focus-visible:outline-offset-4"
     >
-      <Card interactive className="h-full overflow-hidden">
-        <div className="flex h-full flex-col gap-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-semibold text-foreground transition-colors duration-200 group-hover:text-primary-600 dark:group-hover:text-primary-400">
-                {faction.name}
-              </h3>
-              <p className="text-xs text-muted transition-colors duration-200 group-hover:text-foreground dark:group-hover:text-gray-200">
-                Open faction overview, datasheets, detachments, and rules.
-              </p>
-            </div>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-muted transition-colors duration-200 group-hover:bg-gray-300 group-hover:text-foreground dark:bg-gray-800 dark:text-gray-300 dark:group-hover:bg-gray-700">
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </span>
+      <Card interactive className="flex h-full flex-col gap-4 overflow-hidden">
+        <Card.Header className="items-start gap-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <Card.Title as="h3" className="truncate text-base font-semibold sm:text-lg">
+              {faction.name}
+            </Card.Title>
+            <Card.Description className="text-xs transition-colors duration-200 group-hover:text-body sm:text-sm">
+              Open faction overview, datasheets, detachments, and rules.
+            </Card.Description>
           </div>
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full surface-soft text-muted transition-colors duration-200 group-hover:surface-accent group-hover:text-accent-strong">
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </Card.Header>
 
-          <div className="grid grid-cols-2 gap-3 text-left">
-            {stats.map(({ label, value, icon: Icon }) => (
-              <div
-                key={label}
-                className="flex flex-col gap-2 rounded-lg border border-subtle bg-white p-3 transition-colors duration-200 group-hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900/40 dark:group-hover:border-gray-700"
-              >
-                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-subtle">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-muted dark:bg-gray-800 dark:text-gray-200">
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                  </span>
-                  <span>{label}</span>
-                </div>
-                <span className="text-xl font-semibold text-foreground tabular-nums">{value}</span>
+        <Card.Content className="grid grid-cols-2 gap-3 text-left">
+          {stats.map(({ label, value, icon: Icon }) => (
+            <div
+              key={label}
+              className="flex flex-col gap-2 rounded-lg border border-subtle surface-soft p-3 transition-colors duration-200 group-hover:border-accent group-hover:surface-accent"
+            >
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full surface-accent text-accent">
+                  <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+                <span className="truncate">{label}</span>
               </div>
-            ))}
-          </div>
-        </div>
+              <span className="text-xl font-semibold text-foreground tabular-nums">{value}</span>
+            </div>
+          ))}
+        </Card.Content>
       </Card>
     </Link>
   );

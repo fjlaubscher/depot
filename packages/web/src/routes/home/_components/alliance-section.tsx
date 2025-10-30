@@ -14,14 +14,12 @@ const AllianceSection: React.FC<AllianceSectionProps> = ({
   loading = false
 }) => {
   return (
-    <div className="mb-8">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 capitalize">
-          {alliance}
-        </h2>
-      </div>
+    <section className="flex flex-col gap-4">
+      <header>
+        <h2 className="text-xl font-semibold text-foreground capitalize">{alliance}</h2>
+      </header>
       <FactionGrid factions={factions} loading={loading} />
-    </div>
+    </section>
   );
 };
 
