@@ -21,40 +21,51 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   const remainingWargearCount = unit.selectedWargear.length - wargearToDisplay.length;
 
   return (
-    <Card padding="sm" className="relative flex flex-col gap-2" onClick={onClick}>
-      <div className="flex flex-wrap items-start gap-2">
-        <div className="flex flex-col gap-1 flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-foreground truncate">{unit.datasheet.name}</h3>
+    <Card
+      padding="sm"
+      className={classNames('relative flex flex-col gap-2', onClick && 'cursor-pointer')}
+      onClick={onClick}
+    >
+      <Card.Header className="items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <Card.Title as="h3" className="truncate text-sm font-semibold">
+            {unit.datasheet.name}
+          </Card.Title>
           {unit.modelCost.description ? (
-            <span className="text-xs text-secondary truncate">{unit.modelCost.description}</span>
-          ) : null}
-          {unit.selectedWargear.length > 0 ? (
-            <TagGroup spacing="sm" className="gap-1">
-              {wargearToDisplay.map((wargear, index) => (
-                <Tag
-                  key={`compact-wargear-${index}`}
-                  variant="secondary"
-                  size="sm"
-                  className="capitalize"
-                >
-                  {wargear.name.toLowerCase()}
-                </Tag>
-              ))}
-              {remainingWargearCount > 0 ? (
-                <Tag variant="default" size="sm">
-                  +{remainingWargearCount} more
-                </Tag>
-              ) : null}
-            </TagGroup>
+            <Card.Subtitle as="span" className="truncate text-xs">
+              {unit.modelCost.description}
+            </Card.Subtitle>
           ) : null}
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <PointsTag points={unitPoints} className="whitespace-nowrap" />
           {actions ? <div className="flex items-center gap-1">{actions}</div> : null}
         </div>
-      </div>
+      </Card.Header>
 
-      {children}
+      {unit.selectedWargear.length > 0 ? (
+        <Card.Content className="pt-0">
+          <TagGroup spacing="sm" className="gap-1">
+            {wargearToDisplay.map((wargear, index) => (
+              <Tag
+                key={`compact-wargear-${index}`}
+                variant="secondary"
+                size="sm"
+                className="capitalize"
+              >
+                {wargear.name.toLowerCase()}
+              </Tag>
+            ))}
+            {remainingWargearCount > 0 ? (
+              <Tag variant="default" size="sm">
+                +{remainingWargearCount} more
+              </Tag>
+            ) : null}
+          </TagGroup>
+        </Card.Content>
+      ) : null}
+
+      {children ? <Card.Content separated>{children}</Card.Content> : null}
     </Card>
   );
 };

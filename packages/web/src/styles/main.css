@@ -78,6 +78,26 @@ span.kwbu {
   @apply bg-gray-50 dark:bg-gray-800;
 }
 
+@utility text-accent {
+  @apply text-primary-700 dark:text-primary-300;
+}
+
+@utility text-accent-strong {
+  @apply text-primary-800 dark:text-primary-200;
+}
+
+@utility surface-accent {
+  @apply bg-primary-50 dark:bg-primary-900;
+}
+
+@utility surface-accent-strong {
+  @apply bg-primary-100 dark:bg-primary-900;
+}
+
+@utility border-accent {
+  @apply border-primary-200 dark:border-primary-800;
+}
+
 @utility sidebar-item {
   @apply flex items-center gap-3 px-3 py-2 text-sm text-body hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200;
 }
