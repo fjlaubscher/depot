@@ -32,7 +32,8 @@ const EditRosterUnitView: React.FC = () => {
     updateUnitWargear,
     updateUnitModelCost,
     applyEnhancement,
-    removeEnhancement
+    removeEnhancement,
+    setWarlord
   } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const EditRosterUnitView: React.FC = () => {
   const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(() => {
     return roster.enhancements.filter((e) => e.unitId === unitId).map((e) => e.enhancement.id);
   });
-  const [isWarlord, setIsWarlord] = useState(false); // TODO: Implement warlord tracking
+  const [isWarlord, setIsWarlord] = useState(() => roster.warlordUnitId === unitId);
 
   // Initialize wargear only when switching to a new unit
   useEffect(() => {
@@ -75,11 +76,12 @@ const EditRosterUnitView: React.FC = () => {
         .filter((e) => e.unitId === unitId)
         .map((e) => e.enhancement.id);
       setSelectedEnhancements(unitEnhancements);
+      setIsWarlord(roster.warlordUnitId === unitId);
 
       // Mark this unit as initialized
       initializedUnitRef.current = unitId;
     }
-  }, [unitId, unit, roster.enhancements]);
+  }, [unitId, unit, roster.enhancements, roster.warlordUnitId]);
 
   // Memoized calculations (must be before early returns to maintain hook order)
   const shouldShowWargearOptions = useMemo(() => {
@@ -150,11 +152,10 @@ const EditRosterUnitView: React.FC = () => {
         updateUnitModelCost(unitId, selectedModelCost);
       }
 
-      // TODO: Implement warlord tracking
-      // This requires adding warlord tracking to the roster data structure
-      if (isWarlord !== false) {
-        // assuming false is the initial state
-        console.warn('Warlord nomination not yet implemented in roster context');
+      if (isWarlord) {
+        setWarlord(unitId);
+      } else if (roster.warlordUnitId === unitId) {
+        setWarlord(null);
       }
 
       showToast({

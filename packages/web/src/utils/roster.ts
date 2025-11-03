@@ -110,31 +110,27 @@ export const generateRosterMarkdown = (
 
     unitsByRole[role].forEach((unit) => {
       const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
-      lines.push(`- **${unit.datasheet.name}** - ${unit.modelCost.description} (${unitCost} pts)`);
+      const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
+      const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
+      lines.push(`- **${unitName}** - ${unit.modelCost.description} (${unitCost} pts)`);
 
-      // Add wargear if present
       if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
           lines.push(`  - ${wargear.name}`);
         });
       }
+
+      const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
+      unitEnhancements.forEach(({ enhancement }) => {
+        const enhancementCost = parseInt(enhancement.cost, 10) || 0;
+        lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
+      });
     });
 
     lines.push('');
   });
 
-  // Enhancements if present
-  if (roster.enhancements.length > 0) {
-    lines.push('## Enhancements');
-    lines.push('');
-
-    roster.enhancements.forEach(({ enhancement }) => {
-      const enhancementCost = parseInt(enhancement.cost, 10) || 0;
-      lines.push(`- **${enhancement.name}** (${enhancementCost} pts)`);
-    });
-
-    lines.push('');
-  }
+  lines.push('https://fjlaubscher.github.io/depot');
 
   return lines.join('\n');
 };
@@ -178,25 +174,24 @@ export const generateRosterShareText = (
     lines.push(`*${role}*`);
     unitsByRole[role].forEach((unit) => {
       const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
-      lines.push(`- ${unit.datasheet.name} - ${unit.modelCost.description} (${unitCost} pts)`);
+      const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
+      const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
+      lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
       if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
           lines.push(`  - ${wargear.name}`);
         });
       }
+      const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
+      unitEnhancements.forEach(({ enhancement }) => {
+        const enhancementCost = parseInt(enhancement.cost, 10) || 0;
+        lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
+      });
     });
     lines.push('');
   });
 
-  // Enhancements
-  if (roster.enhancements.length > 0) {
-    lines.push('*Enhancements*');
-    roster.enhancements.forEach(({ enhancement }) => {
-      const enhancementCost = parseInt(enhancement.cost, 10) || 0;
-      lines.push(`- ${enhancement.name} (${enhancementCost} pts)`);
-    });
-    lines.push('');
-  }
+  lines.push('https://fjlaubscher.github.io/depot');
 
   return lines.join('\n');
 };

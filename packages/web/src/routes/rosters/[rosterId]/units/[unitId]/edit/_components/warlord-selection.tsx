@@ -22,12 +22,9 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
       u.datasheet.keywords.some((k) => k.keyword.toLowerCase().includes('character'))
   );
 
-  const currentWarlord = roster.units.find(
-    (_u) =>
-      // TODO: This would need actual warlord tracking in the roster data structure
-      // For now, we'll just use the isWarlord state
-      false // placeholder
-  );
+  const currentWarlord = roster.warlordUnitId
+    ? roster.units.find((u) => u.id === roster.warlordUnitId)
+    : undefined;
 
   return (
     <div className="flex flex-col gap-4" data-testid="warlord-selection">
@@ -59,10 +56,9 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
           <h5 className="font-medium text-purple-900 dark:text-purple-200 flex items-center gap-2">
             👑 Warlord Benefits
           </h5>
-          <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
-            <li>• Can use Warlord Traits (if available)</li>
-            <li>• May have special deployment or strategic abilities</li>
-            <li>• Target for certain enemy abilities and victory conditions</li>
+          <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1 list-disc pl-6">
+            <li>May have special deployment or strategic abilities</li>
+            <li>Target for certain enemy abilities and victory conditions</li>
           </ul>
         </div>
       )}

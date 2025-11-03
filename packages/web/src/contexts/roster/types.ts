@@ -27,6 +27,7 @@ export type RosterAction =
     }
   | { type: 'APPLY_ENHANCEMENT'; payload: { enhancement: depot.Enhancement; targetUnitId: string } }
   | { type: 'REMOVE_ENHANCEMENT'; payload: { enhancementId: string } }
+  | { type: 'SET_WARLORD'; payload: { unitId: string | null } }
   | { type: 'RECALCULATE_POINTS' };
 
 export interface RosterContextValue {
@@ -47,5 +48,6 @@ export interface RosterContextValue {
   updateUnitModelCost: (rosterUnitId: string, modelCost: depot.ModelCost) => void;
   applyEnhancement: (enhancement: depot.Enhancement, targetUnitId: string) => void;
   removeEnhancement: (enhancementId: string) => void;
+  setWarlord: (unitId: string | null) => void;
   recalculatePoints: () => void;
 }

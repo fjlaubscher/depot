@@ -44,6 +44,7 @@ function createMockRosterState(): depot.Roster {
       enhancements: [],
       stratagems: []
     },
+    warlordUnitId: null,
     units: [] as depot.RosterUnit[],
     enhancements: [],
     points: { current: 0, max: 2000 }

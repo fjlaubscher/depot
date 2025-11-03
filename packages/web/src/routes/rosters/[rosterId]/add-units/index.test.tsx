@@ -36,6 +36,7 @@ const mockRosterContext = vi.hoisted(() => ({
     factionSlug: 'space-marines',
     faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
     detachment: { name: 'Gladius Task Force' },
+    warlordUnitId: null,
     units: [],
     enhancements: [],
     points: { current: 0, max: 2000 }
@@ -200,6 +201,7 @@ describe('AddRosterUnitsPage', () => {
       factionSlug: 'space-marines',
       faction: { id: 'SM', slug: 'space-marines', name: 'Space Marines' },
       detachment: { name: 'Gladius Task Force' },
+      warlordUnitId: null,
       units: [],
       enhancements: [],
       points: { current: 0, max: 2000 }

@@ -474,6 +474,7 @@ describe('OfflineStorage', () => {
         stratagems: []
       },
       points: { current: 0, max: 2000 },
+      warlordUnitId: null,
       units: [],
       enhancements: []
     };

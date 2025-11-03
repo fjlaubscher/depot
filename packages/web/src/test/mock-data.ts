@@ -335,6 +335,7 @@ export const mockRoster: depot.Roster = {
     current: 80,
     max: 2000
   },
+  warlordUnitId: null,
   units: [mockRosterUnit],
   enhancements: []
 };

@@ -7,7 +7,8 @@ import {
   mockFactionIndex,
   mockRosterUnit,
   mockEnhancement,
-  createMockDatasheet
+  createMockDatasheet,
+  createMockRoster
 } from '@/test/mock-data';
 
 describe('rosterReducer', () => {
@@ -42,6 +43,7 @@ describe('rosterReducer', () => {
           current: 500,
           max: 2000
         },
+        warlordUnitId: null,
         units: [rosterUnit],
         enhancements: []
       };
@@ -263,6 +265,59 @@ describe('rosterReducer', () => {
     });
   });
 
+  describe('SET_WARLORD', () => {
+    it('should set the warlord when unit exists', () => {
+      const roster = createMockRoster({
+        warlordUnitId: null,
+        units: [mockRosterUnit]
+      });
+
+      const action: RosterAction = {
+        type: 'SET_WARLORD',
+        payload: { unitId: mockRosterUnit.id }
+      };
+
+      const result = rosterReducer(roster, action);
+
+      expect(result.warlordUnitId).toBe(mockRosterUnit.id);
+    });
+
+    it('should clear the warlord when null provided', () => {
+      const roster = createMockRoster({
+        warlordUnitId: mockRosterUnit.id,
+        units: [mockRosterUnit]
+      });
+
+      const action: RosterAction = {
+        type: 'SET_WARLORD',
+        payload: { unitId: null }
+      };
+
+      const result = rosterReducer(roster, action);
+
+      expect(result.warlordUnitId).toBeNull();
+    });
+  });
+
+  describe('REMOVE_UNIT', () => {
+    it('should clear warlord when the designated unit is removed', () => {
+      const roster = createMockRoster({
+        warlordUnitId: mockRosterUnit.id,
+        units: [mockRosterUnit]
+      });
+
+      const action: RosterAction = {
+        type: 'REMOVE_UNIT',
+        payload: { rosterUnitId: mockRosterUnit.id }
+      };
+
+      const result = rosterReducer(roster, action);
+
+      expect(result.warlordUnitId).toBeNull();
+      expect(result.units).toHaveLength(0);
+    });
+  });
+
   describe('immutability', () => {
     it('should not mutate the original state for any action', () => {
       const originalState = { ...initialState };
@@ -284,6 +339,10 @@ describe('rosterReducer', () => {
         {
           type: 'SET_DETACHMENT',
           payload: { name: 'New Det', abilities: [], enhancements: [], stratagems: [] }
+        },
+        {
+          type: 'SET_WARLORD',
+          payload: { unitId: null }
         }
       ];
 

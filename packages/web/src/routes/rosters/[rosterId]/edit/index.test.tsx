@@ -44,13 +44,18 @@ const mockRosterContext = vi.hoisted(() => ({
       enhancements: [],
       stratagems: []
     } as depot.Detachment,
+    warlordUnitId: null,
     units: [] as depot.RosterUnit[],
     enhancements: [],
     points: { current: 0, max: 2000 }
   } as depot.Roster,
   duplicateUnit: vi.fn(),
   removeUnit: vi.fn(),
-  updateUnitWargear: vi.fn()
+  updateUnitWargear: vi.fn(),
+  updateUnitModelCost: vi.fn(),
+  applyEnhancement: vi.fn(),
+  removeEnhancement: vi.fn(),
+  setWarlord: vi.fn()
 }));
 
 vi.mock('@/contexts/roster/context', () => ({
@@ -142,6 +147,7 @@ describe('EditRosterPage', () => {
         enhancements: [],
         stratagems: []
       } as depot.Detachment,
+      warlordUnitId: null,
       units: [],
       enhancements: [],
       points: { current: 0, max: 2000 }

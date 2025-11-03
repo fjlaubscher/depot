@@ -16,6 +16,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         faction: action.payload.faction
           ? { ...action.payload.faction, slug: action.payload.faction.slug ?? fallbackSlug }
           : action.payload.faction,
+        warlordUnitId: action.payload.warlordUnitId ?? null,
         units: action.payload.units.map((unit) => ({
           ...unit,
           datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
@@ -43,7 +44,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: {
           ...initialState.points,
           max: action.payload.maxPoints
-        }
+        },
+        warlordUnitId: null
       };
 
     case 'SET_DETACHMENT':
@@ -102,7 +104,9 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         units: state.units.filter((unit) => unit.id !== action.payload.rosterUnitId),
         enhancements: state.enhancements.filter(
           (enhancement) => enhancement.unitId !== action.payload.rosterUnitId
-        )
+        ),
+        warlordUnitId:
+          state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId
       };
 
       return {
@@ -187,6 +191,24 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           ...updatedState.points,
           current: calculateTotalPoints(updatedState)
         }
+      };
+    }
+
+    case 'SET_WARLORD': {
+      const { unitId } = action.payload;
+      const nextWarlordId =
+        unitId && state.units.some((unit) => unit.id === unitId) ? unitId : null;
+
+      if (state.warlordUnitId === nextWarlordId) {
+        return {
+          ...state,
+          warlordUnitId: state.warlordUnitId ?? null
+        };
+      }
+
+      return {
+        ...state,
+        warlordUnitId: nextWarlordId
       };
     }
 

@@ -124,6 +124,10 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     dispatch({ type: 'REMOVE_ENHANCEMENT', payload: { enhancementId } });
   }, []);
 
+  const setWarlord = useCallback((unitId: string | null): void => {
+    dispatch({ type: 'SET_WARLORD', payload: { unitId } });
+  }, []);
+
   const recalculatePoints = useCallback((): void => {
     dispatch({ type: 'RECALCULATE_POINTS' });
   }, []);
@@ -141,6 +145,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         updateUnitModelCost,
         applyEnhancement,
         removeEnhancement,
+        setWarlord,
         recalculatePoints
       }}
     >

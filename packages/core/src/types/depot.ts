@@ -204,6 +204,7 @@ export interface Roster {
     current: number;
     max: number;
   };
+  warlordUnitId?: string | null;
   units: RosterUnit[];
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
 }

@@ -31,6 +31,7 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
     faction: roster.faction
       ? { ...roster.faction, slug: roster.faction.slug ?? factionSlug }
       : roster.faction,
+    warlordUnitId: roster.warlordUnitId ?? null,
     units: roster.units.map((unit) => ({
       ...unit,
       datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug

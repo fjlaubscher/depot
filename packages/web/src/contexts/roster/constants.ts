@@ -25,6 +25,7 @@ export const initialState: depot.Roster = {
     current: 0,
     max: 2000
   },
+  warlordUnitId: null,
   units: [],
   enhancements: []
 };
