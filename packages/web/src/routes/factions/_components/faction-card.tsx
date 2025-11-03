@@ -30,7 +30,10 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
       <Card interactive className="flex h-full flex-col gap-4 overflow-hidden">
         <Card.Header className="items-start gap-3">
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <Card.Title as="h3" className="truncate text-base font-semibold sm:text-lg">
+            <Card.Title
+              as="h3"
+              className="truncate text-base font-semibold sm:text-lg group-hover:text-accent"
+            >
               {faction.name}
             </Card.Title>
             <Card.Description className="text-xs transition-colors duration-200 group-hover:text-body sm:text-sm">
@@ -46,7 +49,7 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
           {stats.map(({ label, value, icon: Icon }) => (
             <div
               key={label}
-              className="flex flex-col gap-2 rounded-lg border border-subtle surface-soft p-3 transition-colors duration-200 group-hover:border-accent group-hover:surface-accent"
+              className="flex flex-col gap-2 rounded-lg border border-subtle surface-soft p-3 transition-colors duration-200"
             >
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full surface-accent text-accent">

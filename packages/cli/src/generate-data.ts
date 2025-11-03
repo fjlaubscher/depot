@@ -118,6 +118,10 @@ const buildDatasheet = (
 
   const { isForgeWorld, isLegends } = classifySource(datasheet.sourceId);
   const supplementInfo = getSupplementInfo(datasheet.factionId, datasheet.sourceId);
+  const source = data.sources.find((entry) => entry.id === datasheet.sourceId);
+  if (!source) {
+    throw new Error(`Missing source for datasheet ${datasheet.id} (${datasheet.name})`);
+  }
 
   const keywords = data.datasheetKeywords.filter(
     (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
@@ -200,6 +204,7 @@ const buildDatasheet = (
     leaders,
     supplementSlug: supplementInfo?.slug,
     supplementName: supplementInfo?.name,
+    sourceName: `${source.type}: ${source.name}`,
     isForgeWorld,
     isLegends
   };

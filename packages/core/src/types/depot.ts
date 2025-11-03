@@ -116,6 +116,7 @@ export interface Datasheet {
   factionId: string;
   factionSlug: string;
   sourceId: string;
+  sourceName: string;
   supplementSlug?: string;
   supplementName?: string;
   legend: string;

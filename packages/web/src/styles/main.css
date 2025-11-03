@@ -2,8 +2,10 @@
 
 /* Font and color configuration */
 @theme {
-  --font-family-sans: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  
+  --font-family-sans:
+    'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
   /* Map primary colors to orange palette */
   --color-primary-50: var(--color-orange-50);
   --color-primary-100: var(--color-orange-100);
@@ -28,7 +30,9 @@
 
 /* Ensure font is applied to body */
 body {
-  font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family:
+    'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /* Keyword spans from Wahapedia data */
@@ -79,23 +83,23 @@ span.kwbu {
 }
 
 @utility text-accent {
-  @apply text-primary-700 dark:text-primary-300;
+  @apply text-primary-700 dark:text-primary-400;
 }
 
 @utility text-accent-strong {
-  @apply text-primary-800 dark:text-primary-200;
+  @apply text-primary-800 dark:text-primary-300;
 }
 
 @utility surface-accent {
-  @apply bg-primary-50 dark:bg-primary-900;
+  @apply bg-primary-50 dark:bg-primary-800;
 }
 
 @utility surface-accent-strong {
-  @apply bg-primary-100 dark:bg-primary-900;
+  @apply bg-primary-100 dark:bg-primary-700;
 }
 
 @utility border-accent {
-  @apply border-primary-200 dark:border-primary-800;
+  @apply border-primary-200 dark:border-primary-500/60;
 }
 
 @utility sidebar-item {
@@ -115,23 +119,23 @@ span.kwbu {
 }
 
 @utility focus-ring-primary {
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-200 dark:focus-visible:outline-primary-300;
+  @apply focus-visible:outline-2 focus-visible:outline-primary-200 dark:focus-visible:outline-primary-300;
 }
 
 @utility focus-ring-info {
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400;
+  @apply focus-visible:outline-2 focus-visible:outline-blue-400;
 }
 
 @utility focus-ring-success {
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-400;
+  @apply focus-visible:outline-2 focus-visible:outline-green-400;
 }
 
 @utility focus-ring-warning {
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400;
+  @apply focus-visible:outline-2 focus-visible:outline-yellow-400;
 }
 
 @utility focus-ring-danger {
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400;
+  @apply focus-visible:outline-2 focus-visible:outline-red-400;
 }
 
 @utility text-info-strong {

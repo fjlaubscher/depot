@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
 // components
-import { Tag, TagSection } from '@/components/ui';
+import { Tag, TagSection, TagGroup } from '@/components/ui';
 import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
 import DatasheetLeaderRules from './datasheet-leader-rules';
 
@@ -17,6 +17,10 @@ interface DatasheetHeroProps {
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets }) => {
   const { models, keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = groupKeywords(keywords);
+  const pointTags = datasheet.modelCosts.map((cost) => ({
+    key: `${cost.datasheetId}-${cost.line}`,
+    label: cost.description ? `${cost.cost} pts (${cost.description})` : `${cost.cost} pts`
+  }));
 
   if (models.length === 0) return null;
 
@@ -35,6 +39,16 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets })
       />
 
       <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+
+      {pointTags.length > 0 ? (
+        <TagGroup spacing="sm" className="flex-wrap" data-testid="datasheet-points">
+          {pointTags.map((entry) => (
+            <Tag key={entry.key} variant="primary" size="sm">
+              {entry.label}
+            </Tag>
+          ))}
+        </TagGroup>
+      ) : null}
 
       {/* Keywords */}
       <div className="flex flex-col gap-2">

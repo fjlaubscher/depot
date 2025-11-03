@@ -101,6 +101,7 @@ const mockFaction: depot.Faction = {
       factionId: 'test-faction',
       factionSlug: 'test-faction',
       sourceId: 'core',
+      sourceName: 'Test Source',
       legend: '',
       role: 'Battleline',
       loadout: '',

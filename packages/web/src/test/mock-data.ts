@@ -12,6 +12,7 @@ export const mockDatasheet: depot.Datasheet = {
   factionId: 'SM',
   factionSlug: 'space-marines',
   sourceId: 'core',
+  sourceName: 'Faction Pack: Space Marines',
   legend: '',
   role: 'CHARACTER', // Updated for 10th edition
   loadout: '',

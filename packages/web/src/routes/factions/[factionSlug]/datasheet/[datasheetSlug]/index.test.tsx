@@ -16,14 +16,6 @@ import DatasheetPage from './index';
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
 vi.mock('@/contexts/toast/use-toast-context');
-
-// Mock child components
-vi.mock('./_components/datasheet-profile', () => ({
-  default: ({ datasheet }: { datasheet: any }) => (
-    <div data-testid="datasheet-profile">Profile for {datasheet.name}</div>
-  )
-}));
-
 // Mock react-router-dom params and navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -58,11 +50,11 @@ describe('DatasheetPage', () => {
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
   });
 
-  it('renders points cost correctly', () => {
+  it('displays source and points info', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    // Points cost should be handled by child components, just verify main content renders
-    expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-header')).toHaveTextContent('Faction Pack: Space Marines');
+    expect(screen.getByTestId('datasheet-points')).toHaveTextContent('80 pts (Captain)');
   });
 
   it('renders child components with correct data', () => {
@@ -114,12 +106,6 @@ describe('DatasheetPage', () => {
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
   });
 
-  it('shows share button', () => {
-    render(<DatasheetPage />, { wrapper: TestWrapper });
-
-    expect(screen.getByTestId('share-datasheet-button')).toBeInTheDocument();
-  });
-
   it('handles datasheet with no costs', () => {
     const factionWithoutCosts = {
       ...mockFaction,
@@ -136,5 +122,6 @@ describe('DatasheetPage', () => {
 
     // Cost handling is done by child components, just verify main content renders
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
+    expect(screen.queryByTestId('datasheet-points')).not.toBeInTheDocument();
   });
 });

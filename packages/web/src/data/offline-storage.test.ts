@@ -69,6 +69,7 @@ const mockFaction: depot.Faction = {
       factionId: 'SM',
       factionSlug: 'space-marines',
       sourceId: 'core',
+      sourceName: 'Faction Pack: Space Marines',
       legend: '',
       role: 'HQ',
       loadout: '',

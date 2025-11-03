@@ -52,13 +52,6 @@ const Home: React.FC = () => {
   return (
     <AppLayout title="Home">
       <div className="flex flex-col gap-12">
-        <Alert title="Heads up!" variant="warning">
-          Wahapedia&apos;s latest export (2025-10-29) is missing wargear for some datasheets.
-          <br />
-          Your existing rosters keep their wargear, but freshly generated ones will be missing those
-          entries until Wahapedia publishes an updated dump.
-        </Alert>
-
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
           <img
             src={getImageUrl('depot-hero.jpg')}

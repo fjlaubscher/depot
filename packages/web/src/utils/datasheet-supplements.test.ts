@@ -15,6 +15,7 @@ const makeDatasheet = (
   factionId: overrides.factionId ?? 'SM',
   factionSlug: overrides.factionSlug ?? 'space-marines',
   sourceId: overrides.sourceId ?? '000000139',
+  sourceName: overrides.sourceName ?? 'Codex',
   supplementSlug: overrides.supplementSlug,
   supplementName: overrides.supplementName,
   legend: overrides.legend ?? '',

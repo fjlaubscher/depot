@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Share2 } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
@@ -10,7 +9,6 @@ import { BackButton } from '@/components/shared';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
-import { useToast } from '@/contexts/toast/use-toast-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
 
 // page components
@@ -22,7 +20,6 @@ const DatasheetPage: FC = () => {
     factionSlug: string;
     datasheetSlug: string;
   }>();
-  const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { state } = useAppContext();
   const settings = state.settings;
@@ -33,38 +30,6 @@ const DatasheetPage: FC = () => {
     }
     return undefined;
   }, [faction, datasheetSlug]);
-
-  const datasheetCost = useMemo(() => {
-    if (datasheet) {
-      return datasheet.modelCosts.reduce((acc, curr) => {
-        const formattedCost = `${curr.cost} pts (${curr.description})`;
-        return acc ? `${acc} • ${formattedCost}` : formattedCost;
-      }, '');
-    }
-
-    return undefined;
-  }, [datasheet]);
-
-  const handleShare = () => {
-    const url = window.location.href;
-    // @ts-ignore - Web Share API types not available in TypeScript lib
-    if (navigator.share) {
-      // @ts-ignore - Web Share API types not available in TypeScript lib
-      navigator
-        .share({
-          title: datasheet?.name || 'Datasheet',
-          url: url
-        })
-        .catch(() => {
-          // Fallback to clipboard
-          navigator.clipboard.writeText(url);
-          showToast({ type: 'info', title: 'Success', message: 'Link copied to clipboard' });
-        });
-    } else {
-      navigator.clipboard.writeText(url);
-      showToast({ type: 'info', title: 'Success', message: 'Link copied to clipboard' });
-    }
-  };
 
   if (error) {
     return (
@@ -124,14 +89,7 @@ const DatasheetPage: FC = () => {
         {/* Header */}
         <PageHeader
           title={datasheet.name}
-          subtitle={datasheetCost}
-          action={{
-            icon: <Share2 size={16} />,
-            onClick: handleShare,
-            ariaLabel: 'Share datasheet',
-            variant: 'default',
-            testId: 'share-datasheet-button'
-          }}
+          subtitle={datasheet.sourceName}
           data-testid="datasheet-header"
         />
 
