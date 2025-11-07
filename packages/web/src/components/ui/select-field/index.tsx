@@ -14,6 +14,7 @@ interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   fullWidth?: boolean;
   placeholder?: string;
   'data-testid'?: string;
+  selectDataTestId?: string;
 }
 
 const SelectField: FC<SelectFieldProps> = ({
@@ -26,6 +27,7 @@ const SelectField: FC<SelectFieldProps> = ({
   name,
   placeholder,
   'data-testid': dataTestId,
+  selectDataTestId,
   ...props
 }) => {
   const selectId = id || name || label?.toLowerCase().replace(/\s+/g, '-');
@@ -57,7 +59,7 @@ const SelectField: FC<SelectFieldProps> = ({
           id={selectId}
           name={name}
           className={selectClasses}
-          data-testid={dataTestId ? `${dataTestId}-select` : undefined}
+          data-testid={selectDataTestId ?? (dataTestId ? `${dataTestId}-select` : undefined)}
           {...props}
         >
           {placeholder && (

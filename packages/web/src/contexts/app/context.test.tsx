@@ -127,9 +127,15 @@ const mockFaction: depot.Faction = {
       isLegends: false
     }
   ],
-  stratagems: [],
-  enhancements: [],
-  detachmentAbilities: []
+  detachments: [
+    {
+      slug: 'test-detachment',
+      name: 'Test Detachment',
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    }
+  ]
 };
 
 const mockSettings: depot.Settings = {

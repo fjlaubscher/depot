@@ -21,9 +21,9 @@ vi.mock('./_components/faction-datasheets', () => ({
   )
 }));
 
-vi.mock('./_components/faction-detachments', () => ({
-  default: ({ detachmentAbilities }: { detachmentAbilities: depot.DetachmentAbility[] }) => (
-    <div data-testid="faction-detachments">Detachments: {detachmentAbilities.length}</div>
+vi.mock('./_components/detachments', () => ({
+  default: ({ detachments }: { detachments: depot.Detachment[] }) => (
+    <div data-testid="faction-detachments">Detachments: {detachments.length}</div>
   )
 }));
 

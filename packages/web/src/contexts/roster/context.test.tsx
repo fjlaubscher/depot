@@ -47,12 +47,11 @@ const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
         name: 'Space Marines',
         path: '/data/space-marines.json',
         datasheetCount: 50,
-        stratagemCount: 12,
-        enhancementCount: 8,
         detachmentCount: 4
       },
       maxPoints: 2000,
       detachment: {
+        slug: 'test-detachment',
         name: 'Test Detachment',
         abilities: [],
         enhancements: [],

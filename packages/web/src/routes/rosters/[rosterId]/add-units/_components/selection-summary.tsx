@@ -161,18 +161,20 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
         <button
           ref={triggerButtonRef}
           type="button"
-          className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-2xl bg-primary-500 px-4 py-4 text-white shadow-lg shadow-primary-900/30 transition hover:bg-primary-600 focus-ring-primary md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-full md:px-5 md:py-3 md:text-sm dark:bg-primary-600 dark:hover:bg-primary-500"
+          className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-2xl border-t border-subtle surface-base px-4 py-4 text-body shadow-lg shadow-black/10 transition hover:bg-gray-50 focus-ring-primary md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-full md:border md:px-5 md:py-3 md:text-sm md:shadow-lg md:shadow-black/15 dark:hover:bg-gray-700"
           onClick={openSummary}
         >
           <span className="flex flex-col text-left md:flex-row md:items-center md:gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-white/90 md:text-sm">
+            <span className="text-xs font-semibold uppercase tracking-wide text-secondary md:text-sm">
               Review Selection
             </span>
-            <span className="text-lg font-semibold md:text-sm">
+            <span className="text-lg font-semibold text-foreground md:text-sm">
               {selectedUnitsCount} unit{selectedUnitsCount === 1 ? '' : 's'} • {totalPoints} pts
             </span>
           </span>
-          <span className="text-sm font-medium underline underline-offset-4 md:hidden">Open</span>
+          <span className="text-sm font-medium text-secondary underline underline-offset-4 md:hidden">
+            Review
+          </span>
         </button>
       ) : null}
 

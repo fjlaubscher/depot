@@ -11,11 +11,10 @@ export const initialState: depot.Roster = {
     name: '',
     path: '',
     datasheetCount: 0,
-    stratagemCount: 0,
-    enhancementCount: 0,
     detachmentCount: 0
   },
   detachment: {
+    slug: '',
     name: '',
     abilities: [],
     enhancements: [],

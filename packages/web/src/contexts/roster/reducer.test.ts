@@ -34,6 +34,7 @@ describe('rosterReducer', () => {
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
         detachment: {
+          slug: 'test-detachment',
           name: 'Test Detachment',
           abilities: [],
           enhancements: [],
@@ -96,6 +97,7 @@ describe('rosterReducer', () => {
   describe('CREATE_ROSTER', () => {
     it('should create a new roster with provided data', () => {
       const mockDetachment: depot.Detachment = {
+        slug: 'test-detachment',
         name: 'Test Detachment',
         abilities: [],
         enhancements: [],
@@ -145,6 +147,7 @@ describe('rosterReducer', () => {
 
     it('should preserve initial detachment structure', () => {
       const mockDetachment: depot.Detachment = {
+        slug: 'combat-patrol',
         name: 'Combat Patrol',
         abilities: [],
         enhancements: [],
@@ -182,6 +185,7 @@ describe('rosterReducer', () => {
       };
 
       const mockDetachment: depot.Detachment = {
+        slug: 'gladius-task-force',
         name: 'Gladius Task Force',
         abilities: [
           {
@@ -218,6 +222,7 @@ describe('rosterReducer', () => {
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
         detachment: {
+          slug: 'original-detachment',
           name: 'Original Detachment',
           abilities: [],
           enhancements: [],
@@ -226,6 +231,7 @@ describe('rosterReducer', () => {
       };
 
       const newDetachment: depot.Detachment = {
+        slug: 'new-detachment',
         name: 'New Detachment',
         abilities: [],
         enhancements: [],
@@ -333,12 +339,24 @@ describe('rosterReducer', () => {
             factionSlug: 'space-marines',
             faction: mockFactionIndex,
             maxPoints: 2000,
-            detachment: { name: 'Test', abilities: [], enhancements: [], stratagems: [] }
+            detachment: {
+              slug: 'immutability-detachment',
+              name: 'Test',
+              abilities: [],
+              enhancements: [],
+              stratagems: []
+            }
           }
         },
         {
           type: 'SET_DETACHMENT',
-          payload: { name: 'New Det', abilities: [], enhancements: [], stratagems: [] }
+          payload: {
+            slug: 'set-detachment',
+            name: 'New Det',
+            abilities: [],
+            enhancements: [],
+            stratagems: []
+          }
         },
         {
           type: 'SET_WARLORD',

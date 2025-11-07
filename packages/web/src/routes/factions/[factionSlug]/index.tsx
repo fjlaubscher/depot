@@ -18,7 +18,7 @@ import { getFactionAlliance } from '@/utils/faction';
 // Components
 import Skeleton from './_components/skeleton';
 import FactionDatasheets from './_components/faction-datasheets';
-import FactionDetachments from './_components/faction-detachments';
+import FactionDetachments from './_components/detachments';
 
 // Types
 import type { depot } from '@depot/core';
@@ -161,11 +161,7 @@ const Faction: React.FC = () => {
 
         <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
           <FactionDatasheets datasheets={faction.datasheets} filters={datasheetFilters} />
-          <FactionDetachments
-            detachmentAbilities={faction.detachmentAbilities}
-            enhancements={faction.enhancements}
-            stratagems={faction.stratagems}
-          />
+          <FactionDetachments detachments={faction.detachments} />
         </Tabs>
       </div>
     </AppLayout>

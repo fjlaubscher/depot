@@ -158,10 +158,15 @@ describe('CreateRoster', () => {
 
     const nameInput = screen.getByTestId('roster-name-input');
     const factionSelect = screen.getByTestId('faction-field-select');
-    const pointsInput = screen.getByTestId('max-points-input');
+    const maxPointsSelect = screen.getByTestId('max-points-field-select');
 
     await user.type(nameInput, 'Test Roster');
     await user.selectOptions(factionSelect, 'space-marines');
+    await user.selectOptions(maxPointsSelect, 'custom');
+
+    const pointsInput = await screen.findByTestId('max-points-input');
+    pointsInput.removeAttribute('min');
+    pointsInput.removeAttribute('required');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -176,10 +181,12 @@ describe('CreateRoster', () => {
     const submitButton = screen.getByTestId('submit-button');
     await user.click(submitButton);
 
-    expect(mockShowToast).toHaveBeenCalledWith({
-      type: 'error',
-      title: 'Validation Error',
-      message: 'Max points must be greater than 0.'
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith({
+        type: 'error',
+        title: 'Validation Error',
+        message: 'Max points must be greater than 0.'
+      });
     });
     expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
   });
@@ -224,10 +231,13 @@ describe('CreateRoster', () => {
 
     const nameInput = screen.getByTestId('roster-name-input');
     const factionSelect = screen.getByTestId('faction-field-select');
-    const pointsInput = screen.getByTestId('max-points-input');
+    const maxPointsSelect = screen.getByTestId('max-points-field-select');
 
     await user.type(nameInput, 'My Awesome Roster');
     await user.selectOptions(factionSelect, 'space-marines');
+    await user.selectOptions(maxPointsSelect, 'custom');
+
+    const pointsInput = await screen.findByTestId('max-points-input');
 
     // Wait for detachment field to appear and select it
     await waitFor(() => {
@@ -307,8 +317,9 @@ describe('CreateRoster', () => {
   it('uses default max points of 2000', () => {
     render(<CreateRoster />, { wrapper: TestWrapper });
 
-    const pointsInput = screen.getByTestId('max-points-input');
-    expect(pointsInput).toHaveValue(2000);
+    const maxPointsSelect = screen.getByTestId('max-points-field-select') as HTMLSelectElement;
+    expect(maxPointsSelect.value).toBe('strike-force');
+    expect(screen.queryByTestId('max-points-input')).not.toBeInTheDocument();
   });
 
   it('handles empty faction list gracefully', () => {

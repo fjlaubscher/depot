@@ -7,11 +7,10 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import type { depot } from '@depot/core';
 
-import { groupFactionDataByDetachment } from '@/utils/faction';
-
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
+import MaxPointsField from './_components/max-points-field';
 
 const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +19,7 @@ const CreateRoster: React.FC = () => {
 
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
-  const [detachmentName, setDetachmentName] = useState<string | null>(null);
+  const [detachmentSlug, setDetachmentSlug] = useState<string | null>(null);
   const [maxPoints, setMaxPoints] = useState(2000);
 
   const { factions, loading: factionsLoading } = useFactions();
@@ -31,35 +30,25 @@ const CreateRoster: React.FC = () => {
       ?.map((f) => ({ value: f.slug, label: f.name }))
       .sort((a, b) => a.label.localeCompare(b.label)) || [];
 
-  // Group detachment data from selected faction
-  const detachmentsData = useMemo(() => {
-    if (
-      !selectedFaction?.detachmentAbilities ||
-      !selectedFaction?.enhancements ||
-      !selectedFaction?.stratagems
-    ) {
-      return {};
-    }
+  const factionDetachments: depot.Detachment[] = selectedFaction?.detachments ?? [];
 
-    return groupFactionDataByDetachment(
-      selectedFaction.detachmentAbilities,
-      selectedFaction.enhancements,
-      selectedFaction.stratagems
-    );
-  }, [selectedFaction]);
+  const sortedDetachments = useMemo(
+    () => [...factionDetachments].sort((a, b) => a.name.localeCompare(b.name)),
+    [factionDetachments]
+  );
 
-  // Create detachment options from grouped data
-  const detachmentOptions = useMemo(() => {
-    return Object.keys(detachmentsData)
-      .sort()
-      .map((name) => ({ value: name, label: name }));
-  }, [detachmentsData]);
+  const detachmentOptions = useMemo(
+    () =>
+      sortedDetachments.map((detachment) => ({
+        value: detachment.slug,
+        label: detachment.name
+      })),
+    [sortedDetachments]
+  );
 
   // Reset detachment when faction changes
   useEffect(() => {
-    if (factionSlug && detachmentName) {
-      setDetachmentName(null);
-    }
+    setDetachmentSlug(null);
   }, [factionSlug]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +69,7 @@ const CreateRoster: React.FC = () => {
       });
       return;
     }
-    if (!detachmentName) {
+    if (!detachmentSlug) {
       showToast({
         type: 'error',
         title: 'Validation Error',
@@ -98,8 +87,10 @@ const CreateRoster: React.FC = () => {
     }
 
     // Build the complete detachment object using lookup
-    const selectedDetachmentData = detachmentsData[detachmentName];
-    if (!selectedDetachmentData) {
+    const selectedDetachment = sortedDetachments.find(
+      (detachment) => detachment.slug === detachmentSlug
+    );
+    if (!selectedDetachment) {
       showToast({
         type: 'error',
         title: 'Validation Error',
@@ -108,12 +99,7 @@ const CreateRoster: React.FC = () => {
       return;
     }
 
-    const detachment: depot.Detachment = {
-      name: detachmentName,
-      abilities: selectedDetachmentData.abilities,
-      enhancements: selectedDetachmentData.enhancements,
-      stratagems: selectedDetachmentData.stratagems
-    };
+    const detachment: depot.Detachment = selectedDetachment;
 
     // Find the faction Index entry
     const selectedFactionIndex = factions?.find(
@@ -181,8 +167,8 @@ const CreateRoster: React.FC = () => {
                 data-testid="detachment-field"
                 label="Detachment"
                 options={detachmentOptions}
-                value={detachmentName || ''}
-                onChange={(e) => setDetachmentName(e.target.value || null)}
+                value={detachmentSlug || ''}
+                onChange={(e) => setDetachmentSlug(e.target.value || null)}
                 placeholder="Select a Detachment"
                 required
               />
@@ -195,20 +181,11 @@ const CreateRoster: React.FC = () => {
               </Field>
             ) : null}
 
-            <Field data-testid="max-points-field">
-              <label htmlFor="max-points" className="block text-sm font-medium text-body">
-                Max Points
-              </label>
-              <input
-                data-testid="max-points-input"
-                id="max-points"
-                type="number"
-                className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
-                value={maxPoints.toString()}
-                onChange={(e) => setMaxPoints(parseInt(e.target.value, 10))}
-                required
-              />
-            </Field>
+            <MaxPointsField
+              data-testid="max-points-field"
+              value={maxPoints}
+              onChange={setMaxPoints}
+            />
 
             <div className="flex justify-end gap-4">
               <Button
@@ -222,7 +199,7 @@ const CreateRoster: React.FC = () => {
                 data-testid="submit-button"
                 type="submit"
                 disabled={
-                  !name || !factionSlug || !detachmentName || factionsLoading || factionLoading
+                  !name || !factionSlug || !detachmentSlug || factionsLoading || factionLoading
                 }
               >
                 Create Roster

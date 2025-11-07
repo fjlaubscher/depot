@@ -95,9 +95,15 @@ const mockFaction: depot.Faction = {
       isLegends: false
     }
   ],
-  stratagems: [],
-  enhancements: [],
-  detachmentAbilities: []
+  detachments: [
+    {
+      slug: 'gladius-task-force',
+      name: 'Gladius Task Force',
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    }
+  ]
 };
 
 const mockSettings: depot.Settings = {
@@ -463,11 +469,10 @@ describe('OfflineStorage', () => {
         name: 'Space Marines',
         path: '/data/space-marines.json',
         datasheetCount: 50,
-        stratagemCount: 12,
-        enhancementCount: 8,
         detachmentCount: 4
       },
       detachment: {
+        slug: 'test-detachment',
         name: 'Test Detachment',
         abilities: [],
         enhancements: [],

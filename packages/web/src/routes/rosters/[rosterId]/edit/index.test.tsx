@@ -39,6 +39,7 @@ const mockRosterContext = vi.hoisted(() => ({
       path: '/data/space-marines.json'
     } as depot.Index,
     detachment: {
+      slug: 'gladius-task-force',
       name: 'Gladius Task Force',
       abilities: [],
       enhancements: [],
@@ -142,6 +143,7 @@ describe('EditRosterPage', () => {
         path: '/data/space-marines.json'
       } as depot.Index,
       detachment: {
+        slug: 'gladius-task-force',
         name: 'Gladius Task Force',
         abilities: [],
         enhancements: [],

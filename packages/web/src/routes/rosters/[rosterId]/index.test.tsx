@@ -39,6 +39,7 @@ function createMockRosterState(): depot.Roster {
       path: '/indices/space-marines'
     },
     detachment: {
+      slug: 'gladius-task-force',
       name: 'Gladius Task Force',
       abilities: [],
       enhancements: [],
@@ -207,6 +208,7 @@ describe('ViewRosterPage', () => {
       ...mockRosterState.state,
       units: [mockUnit],
       detachment: {
+        slug: 'gladius-task-force',
         name: 'Gladius Task Force',
         abilities: [
           {

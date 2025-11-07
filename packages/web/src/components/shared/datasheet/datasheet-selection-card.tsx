@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 
 import { ContentCard, PointsTag, Tag, SelectField, Button } from '@/components/ui';
+import { groupKeywords } from '@/utils/keywords';
 
 interface DatasheetSelectionCardProps {
   datasheet: depot.Datasheet;
@@ -43,6 +44,10 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
     return getUnitCount(datasheet, selectedModelCost);
   }, [datasheet, selectedModelCost, getUnitCount]);
 
+  const factionKeywords = useMemo(() => {
+    return groupKeywords(datasheet.keywords).faction;
+  }, [datasheet.keywords]);
+
   const handleAdd = () => {
     if (selectedModelCost) {
       onAdd(datasheet, selectedModelCost);
@@ -82,6 +87,16 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
               ) : null}
             </div>
           )}
+
+          {factionKeywords.length > 0 ? (
+            <div className="flex flex-wrap gap-2" data-testid="faction-keywords">
+              {factionKeywords.map((keyword) => (
+                <Tag key={keyword} size="sm" variant="primary">
+                  {keyword}
+                </Tag>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-1">

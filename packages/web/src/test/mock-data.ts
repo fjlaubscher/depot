@@ -217,15 +217,21 @@ export const mockDetachmentAbility: depot.DetachmentAbility = {
   detachment: 'Gladius Task Force'
 };
 
+export const mockDetachment: depot.Detachment = {
+  slug: 'gladius-task-force',
+  name: 'Gladius Task Force',
+  abilities: [mockDetachmentAbility],
+  enhancements: [mockEnhancement],
+  stratagems: [mockStratagem]
+};
+
 export const mockFaction: depot.Faction = {
   id: 'SM',
   slug: 'space-marines',
   name: 'Space Marines',
   link: '/faction/space-marines',
   datasheets: [mockDatasheet],
-  stratagems: [mockStratagem],
-  enhancements: [mockEnhancement],
-  detachmentAbilities: [mockDetachmentAbility]
+  detachments: [mockDetachment]
 };
 
 export const mockFactionIndexes: depot.Index[] = [
@@ -289,21 +295,12 @@ export const mockFactionWithoutDatasheets = createMockFaction({
 
 export const mockEmptyFaction = createMockFaction({
   datasheets: [],
-  stratagems: [],
-  enhancements: [],
-  detachmentAbilities: []
+  detachments: []
 });
 
 /**
  * Roster-related mock data
  */
-
-export const mockDetachment: depot.Detachment = {
-  name: 'Gladius Task Force',
-  abilities: [mockDetachmentAbility],
-  enhancements: [mockEnhancement],
-  stratagems: [mockStratagem]
-};
 
 export const mockRosterUnit: depot.RosterUnit = {
   id: 'roster-unit-1',
@@ -319,8 +316,6 @@ export const mockFactionIndex: depot.Index = {
   name: 'Space Marines',
   path: '/data/space-marines.json',
   datasheetCount: 50,
-  stratagemCount: 12,
-  enhancementCount: 8,
   detachmentCount: 4
 };
 
