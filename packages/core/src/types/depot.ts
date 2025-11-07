@@ -150,9 +150,7 @@ export interface Faction {
   name: string;
   link: string;
   datasheets: Datasheet[];
-  stratagems: Stratagem[];
-  enhancements: Enhancement[];
-  detachmentAbilities: DetachmentAbility[];
+  detachments: Detachment[];
 }
 
 export interface Index {
@@ -161,8 +159,6 @@ export interface Index {
   name: string;
   path: string;
   datasheetCount?: number;
-  stratagemCount?: number;
-  enhancementCount?: number;
   detachmentCount?: number;
 }
 
@@ -177,6 +173,7 @@ export interface Settings {
 
 // Detachment, composed from other types
 export interface Detachment {
+  slug: string;
   name: string;
   abilities: DetachmentAbility[];
   enhancements: Enhancement[];

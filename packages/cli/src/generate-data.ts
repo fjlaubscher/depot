@@ -210,6 +210,62 @@ const buildDatasheet = (
   };
 };
 
+const sortByName = <T extends { name: string }>(items: T[]) =>
+  items.sort((a, b) => a.name.localeCompare(b.name));
+
+const buildDetachments = (
+  detachmentAbilities: wahapedia.DetachmentAbility[],
+  enhancements: wahapedia.Enhancement[],
+  stratagems: wahapedia.Stratagem[],
+  createSlug: (value: string) => string
+): depot.Detachment[] => {
+  const detachments = new Map<string, depot.Detachment>();
+
+  const addToDetachment = (
+    name: string,
+    type: 'abilities' | 'enhancements' | 'stratagems',
+    entry: wahapedia.DetachmentAbility | wahapedia.Enhancement | wahapedia.Stratagem
+  ) => {
+    if (!name) {
+      return;
+    }
+
+    if (!detachments.has(name)) {
+      detachments.set(name, {
+        slug: createSlug(name),
+        name,
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      });
+    }
+
+    const detachment = detachments.get(name);
+    if (!detachment) {
+      return;
+    }
+
+    detachment[type].push(entry as never);
+  };
+
+  detachmentAbilities.forEach((ability) =>
+    addToDetachment(ability.detachment, 'abilities', ability)
+  );
+  enhancements.forEach((enhancement) =>
+    addToDetachment(enhancement.detachment, 'enhancements', enhancement)
+  );
+  stratagems.forEach((stratagem) => addToDetachment(stratagem.detachment, 'stratagems', stratagem));
+
+  const builtDetachments = Array.from(detachments.values());
+  builtDetachments.forEach((detachment) => {
+    sortByName(detachment.abilities);
+    sortByName(detachment.enhancements);
+    sortByName(detachment.stratagems);
+  });
+
+  return sortByName(builtDetachments);
+};
+
 const buildFactionData = (
   data: wahapedia.Data,
   faction: wahapedia.Faction,
@@ -233,14 +289,19 @@ const buildFactionData = (
     (enhancement) => enhancement.factionId === faction.id
   );
   const detachmentAbilities = data.detachmentAbilities.filter((da) => da.factionId === faction.id);
+  const detachmentSlugGenerator = slugUtils.createSlugGenerator(`${factionSlug}-detachment`);
+  const detachments = buildDetachments(
+    detachmentAbilities,
+    enhancements,
+    stratagems,
+    detachmentSlugGenerator
+  );
 
   return {
     ...faction,
     slug: factionSlug,
     datasheets,
-    stratagems,
-    enhancements,
-    detachmentAbilities
+    detachments
   };
 };
 

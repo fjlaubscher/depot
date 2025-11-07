@@ -113,9 +113,7 @@ const init = async () => {
 
     // Calculate metadata counts for the index
     const datasheetCount = faction.datasheets.length;
-    const stratagemCount = faction.stratagems.length;
-    const enhancementCount = faction.enhancements.length;
-    const detachmentCount = faction.detachmentAbilities.length;
+    const detachmentCount = faction.detachments.length;
 
     index.push({
       id: faction.id,
@@ -123,8 +121,6 @@ const init = async () => {
       name: faction.name,
       path: `/data/${faction.slug}.json`,
       datasheetCount,
-      stratagemCount,
-      enhancementCount,
       detachmentCount
     });
 
