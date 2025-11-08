@@ -111,14 +111,31 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
               storedVersion,
               dataVersion: DATA_VERSION
             });
-            await offlineStorage.destroy();
+            try {
+              await offlineStorage.clearFactionData();
+            } catch (clearError) {
+              console.warn(
+                'Failed to clear cached faction data, attempting full reset.',
+                clearError
+              );
+              try {
+                await offlineStorage.destroy();
+              } catch (destroyError) {
+                console.error('Failed to reset offline storage.', destroyError);
+              }
+            }
           }
         } catch (versionError) {
           console.warn('Failed to verify cached data version, forcing reset.', versionError);
           try {
-            await offlineStorage.destroy();
-          } catch (destroyError) {
-            console.error('Failed to reset offline storage.', destroyError);
+            await offlineStorage.clearFactionData();
+          } catch (clearError) {
+            console.warn('Failed to clear cached faction data, attempting full reset.', clearError);
+            try {
+              await offlineStorage.destroy();
+            } catch (destroyError) {
+              console.error('Failed to reset offline storage.', destroyError);
+            }
           }
         }
 
