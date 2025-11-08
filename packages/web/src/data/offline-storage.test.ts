@@ -348,6 +348,7 @@ describe('OfflineStorage', () => {
   describe('clearFactionData', () => {
     it('should clear cached factions from store', async () => {
       mockObjectStore.clear.mockClear();
+      mockDatabase.transaction.mockClear();
       mockObjectStore.clear.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
@@ -357,7 +358,11 @@ describe('OfflineStorage', () => {
       });
 
       await expect(offlineStorage.clearFactionData()).resolves.toBeUndefined();
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(1);
+      expect(mockDatabase.transaction).toHaveBeenCalledWith(
+        ['factionIndex', 'factions'],
+        'readwrite'
+      );
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(2);
     });
   });
 

@@ -262,7 +262,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       expect(mockOfflineStorage.getAllCachedFactions).toHaveBeenCalled();
     });
 
-    it('should reset offline storage when data version changes', async () => {
+    it('should clear cached faction data when data version changes', async () => {
       mockOfflineStorage.getDataVersion.mockResolvedValue('legacy-version');
       mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
 
@@ -273,7 +273,45 @@ describe('AppProvider with IndexedDB Integration', () => {
       );
 
       await waitFor(() => {
+        expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
+        expect(mockOfflineStorage.destroy).not.toHaveBeenCalled();
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+      });
+    });
+
+    it('should fall back to full reset when clearing cached faction data fails', async () => {
+      const clearError = new Error('clear failed');
+      mockOfflineStorage.getDataVersion.mockResolvedValue('legacy-version');
+      mockOfflineStorage.clearFactionData.mockRejectedValueOnce(clearError);
+      mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+
+      render(
+        <AppProvider>
+          <TestComponent />
+        </AppProvider>
+      );
+
+      await waitFor(() => {
+        expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
         expect(mockOfflineStorage.destroy).toHaveBeenCalledTimes(1);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+      });
+    });
+
+    it('should clear cached faction data when the stored version cannot be read', async () => {
+      const versionError = new Error('version read failed');
+      mockOfflineStorage.getDataVersion.mockRejectedValueOnce(versionError);
+      mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+
+      render(
+        <AppProvider>
+          <TestComponent />
+        </AppProvider>
+      );
+
+      await waitFor(() => {
+        expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
+        expect(mockOfflineStorage.destroy).not.toHaveBeenCalled();
         expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
       });
     });
