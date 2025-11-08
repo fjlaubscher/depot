@@ -40,6 +40,10 @@ describe('ViewRosterUnitCard', () => {
 
     expect(screen.getByTestId('roster-unit-core-abilities')).toBeInTheDocument();
     expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-keywords')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-keyword-infantry')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-keyword-character')).toBeInTheDocument();
+    expect(screen.queryByTestId('roster-unit-keyword-imperium')).not.toBeInTheDocument();
   });
 
   it('keeps the card expanded when interacting within details', () => {
