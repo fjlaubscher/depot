@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
 import ModelStatsRow from '@/components/shared/model-stats-row';
 import { WargearTable, DatasheetAbilities } from '@/components/shared';
+import { Tag, TagSection } from '@/components/ui';
 import { categorizeAbilities } from '@/utils/abilities';
+import { groupKeywords } from '@/utils/keywords';
 
 interface UnitDetailsProps {
   unit: depot.RosterUnit;
@@ -15,6 +17,14 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
     unit.datasheet.abilities
   );
   const models = unit.datasheet.models;
+  const datasheetKeywords = useMemo(() => {
+    const { datasheet } = groupKeywords(unit.datasheet.keywords);
+
+    return datasheet.map((keyword) => ({
+      label: keyword,
+      normalized: keyword.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    }));
+  }, [unit.datasheet.keywords]);
 
   return (
     <div className="border-t border-subtle surface-muted p-4">
@@ -45,6 +55,21 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
           abilities={inlineAbilities}
           dataTestId="roster-unit-abilities"
         />
+
+        {datasheetKeywords.length > 0 ? (
+          <TagSection title="Keywords" spacing="sm" data-testid="roster-unit-keywords">
+            {datasheetKeywords.map(({ label, normalized }) => (
+              <Tag
+                key={label}
+                variant="default"
+                size="sm"
+                data-testid={`roster-unit-keyword-${normalized}`}
+              >
+                {label}
+              </Tag>
+            ))}
+          </TagSection>
+        ) : null}
 
         {/* Quick Link to Full Datasheet */}
         <div className="pt-2 border-t border-subtle">
