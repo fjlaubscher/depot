@@ -11,7 +11,8 @@ const mockAbilities = [
     type: 'Core',
     description: '<p>Fallback doctrine description</p>',
     legend: '',
-    factionId: 'SM'
+    factionId: 'SM',
+    parameter: '6"'
   },
   {
     id: 'core-1',
@@ -19,7 +20,8 @@ const mockAbilities = [
     type: 'Core',
     description: '<p>Advance doctrine description</p>',
     legend: '',
-    factionId: 'SM'
+    factionId: 'SM',
+    parameter: '3"'
   }
 ];
 
@@ -31,8 +33,8 @@ describe('DatasheetAbilities', () => {
 
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(2);
-    expect(buttons[0]).toHaveTextContent(/advance doctrine/i);
-    expect(buttons[1]).toHaveTextContent(/fallback doctrine/i);
+    expect(buttons[0]).toHaveTextContent(/advance doctrine 3"/i);
+    expect(buttons[1]).toHaveTextContent(/fallback doctrine 6"/i);
   });
 
   it('opens modal with ability details when a tag is clicked', async () => {
@@ -42,6 +44,7 @@ describe('DatasheetAbilities', () => {
     await user.click(screen.getByRole('button', { name: /advance doctrine/i }));
 
     expect(screen.getByTestId('ability-modal')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /advance doctrine 3"/i })).toBeInTheDocument();
     expect(screen.getByText('Advance doctrine description')).toBeInTheDocument();
 
     await user.click(screen.getByTestId('ability-modal-close'));

@@ -106,9 +106,9 @@ const init = async () => {
   mkdirSync(DATA_DIR);
 
   const index: depot.Index[] = [];
-  const data = generateData();
+  const { factions, coreStratagems } = generateData();
 
-  data.forEach((faction) => {
+  factions.forEach((faction) => {
     const filePath = join(DATA_DIR, `${faction.slug}.json`);
 
     // Calculate metadata counts for the index
@@ -130,6 +130,9 @@ const init = async () => {
 
   console.log('Generating index file');
   writeFileSync(join(DATA_DIR, 'index.json'), JSON.stringify(index));
+
+  console.log('Creating core stratagems file');
+  writeFileSync(join(DATA_DIR, 'core-stratagems.json'), JSON.stringify(coreStratagems));
 };
 
 init()

@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import type { FC } from 'react';
+import { Fragment, useMemo } from 'react';
+import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Download, Pencil, Share } from 'lucide-react';
 
@@ -7,6 +7,7 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
+import useCoreStratagems from '@/hooks/use-core-stratagems';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs } from '@/components/ui';
@@ -18,12 +19,18 @@ import {
 } from '@/utils/roster';
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
+import StratagemsTab from './_components/stratagems-tab';
 
 const RosterView: FC = () => {
   const { state: roster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { state: appState } = useAppContext();
+  const {
+    stratagems: coreStratagems,
+    loading: loadingCoreStratagems,
+    error: coreStratagemsError
+  } = useCoreStratagems();
 
   const factionName = getRosterFactionName(roster);
   const includeWargearOnExport = appState.settings?.includeWargearOnExport ?? true;
@@ -89,6 +96,33 @@ const RosterView: FC = () => {
     factionName && roster.detachment?.name
       ? `${factionName} • ${roster.detachment.name}`
       : factionName;
+
+  const tabLabels: string[] = ['Units'];
+  const tabPanels: ReactNode[] = [<UnitsTab key="units" units={roster.units} />];
+
+  if (roster.detachment) {
+    tabLabels.push('Detachment');
+    tabPanels.push(
+      <DetachmentTab
+        key="detachment"
+        detachment={roster.detachment}
+        rosterEnhancements={roster.enhancements}
+        units={roster.units}
+      />
+    );
+  }
+
+  tabLabels.push('Stratagems');
+  tabPanels.push(
+    <StratagemsTab
+      key="stratagems"
+      coreStratagems={coreStratagems}
+      detachmentStratagems={roster.detachment?.stratagems ?? []}
+      units={roster.units}
+      loadingCore={loadingCoreStratagems}
+      coreError={coreStratagemsError}
+    />
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -156,19 +190,12 @@ const RosterView: FC = () => {
         </p>
       </div>
 
-      {/* Units & Detachment */}
-      {roster.detachment ? (
-        <Tabs tabs={['Units', 'Detachment']} data-testid="roster-tabs">
-          <UnitsTab units={roster.units} />
-          <DetachmentTab
-            detachment={roster.detachment}
-            rosterEnhancements={roster.enhancements}
-            units={roster.units}
-          />
-        </Tabs>
-      ) : (
-        <UnitsTab units={roster.units} />
-      )}
+      {/* Units, Detachment & Stratagems */}
+      <Tabs tabs={tabLabels} data-testid="roster-tabs">
+        {tabPanels.map((panel, index) => (
+          <Fragment key={`roster-tab-panel-${index}`}>{panel}</Fragment>
+        ))}
+      </Tabs>
     </div>
   );
 };

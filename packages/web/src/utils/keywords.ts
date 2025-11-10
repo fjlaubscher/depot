@@ -6,10 +6,13 @@ export const groupKeywords = (keywords: depot.Keyword[]) => {
 
   for (let i = 0; i < keywords.length; i++) {
     const keyword = keywords[i];
-    if (keyword.isFactionKeyword === 'true') {
-      faction.push(keyword.keyword);
-    } else {
-      datasheet.push(keyword.keyword);
+    // only add the keyword if it has content
+    if (keyword.keyword) {
+      if (keyword.isFactionKeyword === 'true') {
+        faction.push(keyword.keyword);
+      } else {
+        datasheet.push(keyword.keyword);
+      }
     }
   }
 

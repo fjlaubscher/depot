@@ -140,6 +140,7 @@ export interface Ability {
   legend: string;
   factionId: string;
   description: string;
+  parameter?: string;
 }
 
 export interface Enhancement {

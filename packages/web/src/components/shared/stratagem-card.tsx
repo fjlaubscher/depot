@@ -5,9 +5,10 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 
 interface StratagemCardProps {
   stratagem: depot.Stratagem;
+  unitNames?: string[];
 }
 
-const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
+const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = [] }) => {
   const { state } = useAppContext();
   const showFluff = state.settings?.showFluff ?? true;
 
@@ -35,6 +36,14 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem }) => {
         className="flex-1"
         dangerouslySetInnerHTML={{ __html: stratagem.description }}
       />
+      {unitNames.length > 0 ? (
+        <Card.Footer className="flex-col items-start gap-1 text-xs text-subtle">
+          <span className="font-semibold uppercase tracking-wide text-secondary">
+            Available to:
+          </span>
+          <span className="text-foreground">{unitNames.join(', ')}</span>
+        </Card.Footer>
+      ) : null}
     </Card>
   );
 };
