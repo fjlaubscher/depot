@@ -44,4 +44,22 @@ describe('convertToJSON', () => {
     // Anchor inner text preserved
     expect(value).toContain('anchor');
   });
+
+  it('normalizes malformed markup and strips unsafe attributes', () => {
+    const htmlCell =
+      '<ul><li>First<li style="color:red">Second</ul>' +
+      '<table width="200"><tr><td style="text-align:center">Cell</td></tr></table>';
+
+    const input = 'Col|\r\n' + htmlCell + '|\r\n';
+    const result = convertToJSON(input);
+    expect(result).toHaveLength(1);
+    const value = result[0].col;
+
+    expect(value).toContain('<li>First</li>');
+    expect(value).toContain('<li>Second</li>');
+    expect(value).toContain('<table>');
+
+    expect(value).not.toContain('style=');
+    expect(value).not.toContain('width=');
+  });
 });

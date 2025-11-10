@@ -28,6 +28,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@depot/core": "workspace:*"
+    "@depot/core": "workspace:*",
+    "node-html-parser": "^7.0.1"
   }
 }

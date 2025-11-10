@@ -1,34 +1,69 @@
+import { parse, HTMLElement as HtmlNode } from 'node-html-parser';
+
 const cleanCSV = (input: string) => input.replace(/^\uFEFF/, '').split('\r\n');
 
+const ATTRIBUTES_TO_REMOVE = ['style', 'width', 'height', 'cellspacing', 'cellpadding', 'border'];
+const BLOCKED_TAGS = new Set(['script', 'style']);
+const TAGS_TO_UNWRAP = new Set(['a', 'i']);
+
+const hasClassName = (element: HtmlNode, className: string) =>
+  element
+    .getAttribute('class')
+    ?.split(/\s+/)
+    .some((name) => name === className);
+
+const sanitizeElement = (element: HtmlNode) => {
+  const tagName = element.tagName.toLowerCase();
+
+  if (tagName === 'div' && hasClassName(element, 'abName')) {
+    element.remove();
+    return;
+  }
+
+  if (BLOCKED_TAGS.has(tagName)) {
+    element.remove();
+    return;
+  }
+
+  element.childNodes.forEach((child) => {
+    if (child instanceof HtmlNode) {
+      sanitizeElement(child);
+    }
+  });
+
+  if (TAGS_TO_UNWRAP.has(tagName)) {
+    element.replaceWith(element.innerHTML);
+    return;
+  }
+
+  ATTRIBUTES_TO_REMOVE.forEach((attribute) => element.removeAttribute(attribute));
+};
+
 const stripHtml = (input: string) => {
-  // First, completely remove div elements with class="abName" and their contents
-  let processedInput = input.replace(/<div\s+class="abName"[^>]*>.*?<\/div>/gis, '');
-
-  // Preserve span tags with class="kwb" and their variations, list elements, bold tags, and br tags
-  const preserveRegex =
-    /(<span\s+class="kwb[^"]*"[^>]*>.*?<\/span>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<b[^>]*>.*?<\/b>|<br[^>]*\/?>|<p[^>]*>.*?<\/p>|<table[^>]*>.*?<\/table>)/gis;
-  const preservedElements: string[] = [];
-
-  // Extract and temporarily replace preserved elements with placeholders
-  processedInput = processedInput.replace(preserveRegex, (match) => {
-    const placeholder = `__PRESERVED_${preservedElements.length}__`;
-    preservedElements.push(match);
-    return placeholder;
+  const wrapped = `<body>${input}</body>`;
+  const root = parse(wrapped, {
+    lowerCaseTagName: false,
+    comment: false,
+    blockTextElements: {
+      script: false,
+      style: false
+    }
   });
 
-  // Remove all other HTML tags
-  processedInput = processedInput.replace(/(<([^>]+)>)/gi, '');
+  const body = root.querySelector('body');
+  if (!body) {
+    return input;
+  }
 
-  // Restore preserved elements
-  preservedElements.forEach((element, index) => {
-    const placeholder = `__PRESERVED_${index}__`;
-    processedInput = processedInput.replace(placeholder, element);
+  body.childNodes.forEach((node) => {
+    if (node instanceof HtmlNode) {
+      sanitizeElement(node);
+    }
   });
 
-  // Remove inline style attributes to avoid leaking Wahapedia styling into the app
-  processedInput = processedInput.replace(/\sstyle=(["']).*?\1/gi, '');
+  let processedInput = body.innerHTML;
 
-  // Remove anchor tags but keep their inner text content (after restoring preserved elements)
+  // Remove anchor tags but keep their inner text content
   processedInput = processedInput.replace(/<a[^>]*>(.*?)<\/a>/gis, '$1');
 
   // Remove empty paragraphs to avoid stray spacing
@@ -40,7 +75,7 @@ const stripHtml = (input: string) => {
     '$1'
   );
 
-  return processedInput;
+  return processedInput.trim();
 };
 
 const convertToCamelCase = (input: string) =>

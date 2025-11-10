@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
@@ -16,7 +17,8 @@ interface DatasheetHeroProps {
 
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets }) => {
   const { models, keywords, unitComposition, loadout, transport } = datasheet;
-  const groupedKeywords = groupKeywords(keywords);
+  const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
+
   const pointTags = datasheet.modelCosts.map((cost) => ({
     key: `${cost.datasheetId}-${cost.line}`,
     label: cost.description ? `${cost.cost} pts (${cost.description})` : `${cost.cost} pts`
