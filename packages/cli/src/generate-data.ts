@@ -95,7 +95,8 @@ const buildDatasheet = (
         if (referencedAbility) {
           return {
             ...referencedAbility,
-            type: a.type // Add the type from the datasheet-abilities data
+            type: a.type, // Add the type from the datasheet-abilities data
+            parameter: a.parameter || referencedAbility.parameter
           };
         }
         return undefined;
@@ -108,7 +109,8 @@ const buildDatasheet = (
           legend: '', // inline abilities don't have legends
           factionId: '', // inline abilities don't have factionIds
           description: a.description,
-          type: a.type // Add the type from the datasheet-abilities data
+          type: a.type, // Add the type from the datasheet-abilities data
+          parameter: a.parameter
         };
       }
       // Skip empty entries
@@ -266,6 +268,11 @@ const buildDetachments = (
   return sortByName(builtDetachments);
 };
 
+const buildCoreStratagems = (stratagems: wahapedia.Stratagem[]): depot.Stratagem[] => {
+  const genericStratagems = stratagems.filter((stratagem) => !stratagem.factionId?.trim());
+  return sortByName(genericStratagems);
+};
+
 const buildFactionData = (
   data: wahapedia.Data,
   faction: wahapedia.Faction,
@@ -305,7 +312,12 @@ const buildFactionData = (
   };
 };
 
-const generateData = () => {
+interface GenerateDataResult {
+  factions: depot.Faction[];
+  coreStratagems: depot.Stratagem[];
+}
+
+const generateData = (): GenerateDataResult => {
   const data = consolidateFiles();
   const classifySource = buildSourceClassifier(data.sources);
 
@@ -322,9 +334,12 @@ const generateData = () => {
     datasheetSlugs.set(datasheet.id, datasheetSlugGenerator(datasheet.name));
   });
 
-  return data.factions.map((f) =>
+  const factions = data.factions.map((f) =>
     buildFactionData(data, f, datasheetSlugs, factionSlugs, classifySource)
   );
+  const coreStratagems = buildCoreStratagems(data.stratagems);
+
+  return { factions, coreStratagems };
 };
 
 export default generateData;

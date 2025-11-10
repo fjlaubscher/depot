@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 import { Tag, TagSection } from '@/components/ui';
 import AbilityModal from '@/components/shared/ability-modal';
-import { getAbilityTagVariant } from '@/utils/abilities';
+import { formatAbilityName, getAbilityTagVariant } from '@/utils/abilities';
 import { sortByName } from '@/utils/array';
 
 interface DatasheetAbilitiesProps {
@@ -56,7 +56,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
       >
         {sortedAbilities.map((ability) => {
           const variant = getAbilityTagVariant(ability.type);
-          const label = ability.name.toLowerCase();
+          const label = formatAbilityName(ability).toLowerCase();
 
           return (
             <button

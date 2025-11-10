@@ -6,7 +6,7 @@ const stripHtml = (input: string) => {
 
   // Preserve span tags with class="kwb" and their variations, list elements, bold tags, and br tags
   const preserveRegex =
-    /(<span\s+class="kwb[^"]*"[^>]*>.*?<\/span>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<b[^>]*>.*?<\/b>|<br[^>]*\/?>)/gis;
+    /(<span\s+class="kwb[^"]*"[^>]*>.*?<\/span>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<b[^>]*>.*?<\/b>|<br[^>]*\/?>|<p[^>]*>.*?<\/p>|<table[^>]*>.*?<\/table>)/gis;
   const preservedElements: string[] = [];
 
   // Extract and temporarily replace preserved elements with placeholders
@@ -25,8 +25,20 @@ const stripHtml = (input: string) => {
     processedInput = processedInput.replace(placeholder, element);
   });
 
+  // Remove inline style attributes to avoid leaking Wahapedia styling into the app
+  processedInput = processedInput.replace(/\sstyle=(["']).*?\1/gi, '');
+
   // Remove anchor tags but keep their inner text content (after restoring preserved elements)
   processedInput = processedInput.replace(/<a[^>]*>(.*?)<\/a>/gis, '$1');
+
+  // Remove empty paragraphs to avoid stray spacing
+  processedInput = processedInput.replace(/<p[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, '');
+
+  // Unwrap block-level content inside paragraphs (e.g., Wahapedia stat frames within <p>)
+  processedInput = processedInput.replace(
+    /<p[^>]*>(\s*<div[^>]*class="dsCharWrap"[^>]*>[\s\S]*?<\/div>[\s\S]*?)<\/p>/gi,
+    '$1'
+  );
 
   return processedInput;
 };

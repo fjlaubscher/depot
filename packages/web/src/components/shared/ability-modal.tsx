@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { IconButton, Tag } from '@/components/ui';
-import { getAbilityTagVariant, getAbilityTypeBadge } from '@/utils/abilities';
+import { formatAbilityName, getAbilityTagVariant, getAbilityTypeBadge } from '@/utils/abilities';
 
 interface AbilityModalProps {
   ability: depot.Ability | null;
@@ -39,6 +39,7 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
 
   const badge = getAbilityTypeBadge(ability.type);
   const tagVariant = getAbilityTagVariant(ability.type);
+  const abilityName = formatAbilityName(ability);
 
   return createPortal(
     <div
@@ -66,7 +67,7 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
               id="ability-modal-title"
               className="text-lg font-semibold text-gray-900 dark:text-gray-100"
             >
-              {ability.name}
+              {abilityName}
             </h2>
             <Tag variant={tagVariant} size="sm" className="self-start cursor-default">
               {badge.text}
@@ -88,7 +89,10 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
           {ability.legend ? (
             <div className="text-muted italic font-medium">{ability.legend}</div>
           ) : null}
-          <div dangerouslySetInnerHTML={{ __html: ability.description }} />
+          <div
+            className="ability-rich-text"
+            dangerouslySetInnerHTML={{ __html: ability.description }}
+          />
         </div>
       </div>
     </div>,

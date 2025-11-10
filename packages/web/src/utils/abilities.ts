@@ -114,3 +114,14 @@ export const getAbilityTagVariant = (type: string): TagVariant => {
 
   return 'default';
 };
+
+export const formatAbilityName = (ability: depot.Ability): string => {
+  const name = ability.name?.trim() ?? '';
+  const parameter = ability.parameter?.trim();
+
+  if (parameter) {
+    return `${name} ${parameter}`.trim();
+  }
+
+  return name;
+};
