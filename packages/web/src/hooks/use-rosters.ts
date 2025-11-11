@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
+import { createRosterDuplicate } from '@/utils/roster';
 
 interface UseRosters {
   rosters: depot.Roster[];
@@ -10,6 +11,7 @@ interface UseRosters {
   updateRoster: (roster: depot.Roster) => Promise<void>;
   deleteRoster: (rosterId: string) => Promise<void>;
   getRoster: (rosterId: string) => Promise<depot.Roster | null>;
+  duplicateRoster: (roster: depot.Roster) => Promise<depot.Roster>;
 }
 
 function useRosters(): UseRosters {
@@ -55,6 +57,13 @@ function useRosters(): UseRosters {
     return await offlineStorage.getRoster(rosterId);
   };
 
+  const duplicateRoster = async (roster: depot.Roster) => {
+    const duplicatedRoster = createRosterDuplicate(roster);
+    await offlineStorage.saveRoster(duplicatedRoster);
+    await loadRosters();
+    return duplicatedRoster;
+  };
+
   return {
     rosters,
     loading,
@@ -62,7 +71,8 @@ function useRosters(): UseRosters {
     addRoster,
     updateRoster,
     deleteRoster,
-    getRoster
+    getRoster,
+    duplicateRoster
   };
 }
 

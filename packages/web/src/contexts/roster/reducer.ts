@@ -48,6 +48,26 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         warlordUnitId: null
       };
 
+    case 'UPDATE_DETAILS': {
+      const updatedState: depot.Roster = {
+        ...state,
+        name: action.payload.name,
+        detachment: action.payload.detachment,
+        points: {
+          ...state.points,
+          max: action.payload.maxPoints
+        }
+      };
+
+      return {
+        ...updatedState,
+        points: {
+          ...updatedState.points,
+          current: calculateTotalPoints(updatedState)
+        }
+      };
+    }
+
     case 'SET_DETACHMENT':
       return {
         ...state,

@@ -56,7 +56,8 @@ const mockRosterContext = vi.hoisted(() => ({
   updateUnitModelCost: vi.fn(),
   applyEnhancement: vi.fn(),
   removeEnhancement: vi.fn(),
-  setWarlord: vi.fn()
+  setWarlord: vi.fn(),
+  updateRosterDetails: vi.fn()
 }));
 
 vi.mock('@/contexts/roster/context', () => ({

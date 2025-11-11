@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
 import { useToast } from '@/contexts/toast/use-toast-context';
+import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, ErrorState } from '@/components/ui';
@@ -11,7 +12,7 @@ import { RosterCard } from './_components/roster-card';
 
 const Rosters: React.FC = () => {
   const navigate = useNavigate();
-  const { rosters, loading, error, deleteRoster } = useRosters();
+  const { rosters, loading, error, deleteRoster, duplicateRoster } = useRosters();
   const { showToast } = useToast();
 
   const handleCreate = () => {
@@ -32,6 +33,24 @@ const Rosters: React.FC = () => {
         type: 'error',
         title: 'Delete Failed',
         message: 'Failed to delete the roster. Please try again.'
+      });
+    }
+  };
+
+  const handleDuplicateRoster = async (roster: depot.Roster) => {
+    try {
+      const duplicated = await duplicateRoster(roster);
+      showToast({
+        type: 'success',
+        title: 'Roster Duplicated',
+        message: `Created ${duplicated.name}.`
+      });
+    } catch (error) {
+      console.error('Failed to duplicate roster:', error);
+      showToast({
+        type: 'error',
+        title: 'Duplicate Failed',
+        message: 'Could not duplicate the roster. Please try again.'
       });
     }
   };
@@ -99,7 +118,12 @@ const Rosters: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {rosters.map((roster) => (
-              <RosterCard key={roster.id} roster={roster} onDelete={handleDeleteRoster} />
+              <RosterCard
+                key={roster.id}
+                roster={roster}
+                onDelete={handleDeleteRoster}
+                onDuplicate={handleDuplicateRoster}
+              />
             ))}
           </div>
         )}

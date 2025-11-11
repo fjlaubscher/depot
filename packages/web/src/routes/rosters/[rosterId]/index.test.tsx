@@ -150,8 +150,11 @@ describe('ViewRosterPage', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('page-header')).toBeInTheDocument();
-    const editButton = screen.getByLabelText('Edit roster');
+    const editButton = screen.getByLabelText('Edit roster details');
     expect(editButton).toBeInTheDocument();
+    fireEvent.click(editButton);
+    expect(mockNavigate).toHaveBeenCalledWith('/rosters/test-roster-id/details');
+    expect(screen.getByTestId('manage-units-button')).toBeInTheDocument();
   });
 
   it('renders export and share buttons', () => {
@@ -336,13 +339,12 @@ describe('ViewRosterPage', () => {
     expect(screen.getByText('No units in this roster')).toBeInTheDocument();
   });
 
-  it('navigates to edit mode correctly', () => {
+  it('navigates to unit management when manage button is clicked', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
-    const editButton = screen.getByTestId('edit-roster-button');
-    fireEvent.click(editButton);
+    const manageUnitsButton = screen.getByTestId('manage-units-button');
+    fireEvent.click(manageUnitsButton);
 
-    // Note: Navigation would be tested with the actual navigate function in integration tests
-    expect(editButton).toBeInTheDocument();
+    expect(mockNavigate).toHaveBeenCalledWith('/rosters/test-roster-id/edit');
   });
 });

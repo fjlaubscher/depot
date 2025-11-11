@@ -11,6 +11,7 @@ import Settings from './routes/settings';
 import Rosters from './routes/rosters';
 import CreateRoster from './routes/rosters/create';
 import EditRoster from './routes/rosters/[rosterId]/edit';
+import RosterDetails from './routes/rosters/[rosterId]/details';
 import ViewRoster from './routes/rosters/[rosterId]';
 import AddRosterUnits from './routes/rosters/[rosterId]/add-units';
 import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
@@ -27,6 +28,7 @@ const AppRoutes = () => (
     <Route path="/settings" element={<Settings />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="/rosters" element={<Rosters />} />
+    <Route path="/rosters/:rosterId/details" element={<RosterDetails />} />
     <Route path="/rosters/:rosterId/edit" element={<EditRoster />} />
     <Route path="/rosters/:rosterId/add-units" element={<AddRosterUnits />} />
     <Route path="/rosters/:rosterId/units/:unitId/edit" element={<EditRosterUnit />} />

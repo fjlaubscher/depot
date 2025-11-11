@@ -90,6 +90,13 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     dispatch({ type: 'SET_DETACHMENT', payload: detachment });
   }, []);
 
+  const updateRosterDetails = useCallback(
+    (payload: { name: string; detachment: depot.Detachment; maxPoints: number }): void => {
+      dispatch({ type: 'UPDATE_DETAILS', payload });
+    },
+    []
+  );
+
   const addUnit = useCallback((datasheet: depot.Datasheet, modelCost: depot.ModelCost): void => {
     dispatch({ type: 'ADD_UNIT', payload: { datasheet, modelCost } });
   }, []);
@@ -138,6 +145,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         state,
         createRoster,
         setDetachment,
+        updateRosterDetails,
         addUnit,
         duplicateUnit,
         removeUnit,

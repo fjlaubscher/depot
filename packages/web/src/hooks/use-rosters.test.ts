@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
+import type { depot } from '@depot/core';
 import useRosters from './use-rosters';
 import { createMockRoster, mockRoster } from '@/test/mock-data';
 
@@ -162,6 +163,46 @@ describe('useRosters', () => {
     expect(result.current.rosters).toEqual(rostersAfterDelete);
   });
 
+  it('should duplicate roster with new identifiers and reload list', async () => {
+    const originalRoster = createMockRoster({ id: 'original-roster', name: 'Original Roster' });
+    let duplicatedRoster: depot.Roster | null = null;
+
+    mockOfflineStorage.getAllRosters
+      .mockResolvedValueOnce([originalRoster])
+      .mockImplementationOnce(async () => {
+        if (!duplicatedRoster) {
+          throw new Error('Duplicate roster was not saved');
+        }
+        return [originalRoster, duplicatedRoster];
+      });
+
+    mockOfflineStorage.saveRoster.mockImplementation(async (roster) => {
+      duplicatedRoster = roster;
+    });
+
+    const { result } = renderHook(() => useRosters());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    await act(async () => {
+      const createdDuplicate = await result.current.duplicateRoster(originalRoster);
+      expect(createdDuplicate).toEqual(duplicatedRoster);
+    });
+
+    expect(duplicatedRoster).not.toBeNull();
+    if (!duplicatedRoster) {
+      throw new Error('Duplicate roster was not created');
+    }
+    const created: depot.Roster = duplicatedRoster;
+    expect(created.id).not.toBe(originalRoster.id);
+    expect(created.name).toBe('Original Roster (Copy)');
+    expect(created.units[0]?.id).not.toBe(originalRoster.units[0]?.id);
+    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledWith(created);
+    expect(result.current.rosters).toEqual([originalRoster, created]);
+  });
+
   it('should get roster by ID', async () => {
     const specificRoster = createMockRoster({ id: 'specific-roster' });
     mockOfflineStorage.getRoster.mockResolvedValue(specificRoster);
@@ -222,6 +263,11 @@ describe('useRosters', () => {
       await result.current.deleteRoster('roster-id');
     });
     expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(4);
+
+    await act(async () => {
+      await result.current.duplicateRoster(mockRoster);
+    });
+    expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(5);
   });
 
   it('should handle empty roster list', async () => {
