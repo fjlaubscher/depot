@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import { calculateTotalPoints } from '@/contexts/roster/utils';
 
 const stripHtml = (html?: string): string => {
   if (!html) return '';
@@ -194,4 +195,54 @@ export const generateRosterShareText = (
   lines.push('https://fjlaubscher.github.io/depot');
 
   return lines.join('\n');
+};
+
+interface DuplicateRosterOptions {
+  name?: string;
+}
+
+export const createRosterDuplicate = (
+  roster: depot.Roster,
+  options: DuplicateRosterOptions = {}
+): depot.Roster => {
+  const unitIdMap = new Map<string, string>();
+
+  const duplicatedUnits = roster.units.map((unit) => {
+    const duplicatedUnitId = crypto.randomUUID();
+    unitIdMap.set(unit.id, duplicatedUnitId);
+
+    return {
+      ...unit,
+      id: duplicatedUnitId,
+      modelCost: { ...unit.modelCost },
+      selectedWargear: unit.selectedWargear.map((wargear) => ({ ...wargear }))
+    };
+  });
+
+  const duplicatedEnhancements = roster.enhancements.map((enhancement) => ({
+    ...enhancement,
+    unitId: enhancement.unitId
+      ? (unitIdMap.get(enhancement.unitId) ?? enhancement.unitId)
+      : enhancement.unitId
+  }));
+
+  const duplicatedRoster: depot.Roster = {
+    ...roster,
+    id: crypto.randomUUID(),
+    name: options.name ?? `${roster.name} (Copy)`,
+    units: duplicatedUnits,
+    enhancements: duplicatedEnhancements,
+    warlordUnitId: roster.warlordUnitId ? (unitIdMap.get(roster.warlordUnitId) ?? null) : null,
+    points: {
+      ...roster.points
+    }
+  };
+
+  return {
+    ...duplicatedRoster,
+    points: {
+      ...duplicatedRoster.points,
+      current: calculateTotalPoints(duplicatedRoster)
+    }
+  };
 };

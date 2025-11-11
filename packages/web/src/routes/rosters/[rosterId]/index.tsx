@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Download, Pencil, Share } from 'lucide-react';
+import { Copy, Download, List, Pencil, Share } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -145,8 +145,8 @@ const RosterView: FC = () => {
         stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Pencil size={16} />,
-          onClick: () => navigate(`/rosters/${roster.id}/edit`),
-          ariaLabel: 'Edit roster',
+          onClick: () => navigate(`/rosters/${roster.id}/details`),
+          ariaLabel: 'Edit roster details',
           testId: 'edit-roster-button'
         }}
       />
@@ -154,6 +154,15 @@ const RosterView: FC = () => {
       {/* Actions */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap gap-4">
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/rosters/${roster.id}/edit`)}
+            className="flex items-center gap-2"
+            data-testid="manage-units-button"
+          >
+            <List size={16} />
+            Manage Units
+          </Button>
           <Button
             variant="secondary"
             onClick={handleExportMarkdown}

@@ -29,7 +29,9 @@ vi.mock('react-router-dom', async () => {
 const mockUseRosters = vi.hoisted(() => ({
   rosters: [] as depot.Roster[],
   loading: false,
-  error: null as string | null
+  error: null as string | null,
+  deleteRoster: vi.fn(),
+  duplicateRoster: vi.fn()
 }));
 
 vi.mock('@/hooks/use-rosters', () => ({
@@ -42,6 +44,8 @@ describe('Rosters', () => {
     mockUseRosters.rosters = [];
     mockUseRosters.loading = false;
     mockUseRosters.error = null;
+    mockUseRosters.deleteRoster = vi.fn();
+    mockUseRosters.duplicateRoster = vi.fn();
   });
 
   it('renders page header with create button', () => {

@@ -173,6 +173,38 @@ describe('rosterReducer', () => {
     });
   });
 
+  describe('UPDATE_DETAILS', () => {
+    it('should update roster metadata and recalculate totals', () => {
+      const startingState = createMockRoster({
+        points: { current: 999, max: 2000 }
+      });
+
+      const updatedDetachment: depot.Detachment = {
+        slug: 'ironstorm-spearhead',
+        name: 'Ironstorm Spearhead',
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      };
+
+      const action: RosterAction = {
+        type: 'UPDATE_DETAILS',
+        payload: {
+          name: 'Updated Roster',
+          detachment: updatedDetachment,
+          maxPoints: 1500
+        }
+      };
+
+      const result = rosterReducer(startingState, action);
+
+      expect(result.name).toBe('Updated Roster');
+      expect(result.detachment).toEqual(updatedDetachment);
+      expect(result.points.max).toBe(1500);
+      expect(result.points.current).toBe(80);
+    });
+  });
+
   describe('SET_DETACHMENT', () => {
     it('should update the detachment', () => {
       const currentState: depot.Roster = {
