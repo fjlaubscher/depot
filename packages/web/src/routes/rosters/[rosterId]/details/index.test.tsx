@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import type { depot } from '@depot/core';
 
 import { TestWrapper } from '@/test/test-utils';
@@ -14,7 +15,7 @@ import RosterDetailsPage from './index';
 
 // Mock AppLayout
 vi.mock('@/components/layout', () => ({
-  default: ({ children, title }: { children: React.ReactNode; title: string }) => (
+  default: ({ children, title }: { children: ReactNode; title: string }) => (
     <div data-testid="app-layout" data-title={title}>
       {children}
     </div>
@@ -34,21 +35,13 @@ vi.mock('react-router-dom', async () => {
 
 // Mock roster context
 const mockUpdateRosterDetails = vi.fn();
-const mockRosterContext = vi.hoisted(() => ({
-  state: createMockRoster({
-    id: 'test-roster-id',
-    name: 'Test Roster',
-    detachment: createMockDetachment({
-      slug: 'gladius-task-force',
-      name: 'Gladius Task Force'
-    }),
-    points: { current: 80, max: 2000 }
-  }),
-  updateRosterDetails: mockUpdateRosterDetails
-}));
+let mockRosterContext!: {
+  state: depot.Roster;
+  updateRosterDetails: typeof mockUpdateRosterDetails;
+};
 
 vi.mock('@/contexts/roster/context', () => ({
-  RosterProvider: ({ children }: { children: React.ReactNode }) => (
+  RosterProvider: ({ children }: { children: ReactNode }) => (
     <div data-testid="roster-provider">{children}</div>
   )
 }));
@@ -73,15 +66,7 @@ const detachments = [
   createMockDetachment({ slug: 'ironstorm-spearhead', name: 'Ironstorm Spearhead' })
 ];
 
-const mockUseFaction = vi.hoisted(() =>
-  vi.fn(
-    (): FactionResult => ({
-      data: createMockFaction({ detachments }),
-      loading: false,
-      error: null
-    })
-  )
-);
+const mockUseFaction = vi.hoisted(() => vi.fn<() => FactionResult>());
 
 vi.mock('@/hooks/use-faction', () => ({
   default: mockUseFaction
@@ -92,16 +77,18 @@ const renderPage = () => render(<RosterDetailsPage />, { wrapper: TestWrapper })
 describe('RosterDetailsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRosterContext.state = createMockRoster({
-      id: 'test-roster-id',
-      name: 'Test Roster',
-      detachment: createMockDetachment({
-        slug: 'gladius-task-force',
-        name: 'Gladius Task Force'
+    mockRosterContext = {
+      state: createMockRoster({
+        id: 'test-roster-id',
+        name: 'Test Roster',
+        detachment: createMockDetachment({
+          slug: 'gladius-task-force',
+          name: 'Gladius Task Force'
+        }),
+        points: { current: 80, max: 2000 }
       }),
-      points: { current: 80, max: 2000 }
-    });
-    mockRosterContext.updateRosterDetails = mockUpdateRosterDetails;
+      updateRosterDetails: mockUpdateRosterDetails
+    };
     mockUpdateRosterDetails.mockReset();
     mockUseFaction.mockReturnValue({
       data: createMockFaction({ detachments }),
@@ -111,8 +98,7 @@ describe('RosterDetailsPage', () => {
   });
 
   it('renders loader when roster data is still loading', () => {
-    mockRosterContext.state = mockEmptyRoster;
-    mockRosterContext.state.id = '';
+    mockRosterContext.state = { ...mockEmptyRoster, id: '' };
     mockUseFaction.mockReturnValueOnce({ data: undefined, loading: true, error: null });
 
     renderPage();
@@ -159,7 +145,7 @@ describe('RosterDetailsPage', () => {
     renderPage();
 
     await user.clear(screen.getByLabelText('Roster Name'));
-    await user.click(screen.getByTestId('save-roster-details'));
+    fireEvent.submit(screen.getByTestId('roster-details-form'));
 
     expect(mockShowToast).toHaveBeenCalledWith({
       type: 'error',
@@ -167,5 +153,6 @@ describe('RosterDetailsPage', () => {
       message: 'Please enter a roster name.'
     });
     expect(mockUpdateRosterDetails).not.toHaveBeenCalled();
+    expect(screen.getByTestId('save-roster-details')).toBeDisabled();
   });
 });
