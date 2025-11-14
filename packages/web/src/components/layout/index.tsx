@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronDown, ChevronRight, Users, Settings, Star, List } from 'lucide-react';
+import {
+  Home,
+  ChevronDown,
+  ChevronRight,
+  Users,
+  Settings,
+  Star,
+  ClipboardList
+} from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
@@ -32,7 +40,7 @@ const AppLayout = ({ children, title }: Props) => {
           <span>Factions</span>
         </Link>
         <Link to="/rosters" onClick={closeSidebar} className="sidebar-item">
-          <List size={16} />
+          <ClipboardList size={16} />
           <span>Rosters</span>
         </Link>
         <Link to="/settings" onClick={closeSidebar} className="sidebar-item">

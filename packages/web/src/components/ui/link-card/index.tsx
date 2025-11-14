@@ -9,9 +9,11 @@ interface LinkCardProps
   to: string;
   children: ReactNode;
   className?: string;
+  description?: string;
+  icon?: ReactNode;
 }
 
-const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
+const LinkCard: FC<LinkCardProps> = ({ to, children, className, description, icon, ...rest }) => {
   return (
     <Link
       to={to}
@@ -20,8 +22,20 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, ...rest }) => {
       {...rest}
     >
       <Card interactive className="h-full">
-        <Card.Header className="items-center gap-2">
-          <span className="truncate text-sm font-medium text-foreground">{children}</span>
+        <Card.Header className="items-start gap-3">
+          {icon ? (
+            <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200">
+              {icon}
+            </span>
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <Card.Title as="p" className="truncate text-base text-foreground">
+              {children}
+            </Card.Title>
+            {description ? (
+              <Card.Description className="text-sm text-muted">{description}</Card.Description>
+            ) : null}
+          </div>
           <ChevronRight className="text-hint flex-shrink-0" size={20} />
         </Card.Header>
       </Card>

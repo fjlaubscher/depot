@@ -74,7 +74,7 @@ describe('Home', () => {
     render(<Home />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('settings-button')).toBeInTheDocument();
-    expect(screen.getByText('Adjust settings')).toBeInTheDocument();
+    expect(screen.getByText(/Toggle data refreshes/i)).toBeInTheDocument();
   });
 
   it('should render app info section', () => {

@@ -1,6 +1,6 @@
 # Components
 
-Component library organized by reusability and domain specificity.
+Component library organized by reusability and domain specificity. Components lean on Tailwind utility tokens defined in `src/styles/main.css` (e.g., `text-foreground`, `surface-card`, `focus-ring-*`, status palettes).
 
 ## Directory Structure
 
@@ -11,9 +11,14 @@ Fundamental building blocks with no business logic:
 - Accessible by default
 - TypeScript interfaces
 - **Exported via**: `@/components/ui` index file
-- Styling should lean on shared utilities from `src/styles/main.css` (`text-foreground`, `surface-card`, `focus-ring-*`, status tokens like `surface-success-strong`) before reaching for raw Tailwind colour classes.
+- Styling should lean on shared utilities from `src/styles/main.css` before adding raw Tailwind colour classes.
+- When a look & feel repeats, add an `@utility` entry in `styles/main.css` so JSX stays terse.
 
 Key components: `Button`, `Card`, `Alert`, `Table`, `Toast`, `Layout`, `Search`, `Filters`, `Tag`, `SelectField`, `QuantityStepper`, `CollapsibleSection`, `ContentCard`, `DashboardCard`, `ErrorState`, `Field`, `Grid`, `IconButton`, `LinkCard`, `Loader`, `PageHeader`, `PointsTag`, `Skeleton`, `StatCard`, `StatsRow`, `Tabs`, `ToastContainer`, `ToggleSwitch`.
+
+**Recent additions**
+- `LinkCard` supports optional `icon` + `description` props for richer quick links (used on Home favourites).
+- `DashboardCard` slots icons/actions for hero tiles. Use these before crafting bespoke card markup.
 
 ### `shared/` - Domain Components
 Reusable components with depot-specific logic:
@@ -68,3 +73,7 @@ export { default as Button } from './button';
 import { Datasheet } from '@/components/shared/datasheet';
 import { Roster } from '@/components/shared/roster';
 ```
+
+## Testing Guidelines
+- UI components live close to `ui/` should include focused tests when they encapsulate behavior (e.g., `search`, `filters`). Pure presentational components can rely on integration tests in routes.
+- Shared components with domain logic (datasheet cards, roster tiles) should have colocated tests validating props handling and rendering edge cases.

@@ -1,10 +1,10 @@
 # Test Infrastructure
 
-Centralized testing utilities for consistent, reliable testing.
+Centralized testing utilities for consistent, reliable testing. Vitest runs in jsdom with React 19 + Router 7 future flags enabled via `TestWrapper`.
 
 ## Files
-- `mock-data.ts` - Mock data with factory functions
-- `test-utils.tsx` - TestWrapper and utilities
+- `mock-data.ts` - Mock data with factory functions (factions, datasheets, rosters, etc.)
+- `test-utils.tsx` - `TestWrapper`, router helpers, mock providers
 
 ## Testing Rules
 
@@ -19,8 +19,8 @@ render(<Component />);
 
 TestWrapper provides:
 - React Router v7 with future flags
-- Layout and Toast contexts
-- Proper provider composition
+- Layout/App/Roster/Toast contexts
+- Sentry + theme defaults
 
 ### Use Centralized Mock Data
 ```typescript
@@ -34,7 +34,7 @@ const custom = createMockDatasheet({ name: 'Custom Unit' });
 const mockData = { id: 'test' };
 ```
 
-#### Available Mock Data
+#### Available Mock Data (see `mock-data.ts`)
 - `mockDatasheet` / `createMockDatasheet()` - Unit cards
 - `mockFaction` / `createMockFaction()` - Faction data
 - `mockStratagem` / `createMockStratagem()` - Stratagems
@@ -52,6 +52,11 @@ expect(element).toHaveTextContent('Captain');
 // ❌ Fragile
 expect(screen.getByText('Captain')).toBeInTheDocument();
 ```
+
+### Command Tips
+- Run a single file: `pnpm --filter @depot/web test -- src/routes/home/index.test.tsx`
+- Watch mode while iterating: `pnpm --filter @depot/web test --watch`
+- CI mode (`pnpm --filter @depot/web test:ci`) uses verbose reporter and fails fast.
 
 ## Test Pattern
 
@@ -75,4 +80,4 @@ describe('Component', () => {
 - **Consistency**: Same provider setup everywhere
 - **Maintainability**: Single source for test utilities
 - **Type Safety**: Factory functions ensure proper interfaces
-- **Clean Output**: No router warnings
+- **Clean Output**: Router + context warnings stay silent when TestWrapper is used

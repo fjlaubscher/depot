@@ -1,39 +1,40 @@
 # Core Package
 
-Shared TypeScript types and utilities. Single source of truth for all data structures.
+Shared TypeScript types + lightweight utilities. This package is the single source of truth for all structures flowing between the CLI and the web app.
 
 ## Key Commands
 
 ```bash
-# Build TypeScript
-pnpm build
+# Build once
+pnpm --filter @depot/core build
 
 # Watch mode
-pnpm dev
+pnpm --filter @depot/core dev
 
 # Format code
-pnpm format
+pnpm --filter @depot/core format
 
 # Lint code
-pnpm lint
+pnpm --filter @depot/core lint
 
 # Type check
-pnpm typecheck
+pnpm --filter @depot/core typecheck
 
 # Clean dist folder
-pnpm clean
+pnpm --filter @depot/core clean
 ```
 
 ## File Structure
 
 ```
 src/
-├── index.ts              # Main exports
+├── index.ts              # Package exports (types + utils)
 ├── types/
-│   ├── depot.ts         # Application-ready types
-│   └── wahapedia.ts     # Raw CSV data types
+│   ├── depot.ts          # Application-ready types
+│   └── wahapedia.ts      # Raw CSV data types
 ├── utils/
-│   └── slug.ts          # Shared slug helper used by CLI/web
+│   └── slug.ts           # Shared slug helper used by CLI/web
+└── constants/            # Any future shared constants live here
 ```
 
 ## Type System
@@ -66,4 +67,12 @@ import { wahapedia, depot } from '@depot/core';
 
 // Web package
 import { depot } from '@depot/core';
+
+// Shared utility
+import { slug } from '@depot/core/utils/slug';
 ```
+
+## Guidelines
+- Treat `types/depot.ts` as canonical—update here first, then propagate to CLI/web.
+- Keep utilities side-effect free and framework agnostic.
+- Prefer type re-exports via `src/index.ts` so consumers can import from `@depot/core` without deep linking.
