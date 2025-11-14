@@ -1,5 +1,6 @@
 import type { depot } from '@depot/core';
 import { calculateTotalPoints } from '@/contexts/roster/utils';
+import { formatWargearDisplayName } from '@/utils/wargear';
 
 const stripHtml = (html?: string): string => {
   if (!html) return '';
@@ -117,7 +118,7 @@ export const generateRosterMarkdown = (
 
       if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
-          lines.push(`  - ${wargear.name}`);
+          lines.push(`  - ${formatWargearDisplayName(wargear)}`);
         });
       }
 
@@ -180,7 +181,7 @@ export const generateRosterShareText = (
       lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
       if (includeWargear && unit.selectedWargear.length > 0) {
         unit.selectedWargear.forEach((wargear) => {
-          lines.push(`  - ${wargear.name}`);
+          lines.push(`  - ${formatWargearDisplayName(wargear)}`);
         });
       }
       const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);

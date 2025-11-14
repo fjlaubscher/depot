@@ -8,6 +8,7 @@ import { offlineStorage } from '@/data/offline-storage';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { getDataPath, getDataUrl } from '@/utils/paths';
 import { DATA_VERSION } from '@/constants/data-version';
+import { normalizeDatasheetWargear } from '@/utils/wargear';
 
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,10 +44,14 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
           throw new Error(`Failed to load faction ${slug}`);
         }
         const faction = (await response.json()) as depot.Faction;
+        const normalizedFaction: depot.Faction = {
+          ...faction,
+          datasheets: faction.datasheets.map((datasheet) => normalizeDatasheetWargear(datasheet))
+        };
 
         // Cache the faction in IndexedDB for offline use
         try {
-          await offlineStorage.setFaction(slug, faction);
+          await offlineStorage.setFaction(slug, normalizedFaction);
           // Update offline factions list
           const offlineFactions = await offlineStorage.getAllCachedFactions();
           dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
@@ -54,7 +59,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
           console.warn('Failed to cache faction in IndexedDB:', cacheError);
         }
 
-        return faction;
+        return normalizedFaction;
       } catch (error) {
         console.error(`Failed to load faction ${key}:`, error);
         return null;

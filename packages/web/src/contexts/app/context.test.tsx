@@ -361,7 +361,10 @@ describe('AppProvider with IndexedDB Integration', () => {
         expect(global.fetch).toHaveBeenCalledWith('/data/test-faction.json');
       });
 
-      expect(mockOfflineStorage.setFaction).toHaveBeenCalledWith('test-faction', mockFaction);
+      expect(mockOfflineStorage.setFaction).toHaveBeenCalledWith(
+        'test-faction',
+        expect.objectContaining({ id: mockFaction.id, slug: mockFaction.slug })
+      );
     });
 
     it('should handle network errors gracefully', async () => {

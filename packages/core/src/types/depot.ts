@@ -62,12 +62,13 @@ export interface Stratagem {
   detachment: string;
 }
 
-export interface Wargear {
+export interface WargearProfile {
   datasheetId: string;
   line: string;
   lineInWargear: string;
   dice: string;
   name: string;
+  profileName?: string;
   description: string;
   range: string;
   type: 'Ranged' | 'Melee';
@@ -76,6 +77,15 @@ export interface Wargear {
   s: string;
   ap: string;
   d: string;
+}
+
+export interface Wargear {
+  id: string;
+  datasheetId: string;
+  line: string;
+  name: string;
+  type: 'Ranged' | 'Melee' | 'Mixed';
+  profiles: WargearProfile[];
 }
 
 export interface UnitComposition {

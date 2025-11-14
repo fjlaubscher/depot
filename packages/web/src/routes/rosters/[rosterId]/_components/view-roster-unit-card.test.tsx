@@ -33,7 +33,7 @@ describe('ViewRosterUnitCard', () => {
 
     render(<ViewRosterUnitCard unit={unit} />, { wrapper: TestWrapper });
 
-    expect(screen.getByText('relic blade')).toBeInTheDocument();
+    expect(screen.getByText(/relic blade/i)).toBeInTheDocument();
     expect(screen.queryByText('Abilities')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));

@@ -7,6 +7,7 @@ import {
   mockDatasheet,
   mockEnhancement
 } from '@/test/mock-data';
+import { formatWargearDisplayName } from '@/utils/wargear';
 
 describe('generateRosterShareText', () => {
   const wargearSelection = mockDatasheet.wargear.slice(0, 1);
@@ -33,7 +34,7 @@ describe('generateRosterShareText', () => {
       includeWargear: true
     });
 
-    expect(shareText).toContain(wargearSelection[0].name);
+    expect(shareText).toContain(formatWargearDisplayName(wargearSelection[0]));
     expect(shareText).toContain(`  - [Enhancement] ${mockEnhancement.name} (10 pts)`);
   });
 

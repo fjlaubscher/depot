@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { slug as slugUtils } from '@depot/core';
+import { slug as slugUtils, wargear as wargearUtils } from '@depot/core';
 import type { wahapedia, depot } from '@depot/core';
 import { buildSourceClassifier } from './utils/source-classification.js';
 import type { SourceClassifier } from './utils/source-classification.js';
@@ -134,7 +134,7 @@ const buildDatasheet = (
   const options = data.datasheetOptions.filter(
     (option: wahapedia.DatasheetOption) => option.datasheetId === datasheet.id
   );
-  const wargear = data.datasheetWargear.filter(
+  const rawWargear = data.datasheetWargear.filter(
     (wargear: wahapedia.DatasheetWargear) => wargear.datasheetId === datasheet.id
   );
   const unitComposition = data.datasheetUnitComposition.filter(
@@ -187,6 +187,14 @@ const buildDatasheet = (
   if (!datasheetSlug) {
     throw new Error(`Missing slug for datasheet ${datasheet.id}`);
   }
+
+  const wargearSlug = slugUtils.createSlugGenerator(`${datasheetSlug}-wargear`);
+  const wargear = wargearUtils.groupWargearProfiles(rawWargear, {
+    createId: ({ baseName, groupIndex }) => {
+      const label = baseName || `wargear-${groupIndex + 1}`;
+      return `${datasheet.id}:${wargearSlug(label)}`;
+    }
+  });
 
   return {
     ...datasheet,

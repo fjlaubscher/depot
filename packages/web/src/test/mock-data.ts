@@ -74,66 +74,120 @@ export const mockDatasheet: depot.Datasheet = {
   ],
   wargear: [
     {
+      id: 'captain-bolt-pistol',
       datasheetId: 'SM_CAPTAIN',
       line: '1',
-      lineInWargear: '1',
-      dice: '',
       name: 'Bolt pistol',
       type: 'Ranged',
-      range: '12',
-      a: '1',
-      bsWs: '2',
-      s: '4',
-      ap: '0',
-      d: '1',
-      description: ''
+      profiles: [
+        {
+          datasheetId: 'SM_CAPTAIN',
+          line: '1',
+          lineInWargear: '1',
+          dice: '',
+          name: 'Bolt pistol',
+          description: '',
+          profileName: undefined,
+          range: '12',
+          type: 'Ranged',
+          a: '1',
+          bsWs: '2',
+          s: '4',
+          ap: '0',
+          d: '1'
+        }
+      ]
     },
     {
+      id: 'captain-plasma-gun',
       datasheetId: 'SM_CAPTAIN',
       line: '2',
-      lineInWargear: '2',
-      dice: '',
       name: 'Plasma gun',
-      type: 'Ranged',
-      range: '24',
-      a: '1',
-      bsWs: '3',
-      s: '7',
-      ap: '-2',
-      d: '1',
-      description:
-        '[RAPID FIRE 1] When targeting this unit, weapons with this ability make 1 additional attack. You can re-roll one or more failed wound rolls when targeting this unit, but this weapon gets Hot on unmodified hit rolls of 1, after supercharge.'
+      type: 'Mixed',
+      profiles: [
+        {
+          datasheetId: 'SM_CAPTAIN',
+          line: '2',
+          lineInWargear: '1',
+          dice: '',
+          name: 'Plasma gun – standard',
+          profileName: 'Standard',
+          description: '[RAPID FIRE 1]',
+          range: '24',
+          type: 'Ranged',
+          a: '1',
+          bsWs: '3',
+          s: '7',
+          ap: '-2',
+          d: '1'
+        },
+        {
+          datasheetId: 'SM_CAPTAIN',
+          line: '3',
+          lineInWargear: '2',
+          dice: '',
+          name: 'Plasma gun – supercharge',
+          profileName: 'Supercharge',
+          description: '[RAPID FIRE 1], [HAZARDOUS]',
+          range: '24',
+          type: 'Ranged',
+          a: '1',
+          bsWs: '3',
+          s: '8',
+          ap: '-3',
+          d: '2'
+        }
+      ]
     },
     {
-      datasheetId: 'SM_CAPTAIN',
-      line: '3',
-      lineInWargear: '3',
-      dice: '',
-      name: 'Power sword',
-      type: 'Melee',
-      range: '',
-      a: '4',
-      bsWs: '2',
-      s: '5',
-      ap: '-2',
-      d: '2',
-      description: ''
-    },
-    {
+      id: 'captain-power-sword',
       datasheetId: 'SM_CAPTAIN',
       line: '4',
-      lineInWargear: '4',
-      dice: '',
+      name: 'Power sword',
+      type: 'Melee',
+      profiles: [
+        {
+          datasheetId: 'SM_CAPTAIN',
+          line: '4',
+          lineInWargear: '1',
+          dice: '',
+          name: 'Power sword',
+          profileName: undefined,
+          description: '',
+          range: 'Melee',
+          type: 'Melee',
+          a: '4',
+          bsWs: '2',
+          s: '5',
+          ap: '-2',
+          d: '2'
+        }
+      ]
+    },
+    {
+      id: 'captain-thunder-hammer',
+      datasheetId: 'SM_CAPTAIN',
+      line: '5',
       name: 'Thunder hammer',
       type: 'Melee',
-      range: '',
-      a: '3',
-      bsWs: 'N/A',
-      s: '8',
-      ap: '-2',
-      d: '3',
-      description:
-        '[DEVASTATING WOUNDS] Critical wounds from this weapon cannot be negated by saves or abilities.'
+      profiles: [
+        {
+          datasheetId: 'SM_CAPTAIN',
+          line: '5',
+          lineInWargear: '1',
+          dice: '',
+          name: 'Thunder hammer',
+          profileName: undefined,
+          description: '[DEVASTATING WOUNDS]',
+          range: 'Melee',
+          type: 'Melee',
+          a: '3',
+          bsWs: 'N/A',
+          s: '8',
+          ap: '-2',
+          d: '3'
+        }
+      ]
     }
   ],
   abilities: [

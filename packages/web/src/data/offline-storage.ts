@@ -1,5 +1,6 @@
 import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
+import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
 
 // Database configuration constants
 const DB_CONFIG = {
@@ -32,12 +33,25 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
       ? { ...roster.faction, slug: roster.faction.slug ?? factionSlug }
       : roster.faction,
     warlordUnitId: roster.warlordUnitId ?? null,
-    units: roster.units.map((unit) => ({
-      ...unit,
-      datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
-    }))
+    units: roster.units.map((unit) => {
+      const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
+      return {
+        ...unit,
+        datasheet: normalizedDatasheet,
+        selectedWargear: normalizeSelectedWargear(
+          unit.selectedWargear,
+          normalizedDatasheet.wargear
+        ),
+        datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
+      };
+    })
   };
 };
+
+const normalizeFactionData = (faction: depot.Faction): depot.Faction => ({
+  ...faction,
+  datasheets: faction.datasheets.map((datasheet) => normalizeDatasheetWargear(datasheet))
+});
 
 // Database connection with proper error handling
 class OfflineStorage {
@@ -138,7 +152,10 @@ class OfflineStorage {
 
       return new Promise((resolve, reject) => {
         const request = store.get(factionSlug);
-        request.onsuccess = () => resolve(request.result || null);
+        request.onsuccess = () => {
+          const result = request.result as depot.Faction | undefined;
+          resolve(result ? normalizeFactionData(result) : null);
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
@@ -154,7 +171,7 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.FACTIONS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(faction, factionSlug);
+        const request = store.put(normalizeFactionData(faction), factionSlug);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
