@@ -122,8 +122,7 @@ export function parseLoadoutWargear(loadout: string, wargear: depot.Wargear[]): 
     for (const [wargearName, wargearIds] of wargearMap.entries()) {
       if (
         wargearName.startsWith(cleanItem) &&
-        (wargearName === cleanItem ||
-          /^.+[\s–\-:].+/.test(wargearName.substring(cleanItem.length)))
+        (wargearName === cleanItem || /^.+[\s–\-:].+/.test(wargearName.substring(cleanItem.length)))
       ) {
         wargearIds.forEach((id) => foundWargear.add(id));
       }

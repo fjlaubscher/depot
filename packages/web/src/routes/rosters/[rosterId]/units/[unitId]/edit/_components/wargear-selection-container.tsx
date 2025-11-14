@@ -20,11 +20,7 @@ const WargearSelectionContainer: React.FC<WargearSelectionContainerProps> = ({
       }
       onWargearChange([...selectedWargear, wargear]);
     } else {
-      onWargearChange(
-        selectedWargear.filter(
-          (selected) => selected.id !== wargear.id
-        )
-      );
+      onWargearChange(selectedWargear.filter((selected) => selected.id !== wargear.id));
     }
   };
 

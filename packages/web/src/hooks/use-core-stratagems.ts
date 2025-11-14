@@ -27,10 +27,7 @@ const useCoreStratagems = (): UseCoreStratagemsResult => {
         const requestInit: RequestInit | undefined = controller
           ? { signal: controller.signal }
           : undefined;
-        const response = await fetch(
-          getDataUrl(getDataPath(CORE_STRATAGEM_FILE)),
-          requestInit
-        );
+        const response = await fetch(getDataUrl(getDataPath(CORE_STRATAGEM_FILE)), requestInit);
 
         if (!response.ok) {
           throw new Error('Failed to load core stratagems');

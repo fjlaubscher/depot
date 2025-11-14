@@ -34,11 +34,7 @@ const splitWargearName = (name: string): SplitNameResult => {
 };
 
 export interface GroupWargearProfilesOptions {
-  createId?: (context: {
-    baseName: string;
-    groupIndex: number;
-    entry: DatasheetWargear;
-  }) => string;
+  createId?: (context: { baseName: string; groupIndex: number; entry: DatasheetWargear }) => string;
 }
 
 const getLineValue = (value: string | undefined, fallback: number) => {
@@ -67,8 +63,7 @@ export const groupWargearProfiles = (
 
   entries.forEach((entry, index) => {
     const { baseName, profileName } = splitWargearName(entry.name);
-    const normalizedBaseName =
-      baseName || entry.name || `Wargear ${index + 1}`;
+    const normalizedBaseName = baseName || entry.name || `Wargear ${index + 1}`;
 
     const lineInWargear = parseInt(entry.lineInWargear || '1', 10);
     const shouldContinueCurrentGroup =
@@ -118,8 +113,7 @@ export const groupWargearProfiles = (
 
   return grouped.map((group, index) => {
     const profileTypes = new Set(group.profiles.map((profile: WargearProfile) => profile.type));
-    const derivedType =
-      profileTypes.size === 1 ? group.profiles[0].type : 'Mixed';
+    const derivedType = profileTypes.size === 1 ? group.profiles[0].type : 'Mixed';
 
     return {
       ...group,
