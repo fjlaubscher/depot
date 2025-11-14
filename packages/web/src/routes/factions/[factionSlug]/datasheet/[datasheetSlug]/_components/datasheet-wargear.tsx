@@ -11,7 +11,7 @@ interface DatasheetWargearProps {
 const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
   const { wargear, options } = datasheet;
 
-  const { rangedWargear, meleeWargear } = useMemo(() => {
+  const { rangedWargear, meleeWargear, mixedWargear } = useMemo(() => {
     return separateWargearByType(wargear);
   }, [wargear]);
 
@@ -50,6 +50,7 @@ const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
         {hasWargear && (
           <div className="flex flex-col gap-4">
             <WargearTable wargear={rangedWargear} title="Ranged Wargear" type="Ranged" />
+            <WargearTable wargear={mixedWargear} title="Mixed Wargear" type="Mixed" />
             <WargearTable wargear={meleeWargear} title="Melee Wargear" type="Melee" />
           </div>
         )}

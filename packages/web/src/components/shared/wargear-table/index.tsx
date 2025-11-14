@@ -10,19 +10,60 @@ interface WargearTableProps {
   type: 'Ranged' | 'Melee' | 'Mixed';
 }
 
+interface TableRow {
+  key: string;
+  name: string;
+  range: string;
+  attacks: string;
+  skill: string;
+  strength: string;
+  ap: string;
+  damage: string;
+  keywords: string[];
+}
+
+const buildProfileLabel = (weapon: depot.Wargear, profile: depot.WargearProfile): string => {
+  if (weapon.profiles.length === 1) {
+    return weapon.name;
+  }
+
+  if (profile.profileName) {
+    return `${weapon.name} – ${profile.profileName}`;
+  }
+
+  if (profile.name && profile.name !== weapon.name) {
+    return profile.name;
+  }
+
+  return `${weapon.name} (${profile.type})`;
+};
+
 const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => {
   if (wargear.length === 0) {
     return null;
   }
 
-  const wargearKeywordLookup = useMemo(
+  const rows = useMemo<TableRow[]>(
     () =>
-      wargear.reduce(
-        (acc, curr) => {
-          const keywords = parseWargearKeywords(curr.description);
-          return { ...acc, [curr.line]: keywords };
-        },
-        {} as Record<string, string[]>
+      wargear.flatMap((weapon) =>
+        weapon.profiles.map((profile, index) => {
+          const name = buildProfileLabel(weapon, profile);
+          const statsKey = `${weapon.id}-${profile.line ?? index}`;
+          const keywords = parseWargearKeywords(profile.description);
+          const isMelee = profile.type === 'Melee';
+
+          return {
+            key: statsKey,
+            name,
+            range: isMelee ? '–' : profile.range ? `${profile.range}"` : '–',
+            attacks: profile.a || '–',
+            skill: profile.bsWs === 'N/A' ? profile.bsWs : `${profile.bsWs}+`,
+            strength: profile.s || '–',
+            ap: profile.ap || '–',
+            damage: profile.d || '–',
+            keywords
+          };
+        })
       ),
     [wargear]
   );
@@ -57,38 +98,32 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
             </tr>
           </thead>
           <tbody>
-            {wargear.map((weapon, index) => {
-              const keywords = wargearKeywordLookup[weapon.line];
-              const hasKeywords = keywords.length > 0;
-
+            {rows.map((row) => {
+              const hasKeywords = row.keywords.length > 0;
               const statCellClasses = `${hasKeywords ? 'pt-1' : 'py-2'} text-gray-700 dark:text-white`;
 
               return (
-                <React.Fragment key={index}>
+                <React.Fragment key={row.key}>
                   <tr
                     className={
                       !hasKeywords ? 'border-b border-gray-100 dark:border-gray-800' : undefined
                     }
                   >
-                    <td className={classNames(statCellClasses, 'capitalize')}>{weapon.name}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>
-                      {weapon.type === 'Melee' ? '-' : weapon.range || '-'}
-                    </td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{weapon.a}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>
-                      {weapon.bsWs === 'N/A' ? weapon.bsWs : `${weapon.bsWs}+`}
-                    </td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{weapon.s}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{weapon.ap}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{weapon.d}</td>
+                    <td className={classNames(statCellClasses, 'capitalize')}>{row.name}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.range}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.attacks}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.skill}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.strength}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.ap}</td>
+                    <td className={classNames(statCellClasses, 'text-center')}>{row.damage}</td>
                   </tr>
                   {hasKeywords ? (
                     <tr className="pb-2 border-b border-subtle">
                       <td colSpan={7} className="py-1">
                         <TagGroup spacing="sm">
-                          {keywords.map((keyword, keywordIndex) => (
+                          {row.keywords.map((keyword, keywordIndex) => (
                             <Tag
-                              key={keywordIndex}
+                              key={`${row.key}-kw-${keywordIndex}`}
                               variant="secondary"
                               size="sm"
                               className="capitalize"

@@ -272,7 +272,10 @@ describe('OfflineStorage', () => {
         offlineStorage.setFaction('space-marines', mockFaction)
       ).resolves.toBeUndefined();
 
-      expect(mockObjectStore.put).toHaveBeenCalledWith(mockFaction, 'space-marines');
+      expect(mockObjectStore.put).toHaveBeenCalledWith(
+        expect.objectContaining({ id: mockFaction.id, slug: mockFaction.slug }),
+        'space-marines'
+      );
     });
   });
 

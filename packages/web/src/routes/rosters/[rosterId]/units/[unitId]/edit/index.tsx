@@ -66,8 +66,8 @@ const EditRosterUnitView: React.FC = () => {
         wargearToSelect = unit.selectedWargear;
       } else if (unit.datasheet.loadout && unit.datasheet.wargear.length > 0) {
         // Auto-select wargear based on loadout parsing
-        const matchedLines = parseLoadoutWargear(unit.datasheet.loadout, unit.datasheet.wargear);
-        wargearToSelect = unit.datasheet.wargear.filter((w) => matchedLines.includes(w.line));
+        const matchedIds = parseLoadoutWargear(unit.datasheet.loadout, unit.datasheet.wargear);
+        wargearToSelect = unit.datasheet.wargear.filter((w) => matchedIds.includes(w.id));
       }
 
       setSelectedWargear(wargearToSelect);

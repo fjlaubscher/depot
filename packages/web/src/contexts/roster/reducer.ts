@@ -1,5 +1,9 @@
 import type { depot } from '@depot/core';
-import { getDefaultWargearSelection } from '@/utils/wargear';
+import {
+  getDefaultWargearSelection,
+  normalizeDatasheetWargear,
+  normalizeSelectedWargear
+} from '@/utils/wargear';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
 import { calculateTotalPoints } from './utils';
@@ -17,10 +21,18 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           ? { ...action.payload.faction, slug: action.payload.faction.slug ?? fallbackSlug }
           : action.payload.faction,
         warlordUnitId: action.payload.warlordUnitId ?? null,
-        units: action.payload.units.map((unit) => ({
-          ...unit,
-          datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
-        }))
+        units: action.payload.units.map((unit) => {
+          const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
+          return {
+            ...unit,
+            datasheet: normalizedDatasheet,
+            selectedWargear: normalizeSelectedWargear(
+              unit.selectedWargear,
+              normalizedDatasheet.wargear
+            ),
+            datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
+          };
+        })
       };
 
       return {
@@ -75,13 +87,14 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
       };
 
     case 'ADD_UNIT': {
-      const defaultWargear = getDefaultWargearSelection(action.payload.datasheet);
+      const normalizedDatasheet = normalizeDatasheetWargear(action.payload.datasheet);
+      const defaultWargear = getDefaultWargearSelection(normalizedDatasheet);
       const newUnit: depot.RosterUnit = {
         id: crypto.randomUUID(),
-        datasheet: action.payload.datasheet,
+        datasheet: normalizedDatasheet,
         modelCost: action.payload.modelCost,
         selectedWargear: defaultWargear,
-        datasheetSlug: action.payload.datasheet.slug
+        datasheetSlug: normalizedDatasheet.slug
       };
 
       const updatedState = {

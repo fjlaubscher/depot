@@ -18,7 +18,7 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   onSelectionChange,
   className
 }) => {
-  const { rangedWargear, meleeWargear } = useMemo(() => {
+  const { rangedWargear, meleeWargear, mixedWargear } = useMemo(() => {
     return separateWargearByType(wargear);
   }, [wargear]);
 
@@ -35,7 +35,13 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
       <WargearSection
         wargear={rangedWargear}
         title="Ranged Wargear"
-        isRanged={true}
+        showSelectionColumn={showSelectionColumn}
+        selectedWargear={selectedWargear}
+        onSelectionChange={onSelectionChange}
+      />
+      <WargearSection
+        wargear={mixedWargear}
+        title="Mixed Wargear"
         showSelectionColumn={showSelectionColumn}
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
@@ -43,7 +49,6 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
       <WargearSection
         wargear={meleeWargear}
         title="Melee Wargear"
-        isRanged={false}
         showSelectionColumn={showSelectionColumn}
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}

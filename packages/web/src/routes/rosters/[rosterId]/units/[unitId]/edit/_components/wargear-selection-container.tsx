@@ -15,13 +15,12 @@ const WargearSelectionContainer: React.FC<WargearSelectionContainerProps> = ({
 }) => {
   const handleSelectionChange = (wargear: depot.Wargear, selected: boolean) => {
     if (selected) {
+      if (selectedWargear.some((existing) => existing.id === wargear.id)) {
+        return;
+      }
       onWargearChange([...selectedWargear, wargear]);
     } else {
-      onWargearChange(
-        selectedWargear.filter(
-          (selected) => !(selected.name === wargear.name && selected.line === wargear.line)
-        )
-      );
+      onWargearChange(selectedWargear.filter((selected) => selected.id !== wargear.id));
     }
   };
 

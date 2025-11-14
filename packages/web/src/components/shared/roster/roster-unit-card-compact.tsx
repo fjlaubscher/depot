@@ -2,6 +2,7 @@ import type { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 import type { depot } from '@depot/core';
 import { Card, PointsTag, Tag, TagGroup } from '@/components/ui';
+import { formatWargearDisplayName } from '@/utils/wargear';
 
 interface RosterUnitCardCompactProps {
   unit: depot.RosterUnit;
@@ -53,7 +54,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
                 size="sm"
                 className="capitalize"
               >
-                {wargear.name.toLowerCase()}
+                {formatWargearDisplayName(wargear).toLowerCase()}
               </Tag>
             ))}
             {remainingWargearCount > 0 ? (

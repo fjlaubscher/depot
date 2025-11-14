@@ -16,16 +16,18 @@ const useCoreStratagems = (): UseCoreStratagemsResult => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
+    const supportsAbortController = typeof AbortController !== 'undefined';
+    const controller = supportsAbortController ? new AbortController() : null;
 
     const fetchCoreStratagems = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(getDataUrl(getDataPath(CORE_STRATAGEM_FILE)), {
-          signal: controller.signal
-        });
+        const requestInit: RequestInit | undefined = controller
+          ? { signal: controller.signal }
+          : undefined;
+        const response = await fetch(getDataUrl(getDataPath(CORE_STRATAGEM_FILE)), requestInit);
 
         if (!response.ok) {
           throw new Error('Failed to load core stratagems');
@@ -43,7 +45,7 @@ const useCoreStratagems = (): UseCoreStratagemsResult => {
         setError(message);
         console.error(message, err);
       } finally {
-        if (!controller.signal.aborted) {
+        if (!controller || !controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -51,7 +53,7 @@ const useCoreStratagems = (): UseCoreStratagemsResult => {
 
     void fetchCoreStratagems();
 
-    return () => controller.abort();
+    return () => controller?.abort();
   }, []);
 
   return { stratagems, loading, error };

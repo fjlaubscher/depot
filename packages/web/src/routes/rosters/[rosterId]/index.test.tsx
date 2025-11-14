@@ -26,6 +26,18 @@ vi.mock('react-router-dom', async () => {
 
 import type { depot } from '@depot/core';
 
+const mockUseCoreStratagems = vi.hoisted(() =>
+  vi.fn(() => ({
+    stratagems: [],
+    loading: false,
+    error: null
+  }))
+);
+
+vi.mock('@/hooks/use-core-stratagems', () => ({
+  default: () => mockUseCoreStratagems()
+}));
+
 function createMockRosterState(): depot.Roster {
   return {
     id: 'test-roster-id',
@@ -115,6 +127,11 @@ describe('ViewRosterPage', () => {
     mockRosterState.state = createMockRosterState();
     mockRosterState.loading = false;
     mockRosterState.error = null;
+    mockUseCoreStratagems.mockReturnValue({
+      stratagems: [],
+      loading: false,
+      error: null
+    });
 
     // Default mock for empty roster
     mockGroupRosterUnitsByRole.mockReturnValue({});
