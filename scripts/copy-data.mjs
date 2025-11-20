@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { cpSync, existsSync, mkdirSync, rmSync, statSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 const sourceDir = 'packages/cli/dist/data';
 // Always copy into the production bundle; also copy to public/ for local dev when NODE_ENV is not production.
