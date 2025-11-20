@@ -10,8 +10,9 @@ interface UseFactionReturn {
 
 const useFaction = (factionSlug?: string): UseFactionReturn => {
   const { getFactionManifest } = useAppContext();
+  const shouldStartLoading = Boolean(factionSlug);
   const [data, setData] = useState<depot.FactionManifest | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(shouldStartLoading);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

@@ -10,8 +10,9 @@ interface UseDatasheetReturn {
 
 const useDatasheet = (factionSlug?: string, datasheetIdOrSlug?: string): UseDatasheetReturn => {
   const { getDatasheet } = useAppContext();
+  const shouldStartLoading = Boolean(factionSlug && datasheetIdOrSlug);
   const [data, setData] = useState<depot.Datasheet | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(shouldStartLoading);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
