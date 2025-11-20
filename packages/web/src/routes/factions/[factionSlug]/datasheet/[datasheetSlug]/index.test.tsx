@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { depot } from '@depot/core';
 import {
   mockFaction,
   mockFactionWithoutDatasheets,
@@ -15,6 +16,7 @@ import DatasheetPage from './index';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
+vi.mock('@/hooks/use-datasheet');
 vi.mock('@/contexts/toast/use-toast-context');
 // Mock react-router-dom params and navigation
 const mockNavigate = vi.fn();
@@ -29,6 +31,29 @@ vi.mock('react-router-dom', async () => {
 
 describe('DatasheetPage', () => {
   const mocks = createMockFunctions();
+  const buildManifest = (faction: depot.Faction): depot.FactionManifest => ({
+    id: faction.id,
+    slug: faction.slug,
+    name: faction.name,
+    link: faction.link,
+    datasheets: faction.datasheets.map((ds) => ({
+      id: ds.id,
+      slug: ds.slug,
+      name: ds.name,
+      factionId: faction.id,
+      factionSlug: faction.slug,
+      role: ds.role,
+      path: `/data/factions/${faction.slug}/datasheets/${ds.id}.json`,
+      supplementSlug: ds.supplementSlug,
+      supplementName: ds.supplementName,
+      link: ds.link,
+      isForgeWorld: ds.isForgeWorld,
+      isLegends: ds.isLegends
+    })),
+    detachments: faction.detachments,
+    datasheetCount: faction.datasheets.length,
+    detachmentCount: faction.detachments.length
+  });
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -36,7 +61,12 @@ describe('DatasheetPage', () => {
 
     // Setup default successful state
     mocks.mockUseFaction.mockReturnValue({
-      data: mockFaction,
+      data: buildManifest(mockFaction),
+      loading: false,
+      error: null
+    });
+    mocks.mockUseDatasheet.mockReturnValue({
+      data: mockFaction.datasheets[0],
       loading: false,
       error: null
     });
@@ -64,7 +94,7 @@ describe('DatasheetPage', () => {
   });
 
   it('renders loading state', () => {
-    mocks.mockUseFaction.mockReturnValue({
+    mocks.mockUseDatasheet.mockReturnValue({
       data: null,
       loading: true,
       error: null
@@ -76,10 +106,10 @@ describe('DatasheetPage', () => {
   });
 
   it('renders error state', () => {
-    mocks.mockUseFaction.mockReturnValue({
+    mocks.mockUseDatasheet.mockReturnValue({
       data: null,
       loading: false,
-      error: 'Failed to load faction data'
+      error: 'Failed to load datasheet'
     });
 
     render(<DatasheetPage />, { wrapper: TestWrapper });
@@ -89,7 +119,12 @@ describe('DatasheetPage', () => {
 
   it('renders not found state when datasheet is missing', () => {
     mocks.mockUseFaction.mockReturnValue({
-      data: mockFactionWithoutDatasheets,
+      data: buildManifest(mockFactionWithoutDatasheets),
+      loading: false,
+      error: null
+    });
+    mocks.mockUseDatasheet.mockReturnValue({
+      data: null,
       loading: false,
       error: null
     });
@@ -114,6 +149,11 @@ describe('DatasheetPage', () => {
 
     mocks.mockUseFaction.mockReturnValue({
       data: factionWithoutCosts,
+      loading: false,
+      error: null
+    });
+    mocks.mockUseDatasheet.mockReturnValue({
+      data: mockDatasheetWithoutCosts,
       loading: false,
       error: null
     });

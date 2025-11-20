@@ -1,14 +1,14 @@
-import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 
 export interface DatasheetVisibilityFilters {
   showLegends?: boolean;
   showForgeWorld?: boolean;
 }
 
-export const filterDatasheetsBySettings = (
-  datasheets: depot.Datasheet[],
+export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
+  datasheets: T[],
   filters?: DatasheetVisibilityFilters
-): depot.Datasheet[] => {
+): T[] => {
   if (!filters) {
     return datasheets;
   }

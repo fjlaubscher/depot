@@ -28,7 +28,8 @@ export type AppAction =
 export interface AppContextType {
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
-  getFaction: (slug: string) => Promise<depot.Faction | null>;
+  getFactionManifest: (slug: string) => Promise<depot.FactionManifest | null>;
+  getDatasheet: (factionSlug: string, datasheetIdOrSlug: string) => Promise<depot.Datasheet | null>;
   clearOfflineData: () => Promise<void>;
   updateSettings: (settings: depot.Settings) => Promise<void>;
   updateMyFactions: (factions: depot.Option[]) => Promise<void>;

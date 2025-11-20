@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 import { groupDatasheetsByRole } from '@/utils/datasheet';
 import {
   type DatasheetVisibilityFilters,
@@ -16,14 +16,14 @@ export interface DatasheetRoleTab {
   count: number;
 }
 
-export interface UseDatasheetBrowserResult {
+export interface UseDatasheetBrowserResult<T extends DatasheetListItem> {
   query: string;
   setQuery: (value: string) => void;
   debouncedQuery: string;
   activeRole: string | null;
   setActiveRole: (role: string | null) => void;
   tabs: DatasheetRoleTab[];
-  filteredDatasheets: depot.Datasheet[];
+  filteredDatasheets: T[];
   hasResults: boolean;
   totalCount: number;
   clearFilters: () => void;
@@ -37,12 +37,12 @@ const ALL_ROLE: DatasheetRoleTab = {
 
 const normalizeQuery = (value: string) => value.trim().toLowerCase();
 
-export const useDatasheetBrowser = (
-  datasheets: depot.Datasheet[],
+export const useDatasheetBrowser = <T extends DatasheetListItem>(
+  datasheets: T[],
   filters?: DatasheetFilters,
   debounceMs = 300,
   initialRole: string | null = null
-): UseDatasheetBrowserResult => {
+): UseDatasheetBrowserResult<T> => {
   const [query, setQuery] = useState('');
   const [activeRole, setActiveRole] = useState<string | null>(initialRole);
 

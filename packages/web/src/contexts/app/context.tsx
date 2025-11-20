@@ -6,7 +6,7 @@ import { appReducer, initialState } from './reducer';
 import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
-import { getDataPath, getDataUrl } from '@/utils/paths';
+import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
 import { DATA_VERSION } from '@/constants/data-version';
 import { normalizeDatasheetWargear } from '@/utils/wargear';
 
@@ -21,51 +21,98 @@ interface AppProviderProps {
 export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  // Get faction data directly from IndexedDB with network fallback
-  const getFaction = useCallback(
-    async (key: string): Promise<depot.Faction | null> => {
+  // Get faction manifest with network fallback
+  const getFactionManifest = useCallback(
+    async (key: string): Promise<depot.FactionManifest | null> => {
       try {
         const indexEntry = state.factionIndex?.find(
           (entry) => entry.slug === key || entry.id === key
         );
         const slug = indexEntry?.slug ?? key;
 
-        // First, try to load from IndexedDB
-        const cachedFaction = await offlineStorage.getFaction(slug);
-        if (cachedFaction) {
-          return cachedFaction;
+        const cachedManifest = await offlineStorage.getFactionManifest(slug);
+        if (cachedManifest) {
+          return cachedManifest;
         }
 
-        const path = getDataPath(indexEntry?.path ?? `${slug}.json`);
+        const path = getFactionManifestPath(slug);
+        const resolvedPath = indexEntry?.path ? getDataPath(indexEntry.path) : path;
 
-        // If not cached, fetch from network
-        const response = await fetch(getDataUrl(path));
+        const response = await fetch(getDataUrl(resolvedPath));
         if (!response.ok) {
           throw new Error(`Failed to load faction ${slug}`);
         }
-        const faction = (await response.json()) as depot.Faction;
-        const normalizedFaction: depot.Faction = {
-          ...faction,
-          datasheets: faction.datasheets.map((datasheet) => normalizeDatasheetWargear(datasheet))
-        };
 
-        // Cache the faction in IndexedDB for offline use
+        const manifest = (await response.json()) as depot.FactionManifest;
+
         try {
-          await offlineStorage.setFaction(slug, normalizedFaction);
-          // Update offline factions list
+          await offlineStorage.setFactionManifest(slug, manifest);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
           dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
         } catch (cacheError) {
-          console.warn('Failed to cache faction in IndexedDB:', cacheError);
+          console.warn('Failed to cache faction manifest in IndexedDB:', cacheError);
         }
 
-        return normalizedFaction;
+        return manifest;
       } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Failed to load faction ${key}:`, error);
+        dispatch({
+          type: APP_ACTIONS.LOAD_FACTION_ERROR,
+          payload: { slug: key, error: message }
+        });
         return null;
       }
     },
     [state.factionIndex]
+  );
+
+  const getDatasheet = useCallback(
+    async (factionSlug: string, datasheetIdOrSlug: string): Promise<depot.Datasheet | null> => {
+      try {
+        const manifest = await getFactionManifest(factionSlug);
+        if (!manifest) {
+          throw new Error(`Missing manifest for ${factionSlug}`);
+        }
+
+        const reference = manifest.datasheets.find(
+          (sheet) => sheet.id === datasheetIdOrSlug || sheet.slug === datasheetIdOrSlug
+        );
+
+        if (!reference) {
+          throw new Error(`Datasheet ${datasheetIdOrSlug} not found for ${factionSlug}`);
+        }
+
+        const cachedDatasheet = await offlineStorage.getDatasheet(reference.id);
+        if (cachedDatasheet) {
+          return cachedDatasheet;
+        }
+
+        const path = getDataPath(reference.path || getDatasheetPath(manifest.slug, reference.id));
+        const response = await fetch(getDataUrl(path));
+        if (!response.ok) {
+          throw new Error(`Failed to load datasheet ${reference.id}`);
+        }
+
+        const datasheet = (await response.json()) as depot.Datasheet;
+        const normalized = normalizeDatasheetWargear(datasheet);
+
+        try {
+          await offlineStorage.setDatasheet(normalized);
+        } catch (cacheError) {
+          console.warn('Failed to cache datasheet in IndexedDB:', cacheError);
+        }
+
+        return normalized;
+      } catch (error) {
+        console.error(
+          `Failed to load datasheet ${datasheetIdOrSlug} for faction ${factionSlug}:`,
+          error
+        );
+        return null;
+      }
+    },
+    [getFactionManifest]
   );
 
   // Clear cached faction data
@@ -219,7 +266,8 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const contextValue: AppContextType = {
     state,
     dispatch,
-    getFaction,
+    getFactionManifest,
+    getDatasheet,
     clearOfflineData,
     updateSettings,
     updateMyFactions

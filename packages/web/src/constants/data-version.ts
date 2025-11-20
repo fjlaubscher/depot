@@ -1,4 +1,4 @@
-const FALLBACK_DATA_VERSION = '2025-10-29';
+const FALLBACK_DATA_VERSION = '2025-11-21';
 
 const getEnvDataVersion = (): string | undefined => {
   try {

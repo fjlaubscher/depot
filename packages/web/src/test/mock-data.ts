@@ -288,15 +288,51 @@ export const mockFaction: depot.Faction = {
   detachments: [mockDetachment]
 };
 
+export const toFactionManifest = (faction: depot.Faction): depot.FactionManifest => ({
+  id: faction.id,
+  slug: faction.slug,
+  name: faction.name,
+  link: faction.link,
+  datasheets: faction.datasheets.map((sheet) => ({
+    id: sheet.id,
+    slug: sheet.slug,
+    name: sheet.name,
+    factionId: sheet.factionId,
+    factionSlug: sheet.factionSlug,
+    role: sheet.role,
+    path: `/data/factions/${sheet.factionSlug}/datasheets/${sheet.id}.json`,
+    supplementSlug: sheet.supplementSlug,
+    supplementName: sheet.supplementName,
+    link: sheet.link,
+    isForgeWorld: sheet.isForgeWorld,
+    isLegends: sheet.isLegends
+  })),
+  detachments: faction.detachments,
+  datasheetCount: faction.datasheets.length,
+  detachmentCount: faction.detachments.length
+});
+
+export const mockFactionManifest: depot.FactionManifest = toFactionManifest(mockFaction);
+
 export const mockFactionIndexes: depot.Index[] = [
-  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'SM',
+    slug: 'space-marines',
+    name: 'Space Marines',
+    path: '/data/factions/space-marines/faction.json'
+  },
   {
     id: 'CSM',
     slug: 'chaos-space-marines',
     name: 'Chaos Space Marines',
-    path: '/data/chaos-space-marines.json'
+    path: '/data/factions/chaos-space-marines/faction.json'
   },
-  { id: 'IG', slug: 'astra-militarum', name: 'Astra Militarum', path: '/data/astra-militarum.json' }
+  {
+    id: 'IG',
+    slug: 'astra-militarum',
+    name: 'Astra Militarum',
+    path: '/data/factions/astra-militarum/faction.json'
+  }
 ];
 
 /**
@@ -310,6 +346,13 @@ export const createMockDatasheet = (overrides: Partial<depot.Datasheet> = {}): d
 
 export const createMockFaction = (overrides: Partial<depot.Faction> = {}): depot.Faction => ({
   ...mockFaction,
+  ...overrides
+});
+
+export const createMockFactionManifest = (
+  overrides: Partial<depot.FactionManifest> = {}
+): depot.FactionManifest => ({
+  ...mockFactionManifest,
   ...overrides
 });
 
@@ -368,7 +411,7 @@ export const mockFactionIndex: depot.Index = {
   id: 'SM',
   slug: 'space-marines',
   name: 'Space Marines',
-  path: '/data/space-marines.json',
+  path: '/data/factions/space-marines/faction.json',
   datasheetCount: 50,
   detachmentCount: 4
 };

@@ -1,8 +1,8 @@
-import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 import { sortByName } from './array';
 
-export const groupDatasheetsByRole = (datasheets: depot.Datasheet[]) => {
-  let dictionary: { [role: string]: depot.Datasheet[] } = {};
+export const groupDatasheetsByRole = <T extends DatasheetListItem>(datasheets: T[]) => {
+  let dictionary: { [role: string]: T[] } = {};
 
   for (let i = 0; i < datasheets.length; i++) {
     const datasheet = datasheets[i];
@@ -11,7 +11,7 @@ export const groupDatasheetsByRole = (datasheets: depot.Datasheet[]) => {
   }
 
   Object.keys(dictionary).forEach((key) => {
-    dictionary[key] = sortByName(dictionary[key]) as depot.Datasheet[];
+    dictionary[key] = sortByName(dictionary[key]) as T[];
   });
 
   return dictionary;

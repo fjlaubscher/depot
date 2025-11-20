@@ -9,6 +9,7 @@ import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import useFaction from '@/hooks/use-faction';
+import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Alert } from '@/components/ui';
@@ -33,6 +34,11 @@ const AddRosterUnitsView: FC = () => {
     loading: factionLoading,
     error: factionError
   } = useFaction(rosterFactionSlug);
+  const {
+    datasheets: factionDatasheets,
+    loading: datasheetLoading,
+    error: datasheetError
+  } = useFactionDatasheets(rosterFactionSlug, factionData?.datasheets);
 
   const {
     selectedUnits,
@@ -157,18 +163,18 @@ const AddRosterUnitsView: FC = () => {
         review quantities before confirming your additions.
       </Alert>
 
-      {factionError ? (
+      {factionError || datasheetError ? (
         <Alert variant="error" title="Unable to load datasheets">
-          {factionError}
+          {datasheetError || factionError}
         </Alert>
       ) : null}
 
       <div className="flex flex-col gap-4">
-        {factionLoading ? (
+        {factionLoading || datasheetLoading ? (
           <DatasheetBrowserSkeleton />
         ) : (
           <DatasheetBrowser
-            datasheets={factionData?.datasheets ?? []}
+            datasheets={factionDatasheets}
             searchPlaceholder="Search by unit name..."
             emptyStateMessage="No units available for this faction."
             filters={datasheetFilters}

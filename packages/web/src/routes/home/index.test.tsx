@@ -47,7 +47,8 @@ describe('Home', () => {
       settings: null
     },
     dispatch: vi.fn(),
-    getFaction: vi.fn(),
+    getFactionManifest: vi.fn(),
+    getDatasheet: vi.fn(),
     clearOfflineData: vi.fn(),
     updateSettings: vi.fn(),
     updateMyFactions: vi.fn()

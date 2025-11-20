@@ -1,4 +1,4 @@
-import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 
 export interface SupplementOption {
   label: string;
@@ -40,7 +40,7 @@ export const buildSupplementLabel = (slug: string, name?: string) => {
   return name ?? toTitleCase(slug);
 };
 
-export const deriveSupplementMetadata = (datasheets: depot.Datasheet[]): SupplementMetadata => {
+export const deriveSupplementMetadata = (datasheets: DatasheetListItem[]): SupplementMetadata => {
   const hasSupplements = datasheets.some((sheet) => Boolean(sheet.supplementSlug));
   const hasCodexDatasheets = datasheets.some((sheet) => isCodexEntry(sheet.supplementSlug));
   const supplementCounts = new Map<string, number>();
@@ -92,18 +92,18 @@ export const deriveSupplementMetadata = (datasheets: depot.Datasheet[]): Supplem
   };
 };
 
-export const filterDatasheetsBySupplement = (
-  datasheets: depot.Datasheet[],
+export const filterDatasheetsBySupplement = <T extends DatasheetListItem>(
+  datasheets: T[],
   selectedSupplement: string
-): depot.Datasheet[] => {
+): T[] => {
   const normalizedSelection = normalizeSupplementValue(selectedSupplement || 'all');
 
   if (normalizedSelection === 'all') {
     return datasheets;
   }
 
-  const codexDatasheets: depot.Datasheet[] = [];
-  const supplementDatasheets: depot.Datasheet[] = [];
+  const codexDatasheets: T[] = [];
+  const supplementDatasheets: T[] = [];
 
   datasheets.forEach((sheet) => {
     const slug = sheet.supplementSlug;
@@ -135,6 +135,6 @@ export const filterDatasheetsBySupplement = (
 };
 
 export const shouldResetSupplementSelection = (
-  supplementaryDatasheets: depot.Datasheet[],
-  filtersAppliedDatasheets: depot.Datasheet[]
+  supplementaryDatasheets: DatasheetListItem[],
+  filtersAppliedDatasheets: DatasheetListItem[]
 ) => supplementaryDatasheets.length > 0 && filtersAppliedDatasheets.length === 0;

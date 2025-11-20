@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
 // components
@@ -9,6 +8,7 @@ import { BackButton } from '@/components/shared';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
+import useDatasheet from '@/hooks/use-datasheet';
 import { useAppContext } from '@/contexts/app/use-app-context';
 
 // page components
@@ -20,35 +20,35 @@ const DatasheetPage: FC = () => {
     factionSlug: string;
     datasheetSlug: string;
   }>();
-  const { data: faction, loading, error } = useFaction(factionSlug);
+  const { data: faction, loading: factionLoading, error: factionError } = useFaction(factionSlug);
+  const {
+    data: datasheet,
+    loading: datasheetLoading,
+    error: datasheetError
+  } = useDatasheet(factionSlug, datasheetSlug);
   const { state } = useAppContext();
   const settings = state.settings;
 
-  const datasheet = useMemo(() => {
-    if (faction && datasheetSlug) {
-      return faction.datasheets.find((ds) => ds.slug === datasheetSlug || ds.id === datasheetSlug);
-    }
-    return undefined;
-  }, [faction, datasheetSlug]);
+  const errorMessage = datasheetError || factionError;
 
-  if (error) {
+  if (errorMessage) {
     return (
       <AppLayout title="Error">
         <ErrorState
           title="Failed to Load Datasheet"
           message="We encountered an error while trying to load this datasheet. This could be due to network issues or the datasheet may not exist."
-          stackTrace={error}
+          stackTrace={errorMessage}
           data-testid="datasheet-error"
         />
       </AppLayout>
     );
   }
 
-  if (loading || !faction) {
+  if (datasheetLoading || factionLoading) {
     return <Skeleton />;
   }
 
-  if (!datasheet) {
+  if (!faction || !datasheet) {
     return (
       <AppLayout title="Not Found">
         <ErrorState

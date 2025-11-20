@@ -2,12 +2,13 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 
 import { Card } from '@/components/ui';
 
 interface DatasheetLeaderRulesProps {
   datasheet: depot.Datasheet;
-  factionDatasheets: depot.Datasheet[];
+  factionDatasheets: DatasheetListItem[];
 }
 
 interface LeaderTarget {

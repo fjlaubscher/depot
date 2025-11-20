@@ -26,9 +26,20 @@ export const getDataPath = (path: string): string => {
   }
 
   const normalized = trimmed.replace(/\\/g, '/');
-  const dataSegmentIndex = normalized.indexOf(DATA_ROOT);
-  if (dataSegmentIndex !== -1) {
-    const suffix = normalized.slice(dataSegmentIndex + DATA_ROOT.length);
+  const normalizedLower = normalized.toLowerCase();
+
+  // Respect an explicit /data prefix, but ignore partial matches (e.g. "/datasheets")
+  if (normalizedLower === DATA_ROOT || normalizedLower.startsWith(`${DATA_ROOT}/`)) {
+    const suffix = normalized.slice(DATA_ROOT.length);
+    const sanitizedSuffix = normalizeDataSuffix(suffix);
+    return sanitizedSuffix ? `${DATA_ROOT}/${sanitizedSuffix}` : DATA_ROOT;
+  }
+
+  // If the path already contains a leading base path (e.g. "/depot/data/foo"), strip any leading
+  // segments before the data root and rebuild.
+  const dataIndex = normalizedLower.indexOf('/data/');
+  if (dataIndex > 0) {
+    const suffix = normalized.slice(dataIndex + DATA_ROOT.length);
     const sanitizedSuffix = normalizeDataSuffix(suffix);
     return sanitizedSuffix ? `${DATA_ROOT}/${sanitizedSuffix}` : DATA_ROOT;
   }
@@ -104,3 +115,9 @@ export const getImageUrl = (path: string, basePath?: string): string => {
 
   return `${normalizedBasePath}${normalizedPath}`;
 };
+
+export const getFactionManifestPath = (slug: string): string =>
+  getDataPath(`factions/${slug}/faction.json`);
+
+export const getDatasheetPath = (factionSlug: string, datasheetId: string): string =>
+  getDataPath(`factions/${factionSlug}/datasheets/${datasheetId}.json`);

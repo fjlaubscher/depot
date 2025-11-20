@@ -90,7 +90,7 @@ export const ACTIONS = {
 </AppProvider>
 
 // Consumer in components
-const { state, getFaction } = useAppContext();
+const { state, getFactionManifest, getDatasheet } = useAppContext();
 const { showToast } = useToastContext();
 const { state: roster, addUnit } = useRoster();
 ```

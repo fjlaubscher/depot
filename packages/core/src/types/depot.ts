@@ -155,6 +155,32 @@ export interface Datasheet {
   isLegends: boolean;
 }
 
+export interface DatasheetSummary {
+  id: string;
+  slug: string;
+  name: string;
+  factionId: string;
+  factionSlug: string;
+  role: string;
+  path: string;
+  supplementSlug?: string;
+  supplementName?: string;
+  link: string;
+  isForgeWorld: boolean;
+  isLegends: boolean;
+}
+
+export interface FactionManifest {
+  id: string;
+  slug: string;
+  name: string;
+  link: string;
+  datasheets: DatasheetSummary[];
+  detachments: Detachment[];
+  datasheetCount: number;
+  detachmentCount: number;
+}
+
 export interface Faction {
   id: string;
   slug: string;
