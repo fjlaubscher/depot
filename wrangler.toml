@@ -1,0 +1,7 @@
+name = "depot"
+compatibility_date = "2025-02-05"
+
+[build]
+command = "pnpm build"
+cwd = "."
+pages_build_output_dir = "packages/web/dist"

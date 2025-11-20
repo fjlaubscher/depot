@@ -39,7 +39,7 @@ The web client can report unhandled errors to Sentry. Configure the following en
 - `VITE_SENTRY_ENVIRONMENT` (optional) – display environment name, defaults to build mode
 - `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` – required in CI for source map upload
 
-When deploying via GitHub Pages, set the matching GitHub Action secrets (`SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`) so the deployment workflow can inject them during the build.
+When deploying, set the matching environment variables/secrets (`SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`) so your CI/CD pipeline can inject them during the build (e.g., Cloudflare Pages env vars).
 
 ## Privacy
 
