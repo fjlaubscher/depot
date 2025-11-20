@@ -47,12 +47,17 @@ const mockCursor = {
 
 // Mock data
 const mockFactionIndex: depot.Index[] = [
-  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'SM',
+    slug: 'space-marines',
+    name: 'Space Marines',
+    path: '/data/factions/space-marines/faction.json'
+  },
   {
     id: 'CSM',
     slug: 'chaos-space-marines',
     name: 'Chaos Space Marines',
-    path: '/data/chaos-space-marines.json'
+    path: '/data/factions/chaos-space-marines/faction.json'
   }
 ];
 
@@ -104,6 +109,32 @@ const mockFaction: depot.Faction = {
       stratagems: []
     }
   ]
+};
+
+const mockManifest: depot.FactionManifest = {
+  id: mockFaction.id,
+  slug: mockFaction.slug,
+  name: mockFaction.name,
+  link: mockFaction.link,
+  datasheets: [
+    {
+      id: 'captain',
+      slug: 'captain',
+      name: 'Captain',
+      factionId: mockFaction.id,
+      factionSlug: mockFaction.slug,
+      role: 'HQ',
+      path: '/data/factions/space-marines/datasheets/captain.json',
+      supplementSlug: undefined,
+      supplementName: undefined,
+      link: '',
+      isForgeWorld: false,
+      isLegends: false
+    }
+  ],
+  detachments: mockFaction.detachments,
+  datasheetCount: 1,
+  detachmentCount: 1
 };
 
 const mockSettings: depot.Settings = {
@@ -225,24 +256,24 @@ describe('OfflineStorage', () => {
     });
   });
 
-  describe('getFaction', () => {
-    it('should return faction from IndexedDB', async () => {
+  describe('getFactionManifest', () => {
+    it('should return manifest from IndexedDB', async () => {
       mockObjectStore.get.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
-          request.result = mockFaction;
+          request.result = mockManifest;
           if (request.onsuccess) request.onsuccess();
         }, 0);
         return request;
       });
 
-      const result = await offlineStorage.getFaction('space-marines');
+      const result = await offlineStorage.getFactionManifest('space-marines');
 
-      expect(result).toEqual(mockFaction);
+      expect(result).toEqual(mockManifest);
       expect(mockObjectStore.get).toHaveBeenCalledWith('space-marines');
     });
 
-    it('should return null when faction does not exist', async () => {
+    it('should return null when manifest does not exist', async () => {
       mockObjectStore.get.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
@@ -252,14 +283,14 @@ describe('OfflineStorage', () => {
         return request;
       });
 
-      const result = await offlineStorage.getFaction('non-existent');
+      const result = await offlineStorage.getFactionManifest('non-existent');
 
       expect(result).toBeNull();
     });
   });
 
-  describe('setFaction', () => {
-    it('should store faction in IndexedDB', async () => {
+  describe('setFactionManifest', () => {
+    it('should store manifest in IndexedDB', async () => {
       mockObjectStore.put.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
@@ -269,41 +300,54 @@ describe('OfflineStorage', () => {
       });
 
       await expect(
-        offlineStorage.setFaction('space-marines', mockFaction)
+        offlineStorage.setFactionManifest('space-marines', mockManifest)
       ).resolves.toBeUndefined();
 
+      expect(mockObjectStore.put).toHaveBeenCalledWith(mockManifest, 'space-marines');
+    });
+  });
+
+  describe('datasheet operations', () => {
+    it('should return datasheet from IndexedDB', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          request.result = mockFaction.datasheets[0];
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getDatasheet('captain');
+
+      expect(result).toEqual(mockFaction.datasheets[0]);
+      expect(mockObjectStore.get).toHaveBeenCalledWith('captain');
+    });
+
+    it('should store datasheet in IndexedDB', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await expect(offlineStorage.setDatasheet(mockFaction.datasheets[0])).resolves.toBeUndefined();
       expect(mockObjectStore.put).toHaveBeenCalledWith(
-        expect.objectContaining({ id: mockFaction.id, slug: mockFaction.slug }),
-        'space-marines'
+        expect.objectContaining({ id: 'captain' }),
+        'captain'
       );
     });
   });
 
   describe('getAllCachedFactions', () => {
     it('should return list of cached factions', async () => {
-      mockObjectStore.openCursor.mockImplementation(() => {
+      mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
-        let callCount = 0;
         setTimeout(() => {
-          if (request.onsuccess) {
-            if (callCount === 0) {
-              request.result = {
-                ...mockCursor,
-                value: mockFaction,
-                continue: vi.fn(() => {
-                  callCount++;
-                  setTimeout(() => {
-                    request.result = null;
-                    if (request.onsuccess) request.onsuccess();
-                  }, 0);
-                })
-              };
-              request.onsuccess();
-            } else {
-              request.result = null;
-              request.onsuccess();
-            }
-          }
+          request.result = [mockManifest];
+          if (request.onsuccess) request.onsuccess();
         }, 0);
         return request;
       });
@@ -362,10 +406,10 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.clearFactionData()).resolves.toBeUndefined();
       expect(mockDatabase.transaction).toHaveBeenCalledWith(
-        ['factionIndex', 'factions'],
+        ['factionIndex', 'factionManifests', 'datasheets'],
         'readwrite'
       );
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(2);
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -381,7 +425,7 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.clearAllData()).resolves.toBeUndefined();
 
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(5);
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(6);
     });
   });
 
@@ -475,7 +519,7 @@ describe('OfflineStorage', () => {
         id: 'SM',
         slug: 'space-marines',
         name: 'Space Marines',
-        path: '/data/space-marines.json',
+        path: '/data/factions/space-marines/faction.json',
         datasheetCount: 50,
         detachmentCount: 4
       },

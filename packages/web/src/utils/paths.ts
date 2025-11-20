@@ -104,3 +104,9 @@ export const getImageUrl = (path: string, basePath?: string): string => {
 
   return `${normalizedBasePath}${normalizedPath}`;
 };
+
+export const getFactionManifestPath = (slug: string): string =>
+  getDataPath(`factions/${slug}/faction.json`);
+
+export const getDatasheetPath = (factionSlug: string, datasheetId: string): string =>
+  getDataPath(`/data/factions/${factionSlug}/datasheets/${datasheetId}.json`);

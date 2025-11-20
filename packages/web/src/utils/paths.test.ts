@@ -4,6 +4,8 @@ import {
   getAppBasePath,
   getDataPath,
   getDataUrl,
+  getDatasheetPath,
+  getFactionManifestPath,
   getRouterBasePath,
   getViteBasePath
 } from './paths';
@@ -68,5 +70,14 @@ describe('paths helpers', () => {
     expect(getDataPath('//units.json')).toBe('/data/units.json');
     expect(getDataUrl('/data/units.json')).toBe('/depot/data/units.json');
     expect(getDataUrl('//units.json')).toBe('/depot/data/units.json');
+  });
+
+  it('builds nested faction and datasheet paths', () => {
+    expect(getFactionManifestPath('space-marines')).toBe(
+      '/data/factions/space-marines/faction.json'
+    );
+    expect(getDatasheetPath('space-marines', '123')).toBe(
+      '/data/factions/space-marines/datasheets/123.json'
+    );
   });
 });

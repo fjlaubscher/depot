@@ -1,12 +1,12 @@
 import React from 'react';
-import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 
 // Components
 import { DatasheetBrowser } from '@/components/shared/datasheet';
 import type { DatasheetFilters } from '@/hooks/use-datasheet-browser';
 
 interface FactionDatasheetsProps {
-  datasheets: depot.Datasheet[];
+  datasheets: DatasheetListItem[];
   filters: DatasheetFilters;
 }
 

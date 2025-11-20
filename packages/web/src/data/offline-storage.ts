@@ -5,12 +5,13 @@ import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/war
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 4 // Increment version to invalidate legacy id-based caches
+  VERSION: 5 // Increment version to invalidate legacy id-based caches
 } as const;
 
 const STORES = {
   FACTION_INDEX: 'factionIndex',
-  FACTIONS: 'factions',
+  FACTION_MANIFESTS: 'factionManifests',
+  DATASHEETS: 'datasheets',
   SETTINGS: 'settings',
   USER_DATA: 'userData',
   ROSTERS: 'rosters'
@@ -48,11 +49,6 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
   };
 };
 
-const normalizeFactionData = (faction: depot.Faction): depot.Faction => ({
-  ...faction,
-  datasheets: faction.datasheets.map((datasheet) => normalizeDatasheetWargear(datasheet))
-});
-
 // Database connection with proper error handling
 class OfflineStorage {
   private dbPromise: Promise<IDBDatabase> | null = null;
@@ -76,11 +72,23 @@ class OfflineStorage {
             upgradeTransaction?.objectStore(STORES.FACTION_INDEX).clear();
           }
 
-          // Create or reset factions store keyed by slug
-          if (!db.objectStoreNames.contains(STORES.FACTIONS)) {
-            db.createObjectStore(STORES.FACTIONS);
+          // Create or reset faction manifests store keyed by slug
+          if (!db.objectStoreNames.contains(STORES.FACTION_MANIFESTS)) {
+            db.createObjectStore(STORES.FACTION_MANIFESTS);
           } else {
-            upgradeTransaction?.objectStore(STORES.FACTIONS).clear();
+            upgradeTransaction?.objectStore(STORES.FACTION_MANIFESTS).clear();
+          }
+
+          // Create or reset datasheets store keyed by datasheet id
+          if (!db.objectStoreNames.contains(STORES.DATASHEETS)) {
+            db.createObjectStore(STORES.DATASHEETS);
+          } else {
+            upgradeTransaction?.objectStore(STORES.DATASHEETS).clear();
+          }
+
+          // Drop legacy factions store when upgrading
+          if (db.objectStoreNames.contains('factions')) {
+            db.deleteObjectStore('factions');
           }
 
           // Create settings store (preserve existing data)
@@ -144,39 +152,73 @@ class OfflineStorage {
   }
 
   // Faction Data Operations
-  async getFaction(factionSlug: string): Promise<depot.Faction | null> {
+  async getFactionManifest(factionSlug: string): Promise<depot.FactionManifest | null> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTIONS], 'readonly');
-      const store = transaction.objectStore(STORES.FACTIONS);
+      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
+      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
 
       return new Promise((resolve, reject) => {
         const request = store.get(factionSlug);
-        request.onsuccess = () => {
-          const result = request.result as depot.Faction | undefined;
-          resolve(result ? normalizeFactionData(result) : null);
-        };
+        request.onsuccess = () => resolve((request.result as depot.FactionManifest) ?? null);
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error(`Failed to get faction ${factionSlug} from IndexedDB:`, error);
+      console.error(`Failed to get manifest for ${factionSlug} from IndexedDB:`, error);
       return null;
     }
   }
 
-  async setFaction(factionSlug: string, faction: depot.Faction): Promise<void> {
+  async setFactionManifest(factionSlug: string, manifest: depot.FactionManifest): Promise<void> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTIONS], 'readwrite');
-      const store = transaction.objectStore(STORES.FACTIONS);
+      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readwrite');
+      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(normalizeFactionData(faction), factionSlug);
+        const request = store.put(manifest, factionSlug);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
-      console.error(`Failed to set faction ${factionSlug} in IndexedDB:`, error);
+      console.error(`Failed to set manifest for ${factionSlug} in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async getDatasheet(datasheetId: string): Promise<depot.Datasheet | null> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.DATASHEETS], 'readonly');
+      const store = transaction.objectStore(STORES.DATASHEETS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.get(datasheetId);
+        request.onsuccess = () => {
+          const result = request.result as depot.Datasheet | undefined;
+          resolve(result ? normalizeDatasheetWargear(result) : null);
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to get datasheet ${datasheetId} from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async setDatasheet(datasheet: depot.Datasheet): Promise<void> {
+    try {
+      const db = await this.getDB();
+      const transaction = db.transaction([STORES.DATASHEETS], 'readwrite');
+      const store = transaction.objectStore(STORES.DATASHEETS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.put(normalizeDatasheetWargear(datasheet), datasheet.id);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to set datasheet ${datasheet.id} in IndexedDB:`, error);
       throw error;
     }
   }
@@ -184,46 +226,25 @@ class OfflineStorage {
   async getAllCachedFactions(): Promise<depot.Option[]> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTIONS], 'readonly');
-      const store = transaction.objectStore(STORES.FACTIONS);
+      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
+      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
 
       return new Promise((resolve, reject) => {
-        const factions: depot.Option[] = [];
-        const request = store.openCursor();
-
+        const request = store.getAll();
         request.onsuccess = () => {
-          const cursor = request.result;
-          if (cursor) {
-            const faction = cursor.value as depot.Faction;
-            factions.push({ id: faction.id, slug: faction.slug, name: faction.name });
-            cursor.continue();
-          } else {
-            resolve(factions);
-          }
+          const manifests = (request.result as depot.FactionManifest[] | undefined) ?? [];
+          const factions = manifests.map((manifest) => ({
+            id: manifest.id,
+            slug: manifest.slug,
+            name: manifest.name
+          }));
+          resolve(factions);
         };
-
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
       console.error('Failed to get all cached factions:', error);
       return [];
-    }
-  }
-
-  async deleteFaction(factionSlug: string): Promise<void> {
-    try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTIONS], 'readwrite');
-      const store = transaction.objectStore(STORES.FACTIONS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.delete(factionSlug);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    } catch (error) {
-      console.error(`Failed to delete faction ${factionSlug} from IndexedDB:`, error);
-      throw error;
     }
   }
 
@@ -430,7 +451,10 @@ class OfflineStorage {
   async clearFactionData(): Promise<void> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_INDEX, STORES.FACTIONS], 'readwrite');
+      const transaction = db.transaction(
+        [STORES.FACTION_INDEX, STORES.FACTION_MANIFESTS, STORES.DATASHEETS],
+        'readwrite'
+      );
 
       const clearStore = (storeName: (typeof STORES)[keyof typeof STORES]) =>
         new Promise<void>((resolve, reject) => {
@@ -440,7 +464,11 @@ class OfflineStorage {
           request.onerror = () => reject(request.error);
         });
 
-      await Promise.all([clearStore(STORES.FACTION_INDEX), clearStore(STORES.FACTIONS)]);
+      await Promise.all([
+        clearStore(STORES.FACTION_INDEX),
+        clearStore(STORES.FACTION_MANIFESTS),
+        clearStore(STORES.DATASHEETS)
+      ]);
     } catch (error) {
       console.error('Failed to clear faction cache from IndexedDB:', error);
       throw error;
@@ -451,7 +479,14 @@ class OfflineStorage {
     try {
       const db = await this.getDB();
       const transaction = db.transaction(
-        [STORES.FACTION_INDEX, STORES.FACTIONS, STORES.SETTINGS, STORES.USER_DATA, STORES.ROSTERS],
+        [
+          STORES.FACTION_INDEX,
+          STORES.FACTION_MANIFESTS,
+          STORES.DATASHEETS,
+          STORES.SETTINGS,
+          STORES.USER_DATA,
+          STORES.ROSTERS
+        ],
         'readwrite'
       );
 
@@ -462,7 +497,12 @@ class OfflineStorage {
           request.onerror = () => reject(request.error);
         }),
         new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.FACTIONS).clear();
+          const request = transaction.objectStore(STORES.FACTION_MANIFESTS).clear();
+          request.onsuccess = () => resolve();
+          request.onerror = () => reject(request.error);
+        }),
+        new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore(STORES.DATASHEETS).clear();
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
         }),

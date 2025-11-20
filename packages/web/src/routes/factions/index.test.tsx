@@ -16,7 +16,8 @@ const mockAppContext: AppContextType = {
     settings: null
   },
   dispatch: vi.fn(),
-  getFaction: vi.fn(),
+  getFactionManifest: vi.fn(),
+  getDatasheet: vi.fn(),
   clearOfflineData: vi.fn(),
   updateSettings: vi.fn(),
   updateMyFactions: vi.fn()
@@ -99,14 +100,19 @@ const mockFactions: depot.Index[] = [
     id: 'AM',
     slug: 'astra-militarum',
     name: 'Astra Militarum',
-    path: '/data/astra-militarum.json'
+    path: '/data/factions/astra-militarum/faction.json'
   },
-  { id: 'SM', slug: 'space-marines', name: 'Space Marines', path: '/data/space-marines.json' },
+  {
+    id: 'SM',
+    slug: 'space-marines',
+    name: 'Space Marines',
+    path: '/data/factions/space-marines/faction.json'
+  },
   {
     id: 'CSM',
     slug: 'chaos-space-marines',
     name: 'Chaos Space Marines',
-    path: '/data/chaos-space-marines.json'
+    path: '/data/factions/chaos-space-marines/faction.json'
   }
 ];
 

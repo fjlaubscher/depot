@@ -38,7 +38,7 @@ vi.mock('@/hooks/use-factions', () => ({
 
 // Mock useFaction hook
 const mockUseFaction = vi.hoisted(() => ({
-  data: null as depot.Faction | null,
+  data: null as depot.FactionManifest | null,
   loading: false,
   error: null
 }));
@@ -70,7 +70,29 @@ describe('CreateRoster', () => {
     mockUseFactions.factions = mockFactionIndexes;
     mockUseFactions.loading = false;
     mockUseFactions.error = null;
-    mockUseFaction.data = mockFaction;
+    mockUseFaction.data = {
+      id: mockFaction.id,
+      slug: mockFaction.slug,
+      name: mockFaction.name,
+      link: mockFaction.link,
+      datasheets: mockFaction.datasheets.map((ds) => ({
+        id: ds.id,
+        slug: ds.slug,
+        name: ds.name,
+        factionId: ds.factionId,
+        factionSlug: ds.factionSlug,
+        role: ds.role,
+        path: `/data/factions/${ds.factionSlug}/datasheets/${ds.id}.json`,
+        supplementSlug: ds.supplementSlug,
+        supplementName: ds.supplementName,
+        link: ds.link,
+        isForgeWorld: ds.isForgeWorld,
+        isLegends: ds.isLegends
+      })),
+      detachments: mockFaction.detachments,
+      datasheetCount: mockFaction.datasheets.length,
+      detachmentCount: mockFaction.detachments.length
+    };
     mockUseFaction.loading = false;
     mockUseFaction.error = null;
     mockUseRoster.createRoster.mockReturnValue('new-roster-id');

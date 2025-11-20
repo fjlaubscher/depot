@@ -4,7 +4,7 @@ import type { depot } from '@depot/core';
 import Faction from './index';
 import { TestWrapper } from '@/test/test-utils';
 import type { AppContextType } from '@/contexts/app/types';
-import { createMockFaction, createMockDatasheet } from '@/test/mock-data';
+import { createMockFaction, createMockDatasheet, toFactionManifest } from '@/test/mock-data';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -16,7 +16,7 @@ vi.mock('@/utils/faction', () => ({
 
 // Mock child components
 vi.mock('./_components/faction-datasheets', () => ({
-  default: ({ datasheets }: { datasheets: depot.Datasheet[] }) => (
+  default: ({ datasheets }: { datasheets: any[] }) => (
     <div data-testid="faction-datasheets">Datasheets: {datasheets.length}</div>
   )
 }));
@@ -36,7 +36,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-const mockFaction: depot.Faction = createMockFaction({
+const mockFaction = createMockFaction({
   datasheets: [
     createMockDatasheet({
       id: 'captain',
@@ -46,6 +46,7 @@ const mockFaction: depot.Faction = createMockFaction({
     })
   ]
 });
+const mockManifest = toFactionManifest(mockFaction);
 
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
@@ -64,7 +65,8 @@ describe('Faction Page', () => {
       settings: null
     },
     dispatch: vi.fn(),
-    getFaction: vi.fn(),
+    getFactionManifest: vi.fn(),
+    getDatasheet: vi.fn(),
     clearOfflineData: vi.fn(),
     updateSettings: vi.fn(),
     updateMyFactions: mockUpdateMyFactions
@@ -75,7 +77,7 @@ describe('Faction Page', () => {
 
     // Setup default mocks
     mockUseFaction.mockReturnValue({
-      data: mockFaction,
+      data: mockManifest,
       loading: false,
       error: null
     });

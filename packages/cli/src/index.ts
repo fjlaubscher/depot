@@ -12,6 +12,7 @@ const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = join(PKG_ROOT, 'dist');
 const JSON_DIR = join(DIST_DIR, 'json');
 const DATA_DIR = join(DIST_DIR, 'data');
+const FACTIONS_DIR = join(DATA_DIR, 'factions');
 const SOURCE_DATA_DIR = join(DIST_DIR, 'source_data');
 
 const getFileName = (input: string) =>
@@ -103,29 +104,62 @@ const init = async () => {
   }
 
   console.log('Generating faction files');
-  mkdirSync(DATA_DIR);
+  mkdirSync(DATA_DIR, { recursive: true });
+  mkdirSync(FACTIONS_DIR, { recursive: true });
 
   const index: depot.Index[] = [];
   const { factions, coreStratagems } = generateData();
 
   factions.forEach((faction) => {
-    const filePath = join(DATA_DIR, `${faction.slug}.json`);
+    const factionDir = join(FACTIONS_DIR, faction.slug);
+    const datasheetsDir = join(factionDir, 'datasheets');
 
-    // Calculate metadata counts for the index
-    const datasheetCount = faction.datasheets.length;
-    const detachmentCount = faction.detachments.length;
+    mkdirSync(datasheetsDir, { recursive: true });
+
+    const manifestDatasheets: depot.DatasheetSummary[] = faction.datasheets.map((datasheet) => ({
+      id: datasheet.id,
+      slug: datasheet.slug,
+      name: datasheet.name,
+      factionId: faction.id,
+      factionSlug: faction.slug,
+      role: datasheet.role,
+      path: `/data/factions/${faction.slug}/datasheets/${datasheet.id}.json`,
+      supplementSlug: datasheet.supplementSlug,
+      supplementName: datasheet.supplementName,
+      link: datasheet.link,
+      isForgeWorld: datasheet.isForgeWorld,
+      isLegends: datasheet.isLegends
+    }));
+
+    const manifest: depot.FactionManifest = {
+      id: faction.id,
+      slug: faction.slug,
+      name: faction.name,
+      link: faction.link,
+      datasheets: manifestDatasheets,
+      detachments: faction.detachments,
+      datasheetCount: manifestDatasheets.length,
+      detachmentCount: faction.detachments.length
+    };
+
+    const manifestPath = join(factionDir, 'faction.json');
+    console.log(`Creating ${manifestPath}`);
+    writeFileSync(manifestPath, JSON.stringify(manifest));
+
+    console.log(`Creating ${manifestDatasheets.length} datasheets for ${faction.slug}`);
+    faction.datasheets.forEach((datasheet) => {
+      const datasheetPath = join(datasheetsDir, `${datasheet.id}.json`);
+      writeFileSync(datasheetPath, JSON.stringify(datasheet));
+    });
 
     index.push({
       id: faction.id,
       slug: faction.slug,
       name: faction.name,
-      path: `/data/${faction.slug}.json`,
-      datasheetCount,
-      detachmentCount
+      path: `/data/factions/${faction.slug}/faction.json`,
+      datasheetCount: manifestDatasheets.length,
+      detachmentCount: faction.detachments.length
     });
-
-    console.log(`Creating ${filePath}`);
-    writeFileSync(filePath, JSON.stringify(faction));
   });
 
   console.log('Generating index file');

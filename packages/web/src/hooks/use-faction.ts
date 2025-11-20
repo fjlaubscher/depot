@@ -3,14 +3,14 @@ import type { depot } from '@depot/core';
 import { useAppContext } from '@/contexts/app/use-app-context';
 
 interface UseFactionReturn {
-  data: depot.Faction | undefined;
+  data: depot.FactionManifest | undefined;
   loading: boolean;
   error: string | null;
 }
 
 const useFaction = (factionSlug?: string): UseFactionReturn => {
-  const { getFaction } = useAppContext();
-  const [data, setData] = useState<depot.Faction | undefined>(undefined);
+  const { getFactionManifest } = useAppContext();
+  const [data, setData] = useState<depot.FactionManifest | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,9 +27,9 @@ const useFaction = (factionSlug?: string): UseFactionReturn => {
       setError(null);
 
       try {
-        const faction = await getFaction(factionSlug);
-        if (faction) {
-          setData(faction);
+        const manifest = await getFactionManifest(factionSlug);
+        if (manifest) {
+          setData(manifest);
         } else {
           setError(`Failed to load faction ${factionSlug}`);
         }
@@ -41,7 +41,7 @@ const useFaction = (factionSlug?: string): UseFactionReturn => {
     };
 
     loadFactionData();
-  }, [factionSlug, getFaction]);
+  }, [factionSlug, getFactionManifest]);
 
   return {
     data,

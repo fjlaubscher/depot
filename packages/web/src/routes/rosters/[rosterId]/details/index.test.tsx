@@ -59,7 +59,11 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 }));
 
 // Mock faction hook
-type FactionResult = { data: depot.Faction | undefined; loading: boolean; error: string | null };
+type FactionResult = {
+  data: depot.FactionManifest | undefined;
+  loading: boolean;
+  error: string | null;
+};
 
 const detachments = [
   createMockDetachment({ slug: 'gladius-task-force', name: 'Gladius Task Force' }),
@@ -91,7 +95,16 @@ describe('RosterDetailsPage', () => {
     };
     mockUpdateRosterDetails.mockReset();
     mockUseFaction.mockReturnValue({
-      data: createMockFaction({ detachments }),
+      data: {
+        id: 'SM',
+        slug: 'space-marines',
+        name: 'Space Marines',
+        link: '/faction/space-marines',
+        datasheets: [],
+        detachments,
+        datasheetCount: 0,
+        detachmentCount: detachments.length
+      },
       loading: false,
       error: null
     });

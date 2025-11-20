@@ -63,12 +63,8 @@ const mockAppState = vi.hoisted(() => ({
       showForgeWorld: false
     }
   },
-  getFaction: vi.fn().mockResolvedValue({
-    id: 'SM',
-    slug: 'space-marines',
-    name: 'Space Marines',
-    datasheets: []
-  }),
+  getFactionManifest: vi.fn(),
+  getDatasheet: vi.fn(),
   updateSettings: vi.fn(),
   updateMyFactions: vi.fn(),
   clearOfflineData: vi.fn(),
@@ -90,7 +86,13 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
 
 const mockUseFaction = vi.hoisted(() =>
-  vi.fn(() => ({
+  vi.fn<
+    () => {
+      data: depot.FactionManifest | null;
+      loading: boolean;
+      error: string | null;
+    }
+  >(() => ({
     data: null,
     loading: false,
     error: null
@@ -100,6 +102,55 @@ const mockUseFaction = vi.hoisted(() =>
 vi.mock('@/hooks/use-faction', () => ({
   default: mockUseFaction
 }));
+
+const mockUseFactionDatasheets = vi.hoisted(() =>
+  vi.fn(() => ({
+    datasheets: [] as depot.Datasheet[],
+    loading: false,
+    error: null
+  }))
+);
+
+vi.mock('@/hooks/use-faction-datasheets', () => ({
+  default: mockUseFactionDatasheets
+}));
+
+const buildManifest = (datasheets: depot.Datasheet[]): depot.FactionManifest => ({
+  id: datasheets[0]?.factionId ?? 'SM',
+  slug: datasheets[0]?.factionSlug ?? 'space-marines',
+  name: 'Space Marines',
+  link: '',
+  datasheets: datasheets.map((ds) => ({
+    id: ds.id,
+    slug: ds.slug,
+    name: ds.name,
+    factionId: ds.factionId,
+    factionSlug: ds.factionSlug,
+    role: ds.role,
+    path: `/data/factions/${ds.factionSlug}/datasheets/${ds.id}.json`,
+    supplementSlug: ds.supplementSlug,
+    supplementName: ds.supplementName,
+    link: ds.link,
+    isForgeWorld: ds.isForgeWorld,
+    isLegends: ds.isLegends
+  })),
+  detachments: [],
+  datasheetCount: datasheets.length,
+  detachmentCount: 0
+});
+
+const setFactionData = (datasheets: depot.Datasheet[]) => {
+  mockUseFaction.mockReturnValue({
+    data: buildManifest(datasheets),
+    loading: false,
+    error: null
+  });
+  mockUseFactionDatasheets.mockReturnValue({
+    datasheets,
+    loading: false,
+    error: null
+  });
+};
 
 // Mock useRosterUnitSelection hook
 const mockUnitSelection = vi.hoisted(() => ({
@@ -195,6 +246,11 @@ describe('AddRosterUnitsPage', () => {
       loading: false,
       error: null
     });
+    mockUseFactionDatasheets.mockReturnValue({
+      datasheets: [],
+      loading: false,
+      error: null
+    });
     mockRosterContext.state = {
       id: 'test-roster-id',
       name: 'Test Roster',
@@ -278,16 +334,7 @@ describe('AddRosterUnitsPage', () => {
 
   it('adds unit through datasheet card add button', async () => {
     const datasheet = createMockDatasheet();
-    mockUseFaction.mockReturnValue({
-      data: {
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines',
-        datasheets: [datasheet]
-      } as any,
-      loading: false,
-      error: null
-    });
+    setFactionData([datasheet]);
 
     await act(async () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
@@ -316,16 +363,7 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.totalSelectedPoints = 160;
     mockUnitSelection.getUnitCount.mockImplementation(() => 2);
 
-    mockUseFaction.mockReturnValue({
-      data: {
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines',
-        datasheets: [datasheet]
-      } as any,
-      loading: false,
-      error: null
-    });
+    setFactionData([datasheet]);
 
     await act(async () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
@@ -370,16 +408,7 @@ describe('AddRosterUnitsPage', () => {
     mockUnitSelection.totalSelectedPoints = 80;
     mockUnitSelection.getUnitCount.mockImplementation(() => 1);
 
-    mockUseFaction.mockReturnValue({
-      data: {
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines',
-        datasheets: [datasheet]
-      } as any,
-      loading: false,
-      error: null
-    });
+    setFactionData([datasheet]);
 
     await act(async () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
@@ -486,16 +515,7 @@ describe('AddRosterUnitsPage', () => {
       }
     };
 
-    mockUseFaction.mockReturnValue({
-      data: {
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines',
-        datasheets: [regularUnit, legendsUnit, forgeWorldUnit]
-      } as any,
-      loading: false,
-      error: null
-    });
+    setFactionData([regularUnit, legendsUnit, forgeWorldUnit]);
 
     await act(async () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });
@@ -534,16 +554,7 @@ describe('AddRosterUnitsPage', () => {
       }
     };
 
-    mockUseFaction.mockReturnValue({
-      data: {
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines',
-        datasheets: [legendsUnit, forgeWorldUnit]
-      } as any,
-      loading: false,
-      error: null
-    });
+    setFactionData([legendsUnit, forgeWorldUnit]);
 
     await act(async () => {
       render(<AddRosterUnitsPage />, { wrapper: TestWrapper });

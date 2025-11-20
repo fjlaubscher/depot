@@ -1,8 +1,8 @@
-import { type ReactNode, type FC, useMemo, useState, useEffect, useRef } from 'react';
-import type { depot } from '@depot/core';
+import { type ReactNode, useMemo, useState, useEffect, useRef } from 'react';
 import { LinkCard } from '@/components/ui';
 import Tag from '@/components/ui/tag';
 import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datasheet-browser';
+import type { DatasheetListItem } from '@/types/datasheets';
 import DatasheetSupplementTabs, {
   type SupplementTab as SupplementTabsOption
 } from './datasheet-supplement-tabs';
@@ -21,9 +21,9 @@ import {
   shouldResetSupplementSelection
 } from '@/utils/datasheet-supplements';
 
-interface DatasheetBrowserProps {
-  datasheets: depot.Datasheet[];
-  renderDatasheet?: (datasheet: depot.Datasheet) => ReactNode;
+interface DatasheetBrowserProps<T extends DatasheetListItem> {
+  datasheets: T[];
+  renderDatasheet?: (datasheet: T) => ReactNode;
   searchPlaceholder?: string;
   emptyStateMessage?: string;
   showItemCount?: boolean;
@@ -47,7 +47,7 @@ const formatRoleLabel = (value: string | null | undefined) => {
     .join(' ');
 };
 
-export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
+export const DatasheetBrowser = <T extends DatasheetListItem>({
   datasheets,
   renderDatasheet,
   searchPlaceholder = 'Search datasheets...',
@@ -55,7 +55,7 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
   showItemCount = true,
   filters,
   initialRole = null
-}) => {
+}: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState<string>('all');
 
   const supplementMetadata = useMemo(() => deriveSupplementMetadata(datasheets), [datasheets]);
@@ -187,7 +187,7 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
   ]);
 
   const prevFiltersRef = useRef<DatasheetFilters | undefined>(filters);
-  const prevActiveSupplementDatasheetsRef = useRef<depot.Datasheet[]>(activeSupplementDatasheets);
+  const prevActiveSupplementDatasheetsRef = useRef<T[]>(activeSupplementDatasheets);
 
   useEffect(() => {
     const prevFilters = prevFiltersRef.current;
@@ -240,14 +240,14 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
     hasResults,
     totalCount,
     clearFilters
-  } = useDatasheetBrowser(supplementFilteredDatasheets, filters, 300, initialRole);
+  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters, 300, initialRole);
 
   const visibleDatasheets = useMemo(() => {
     if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {
       return filteredDatasheets;
     }
 
-    const getPriority = (sheet: depot.Datasheet) => {
+    const getPriority = (sheet: T) => {
       const slug = sheet.supplementSlug
         ? normalizeSupplementValue(sheet.supplementSlug)
         : CODEX_SLUG;
@@ -277,7 +277,7 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
     clearFilters();
   };
 
-  const defaultRenderDatasheet = (datasheet: depot.Datasheet) => {
+  const defaultRenderDatasheet = (datasheet: DatasheetListItem) => {
     const tags: ReactNode[] = [];
     const roleLabel = formatRoleLabel(datasheet.role);
 
@@ -329,7 +329,8 @@ export const DatasheetBrowser: FC<DatasheetBrowserProps> = ({
     );
   };
 
-  const renderItem = renderDatasheet || defaultRenderDatasheet;
+  const renderItem: (datasheet: T) => ReactNode =
+    renderDatasheet ?? ((item) => defaultRenderDatasheet(item));
   const isRoleFiltered = activeRole !== initialRole;
   const isSupplementFiltered =
     supplementMetadata.hasSupplements && normalizedSelectedSupplement !== 'all';

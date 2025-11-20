@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
+import type { DatasheetListItem } from '@/types/datasheets';
 
 // components
 import DatasheetHero from './datasheet-hero';
@@ -11,7 +12,7 @@ import { categorizeAbilities } from '@/utils/abilities';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
-  factionDatasheets: depot.Datasheet[];
+  factionDatasheets: DatasheetListItem[];
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet, factionDatasheets }) => {

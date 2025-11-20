@@ -23,6 +23,7 @@ export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
 // Mock functions factory
 export const createMockFunctions = () => ({
   mockUseFaction: vi.fn(),
+  mockUseDatasheet: vi.fn(),
   mockNavigate: vi.fn(),
   mockShowToast: vi.fn(),
   mockUseToastContext: vi.fn(),
@@ -36,7 +37,8 @@ export const createMockFunctions = () => ({
       settings: null
     },
     dispatch: vi.fn(),
-    getFaction: vi.fn(),
+    getFactionManifest: vi.fn(),
+    getDatasheet: vi.fn(),
     clearOfflineData: vi.fn(),
     updateSettings: vi.fn(),
     updateMyFactions: vi.fn()
@@ -45,7 +47,7 @@ export const createMockFunctions = () => ({
 
 // Common mock setup for hooks
 export const setupCommonMocks = async (mocks: ReturnType<typeof createMockFunctions>) => {
-  const { mockUseFaction, mockUseToastContext, mockShowToast } = mocks;
+  const { mockUseFaction, mockUseDatasheet, mockUseToastContext, mockShowToast } = mocks;
 
   // Setup toast context mock
   mockUseToastContext.mockReturnValue({
@@ -59,6 +61,8 @@ export const setupCommonMocks = async (mocks: ReturnType<typeof createMockFuncti
   // Apply mocks
   const useFactionMock = await import('@/hooks/use-faction');
   vi.mocked(useFactionMock.default).mockImplementation(mockUseFaction);
+  const useDatasheetMock = await import('@/hooks/use-datasheet');
+  vi.mocked(useDatasheetMock.default).mockImplementation(mockUseDatasheet);
 
   const useToastMock = await import('@/contexts/toast/use-toast-context');
   vi.mocked(useToastMock.useToast).mockImplementation(mockUseToastContext);
