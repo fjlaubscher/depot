@@ -6,7 +6,7 @@ import type { CachedFaction } from '@/types/offline';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 5 // Increment version to invalidate legacy id-based caches
+  VERSION: 6 // Increment version to re-key faction index by slug
 } as const;
 
 const STORES = {
@@ -19,7 +19,6 @@ const STORES = {
 } as const;
 
 const KEYS = {
-  INDEX: 'index',
   SETTINGS: 'settings',
   MY_FACTIONS: 'my-factions',
   DATA_VERSION: 'data-version'
@@ -67,11 +66,10 @@ class OfflineStorage {
           const upgradeTransaction = request.transaction;
 
           // Create or reset faction index store
-          if (!db.objectStoreNames.contains(STORES.FACTION_INDEX)) {
-            db.createObjectStore(STORES.FACTION_INDEX);
-          } else {
-            upgradeTransaction?.objectStore(STORES.FACTION_INDEX).clear();
+          if (db.objectStoreNames.contains(STORES.FACTION_INDEX)) {
+            db.deleteObjectStore(STORES.FACTION_INDEX);
           }
+          db.createObjectStore(STORES.FACTION_INDEX, { keyPath: 'slug' });
 
           // Create or reset faction manifests store keyed by slug
           if (!db.objectStoreNames.contains(STORES.FACTION_MANIFESTS)) {
@@ -125,8 +123,23 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.FACTION_INDEX);
 
       return new Promise((resolve, reject) => {
-        const request = store.get(KEYS.INDEX);
-        request.onsuccess = () => resolve(request.result || null);
+        const request = store.getAll();
+        request.onsuccess = () => {
+          const result = request.result as (depot.Index | depot.Index[] | undefined)[] | undefined;
+          if (!result || result.length === 0) {
+            resolve(null);
+            return;
+          }
+
+          // Handle legacy single-entry array shape
+          const [first] = result;
+          if (Array.isArray(first)) {
+            resolve(first);
+            return;
+          }
+
+          resolve(result.filter((entry): entry is depot.Index => !Array.isArray(entry)));
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (error) {
@@ -142,9 +155,22 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.FACTION_INDEX);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(index, KEYS.INDEX);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
+        const clearRequest = store.clear();
+        clearRequest.onerror = () => reject(clearRequest.error);
+        clearRequest.onsuccess = () => {
+          Promise.all(
+            index.map(
+              (faction) =>
+                new Promise<void>((putResolve, putReject) => {
+                  const request = store.put(faction);
+                  request.onsuccess = () => putResolve();
+                  request.onerror = () => putReject(request.error);
+                })
+            )
+          )
+            .then(() => resolve())
+            .catch(reject);
+        };
       });
     } catch (error) {
       console.error('Failed to set faction index in IndexedDB:', error);

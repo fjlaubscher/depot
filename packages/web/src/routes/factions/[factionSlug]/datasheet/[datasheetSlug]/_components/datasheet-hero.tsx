@@ -5,7 +5,7 @@ import type { DatasheetListItem } from '@/types/datasheets';
 
 // components
 import { Tag, TagSection, TagGroup } from '@/components/ui';
-import { ModelStatsRow, DatasheetComposition } from '@/components/shared';
+import { DatasheetComposition } from '@/components/shared';
 import DatasheetLeaderRules from './datasheet-leader-rules';
 
 // utils
@@ -17,23 +17,20 @@ interface DatasheetHeroProps {
 }
 
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets }) => {
-  const { models, keywords, unitComposition, loadout, transport } = datasheet;
+  const { keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
+  const keywordTags = useMemo(
+    () => [...groupedKeywords.datasheet, ...groupedKeywords.faction],
+    [groupedKeywords]
+  );
 
   const pointTags = datasheet.modelCosts.map((cost) => ({
     key: `${cost.datasheetId}-${cost.line}`,
     label: cost.description ? `${cost.cost} pts (${cost.description})` : `${cost.cost} pts`
   }));
 
-  if (models.length === 0) return null;
-
   return (
-    <div className="flex flex-col gap-4">
-      {/* Model Stats Rows */}
-      {models.map((model) => (
-        <ModelStatsRow key={model.line} model={model} />
-      ))}
-
+    <div className="flex flex-col gap-2 sm:gap-4">
       <DatasheetComposition
         composition={unitComposition}
         loadout={loadout}
@@ -54,26 +51,15 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets })
       ) : null}
 
       {/* Keywords */}
-      <div className="flex flex-col gap-2">
-        {groupedKeywords.datasheet.length > 0 ? (
-          <TagSection title="Keywords" spacing="sm">
-            {groupedKeywords.datasheet.map((keyword, i) => (
-              <Tag key={`keyword-${i}`} variant="default" size="sm">
-                {keyword}
-              </Tag>
-            ))}
-          </TagSection>
-        ) : null}
-        {groupedKeywords.faction.length > 0 ? (
-          <TagSection title="Faction Keywords" spacing="sm">
-            {groupedKeywords.faction.map((keyword, i) => (
-              <Tag key={`faction-keyword-${i}`} variant="primary" size="sm">
-                {keyword}
-              </Tag>
-            ))}
-          </TagSection>
-        ) : null}
-      </div>
+      {keywordTags.length > 0 ? (
+        <TagSection title="Keywords" spacing="sm">
+          {keywordTags.map((keyword, i) => (
+            <Tag key={`keyword-${i}`} variant="default" size="sm">
+              {keyword}
+            </Tag>
+          ))}
+        </TagSection>
+      ) : null}
     </div>
   );
 };

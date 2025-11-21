@@ -10,6 +10,7 @@ const mockIndexedDB = {
 
 const mockDatabase = {
   createObjectStore: vi.fn(),
+  deleteObjectStore: vi.fn(),
   transaction: vi.fn(),
   close: vi.fn(),
   objectStoreNames: {
@@ -181,7 +182,7 @@ describe('OfflineStorage', () => {
 
   describe('getFactionIndex', () => {
     it('should return faction index from IndexedDB', async () => {
-      mockObjectStore.get.mockImplementation(() => {
+      mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
           request.result = mockFactionIndex;
@@ -193,14 +194,30 @@ describe('OfflineStorage', () => {
       const result = await offlineStorage.getFactionIndex();
 
       expect(result).toEqual(mockFactionIndex);
-      expect(mockObjectStore.get).toHaveBeenCalledWith('index');
+      expect(mockObjectStore.getAll).toHaveBeenCalled();
+    });
+
+    it('should normalize legacy single-entry array shape', async () => {
+      mockObjectStore.getAll.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          request.result = [mockFactionIndex];
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getFactionIndex();
+
+      expect(result).toEqual(mockFactionIndex);
+      expect(mockObjectStore.getAll).toHaveBeenCalled();
     });
 
     it('should return null when no index exists', async () => {
-      mockObjectStore.get.mockImplementation(() => {
+      mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
-          request.result = undefined;
+          request.result = [];
           if (request.onsuccess) request.onsuccess();
         }, 0);
         return request;
@@ -229,6 +246,14 @@ describe('OfflineStorage', () => {
 
   describe('setFactionIndex', () => {
     it('should store faction index in IndexedDB', async () => {
+      mockObjectStore.clear.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
       mockObjectStore.put.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
@@ -239,15 +264,31 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.setFactionIndex(mockFactionIndex)).resolves.toBeUndefined();
 
-      expect(mockObjectStore.put).toHaveBeenCalledWith(mockFactionIndex, 'index');
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(1);
+      expect(mockObjectStore.put).toHaveBeenCalledWith(mockFactionIndex[0]);
+      expect(mockObjectStore.put).toHaveBeenCalledWith(mockFactionIndex[1]);
     });
 
     it('should throw error on storage failure', async () => {
+      mockObjectStore.clear.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      let call = 0;
       mockObjectStore.put.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
-          request.error = new Error('Storage error');
-          if (request.onerror) request.onerror();
+          if (call === 0) {
+            request.error = new Error('Storage error');
+            if (request.onerror) request.onerror();
+          } else if (request.onsuccess) {
+            request.onsuccess();
+          }
+          call += 1;
         }, 0);
         return request;
       });
@@ -679,10 +720,10 @@ describe('OfflineStorage', () => {
 
   describe('isDataStale', () => {
     it('should return true when no index exists', async () => {
-      mockObjectStore.get.mockImplementation(() => {
+      mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
-          request.result = null;
+          request.result = [];
           if (request.onsuccess) request.onsuccess();
         }, 0);
         return request;
@@ -694,7 +735,7 @@ describe('OfflineStorage', () => {
     });
 
     it('should return false when index exists', async () => {
-      mockObjectStore.get.mockImplementation(() => {
+      mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
         setTimeout(() => {
           request.result = mockFactionIndex;

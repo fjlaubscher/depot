@@ -104,6 +104,7 @@ const DatasheetPage: FC = () => {
           title={datasheet.name}
           subtitle={datasheet.sourceName}
           actions={[shareAction]}
+          alignActions="inline"
           data-testid="datasheet-header"
         />
 

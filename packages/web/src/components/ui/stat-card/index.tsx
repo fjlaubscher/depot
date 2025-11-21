@@ -9,14 +9,14 @@ interface StatCardProps {
 const StatCard: FC<StatCardProps> = ({ label, value, size = 'default' }) => {
   const sizeClasses = {
     default: {
-      container: 'py-2 min-w-[56px]',
-      label: 'text-xs',
-      value: 'text-md'
+      container: 'py-1 px-2 min-w-12 sm:py-2 sm:min-w-16',
+      label: 'text-[11px] leading-tight sm:text-xs',
+      value: 'text-sm sm:text-base'
     },
     compact: {
-      container: 'py-1 min-w-[48px]',
-      label: 'text-xs',
-      value: 'text-sm'
+      container: 'py-1 px-2 min-w-10 sm:min-w-12',
+      label: 'text-[10px] sm:text-xs',
+      value: 'text-xs sm:text-sm'
     }
   };
 

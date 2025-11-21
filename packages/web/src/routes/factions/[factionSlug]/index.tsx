@@ -158,6 +158,7 @@ const Faction: React.FC = () => {
         <PageHeader
           title={faction.name}
           subtitle={alliance}
+          alignActions="inline"
           actions={[
             shareAction,
             {
