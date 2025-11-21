@@ -14,7 +14,7 @@ import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
 
 // page components
-import DatasheetProfile from './_components/datasheet-profile';
+import { DatasheetProfile } from '@/components/shared/datasheet';
 import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {

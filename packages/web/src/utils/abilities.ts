@@ -7,6 +7,29 @@ export interface CategorizedAbilities {
   referenced: depot.Ability[];
 }
 
+const normalizeAbilityType = (type: string | undefined): string => type?.toLowerCase().trim() ?? '';
+
+const abilityTypePriority = (type: string): number => (type.includes('core') ? 0 : 1);
+
+export const sortAbilitiesByType = (abilities: depot.Ability[]): depot.Ability[] => {
+  return [...abilities].sort((a, b) => {
+    const aType = normalizeAbilityType(a.type);
+    const bType = normalizeAbilityType(b.type);
+
+    const typePriorityDiff = abilityTypePriority(aType) - abilityTypePriority(bType);
+
+    if (typePriorityDiff !== 0) {
+      return typePriorityDiff;
+    }
+
+    if (aType !== bType) {
+      return aType.localeCompare(bType);
+    }
+
+    return formatAbilityName(a).localeCompare(formatAbilityName(b));
+  });
+};
+
 /**
  * Categorizes abilities into inline (unit-specific) and referenced (core/faction) groups.
  */

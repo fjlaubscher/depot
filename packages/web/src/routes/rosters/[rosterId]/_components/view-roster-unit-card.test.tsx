@@ -5,7 +5,7 @@ import { createMockRosterUnit, createMockDatasheet, mockDatasheet } from '@/test
 import ViewRosterUnitCard from './view-roster-unit-card';
 
 describe('ViewRosterUnitCard', () => {
-  it('expands to show detailed ability sections', () => {
+  it('expands to show datasheet abilities and keywords', () => {
     const datasheetWithInlineAbility = createMockDatasheet({
       abilities: [
         ...mockDatasheet.abilities,
@@ -38,12 +38,11 @@ describe('ViewRosterUnitCard', () => {
 
     fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));
 
-    expect(screen.getByTestId('roster-unit-core-abilities')).toBeInTheDocument();
     expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
-    expect(screen.getByTestId('roster-unit-keywords')).toBeInTheDocument();
-    expect(screen.getByTestId('roster-unit-keyword-infantry')).toBeInTheDocument();
-    expect(screen.getByTestId('roster-unit-keyword-character')).toBeInTheDocument();
-    expect(screen.queryByTestId('roster-unit-keyword-imperium')).not.toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-abilities-tag-leader')).toBeInTheDocument();
+    expect(screen.getByTestId('roster-unit-abilities-tag-shock-assault')).toBeInTheDocument();
+    expect(screen.getByText(/infantry/i)).toBeInTheDocument();
+    expect(screen.getByText(/character/i)).toBeInTheDocument();
   });
 
   it('keeps the card expanded when interacting within details', () => {

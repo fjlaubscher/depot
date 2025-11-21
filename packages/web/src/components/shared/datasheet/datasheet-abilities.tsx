@@ -5,8 +5,7 @@ import classNames from 'classnames';
 
 import { Tag, TagSection } from '@/components/ui';
 import AbilityModal from '@/components/shared/ability-modal';
-import { formatAbilityName, getAbilityTagVariant } from '@/utils/abilities';
-import { sortByName } from '@/utils/array';
+import { formatAbilityName, getAbilityTagVariant, sortAbilitiesByType } from '@/utils/abilities';
 
 interface DatasheetAbilitiesProps {
   title: string;
@@ -24,9 +23,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
   const [selectedAbility, setSelectedAbility] = useState<depot.Ability | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const sortedAbilities = useMemo(() => {
-    return sortByName(abilities) as depot.Ability[];
-  }, [abilities]);
+  const sortedAbilities = useMemo(() => sortAbilitiesByType(abilities), [abilities]);
 
   const handleClose = useCallback(() => {
     setIsModalOpen(false);
