@@ -6,7 +6,7 @@ import type { CachedFaction } from '@/types/offline';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 6 // Increment version to re-key faction index by slug
+  VERSION: 7 // Force cache destroy/rebuild after offline schema changes
 } as const;
 
 const STORES = {
