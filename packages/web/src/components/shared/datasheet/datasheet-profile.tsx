@@ -13,10 +13,15 @@ import { categorizeAbilities } from '@/utils/abilities';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
-  factionDatasheets: DatasheetListItem[];
+  factionDatasheets?: DatasheetListItem[];
+  abilitiesTestId?: string;
 }
 
-const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet, factionDatasheets }) => {
+const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
+  datasheet,
+  factionDatasheets = [],
+  abilitiesTestId = 'datasheet-abilities'
+}) => {
   const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
     return categorizeAbilities(datasheet.abilities);
   }, [datasheet.abilities]);
@@ -36,7 +41,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({ datasheet, factionD
       <DatasheetAbilities
         title="Abilities"
         abilities={mergedAbilities}
-        dataTestId="datasheet-abilities"
+        dataTestId={abilitiesTestId}
       />
       <DatasheetWargear datasheet={datasheet} />
     </div>

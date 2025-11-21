@@ -15,6 +15,14 @@ const mockAbilities = [
     parameter: '6"'
   },
   {
+    id: 'faction-1',
+    name: 'Gladius Strike Force',
+    type: 'Faction',
+    description: '<p>Faction doctrine description</p>',
+    legend: '',
+    factionId: 'SM'
+  },
+  {
     id: 'core-1',
     name: 'Advance Doctrine',
     type: 'Core',
@@ -22,19 +30,29 @@ const mockAbilities = [
     legend: '',
     factionId: 'SM',
     parameter: '3"'
+  },
+  {
+    id: 'datasheet-1',
+    name: 'Rapid Assault',
+    type: 'Datasheet',
+    description: '<p>Rapid assault description</p>',
+    legend: '',
+    factionId: 'SM'
   }
 ];
 
 describe('DatasheetAbilities', () => {
-  it('renders ability tags sorted alphabetically', () => {
+  it('renders ability tags sorted with Core first then by type and name', () => {
     render(<DatasheetAbilities title="Core Abilities" abilities={mockAbilities} />);
 
     expect(screen.getByText(/click a tag to view full rules/i)).toBeInTheDocument();
 
     const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(4);
     expect(buttons[0]).toHaveTextContent(/advance doctrine 3"/i);
     expect(buttons[1]).toHaveTextContent(/fallback doctrine 6"/i);
+    expect(buttons[2]).toHaveTextContent(/rapid assault/i);
+    expect(buttons[3]).toHaveTextContent(/gladius strike force/i);
   });
 
   it('opens modal with ability details when a tag is clicked', async () => {
