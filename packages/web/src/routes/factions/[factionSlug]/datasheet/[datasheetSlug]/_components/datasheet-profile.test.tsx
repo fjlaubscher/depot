@@ -17,7 +17,7 @@ vi.mock('./datasheet-leader-rules', () => ({
 }));
 
 describe('DatasheetProfile', () => {
-  it('renders core and unit abilities as tags', () => {
+  it('renders combined abilities with type-specific tag styles', () => {
     const datasheet = createMockDatasheet({
       abilities: [
         {
@@ -41,32 +41,24 @@ describe('DatasheetProfile', () => {
 
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
-    expect(screen.getAllByText(/click a tag to view full rules/i)).toHaveLength(2);
-    expect(screen.getByTestId('core-abilities')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /leader/i })).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-abilities')).toBeInTheDocument();
+    expect(screen.getByText(/click a tag to view full rules/i)).toBeInTheDocument();
 
-    expect(screen.getByTestId('unit-abilities')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /rapid assault/i })).toBeInTheDocument();
+    const coreAbilityTag = screen.getByTestId('datasheet-abilities-tag-core-1');
+    const unitAbilityTag = screen.getByTestId('datasheet-abilities-tag-inline-1');
+
+    expect(coreAbilityTag).toBeInTheDocument();
+    expect(coreAbilityTag.querySelector('span')).toHaveClass('bg-primary-100');
+
+    expect(unitAbilityTag).toBeInTheDocument();
+    expect(unitAbilityTag.querySelector('span')).toHaveClass('surface-success-strong');
   });
 
-  it('shows empty message when no core abilities available', () => {
-    const datasheet = createMockDatasheet({
-      abilities: [
-        {
-          id: 'inline-1',
-          name: 'Rapid Assault',
-          legend: '',
-          factionId: 'SM',
-          description: '<p>Rapid assault description</p>',
-          type: 'Datasheet'
-        }
-      ]
-    });
+  it('hides abilities when none are available', () => {
+    const datasheet = createMockDatasheet({ abilities: [] });
 
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
-    expect(screen.queryByTestId('core-abilities')).not.toBeInTheDocument();
-    expect(screen.getByTestId('unit-abilities')).toBeInTheDocument();
-    expect(screen.getByText(/click a tag to view full rules/i)).toBeInTheDocument();
+    expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
   });
 });
