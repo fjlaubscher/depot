@@ -99,6 +99,8 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
 
         try {
           await offlineStorage.setDatasheet(normalized);
+          const offlineFactions = await offlineStorage.getAllCachedFactions();
+          dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache datasheet in IndexedDB:', cacheError);
         }

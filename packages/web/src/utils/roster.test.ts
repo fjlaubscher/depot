@@ -24,7 +24,7 @@ describe('generateRosterShareText', () => {
 
     expect(shareText).toContain('- Captain - Captain (80 pts)');
     expect(shareText).not.toContain('Bolt pistol');
-    expect(shareText).toContain('https://fjlaubscher.github.io/depot');
+    expect(shareText).toContain(`${window.location.origin}/`);
     expect(shareText).toContain(`  - [Enhancement] ${mockEnhancement.name} (10 pts)`);
     expect(shareText).not.toContain('*Enhancements*');
   });

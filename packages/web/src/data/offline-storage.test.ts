@@ -343,18 +343,29 @@ describe('OfflineStorage', () => {
 
   describe('getAllCachedFactions', () => {
     it('should return list of cached factions', async () => {
-      mockObjectStore.getAll.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          request.result = [mockManifest];
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
+      mockObjectStore.getAll
+        .mockImplementationOnce(() => {
+          const request = { ...mockRequest };
+          setTimeout(() => {
+            request.result = [mockManifest];
+            if (request.onsuccess) request.onsuccess();
+          }, 0);
+          return request;
+        })
+        .mockImplementationOnce(() => {
+          const request = { ...mockRequest };
+          setTimeout(() => {
+            request.result = mockFaction.datasheets;
+            if (request.onsuccess) request.onsuccess();
+          }, 0);
+          return request;
+        });
 
       const result = await offlineStorage.getAllCachedFactions();
 
-      expect(result).toEqual([{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]);
+      expect(result).toEqual([
+        { id: 'SM', slug: 'space-marines', name: 'Space Marines', cachedDatasheets: 1 }
+      ]);
     });
   });
 

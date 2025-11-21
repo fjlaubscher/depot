@@ -314,7 +314,12 @@ describe('AppProvider with IndexedDB Integration', () => {
 
     it('should load offline factions list on initialization', async () => {
       const offlineFactions = [
-        { id: 'cached-faction', slug: 'cached-faction', name: 'Cached Faction' }
+        {
+          id: 'cached-faction',
+          slug: 'cached-faction',
+          name: 'Cached Faction',
+          cachedDatasheets: 3
+        }
       ];
       mockOfflineStorage.getAllCachedFactions.mockResolvedValue(offlineFactions);
 
@@ -469,6 +474,9 @@ describe('AppProvider with IndexedDB Integration', () => {
         expect(global.fetch).toHaveBeenCalledWith(
           '/data/factions/test-faction/datasheets/test-datasheet.json'
         );
+      });
+      await waitFor(() => {
+        expect(mockOfflineStorage.getAllCachedFactions).toHaveBeenCalledTimes(2);
       });
       expect(mockOfflineStorage.setDatasheet).toHaveBeenCalledWith(
         expect.objectContaining({ id: 'test-datasheet' })

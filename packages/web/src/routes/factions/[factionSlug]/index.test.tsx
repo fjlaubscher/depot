@@ -234,4 +234,39 @@ describe('Faction Page', () => {
     const button = screen.getByRole('button', { name: /remove from my factions/i });
     expect(button).toBeInTheDocument();
   });
+
+  it('shares faction link with native share when available', async () => {
+    const shareMock = vi.fn().mockResolvedValue(undefined);
+    const clipboardMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { share: shareMock, clipboard: { writeText: clipboardMock } });
+
+    render(<Faction />, { wrapper: TestWrapper });
+
+    const shareButton = screen.getByRole('button', { name: /share faction link/i });
+    fireEvent.click(shareButton);
+
+    const expectedUrl = `${window.location.origin}/faction/space-marines`;
+    await waitFor(() => {
+      expect(shareMock).toHaveBeenCalledWith({
+        title: 'Space Marines',
+        url: expectedUrl
+      });
+    });
+    expect(clipboardMock).not.toHaveBeenCalled();
+  });
+
+  it('falls back to copying when native share is unavailable', async () => {
+    const clipboardMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { share: undefined, clipboard: { writeText: clipboardMock } });
+
+    render(<Faction />, { wrapper: TestWrapper });
+
+    const shareButton = screen.getByRole('button', { name: /share faction link/i });
+    fireEvent.click(shareButton);
+
+    const expectedUrl = `${window.location.origin}/faction/space-marines`;
+    await waitFor(() => {
+      expect(clipboardMock).toHaveBeenCalledWith(expectedUrl);
+    });
+  });
 });

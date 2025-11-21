@@ -116,6 +116,22 @@ export const getImageUrl = (path: string, basePath?: string): string => {
   return `${normalizedBasePath}${normalizedPath}`;
 };
 
+/**
+ * Builds an absolute URL for the app, respecting any configured base path.
+ */
+export const buildAbsoluteUrl = (path: string = '/'): string => {
+  const normalizedBasePath = getAppBasePath();
+  const sanitizedPath = path.startsWith('/') ? path : `/${path}`;
+  const normalizedPath = sanitizedPath === '/' ? '' : sanitizedPath;
+  const relativePath = `${normalizedBasePath}${normalizedPath}` || '/';
+  const origin =
+    typeof window !== 'undefined' && typeof window.location !== 'undefined'
+      ? window.location.origin
+      : '';
+
+  return origin ? `${origin}${relativePath}` : relativePath;
+};
+
 export const getFactionManifestPath = (slug: string): string =>
   getDataPath(`factions/${slug}/faction.json`);
 

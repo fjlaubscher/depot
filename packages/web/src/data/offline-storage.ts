@@ -1,6 +1,7 @@
 import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
+import type { CachedFaction } from '@/types/offline';
 
 // Database configuration constants
 const DB_CONFIG = {
@@ -223,25 +224,44 @@ class OfflineStorage {
     }
   }
 
-  async getAllCachedFactions(): Promise<depot.Option[]> {
+  async getAllCachedFactions(): Promise<CachedFaction[]> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
-      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
-
-      return new Promise((resolve, reject) => {
+      const manifestsPromise = new Promise<depot.FactionManifest[]>((resolve, reject) => {
+        const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
+        const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
         const request = store.getAll();
-        request.onsuccess = () => {
-          const manifests = (request.result as depot.FactionManifest[] | undefined) ?? [];
-          const factions = manifests.map((manifest) => ({
-            id: manifest.id,
-            slug: manifest.slug,
-            name: manifest.name
-          }));
-          resolve(factions);
-        };
+        request.onsuccess = () =>
+          resolve((request.result as depot.FactionManifest[] | undefined) ?? []);
         request.onerror = () => reject(request.error);
       });
+
+      const datasheetsPromise = new Promise<depot.Datasheet[]>((resolve, reject) => {
+        const transaction = db.transaction([STORES.DATASHEETS], 'readonly');
+        const store = transaction.objectStore(STORES.DATASHEETS);
+        const request = store.getAll();
+        request.onsuccess = () => resolve((request.result as depot.Datasheet[] | undefined) ?? []);
+        request.onerror = () => reject(request.error);
+      });
+
+      const [manifests, datasheets] = await Promise.all([manifestsPromise, datasheetsPromise]);
+      const datasheetCountByFaction = datasheets.reduce<Record<string, number>>((acc, sheet) => {
+        const factionSlug = sheet.factionSlug || sheet.factionId;
+        if (!factionSlug) {
+          return acc;
+        }
+        acc[factionSlug] = (acc[factionSlug] ?? 0) + 1;
+        return acc;
+      }, {});
+
+      const factions: CachedFaction[] = manifests.map((manifest) => ({
+        id: manifest.id,
+        slug: manifest.slug,
+        name: manifest.name,
+        cachedDatasheets: datasheetCountByFaction[manifest.slug] ?? 0
+      }));
+
+      return factions;
     } catch (error) {
       console.error('Failed to get all cached factions:', error);
       return [];

@@ -10,6 +10,8 @@ import { BackButton } from '@/components/shared';
 import useFaction from '@/hooks/use-faction';
 import useDatasheet from '@/hooks/use-datasheet';
 import { useAppContext } from '@/contexts/app/use-app-context';
+import { buildAbsoluteUrl } from '@/utils/paths';
+import { useShareAction } from '@/hooks/use-share-action';
 
 // page components
 import DatasheetProfile from './_components/datasheet-profile';
@@ -28,6 +30,17 @@ const DatasheetPage: FC = () => {
   } = useDatasheet(factionSlug, datasheetSlug);
   const { state } = useAppContext();
   const settings = state.settings;
+  const shareAction = useShareAction({
+    title: datasheet?.name,
+    url:
+      faction && datasheet
+        ? buildAbsoluteUrl(`/faction/${faction.slug}/datasheet/${datasheet.slug}`)
+        : undefined,
+    ariaLabel: 'Share datasheet link',
+    testId: 'share-datasheet',
+    copySuccessMessage: 'Datasheet link copied to clipboard.',
+    shareSuccessMessage: 'Datasheet link shared.'
+  });
 
   const errorMessage = datasheetError || factionError;
 
@@ -90,6 +103,7 @@ const DatasheetPage: FC = () => {
         <PageHeader
           title={datasheet.name}
           subtitle={datasheet.sourceName}
+          actions={[shareAction]}
           data-testid="datasheet-header"
         />
 

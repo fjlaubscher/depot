@@ -1,6 +1,8 @@
 import type { FC, ReactNode, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 import IconButton from '../icon-button';
+import ActionGroup from '../action-group';
+import type { Action } from '../action-group';
 
 interface PageHeaderProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -16,6 +18,7 @@ interface PageHeaderProps extends HTMLAttributes<HTMLDivElement> {
     loading?: boolean;
     testId?: string;
   };
+  actions?: Action[];
   className?: string;
   'data-testid'?: string;
 }
@@ -25,6 +28,7 @@ const PageHeader: FC<PageHeaderProps> = ({
   subtitle,
   stats,
   action,
+  actions,
   className,
   'data-testid': dataTestId,
   ...props
@@ -41,7 +45,13 @@ const PageHeader: FC<PageHeaderProps> = ({
           {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
 
-        {action && (
+        {actions && actions.length > 0 ? (
+          <div className="flex-shrink-0">
+            <ActionGroup actions={actions} spacing="tight" />
+          </div>
+        ) : null}
+
+        {!actions && action && (
           <IconButton
             onClick={action.onClick}
             aria-label={action.ariaLabel}

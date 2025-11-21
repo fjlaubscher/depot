@@ -14,6 +14,8 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
 import { getFactionAlliance } from '@/utils/faction';
+import { buildAbsoluteUrl } from '@/utils/paths';
+import { useShareAction } from '@/hooks/use-share-action';
 
 // Components
 import Skeleton from './_components/skeleton';
@@ -90,6 +92,14 @@ const Faction: React.FC = () => {
   }, [isMyFaction, faction, state.myFactions, updateMyFactions, showToast, factionSlug]);
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
+  const shareAction = useShareAction({
+    title: faction?.name,
+    url: faction ? buildAbsoluteUrl(`/faction/${faction.slug}`) : undefined,
+    ariaLabel: 'Share faction link',
+    testId: 'share-faction',
+    copySuccessMessage: 'Faction link copied to clipboard.',
+    shareSuccessMessage: 'Faction link shared.'
+  });
 
   // Error State Component
   if (error) {
@@ -148,15 +158,21 @@ const Faction: React.FC = () => {
         <PageHeader
           title={faction.name}
           subtitle={alliance}
-          action={{
-            icon: isMyFaction ? (
-              <Star size={16} className="text-primary-500 fill-current" />
-            ) : (
-              <Star size={16} />
-            ),
-            onClick: toggleMyFaction,
-            ariaLabel: isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'
-          }}
+          actions={[
+            shareAction,
+            {
+              icon: isMyFaction ? (
+                <Star size={16} className="text-primary-500 fill-current" />
+              ) : (
+                <Star size={16} />
+              ),
+              onClick: (event) => {
+                event.preventDefault();
+                void toggleMyFaction();
+              },
+              ariaLabel: isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'
+            }
+          ]}
         />
 
         <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>

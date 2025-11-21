@@ -138,6 +138,10 @@ const Settings = () => {
                           >
                             <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
                             <span className="truncate">{f.name}</span>
+                            <span className="text-xs text-subtle ml-auto flex-shrink-0">
+                              {f.cachedDatasheets}{' '}
+                              {f.cachedDatasheets === 1 ? 'datasheet' : 'datasheets'}
+                            </span>
                           </div>
                         ))}
                         {state.offlineFactions.length > 4 && (

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { depot } from '@depot/core';
 import {
@@ -163,5 +163,38 @@ describe('DatasheetPage', () => {
     // Cost handling is done by child components, just verify main content renders
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
     expect(screen.queryByTestId('datasheet-points')).not.toBeInTheDocument();
+  });
+
+  it('shares datasheet link with native share when available', async () => {
+    const shareMock = vi.fn().mockResolvedValue(undefined);
+    const clipboardMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { share: shareMock, clipboard: { writeText: clipboardMock } });
+
+    render(<DatasheetPage />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole('button', { name: /share datasheet link/i }));
+
+    const expectedUrl = `${window.location.origin}/faction/space-marines/datasheet/captain`;
+    await waitFor(() => {
+      expect(shareMock).toHaveBeenCalledWith({
+        title: 'Captain',
+        url: expectedUrl
+      });
+    });
+    expect(clipboardMock).not.toHaveBeenCalled();
+  });
+
+  it('copies datasheet link when native share is unavailable', async () => {
+    const clipboardMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { share: undefined, clipboard: { writeText: clipboardMock } });
+
+    render(<DatasheetPage />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole('button', { name: /share datasheet link/i }));
+
+    const expectedUrl = `${window.location.origin}/faction/space-marines/datasheet/captain`;
+    await waitFor(() => {
+      expect(clipboardMock).toHaveBeenCalledWith(expectedUrl);
+    });
   });
 });

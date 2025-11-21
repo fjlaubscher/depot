@@ -1,6 +1,7 @@
 import type { depot } from '@depot/core';
 import { calculateTotalPoints } from '@/contexts/roster/utils';
 import { formatWargearDisplayName } from '@/utils/wargear';
+import { buildAbsoluteUrl } from '@/utils/paths';
 
 const stripHtml = (html?: string): string => {
   if (!html) return '';
@@ -132,7 +133,7 @@ export const generateRosterMarkdown = (
     lines.push('');
   });
 
-  lines.push('https://fjlaubscher.github.io/depot');
+  lines.push(buildAbsoluteUrl('/'));
 
   return lines.join('\n');
 };
@@ -193,7 +194,7 @@ export const generateRosterShareText = (
     lines.push('');
   });
 
-  lines.push('https://fjlaubscher.github.io/depot');
+  lines.push(buildAbsoluteUrl('/'));
 
   return lines.join('\n');
 };
