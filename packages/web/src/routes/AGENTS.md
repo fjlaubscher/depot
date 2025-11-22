@@ -69,7 +69,7 @@ routes/
 
 ### Context Integration
 ```typescript
-const { state, getFactionManifest, getDatasheet, updateMyFactions } = useAppContext();
+const { state, getFactionManifest, getDatasheet } = useAppContext();
 const { showToast } = useToastContext();
 ```
 

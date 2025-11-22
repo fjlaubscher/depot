@@ -104,10 +104,7 @@ describe('rosterReducer', () => {
 
     it('normalizes wargear abilities against the datasheet', () => {
       const datasheetWithWargearAbility = createMockDatasheet({
-        abilities: [
-          ...createMockDatasheet().abilities,
-          mockWargearAbility
-        ]
+        abilities: [...createMockDatasheet().abilities, mockWargearAbility]
       });
 
       const rosterUnit: depot.RosterUnit = {

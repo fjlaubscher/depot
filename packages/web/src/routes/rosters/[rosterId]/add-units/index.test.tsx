@@ -66,7 +66,6 @@ const mockAppState = vi.hoisted(() => ({
   getFactionManifest: vi.fn(),
   getDatasheet: vi.fn(),
   updateSettings: vi.fn(),
-  updateMyFactions: vi.fn(),
   clearOfflineData: vi.fn(),
   dispatch: vi.fn()
 }));

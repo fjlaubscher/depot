@@ -1,18 +1,73 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderOpen } from 'lucide-react';
+import type { depot } from '@depot/core';
+
 import { useCollections } from '@/hooks/use-collections';
 import { useAppContext } from '@/contexts/app/use-app-context';
+import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, Button, Loader, Tag } from '@/components/ui';
+import { PageHeader, Card, Button, Loader, ErrorState } from '@/components/ui';
+import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@/utils/collection';
+import CollectionCard from './_components/collection-card';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
-  const { collections, loading, error } = useCollections();
+  const { collections, loading, error, refresh } = useCollections();
   const { state } = useAppContext();
+  const { showToast } = useToast();
   const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
+
+  const handleCreate = () => navigate('/collections/create');
+
+  const handleDelete = async (collectionId: string) => {
+    try {
+      await offlineStorage.deleteCollection(collectionId);
+      await refresh();
+      showToast({
+        type: 'success',
+        title: usePileLabel ? 'Pile entry removed' : 'Collection deleted',
+        message: 'Entry deleted successfully.'
+      });
+    } catch (err) {
+      console.error('Failed to delete collection', err);
+      showToast({
+        type: 'error',
+        title: 'Delete failed',
+        message: 'Could not delete this collection.'
+      });
+    }
+  };
+
+  const handleDuplicate = async (collection: depot.Collection) => {
+    try {
+      const duplicated: depot.Collection = {
+        ...collection,
+        id: crypto.randomUUID(),
+        name: `${collection.name} Copy`,
+        items: collection.items.map((item) => ({ ...item, id: crypto.randomUUID() })),
+        points: { current: calculateCollectionPoints(collection) }
+      };
+
+      await offlineStorage.saveCollection(duplicated);
+      await refresh();
+
+      showToast({
+        type: 'success',
+        title: 'Duplicated',
+        message: `Created ${duplicated.name}.`
+      });
+    } catch (err) {
+      console.error('Failed to duplicate collection', err);
+      showToast({
+        type: 'error',
+        title: 'Duplicate failed',
+        message: 'Could not duplicate this collection.'
+      });
+    }
+  };
 
   return (
     <AppLayout title={label}>
@@ -22,7 +77,7 @@ const CollectionsPage: React.FC = () => {
           subtitle="Track your kits, set their state, and prep them for roster building."
           action={{
             icon: <Plus size={16} />,
-            onClick: () => navigate('/collections/create'),
+            onClick: handleCreate,
             ariaLabel: 'Create collection',
             testId: 'create-collection-button'
           }}
@@ -33,11 +88,7 @@ const CollectionsPage: React.FC = () => {
             <Loader />
           </div>
         ) : error ? (
-          <Card>
-            <p className="text-sm text-danger-600 dark:text-danger-300" data-testid="collections-error">
-              {error}
-            </p>
-          </Card>
+          <ErrorState title="Failed to load collections" message={error} />
         ) : collections.length === 0 ? (
           <Card className="flex flex-col items-center gap-3 py-10">
             <FolderOpen className="h-8 w-8 text-muted" />
@@ -50,35 +101,18 @@ const CollectionsPage: React.FC = () => {
             <Button onClick={() => navigate('/collections/create')}>Create</Button>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {collections.map((collection) => {
-              const points = calculateCollectionPoints(collection);
-              return (
-                <Card
-                  key={collection.id}
-                  padding="lg"
-                  className="flex flex-col gap-3 cursor-pointer hover:border-primary-200 dark:hover:border-primary-700 transition-colors"
-                  onClick={() => navigate(`/collections/${collection.id}`)}
-                  data-testid={`collection-card-${collection.id}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="text-base font-semibold text-foreground">{collection.name}</h3>
-                      <p className="text-sm text-subtle capitalize">
-                        {collection.faction?.name || collection.factionSlug || collection.factionId}
-                      </p>
-                    </div>
-                    <Tag variant="secondary" size="sm">
-                      {collection.items.length} unit{collection.items.length === 1 ? '' : 's'}
-                    </Tag>
-                  </div>
-                  <div className="flex items-center justify-between text-sm text-subtle">
-                    <span>Points</span>
-                    <span className="font-semibold text-foreground">{points}</span>
-                  </div>
-                </Card>
-              );
-            })}
+          <div
+            data-testid="collections-grid"
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            {collections.map((collection) => (
+              <CollectionCard
+                key={collection.id}
+                collection={collection}
+                onDelete={handleDelete}
+                onDuplicate={handleDuplicate}
+              />
+            ))}
           </div>
         )}
       </div>

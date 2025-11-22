@@ -23,17 +23,14 @@ export const useCollection = (collectionId?: string) => {
     }
   }, [collectionId]);
 
-  const save = useCallback(
-    async (updated: depot.Collection) => {
-      const withPoints = {
-        ...updated,
-        points: { current: calculateCollectionPoints(updated) }
-      };
-      await offlineStorage.saveCollection(withPoints);
-      setCollection(withPoints);
-    },
-    []
-  );
+  const save = useCallback(async (updated: depot.Collection) => {
+    const withPoints = {
+      ...updated,
+      points: { current: calculateCollectionPoints(updated) }
+    };
+    await offlineStorage.saveCollection(withPoints);
+    setCollection(withPoints);
+  }, []);
 
   const remove = useCallback(async () => {
     if (!collectionId) return;

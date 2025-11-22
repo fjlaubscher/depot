@@ -98,7 +98,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
             {
               icon: <Pencil size={16} />,
               onClick: (event) => {
-                event.stopPropagation();
+                event?.stopPropagation();
                 handleEdit();
               },
               ariaLabel: 'Edit roster details',
@@ -107,7 +107,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
             {
               icon: <Copy size={16} />,
               onClick: (event) => {
-                event.stopPropagation();
+                event?.stopPropagation();
                 void handleDuplicate();
               },
               ariaLabel: 'Duplicate roster',
@@ -118,7 +118,7 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
             {
               icon: <Trash2 size={16} />,
               onClick: (event) => {
-                event.stopPropagation();
+                event?.stopPropagation();
                 void handleDelete();
               },
               ariaLabel: 'Delete roster',

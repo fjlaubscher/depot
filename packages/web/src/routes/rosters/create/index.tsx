@@ -57,6 +57,31 @@ const CreateRoster: React.FC = () => {
   useEffect(() => {
     const collectionId = searchParams.get('fromCollection');
     if (!collectionId) return;
+
+    // Prefer session-stashed selection from collection flow
+    const saved = sessionStorage.getItem('collection-roster-prefill');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as {
+          collectionId: string;
+          factionSlug?: string | null;
+          factionId?: string;
+          name?: string;
+          units: depot.RosterUnit[];
+        };
+
+        if (parsed.collectionId === collectionId) {
+          if (parsed.factionSlug) setFactionSlug(parsed.factionSlug);
+          if (parsed.name) setName((prev) => prev || parsed.name || '');
+          setPrefillUnits(parsed.units || []);
+          sessionStorage.removeItem('collection-roster-prefill');
+          return;
+        }
+      } catch {
+        // fall through
+      }
+    }
+
     const loadCollection = async () => {
       const collection = await offlineStorage.getCollection(collectionId);
       if (!collection) return;

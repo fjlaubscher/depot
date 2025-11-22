@@ -18,8 +18,9 @@ import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
 import PrivacyPolicy from './routes/privacy';
 import Collections from './routes/collections';
 import CreateCollection from './routes/collections/create';
-import CollectionView from './routes/collections/[collectionId]/view';
-import CollectionDetail from './routes/collections/[collectionId]';
+import CollectionView from './routes/collections/[collectionId]';
+import EditCollectionUnit from './routes/collections/[collectionId]/units/[unitId]/edit';
+import CollectionRosterSelect from './routes/collections/[collectionId]/new-roster';
 
 const AppRoutes = () => (
   <Routes>
@@ -33,7 +34,8 @@ const AppRoutes = () => (
     <Route path="/collections" element={<Collections />} />
     <Route path="/collections/create" element={<CreateCollection />} />
     <Route path="/collections/:collectionId" element={<CollectionView />} />
-    <Route path="/collections/:collectionId/edit" element={<CollectionDetail />} />
+    <Route path="/collections/:collectionId/new-roster" element={<CollectionRosterSelect />} />
+    <Route path="/collections/:collectionId/units/:unitId/edit" element={<EditCollectionUnit />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="/rosters" element={<Rosters />} />
     <Route path="/rosters/:rosterId/details" element={<RosterDetails />} />

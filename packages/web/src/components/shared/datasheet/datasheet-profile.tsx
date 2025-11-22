@@ -36,9 +36,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   const abilitiesForDisplay = useMemo(() => {
     const excluded = new Set(excludeAbilityTypes.map((type) => type.toLowerCase()));
     const baseAbilities = excluded.size
-      ? datasheet.abilities.filter(
-          (ability) => !excluded.has(ability.type?.toLowerCase() ?? '')
-        )
+      ? datasheet.abilities.filter((ability) => !excluded.has(ability.type?.toLowerCase() ?? ''))
       : datasheet.abilities;
 
     return [...baseAbilities, ...additionalAbilities];

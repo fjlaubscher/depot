@@ -140,17 +140,6 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  // Update my factions with offline storage
-  const updateMyFactions = async (factions: depot.Option[]) => {
-    try {
-      await offlineStorage.setMyFactions(factions);
-      dispatch({ type: APP_ACTIONS.UPDATE_MY_FACTIONS, payload: factions });
-    } catch (error) {
-      console.error('Failed to save my factions to IndexedDB:', error);
-      throw error;
-    }
-  };
-
   // Initialize app data on mount
   useEffect(() => {
     const initializeApp = async () => {
@@ -252,14 +241,6 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       } catch (error) {
         console.warn('Failed to load offline factions list:', error);
       }
-
-      // Load my factions (user favorites) from IndexedDB
-      try {
-        const myFactions = await offlineStorage.getMyFactions();
-        dispatch({ type: APP_ACTIONS.LOAD_MY_FACTIONS_SUCCESS, payload: myFactions || [] });
-      } catch (error) {
-        console.warn('Failed to load my factions:', error);
-      }
     };
 
     initializeApp();
@@ -271,8 +252,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     getFactionManifest,
     getDatasheet,
     clearOfflineData,
-    updateSettings,
-    updateMyFactions
+    updateSettings
   };
 
   return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;

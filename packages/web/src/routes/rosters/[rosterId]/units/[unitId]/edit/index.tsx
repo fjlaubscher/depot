@@ -279,19 +279,21 @@ const EditRosterUnitView: React.FC = () => {
           </Card>
 
           {/* Wargear Abilities */}
-          <Card data-testid="wargear-abilities-section">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-foreground">Wargear Abilities</h3>
-              <p className="text-sm text-muted">
-                Toggle wargear-linked abilities that apply to this unit&apos;s chosen loadout.
-              </p>
-              <WargearAbilitiesSelection
-                abilities={wargearAbilities}
-                selected={selectedWargearAbilities}
-                onChange={setSelectedWargearAbilities}
-              />
-            </div>
-          </Card>
+          {wargearAbilities.length > 0 ? (
+            <Card data-testid="wargear-abilities-section">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-foreground">Wargear Abilities</h3>
+                <p className="text-sm text-muted">
+                  Toggle wargear-linked abilities that apply to this unit&apos;s chosen loadout.
+                </p>
+                <WargearAbilitiesSelection
+                  abilities={wargearAbilities}
+                  selected={selectedWargearAbilities}
+                  onChange={setSelectedWargearAbilities}
+                />
+              </div>
+            </Card>
+          ) : null}
         </div>
       </div>
 

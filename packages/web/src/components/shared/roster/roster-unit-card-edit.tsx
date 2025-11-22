@@ -10,18 +10,20 @@ interface RosterUnitCardEditProps {
   rosterId: string;
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
+  basePath?: string;
 }
 
 const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   unit,
   rosterId,
   onRemove,
-  onDuplicate
+  onDuplicate,
+  basePath = '/rosters'
 }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/rosters/${rosterId}/units/${unit.id}/edit`);
+    navigate(`${basePath}/${rosterId}/units/${unit.id}/edit`);
   };
   const actions = (
     <div className="flex items-center gap-1">

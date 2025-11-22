@@ -89,8 +89,6 @@ const Home: React.FC = () => {
     }
   ];
 
-  const hasMyFactions = state.myFactions && state.myFactions.length > 0;
-
   return (
     <AppLayout title="Home">
       <div className="flex flex-col gap-12">
@@ -147,30 +145,6 @@ const Home: React.FC = () => {
             </div>
           </div>
         </section>
-
-        {/* My Factions Quick Access */}
-        {hasMyFactions && (
-          <section className="flex flex-col gap-4" data-testid="quick-access-section">
-            <div className="flex flex-col gap-1">
-              <span className="text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400">
-                Jump back in
-              </span>
-              <h2 className="text-xl font-semibold text-foreground">Your factions, one tap away</h2>
-            </div>
-            <Grid cols={1} className="md:grid-cols-2 lg:grid-cols-3">
-              {state.myFactions?.slice(0, 6).map((faction) => (
-                <LinkCard
-                  key={faction.slug}
-                  to={`/faction/${faction.slug}`}
-                  description="View datasheets and rules"
-                  icon={<Star className="h-4 w-4" />}
-                >
-                  {faction.name}
-                </LinkCard>
-              ))}
-            </Grid>
-          </section>
-        )}
 
         <section className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">

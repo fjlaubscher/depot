@@ -18,8 +18,6 @@ const mockOfflineStorage = vi.hoisted(() => ({
   getSettings: vi.fn(),
   setSettings: vi.fn(),
   getAllCachedFactions: vi.fn(),
-  getMyFactions: vi.fn(),
-  setMyFactions: vi.fn(),
   clearFactionData: vi.fn(),
   clearAllData: vi.fn(),
   getDataVersion: vi.fn(),
@@ -37,14 +35,8 @@ global.fetch = vi.fn();
 
 // Test component to consume the context
 const TestComponent = () => {
-  const {
-    state,
-    getFactionManifest,
-    getDatasheet,
-    updateSettings,
-    clearOfflineData,
-    updateMyFactions
-  } = useAppContext();
+  const { state, getFactionManifest, getDatasheet, updateSettings, clearOfflineData } =
+    useAppContext();
   const [factionUpdateStatus, setFactionUpdateStatus] = useState<
     'idle' | 'pending' | 'success' | 'error'
   >('idle');
@@ -65,16 +57,6 @@ const TestComponent = () => {
     }
   };
 
-  const handleUpdateMyFactions = async () => {
-    setFactionUpdateStatus('pending');
-    try {
-      await updateMyFactions([mockMyFactionOption]);
-      setFactionUpdateStatus('success');
-    } catch {
-      setFactionUpdateStatus('error');
-    }
-  };
-
   return (
     <div>
       <div data-testid="loading">{state.loading.toString()}</div>
@@ -82,8 +64,6 @@ const TestComponent = () => {
       <div data-testid="faction-count">{state.factionIndex?.length || 0}</div>
       <div data-testid="offline-count">{state.offlineFactions.length}</div>
       <div data-testid="settings">{JSON.stringify(state.settings)}</div>
-      <div data-testid="my-factions-count">{state.myFactions.length}</div>
-      <div data-testid="my-factions-status">{factionUpdateStatus}</div>
       <div data-testid="manifest-name">{manifestName ?? 'null'}</div>
       <div data-testid="datasheet-name">{datasheetName ?? 'null'}</div>
       <button onClick={handleLoadManifest} data-testid="load-manifest">
@@ -100,9 +80,6 @@ const TestComponent = () => {
       </button>
       <button onClick={() => clearOfflineData()} data-testid="clear-data">
         Clear Data
-      </button>
-      <button onClick={handleUpdateMyFactions} data-testid="update-my-factions">
-        Update My Factions
       </button>
     </div>
   );
@@ -215,12 +192,6 @@ const mockSettings: depot.Settings = {
   usePileOfShameLabel: true
 };
 
-const mockMyFactionOption: depot.Option = {
-  id: 'mock-faction',
-  slug: 'mock-faction',
-  name: 'Mock Faction'
-};
-
 describe('AppProvider with IndexedDB Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -235,12 +206,10 @@ describe('AppProvider with IndexedDB Integration', () => {
     mockOfflineStorage.getDatasheet.mockResolvedValue(null);
     mockOfflineStorage.getSettings.mockResolvedValue(null);
     mockOfflineStorage.getAllCachedFactions.mockResolvedValue([]);
-    mockOfflineStorage.getMyFactions.mockResolvedValue([]);
     mockOfflineStorage.setFactionIndex.mockResolvedValue(undefined);
     mockOfflineStorage.setFactionManifest.mockResolvedValue(undefined);
     mockOfflineStorage.setDatasheet.mockResolvedValue(undefined);
     mockOfflineStorage.setSettings.mockResolvedValue(undefined);
-    mockOfflineStorage.setMyFactions.mockResolvedValue(undefined);
     mockOfflineStorage.clearFactionData.mockResolvedValue(undefined);
     mockOfflineStorage.clearAllData.mockResolvedValue(undefined);
     mockOfflineStorage.getDataVersion.mockResolvedValue(DATA_VERSION);
@@ -548,59 +517,5 @@ describe('AppProvider with IndexedDB Integration', () => {
     });
   });
 
-  describe('updateMyFactions', () => {
-    it('should update state when IndexedDB save succeeds', async () => {
-      render(
-        <AppProvider>
-          <TestComponent />
-        </AppProvider>
-      );
-
-      const updateButton = screen.getByTestId('update-my-factions');
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.getMyFactions).toHaveBeenCalled();
-      });
-
-      await act(async () => {
-        updateButton.click();
-      });
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.setMyFactions).toHaveBeenCalledWith([mockMyFactionOption]);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('my-factions-count')).toHaveTextContent('1');
-        expect(screen.getByTestId('my-factions-status')).toHaveTextContent('success');
-      });
-    });
-
-    it('should leave state unchanged and surface errors when IndexedDB save fails', async () => {
-      const dbError = new Error('IndexedDB failure');
-      mockOfflineStorage.setMyFactions.mockRejectedValueOnce(dbError);
-
-      render(
-        <AppProvider>
-          <TestComponent />
-        </AppProvider>
-      );
-
-      const updateButton = screen.getByTestId('update-my-factions');
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.getMyFactions).toHaveBeenCalled();
-      });
-
-      await act(async () => {
-        updateButton.click();
-      });
-
-      await waitFor(() => {
-        expect(mockOfflineStorage.setMyFactions).toHaveBeenCalledWith([mockMyFactionOption]);
-        expect(screen.getByTestId('my-factions-status')).toHaveTextContent('error');
-        expect(screen.getByTestId('my-factions-count')).toHaveTextContent('0');
-      });
-    });
-  });
+  // My factions removed; no tests needed
 });

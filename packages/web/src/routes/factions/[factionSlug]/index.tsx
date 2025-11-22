@@ -1,6 +1,6 @@
-import React, { useCallback, useState, useMemo, startTransition } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -10,7 +10,6 @@ import { BackButton } from '@/components/shared';
 // Hooks
 import useFaction from '@/hooks/use-faction';
 import { useAppContext } from '@/contexts/app/use-app-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
 import { getFactionAlliance } from '@/utils/faction';
@@ -27,9 +26,8 @@ import type { depot } from '@depot/core';
 
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
-  const { showToast } = useToast();
   const { data: faction, loading, error } = useFaction(factionSlug);
-  const { state, updateMyFactions } = useAppContext();
+  const { state } = useAppContext();
   const [activeTab, setActiveTab] = useState(0);
 
   const showLegends = state.settings?.showLegends ?? false;
@@ -42,54 +40,6 @@ const Faction: React.FC = () => {
     }),
     [showLegends, showForgeWorld]
   );
-
-  const isMyFaction = useMemo(() => {
-    if (state.myFactions && factionSlug) {
-      return state.myFactions.some((f) => f.slug === factionSlug || f.id === factionSlug);
-    }
-    return false;
-  }, [factionSlug, state.myFactions]);
-
-  const toggleMyFaction = useCallback(async () => {
-    if (!faction || !factionSlug) return;
-
-    try {
-      if (state.myFactions && isMyFaction) {
-        await updateMyFactions(
-          state.myFactions.filter((f) => f.slug !== factionSlug && f.id !== factionSlug)
-        );
-        startTransition(() => {
-          showToast({
-            type: 'success',
-            title: 'Success',
-            message: `${faction.name} removed from My Factions.`
-          });
-        });
-      } else {
-        const myFaction: depot.Option = {
-          id: faction.id,
-          slug: faction.slug,
-          name: faction.name
-        };
-        await updateMyFactions(state.myFactions ? [...state.myFactions, myFaction] : [myFaction]);
-        startTransition(() => {
-          showToast({
-            type: 'success',
-            title: 'Success',
-            message: `${faction.name} added to My Factions.`
-          });
-        });
-      }
-    } catch (error) {
-      startTransition(() => {
-        showToast({
-          type: 'error',
-          title: 'Error',
-          message: 'Failed to update My Factions. Please try again.'
-        });
-      });
-    }
-  }, [isMyFaction, faction, state.myFactions, updateMyFactions, showToast, factionSlug]);
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
   const shareAction = useShareAction({
@@ -158,22 +108,12 @@ const Faction: React.FC = () => {
         <PageHeader
           title={faction.name}
           subtitle={alliance}
-          alignActions="inline"
-          actions={[
-            shareAction,
-            {
-              icon: isMyFaction ? (
-                <Star size={16} className="text-primary-500 fill-current" />
-              ) : (
-                <Star size={16} />
-              ),
-              onClick: (event) => {
-                event.preventDefault();
-                void toggleMyFaction();
-              },
-              ariaLabel: isMyFaction ? 'Remove from My Factions' : 'Add to My Factions'
-            }
-          ]}
+          action={{
+            icon: shareAction.icon ?? <Share2 size={16} />,
+            onClick: () => shareAction.onClick(),
+            ariaLabel: shareAction.ariaLabel ?? 'Share faction',
+            testId: shareAction['data-testid']
+          }}
         />
 
         <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
