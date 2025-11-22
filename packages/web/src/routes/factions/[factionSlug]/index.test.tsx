@@ -51,7 +51,6 @@ const mockManifest = toFactionManifest(mockFaction);
 describe('Faction Page', () => {
   const mockUseFaction = vi.fn();
   const mockUseAppContext = vi.fn();
-  const mockUpdateMyFactions = vi.fn();
   const mockShowToast = vi.fn();
   const mockUseToast = vi.fn();
 
@@ -59,7 +58,6 @@ describe('Faction Page', () => {
     state: {
       factionIndex: null,
       offlineFactions: [],
-      myFactions: [],
       loading: false,
       error: null,
       settings: null
@@ -68,8 +66,7 @@ describe('Faction Page', () => {
     getFactionManifest: vi.fn(),
     getDatasheet: vi.fn(),
     clearOfflineData: vi.fn(),
-    updateSettings: vi.fn(),
-    updateMyFactions: mockUpdateMyFactions
+    updateSettings: vi.fn()
   };
 
   beforeEach(async () => {
@@ -156,52 +153,6 @@ describe('Faction Page', () => {
     });
   });
 
-  it('handles favourite toggle when not favourite', async () => {
-    mockUpdateMyFactions.mockResolvedValue(undefined);
-
-    render(<Faction />, { wrapper: TestWrapper });
-
-    const favouriteButton = screen.getByRole('button', { name: /add to my factions/i });
-    fireEvent.click(favouriteButton);
-
-    await waitFor(() => {
-      expect(mockUpdateMyFactions).toHaveBeenCalledWith([
-        { id: 'SM', slug: 'space-marines', name: 'Space Marines' }
-      ]);
-    });
-    expect(mockShowToast).toHaveBeenCalledWith({
-      type: 'success',
-      title: 'Success',
-      message: 'Space Marines added to My Factions.'
-    });
-  });
-
-  it('handles favourite toggle when already favourite', async () => {
-    mockUpdateMyFactions.mockResolvedValue(undefined);
-    const contextWithMyFaction = {
-      ...defaultAppContext,
-      state: {
-        ...defaultAppContext.state,
-        myFactions: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
-      }
-    };
-    mockUseAppContext.mockReturnValue(contextWithMyFaction);
-
-    render(<Faction />, { wrapper: TestWrapper });
-
-    const favouriteButton = screen.getByRole('button', { name: /remove from my factions/i });
-    fireEvent.click(favouriteButton);
-
-    await waitFor(() => {
-      expect(mockUpdateMyFactions).toHaveBeenCalledWith([]);
-    });
-    expect(mockShowToast).toHaveBeenCalledWith({
-      type: 'success',
-      title: 'Success',
-      message: 'Space Marines removed from My Factions.'
-    });
-  });
-
   it('displays correct data counts in child components', () => {
     render(<Faction />, { wrapper: TestWrapper });
 
@@ -212,29 +163,6 @@ describe('Faction Page', () => {
     expect(screen.getByTestId('faction-detachments')).toBeInTheDocument();
   });
 
-  it('shows unfilled star when not my faction', () => {
-    render(<Faction />, { wrapper: TestWrapper });
-
-    const button = screen.getByRole('button', { name: /add to my factions/i });
-    expect(button).toBeInTheDocument();
-  });
-
-  it('shows filled star when is my faction', () => {
-    const contextWithMyFaction = {
-      ...defaultAppContext,
-      state: {
-        ...defaultAppContext.state,
-        myFactions: [{ id: 'SM', slug: 'space-marines', name: 'Space Marines' }]
-      }
-    };
-    mockUseAppContext.mockReturnValue(contextWithMyFaction);
-
-    render(<Faction />, { wrapper: TestWrapper });
-
-    const button = screen.getByRole('button', { name: /remove from my factions/i });
-    expect(button).toBeInTheDocument();
-  });
-
   it('shares faction link with native share when available', async () => {
     const shareMock = vi.fn().mockResolvedValue(undefined);
     const clipboardMock = vi.fn().mockResolvedValue(undefined);
@@ -242,7 +170,7 @@ describe('Faction Page', () => {
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const shareButton = screen.getByRole('button', { name: /share faction link/i });
+    const shareButton = screen.getByRole('button', { name: /share faction/i });
     fireEvent.click(shareButton);
 
     const expectedUrl = `${window.location.origin}/faction/space-marines`;
@@ -261,7 +189,7 @@ describe('Faction Page', () => {
 
     render(<Faction />, { wrapper: TestWrapper });
 
-    const shareButton = screen.getByRole('button', { name: /share faction link/i });
+    const shareButton = screen.getByRole('button', { name: /share faction/i });
     fireEvent.click(shareButton);
 
     const expectedUrl = `${window.location.origin}/faction/space-marines`;

@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import { Share2 } from 'lucide-react';
 import type { Action } from '@/components/ui/action-group';
@@ -75,13 +75,14 @@ export const useShareAction = ({
     useNativeShare
   ]);
 
+  const handleClick: Action['onClick'] = () => {
+    void share();
+  };
+
   return {
     icon: icon ?? <Share2 size={16} />,
     ariaLabel,
-    onClick: (event: MouseEvent) => {
-      event.preventDefault();
-      void share();
-    },
+    onClick: handleClick,
     'data-testid': testId
   };
 };

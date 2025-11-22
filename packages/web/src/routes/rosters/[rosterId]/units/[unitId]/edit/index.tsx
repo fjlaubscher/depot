@@ -22,14 +22,17 @@ import WargearSelectionContainer from './_components/wargear-selection-container
 import ModelCostSelection from './_components/model-cost-selection';
 import EnhancementSelection from './_components/enhancement-selection';
 import WarlordSelection from './_components/warlord-selection';
+import WargearAbilitiesSelection from './_components/wargear-abilities-selection';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
+import { getWargearAbilities } from '@/utils/abilities';
 import { getRosterFactionName } from '@/utils/roster';
 
 const EditRosterUnitView: React.FC = () => {
   const {
     state: roster,
     updateUnitWargear,
+    updateUnitWargearAbilities,
     updateUnitModelCost,
     applyEnhancement,
     removeEnhancement,
@@ -50,6 +53,7 @@ const EditRosterUnitView: React.FC = () => {
   const [selectedModelCost, setSelectedModelCost] = useState<depot.ModelCost | undefined>(
     unit?.modelCost
   );
+  const [selectedWargearAbilities, setSelectedWargearAbilities] = useState<depot.Ability[]>([]);
   const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(() => {
     return roster.enhancements.filter((e) => e.unitId === unitId).map((e) => e.enhancement.id);
   });
@@ -72,6 +76,7 @@ const EditRosterUnitView: React.FC = () => {
 
       setSelectedWargear(wargearToSelect);
       setSelectedModelCost(unit.modelCost);
+      setSelectedWargearAbilities(unit.selectedWargearAbilities ?? []);
       const unitEnhancements = roster.enhancements
         .filter((e) => e.unitId === unitId)
         .map((e) => e.enhancement.id);
@@ -95,6 +100,11 @@ const EditRosterUnitView: React.FC = () => {
     }
     return true;
   }, [unit?.datasheet.options]);
+
+  const wargearAbilities = useMemo(
+    () => getWargearAbilities(unit?.datasheet.abilities ?? []),
+    [unit?.datasheet.abilities]
+  );
 
   // Loading state while roster loads
   if (!roster.id) {
@@ -134,6 +144,7 @@ const EditRosterUnitView: React.FC = () => {
     try {
       // Update unit wargear
       updateUnitWargear(unitId, selectedWargear);
+      updateUnitWargearAbilities(unitId, selectedWargearAbilities);
 
       // Handle enhancements - first remove existing ones for this unit
       const existingEnhancements = roster.enhancements.filter((e) => e.unitId === unitId);
@@ -211,104 +222,125 @@ const EditRosterUnitView: React.FC = () => {
         data-testid="edit-unit-header"
       />
 
-      <div className="flex flex-col gap-4">
-        {/* Model Cost Selection - only show if there are multiple options */}
-        {unit.datasheet.modelCosts.length > 1 && (
-          <Card data-testid="model-cost-section">
+      <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
+        <div className="flex flex-col gap-4">
+          {/* Model Cost Selection - only show if there are multiple options */}
+          {unit.datasheet.modelCosts.length > 1 && (
+            <Card data-testid="model-cost-section">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
+                <p className="text-sm text-muted">Choose the number of models for this unit</p>
+                <ModelCostSelection
+                  unit={unit}
+                  selectedModelCost={selectedModelCost || unit.modelCost}
+                  onModelCostChange={setSelectedModelCost}
+                />
+              </div>
+            </Card>
+          )}
+
+          {/* Unit Composition */}
+          <DatasheetComposition
+            composition={unit.datasheet.unitComposition}
+            loadout={unit.datasheet.loadout}
+            transport={unit.datasheet.transport}
+            data-testid="unit-composition"
+          />
+
+          {/* Wargear Options */}
+          {shouldShowWargearOptions && (
+            <Alert variant="info" title="Wargear Options" data-testid="wargear-options-section">
+              <ul className="space-y-2 list-disc pl-4 text-sm">
+                {unit.datasheet.options.map((option, index) => (
+                  <li
+                    key={`${option.line}-${index}`}
+                    className="[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
+                    dangerouslySetInnerHTML={{ __html: option.description }}
+                    data-testid={`option-${option.line}`}
+                  />
+                ))}
+              </ul>
+            </Alert>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {/* Wargear Selection */}
+          <Card data-testid="wargear-section">
             <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
-              <p className="text-sm text-muted">Choose the number of models for this unit</p>
-              <ModelCostSelection
+              <h3 className="text-lg font-semibold text-foreground">Wargear</h3>
+              <p className="text-sm text-muted">Select wargear options for this unit</p>
+              <WargearSelectionContainer
                 unit={unit}
-                selectedModelCost={selectedModelCost || unit.modelCost}
-                onModelCostChange={setSelectedModelCost}
+                selectedWargear={selectedWargear}
+                onWargearChange={setSelectedWargear}
               />
             </div>
           </Card>
-        )}
 
-        {/* Unit Composition */}
-        <DatasheetComposition
-          composition={unit.datasheet.unitComposition}
-          loadout={unit.datasheet.loadout}
-          transport={unit.datasheet.transport}
-          data-testid="unit-composition"
-        />
-
-        {/* Wargear Options */}
-        {shouldShowWargearOptions && (
-          <Alert variant="info" title="Wargear Options" data-testid="wargear-options-section">
-            <ul className="space-y-2 list-disc pl-4 text-sm">
-              {unit.datasheet.options.map((option, index) => (
-                <li
-                  key={`${option.line}-${index}`}
-                  className="[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
-                  dangerouslySetInnerHTML={{ __html: option.description }}
-                  data-testid={`option-${option.line}`}
+          {/* Wargear Abilities */}
+          {wargearAbilities.length > 0 ? (
+            <Card data-testid="wargear-abilities-section">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-foreground">Wargear Abilities</h3>
+                <p className="text-sm text-muted">
+                  Toggle wargear-linked abilities that apply to this unit&apos;s chosen loadout.
+                </p>
+                <WargearAbilitiesSelection
+                  abilities={wargearAbilities}
+                  selected={selectedWargearAbilities}
+                  onChange={setSelectedWargearAbilities}
                 />
-              ))}
-            </ul>
-          </Alert>
-        )}
+              </div>
+            </Card>
+          ) : null}
+        </div>
+      </div>
 
-        {/* Wargear Selection */}
-        <Card data-testid="wargear-section">
+      {/* Enhancement Selection for Characters */}
+      {isCharacter && (
+        <Card data-testid="enhancement-section">
           <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-semibold text-foreground">Wargear</h3>
-            <p className="text-sm text-muted">Select wargear options for this unit</p>
-            <WargearSelectionContainer
+            <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
+            <p className="text-sm text-muted">Select enhancements for this character</p>
+            <EnhancementSelection
               unit={unit}
-              selectedWargear={selectedWargear}
-              onWargearChange={setSelectedWargear}
+              roster={roster}
+              selectedEnhancements={selectedEnhancements}
+              onEnhancementChange={setSelectedEnhancements}
             />
           </div>
         </Card>
+      )}
 
-        {/* Enhancement Selection for Characters */}
-        {isCharacter && (
-          <Card data-testid="enhancement-section">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
-              <p className="text-sm text-muted">Select enhancements for this character</p>
-              <EnhancementSelection
-                unit={unit}
-                roster={roster}
-                selectedEnhancements={selectedEnhancements}
-                onEnhancementChange={setSelectedEnhancements}
-              />
-            </div>
-          </Card>
-        )}
+      {/* Warlord Nomination for Characters */}
+      {isCharacter && (
+        <Card data-testid="warlord-section">
+          <div className="flex flex-col gap-4">
+            <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
+            <p className="text-sm text-muted">Nominate this character as your warlord</p>
+            <WarlordSelection
+              unit={unit}
+              roster={roster}
+              isWarlord={isWarlord}
+              onWarlordChange={setIsWarlord}
+            />
+          </div>
+        </Card>
+      )}
 
-        {/* Warlord Nomination for Characters */}
-        {isCharacter && (
-          <Card data-testid="warlord-section">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
-              <p className="text-sm text-muted">Nominate this character as your warlord</p>
-              <WarlordSelection
-                unit={unit}
-                roster={roster}
-                isWarlord={isWarlord}
-                onWarlordChange={setIsWarlord}
-              />
-            </div>
-          </Card>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4" data-testid="action-buttons">
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/rosters/${rosterId}/edit`)}
-            data-testid="cancel-button"
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleSave} data-testid="save-button">
-            Save Changes
-          </Button>
-        </div>
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4" data-testid="action-buttons">
+        <Button
+          variant="secondary"
+          onClick={() => navigate(`/rosters/${rosterId}/edit`)}
+          data-testid="cancel-button"
+        >
+          Cancel
+        </Button>
+        <Button onClick={handleSave} data-testid="save-button">
+          Save Changes
+        </Button>
       </div>
     </div>
   );

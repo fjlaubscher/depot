@@ -1,15 +1,7 @@
 import type { FC } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import type { depot } from '@depot/core';
-
-import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
-import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
-import useFaction from '@/hooks/use-faction';
-import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Alert } from '@/components/ui';
@@ -20,26 +12,34 @@ import {
   DatasheetBrowserSkeleton,
   RosterHeader
 } from '@/components/shared';
-import SelectionSummary from './_components/selection-summary';
-import type { SelectionGroup } from './_components/selection-summary';
+import { useAppContext } from '@/contexts/app/use-app-context';
+import { useToast } from '@/contexts/toast/use-toast-context';
+import useCollection from '@/hooks/use-collection';
+import useFaction from '@/hooks/use-faction';
+import useFactionDatasheets from '@/hooks/use-faction-datasheets';
+import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
+import { calculateCollectionPoints, createCollectionUnitFromDatasheet } from '@/utils/collection';
+import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
+import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 
-const AddRosterUnitsView: FC = () => {
-  const { state: roster, addUnit } = useRoster();
-  const { state: appState } = useAppContext();
-  const { showToast } = useToast();
+const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
-  const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
+  const { showToast } = useToast();
+  const { state: appState } = useAppContext();
+  const { collection, loading, error, save } = useCollection(collectionId);
+
+  const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
   const {
     data: factionData,
     loading: factionLoading,
     error: factionError
-  } = useFaction(rosterFactionSlug);
+  } = useFaction(factionSlug);
   const {
     datasheets: factionDatasheets,
     loading: datasheetLoading,
     error: datasheetError,
     progress: datasheetProgress
-  } = useFactionDatasheets(rosterFactionSlug, factionData?.datasheets);
+  } = useFactionDatasheets(factionSlug, factionData?.datasheets);
 
   const {
     selectedUnits,
@@ -106,61 +106,84 @@ const AddRosterUnitsView: FC = () => {
     [showLegends, showForgeWorld]
   );
 
-  if (!roster.id) {
+  const rosterStats = useMemo(
+    () => ({
+      points: { current: collection ? calculateCollectionPoints(collection) : 0 }
+    }),
+    [collection]
+  );
+
+  if (loading) {
     return <Loader />;
   }
 
-  const factionName = roster.faction?.name;
-  const subtitle =
-    factionName && roster.detachment?.name
-      ? `${factionName} • ${roster.detachment.name}`
-      : factionName || roster.factionSlug;
+  if (error || !collection) {
+    return (
+      <Alert variant="error" title="Unable to load collection">
+        {error || 'Collection not found'}
+      </Alert>
+    );
+  }
 
-  const handleAddSelectedUnits = () => {
-    selectedUnits.forEach(({ datasheet, modelCost }) => {
-      addUnit(datasheet, modelCost);
-    });
+  const subtitle = collection.faction?.name || collection.factionSlug || collection.factionId;
 
-    showToast({
-      type: 'success',
-      title: 'Units Added',
-      message: `Added ${selectedUnits.length} unit${
-        selectedUnits.length === 1 ? '' : 's'
-      } to roster`
-    });
+  const handleAddSelectedUnits = async () => {
+    if (!collection || selectedUnits.length === 0) return;
 
-    navigate(`/rosters/${roster.id}/edit`);
+    const newUnits = selectedUnits.map(({ datasheet, modelCost }) =>
+      createCollectionUnitFromDatasheet(datasheet, modelCost)
+    );
+    const updated = {
+      ...collection,
+      items: [...collection.items, ...newUnits]
+    };
+
+    try {
+      await save(updated);
+      clearSelection();
+      showToast({
+        type: 'success',
+        title: 'Units Added',
+        message: `Added ${selectedUnits.length} unit${selectedUnits.length === 1 ? '' : 's'}`
+      });
+      navigate(`/collections/${collection.id}`);
+    } catch (err) {
+      console.error('Failed to add units to collection', err);
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Could not add units to collection.'
+      });
+    }
   };
 
   return (
     <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
       <BackButton
-        to={`/rosters/${roster.id}/edit`}
-        label="Back to Roster"
-        ariaLabel="Back to Edit Roster"
+        to={`/collections/${collection.id}`}
+        label="Back to Collection"
+        ariaLabel="Back to Collection"
         className="md:hidden"
       />
 
-      {/* Desktop Breadcrumbs */}
       <div className="hidden md:block">
         <Breadcrumbs
           items={[
-            { label: 'Rosters', path: '/rosters' },
-            { label: roster.name, path: `/rosters/${roster.id}` },
-            { label: 'Edit', path: `/rosters/${roster.id}/edit` },
-            { label: 'Add Units', path: `/rosters/${roster.id}/add-units` }
+            { label: 'Collections', path: '/collections' },
+            { label: collection.name, path: `/collections/${collection.id}` },
+            { label: 'Add Units', path: `/collections/${collection.id}/add-units` }
           ]}
         />
       </div>
 
       <PageHeader
-        title={roster.name}
+        title={collection.name}
         subtitle={subtitle}
-        stats={<RosterHeader roster={roster} />}
+        stats={<RosterHeader roster={rosterStats} showEnhancements={false} showMax={false} />}
       />
 
       <Alert variant="info" title="Add Units">
-        Browse the datasheets below and queue units for your roster. Use the summary drawer to
+        Browse the datasheets below and queue units for your collection. Use the summary drawer to
         review quantities before confirming your additions.
       </Alert>
 
@@ -178,7 +201,7 @@ const AddRosterUnitsView: FC = () => {
               <div className="flex items-center justify-between text-sm text-subtle">
                 <span>Loading datasheets</span>
                 <span>
-                  {datasheetProgress.loaded}/{datasheetProgress.total || '…'}
+                  {datasheetProgress.loaded}/{datasheetProgress.total || '.'}
                 </span>
               </div>
               <div className="mt-2 h-2 rounded bg-muted">
@@ -229,16 +252,14 @@ const AddRosterUnitsView: FC = () => {
   );
 };
 
-const AddRosterUnitsPage: FC = () => {
-  const { rosterId } = useParams<{ rosterId: string }>();
+const AddCollectionUnitsPage: FC = () => {
+  const { collectionId } = useParams<{ collectionId: string }>();
 
   return (
     <AppLayout title="Add Units">
-      <RosterProvider rosterId={rosterId}>
-        <AddRosterUnitsView />
-      </RosterProvider>
+      <AddCollectionUnitsView collectionId={collectionId} />
     </AppLayout>
   );
 };
 
-export default AddRosterUnitsPage;
+export default AddCollectionUnitsPage;

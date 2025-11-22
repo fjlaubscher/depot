@@ -78,6 +78,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       maxPoints: number;
       name: string;
       detachment: depot.Detachment;
+      units?: depot.RosterUnit[];
     }): string => {
       const newId = crypto.randomUUID();
       dispatch({ type: 'CREATE_ROSTER', payload: { ...payload, id: newId } });
@@ -112,6 +113,13 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
   const updateUnitWargear = useCallback((rosterUnitId: string, wargear: depot.Wargear[]): void => {
     dispatch({ type: 'UPDATE_UNIT_WARGEAR', payload: { rosterUnitId, wargear } });
   }, []);
+
+  const updateUnitWargearAbilities = useCallback(
+    (rosterUnitId: string, abilities: depot.Ability[]): void => {
+      dispatch({ type: 'UPDATE_UNIT_WARGEAR_ABILITIES', payload: { rosterUnitId, abilities } });
+    },
+    []
+  );
 
   const updateUnitModelCost = useCallback(
     (rosterUnitId: string, modelCost: depot.ModelCost): void => {
@@ -150,6 +158,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         duplicateUnit,
         removeUnit,
         updateUnitWargear,
+        updateUnitWargearAbilities,
         updateUnitModelCost,
         applyEnhancement,
         removeEnhancement,

@@ -5,7 +5,6 @@ import type { CachedFaction } from '@/types/offline';
 export interface AppState {
   factionIndex: depot.Index[] | null;
   offlineFactions: CachedFaction[];
-  myFactions: depot.Option[];
   loading: boolean;
   error: string | null;
   settings: depot.Settings | null;
@@ -19,8 +18,6 @@ export type AppAction =
   | { type: 'LOAD_FACTION_START'; payload: string }
   | { type: 'LOAD_FACTION_ERROR'; payload: { slug: string; error: string } }
   | { type: 'UPDATE_OFFLINE_FACTIONS'; payload: CachedFaction[] }
-  | { type: 'LOAD_MY_FACTIONS_SUCCESS'; payload: depot.Option[] }
-  | { type: 'UPDATE_MY_FACTIONS'; payload: depot.Option[] }
   | { type: 'LOAD_SETTINGS_SUCCESS'; payload: depot.Settings }
   | { type: 'UPDATE_SETTINGS'; payload: depot.Settings }
   | { type: 'CLEAR_ERROR' };
@@ -33,5 +30,4 @@ export interface AppContextType {
   getDatasheet: (factionSlug: string, datasheetIdOrSlug: string) => Promise<depot.Datasheet | null>;
   clearOfflineData: () => Promise<void>;
   updateSettings: (settings: depot.Settings) => Promise<void>;
-  updateMyFactions: (factions: depot.Option[]) => Promise<void>;
 }

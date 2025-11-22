@@ -206,6 +206,7 @@ export interface Settings {
   showFluff?: boolean;
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
+  usePileOfShameLabel?: boolean;
 }
 
 // Detachment, composed from other types
@@ -223,6 +224,11 @@ export interface RosterUnit {
   datasheet: Datasheet;
   modelCost: ModelCost; // The selected model/unit count and its point cost
   selectedWargear: Wargear[];
+  /**
+   * Selected abilities that are tied to wargear (toggleable per unit).
+   * Optional for backward compatibility with older saved rosters.
+   */
+  selectedWargearAbilities?: Ability[];
   datasheetSlug?: string;
 }
 
@@ -241,4 +247,28 @@ export interface Roster {
   warlordUnitId?: string | null;
   units: RosterUnit[];
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
+}
+
+export type CollectionUnitState = 'sprue' | 'built' | 'battle-ready' | 'parade-ready';
+
+export interface CollectionUnit {
+  id: string;
+  datasheet: Datasheet;
+  modelCost: ModelCost;
+  selectedWargear: Wargear[];
+  selectedWargearAbilities?: Ability[];
+  state: CollectionUnitState;
+  datasheetSlug?: string;
+}
+
+export interface Collection {
+  id: string;
+  name: string;
+  factionId: string;
+  factionSlug?: string;
+  faction?: Index;
+  items: CollectionUnit[];
+  points: {
+    current: number;
+  };
 }

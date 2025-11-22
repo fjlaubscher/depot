@@ -6,7 +6,6 @@ import { APP_ACTIONS } from './constants';
 export const initialState: AppState = {
   factionIndex: null,
   offlineFactions: [],
-  myFactions: [],
   loading: false,
   error: null,
   settings: DEFAULT_SETTINGS
@@ -32,12 +31,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
 
     case APP_ACTIONS.UPDATE_OFFLINE_FACTIONS:
       return { ...state, offlineFactions: action.payload };
-
-    case APP_ACTIONS.LOAD_MY_FACTIONS_SUCCESS:
-      return { ...state, myFactions: action.payload };
-
-    case APP_ACTIONS.UPDATE_MY_FACTIONS:
-      return { ...state, myFactions: action.payload };
 
     case APP_ACTIONS.LOAD_SETTINGS_SUCCESS:
       return { ...state, settings: action.payload };

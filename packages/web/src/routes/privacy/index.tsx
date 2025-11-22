@@ -38,9 +38,9 @@ const PrivacyPolicy = () => (
           metrics beyond the anonymized error reporting described below.
         </p>
         <p className="text-sm text-body">
-          The site is hosted on GitHub Pages. GitHub may collect standard server logs (such as IP
-          address, user-agent, and timestamps) when you access the site. These logs are managed by
-          GitHub and are not shared with depot.
+          The site is hosted on Cloudflare Pages for fast global delivery. Cloudflare may collect
+          standard server logs (such as IP address, user-agent, and timestamps) when you access the
+          site. These logs are managed by Cloudflare and are not shared with depot.
         </p>
       </section>
 
@@ -97,7 +97,7 @@ const PrivacyPolicy = () => (
       </section>
 
       <section className="flex flex-col gap-2 text-xs text-subtle">
-        <span>Effective date: October 23, 2025</span>
+        <span>Effective date: November 22, 2025</span>
       </section>
     </div>
   </AppLayout>

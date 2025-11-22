@@ -1,14 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Home,
-  ChevronDown,
-  ChevronRight,
-  Users,
-  Settings,
-  Star,
-  ClipboardList
-} from 'lucide-react';
+import { Home, Users, Settings, ClipboardList, Boxes } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useLayoutContext } from '@/contexts/layout/use-layout-context';
@@ -22,11 +14,10 @@ interface Props {
 
 const AppLayout = ({ children, title }: Props) => {
   const { state } = useAppContext();
-  const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
   const { closeSidebar } = useLayoutContext();
   const appVersion = import.meta.env.VITE_APP_VERSION?.trim() || 'dev';
-
-  const hasMyFactions = state.myFactions && state.myFactions.length > 0;
+  const collectionLabel =
+    (state.settings?.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections';
 
   const sidebar = (
     <div className="space-y-4">
@@ -43,43 +34,15 @@ const AppLayout = ({ children, title }: Props) => {
           <ClipboardList size={16} />
           <span>Rosters</span>
         </Link>
+        <Link to="/collections" onClick={closeSidebar} className="sidebar-item">
+          <Boxes size={16} />
+          <span>{collectionLabel}</span>
+        </Link>
         <Link to="/settings" onClick={closeSidebar} className="sidebar-item">
           <Settings size={16} />
           <span>Settings</span>
         </Link>
       </div>
-
-      {hasMyFactions && (
-        <>
-          <hr className="my-4 border-gray-200 dark:border-gray-600" />
-
-          <div className="space-y-2">
-            <button
-              onClick={() => setIsMyFactionsExpanded(!isMyFactionsExpanded)}
-              className="sidebar-item w-full justify-between font-medium text-foreground"
-            >
-              <span>My Factions</span>
-              {isMyFactionsExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-            </button>
-
-            {isMyFactionsExpanded && (
-              <div className="ml-4 space-y-1">
-                {state.myFactions.map((faction) => (
-                  <Link
-                    key={faction.slug}
-                    to={`/faction/${faction.slug}`}
-                    onClick={closeSidebar}
-                    className="sidebar-sub-item"
-                  >
-                    <Star size={12} className="text-yellow-500 fill-current" />
-                    <span>{faction.name}</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </>
-      )}
 
       <div className="pt-4 border-t border-subtle text-xs text-subtle flex flex-col gap-2">
         <span>

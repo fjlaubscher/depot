@@ -1,6 +1,7 @@
 import type { depot } from '@depot/core';
 import { calculateTotalPoints } from '@/contexts/roster/utils';
 import { formatWargearDisplayName } from '@/utils/wargear';
+import { formatAbilityName } from '@/utils/abilities';
 import { buildAbsoluteUrl } from '@/utils/paths';
 
 const stripHtml = (html?: string): string => {
@@ -123,6 +124,12 @@ export const generateRosterMarkdown = (
         });
       }
 
+      if (includeWargear && unit.selectedWargearAbilities?.length) {
+        unit.selectedWargearAbilities.forEach((ability) => {
+          lines.push(`  - [Wargear Ability] ${formatAbilityName(ability)}`);
+        });
+      }
+
       const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
       unitEnhancements.forEach(({ enhancement }) => {
         const enhancementCost = parseInt(enhancement.cost, 10) || 0;
@@ -185,6 +192,11 @@ export const generateRosterShareText = (
           lines.push(`  - ${formatWargearDisplayName(wargear)}`);
         });
       }
+      if (includeWargear && unit.selectedWargearAbilities?.length) {
+        unit.selectedWargearAbilities.forEach((ability) => {
+          lines.push(`  - [Wargear Ability] ${formatAbilityName(ability)}`);
+        });
+      }
       const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
       unitEnhancements.forEach(({ enhancement }) => {
         const enhancementCost = parseInt(enhancement.cost, 10) || 0;
@@ -217,7 +229,8 @@ export const createRosterDuplicate = (
       ...unit,
       id: duplicatedUnitId,
       modelCost: { ...unit.modelCost },
-      selectedWargear: unit.selectedWargear.map((wargear) => ({ ...wargear }))
+      selectedWargear: unit.selectedWargear.map((wargear) => ({ ...wargear })),
+      selectedWargearAbilities: unit.selectedWargearAbilities?.map((ability) => ({ ...ability }))
     };
   });
 

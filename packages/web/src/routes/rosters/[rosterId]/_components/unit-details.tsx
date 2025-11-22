@@ -19,6 +19,8 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
           compact
           showLeaderRules={false}
           showWargear={false}
+          excludeAbilityTypes={['wargear']}
+          additionalAbilities={unit.selectedWargearAbilities ?? []}
         />
 
         <div className="pt-2 border-t border-subtle">

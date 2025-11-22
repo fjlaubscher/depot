@@ -62,10 +62,6 @@ export const groupFactionsByAlliance = (factions: depot.Index[]): GroupedFaction
   return sortedGrouped;
 };
 
-export const createTabLabels = (hasMyFactions: boolean): string[] => {
-  return [...(hasMyFactions ? ['My Factions'] : []), 'All Factions'];
-};
-
-export const hasMyFactions = (myFactions: depot.Index[] | undefined): boolean => {
-  return myFactions ? myFactions.length > 0 : false;
+export const createTabLabels = (): string[] => {
+  return ['All Factions'];
 };

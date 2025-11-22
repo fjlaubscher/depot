@@ -31,7 +31,6 @@ export const createMockFunctions = () => ({
     state: {
       factionIndex: null,
       offlineFactions: [],
-      myFactions: [],
       loading: false,
       error: null,
       settings: null
@@ -40,8 +39,7 @@ export const createMockFunctions = () => ({
     getFactionManifest: vi.fn(),
     getDatasheet: vi.fn(),
     clearOfflineData: vi.fn(),
-    updateSettings: vi.fn(),
-    updateMyFactions: vi.fn()
+    updateSettings: vi.fn()
   }
 });
 

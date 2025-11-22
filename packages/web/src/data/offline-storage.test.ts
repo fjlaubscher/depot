@@ -144,7 +144,8 @@ const mockSettings: depot.Settings = {
   showUnaligned: false,
   showFluff: true,
   includeWargearOnExport: true,
-  useNativeShare: true
+  useNativeShare: true,
+  usePileOfShameLabel: true
 };
 
 describe('OfflineStorage', () => {
@@ -477,7 +478,7 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.clearAllData()).resolves.toBeUndefined();
 
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(6);
+      expect(mockObjectStore.clear).toHaveBeenCalledTimes(7);
     });
   });
 

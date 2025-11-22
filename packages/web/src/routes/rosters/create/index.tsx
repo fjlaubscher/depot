@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import useFactions from '@/hooks/use-factions';
 import useFaction from '@/hooks/use-faction';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
+import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
@@ -14,6 +15,7 @@ import MaxPointsField from './_components/max-points-field';
 
 const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
   const { showToast } = useToast();
 
@@ -21,6 +23,7 @@ const CreateRoster: React.FC = () => {
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
   const [detachmentSlug, setDetachmentSlug] = useState<string | null>(null);
   const [maxPoints, setMaxPoints] = useState(2000);
+  const [prefillUnits, setPrefillUnits] = useState<depot.RosterUnit[]>([]);
 
   const { factions, loading: factionsLoading } = useFactions();
   const { data: selectedFaction, loading: factionLoading } = useFaction(factionSlug || undefined);
@@ -50,6 +53,53 @@ const CreateRoster: React.FC = () => {
   useEffect(() => {
     setDetachmentSlug(null);
   }, [factionSlug]);
+
+  useEffect(() => {
+    const collectionId = searchParams.get('fromCollection');
+    if (!collectionId) return;
+
+    // Prefer session-stashed selection from collection flow
+    const saved = sessionStorage.getItem('collection-roster-prefill');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as {
+          collectionId: string;
+          factionSlug?: string | null;
+          factionId?: string;
+          name?: string;
+          units: depot.RosterUnit[];
+        };
+
+        if (parsed.collectionId === collectionId) {
+          if (parsed.factionSlug) setFactionSlug(parsed.factionSlug);
+          if (parsed.name) setName((prev) => prev || parsed.name || '');
+          setPrefillUnits(parsed.units || []);
+          sessionStorage.removeItem('collection-roster-prefill');
+          return;
+        }
+      } catch {
+        // fall through
+      }
+    }
+
+    const loadCollection = async () => {
+      const collection = await offlineStorage.getCollection(collectionId);
+      if (!collection) return;
+      setFactionSlug(collection.factionSlug ?? collection.factionId);
+      setName((prev) => prev || `${collection.name} roster`);
+
+      const units: depot.RosterUnit[] = collection.items.map((item) => ({
+        id: crypto.randomUUID(),
+        datasheet: item.datasheet,
+        modelCost: item.modelCost,
+        selectedWargear: item.selectedWargear,
+        selectedWargearAbilities: item.selectedWargearAbilities,
+        datasheetSlug: item.datasheetSlug ?? item.datasheet.slug
+      }));
+      setPrefillUnits(units);
+    };
+    void loadCollection();
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +170,8 @@ const CreateRoster: React.FC = () => {
       factionSlug: selectedFactionIndex.slug,
       faction: selectedFactionIndex,
       maxPoints,
-      detachment
+      detachment,
+      units: prefillUnits
     });
     navigate(`/rosters/${newId}/edit`);
   };
@@ -129,6 +180,13 @@ const CreateRoster: React.FC = () => {
     <AppLayout title="Create Roster">
       <div className="flex flex-col gap-4">
         <PageHeader title="Create New Roster" />
+        {prefillUnits.length > 0 ? (
+          <Card>
+            <div className="text-sm text-foreground">
+              Prefilling with {prefillUnits.length} units from your collection.
+            </div>
+          </Card>
+        ) : null}
         <Card>
           <form data-testid="roster-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field data-testid="roster-name-field">

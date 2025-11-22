@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  filterFactionsByQuery,
-  groupFactionsByAlliance,
-  createTabLabels,
-  hasMyFactions
-} from './faction';
+import { filterFactionsByQuery, groupFactionsByAlliance, createTabLabels } from './faction';
 import type { depot } from '@depot/core';
 
 // Mock data for testing
@@ -105,36 +100,9 @@ describe('faction utilities', () => {
   });
 
   describe('createTabLabels', () => {
-    it('should include My Factions when user has factions', () => {
-      const result = createTabLabels(true);
-      expect(result).toEqual(['My Factions', 'All Factions']);
-    });
-
-    it('should only show All Factions when user has no factions', () => {
-      const result = createTabLabels(false);
+    it('should only show All Factions', () => {
+      const result = createTabLabels();
       expect(result).toEqual(['All Factions']);
-    });
-  });
-
-  describe('hasMyFactions', () => {
-    it('should return true when factions array has items', () => {
-      const result = hasMyFactions([mockFactions[0]]);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when factions array is empty', () => {
-      const result = hasMyFactions([]);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when factions is undefined', () => {
-      const result = hasMyFactions(undefined);
-      expect(result).toBe(false);
-    });
-
-    it('should return false when factions is null', () => {
-      const result = hasMyFactions(null as any);
-      expect(result).toBe(false);
     });
   });
 });

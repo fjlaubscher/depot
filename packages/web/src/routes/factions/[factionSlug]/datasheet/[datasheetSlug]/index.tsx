@@ -103,8 +103,12 @@ const DatasheetPage: FC = () => {
         <PageHeader
           title={datasheet.name}
           subtitle={datasheet.sourceName}
-          actions={[shareAction]}
-          alignActions="inline"
+          action={{
+            icon: shareAction.icon,
+            onClick: () => shareAction.onClick(),
+            ariaLabel: shareAction.ariaLabel,
+            testId: shareAction['data-testid']
+          }}
           data-testid="datasheet-header"
         />
 
