@@ -16,7 +16,7 @@ const CreateCollectionPage: React.FC = () => {
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
 
   const { factions, loading: factionsLoading } = useFactions();
-  const { data: selectedFaction, loading: factionLoading } = useFaction(factionSlug || undefined);
+  const { loading: factionLoading } = useFaction(factionSlug || undefined);
 
   const factionOptions =
     factions

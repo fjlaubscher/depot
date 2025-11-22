@@ -165,18 +165,34 @@ class OfflineStorage {
 
   /**
    * Ensures the requested object store exists; if not, reset the DB and recreate.
+   * Limits retries to avoid infinite recursion if the store cannot be created.
    */
   private async getDBWithStore(
-    storeName: (typeof STORES)[keyof typeof STORES]
+    storeName: (typeof STORES)[keyof typeof STORES],
+    retryCount = 0
   ): Promise<IDBDatabase> {
+    const MAX_RETRIES = 2;
     const db = await this.getDB();
     if (db.objectStoreNames.contains(storeName)) {
       return db;
     }
 
-    console.warn(`IndexedDB missing store ${storeName}, resetting database.`);
+    if (retryCount >= MAX_RETRIES) {
+      throw new Error(
+        `IndexedDB store "${storeName}" missing after ${MAX_RETRIES} retries. Database may be in an invalid state.`
+      );
+    }
+
+    console.warn(
+      `IndexedDB missing store ${storeName}, resetting database (attempt ${retryCount + 1}).`
+    );
     await this.destroy();
-    return this.getDB();
+    const newDb = await this.getDB();
+    if (newDb.objectStoreNames.contains(storeName)) {
+      return newDb;
+    }
+
+    return this.getDBWithStore(storeName, retryCount + 1);
   }
 
   // Faction Index Operations

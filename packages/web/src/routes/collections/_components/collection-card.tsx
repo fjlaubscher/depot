@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
-import { Trash2, Pencil, Copy, Users, Boxes } from 'lucide-react';
+import { Trash2, Pencil, Copy } from 'lucide-react';
 
 import { Card, ActionGroup, PointsTag, Tag } from '@/components/ui';
 import { COLLECTION_STATE_META } from '@/utils/collection';

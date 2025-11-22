@@ -19,6 +19,7 @@ import PrivacyPolicy from './routes/privacy';
 import Collections from './routes/collections';
 import CreateCollection from './routes/collections/create';
 import CollectionView from './routes/collections/[collectionId]';
+import AddCollectionUnits from './routes/collections/[collectionId]/add-units';
 import EditCollectionUnit from './routes/collections/[collectionId]/units/[unitId]/edit';
 import CollectionRosterSelect from './routes/collections/[collectionId]/new-roster';
 
@@ -34,6 +35,7 @@ const AppRoutes = () => (
     <Route path="/collections" element={<Collections />} />
     <Route path="/collections/create" element={<CreateCollection />} />
     <Route path="/collections/:collectionId" element={<CollectionView />} />
+    <Route path="/collections/:collectionId/add-units" element={<AddCollectionUnits />} />
     <Route path="/collections/:collectionId/new-roster" element={<CollectionRosterSelect />} />
     <Route path="/collections/:collectionId/units/:unitId/edit" element={<EditCollectionUnit />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
