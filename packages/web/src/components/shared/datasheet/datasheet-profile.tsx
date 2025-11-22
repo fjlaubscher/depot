@@ -5,6 +5,7 @@ import type { DatasheetListItem } from '@/types/datasheets';
 // components
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
+import DatasheetLeaderRules from './datasheet-leader-rules';
 import { ModelStatsRow } from '@/components/shared';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
 
@@ -15,12 +16,16 @@ interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
   factionDatasheets?: DatasheetListItem[];
   abilitiesTestId?: string;
+  showLeaderRules?: boolean;
+  showWargear?: boolean;
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = [],
-  abilitiesTestId = 'datasheet-abilities'
+  abilitiesTestId = 'datasheet-abilities',
+  showLeaderRules = true,
+  showWargear = true
 }) => {
   const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
     return categorizeAbilities(datasheet.abilities);
@@ -43,7 +48,10 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
         abilities={mergedAbilities}
         dataTestId={abilitiesTestId}
       />
-      <DatasheetWargear datasheet={datasheet} />
+      {showLeaderRules ? (
+        <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+      ) : null}
+      {showWargear ? <DatasheetWargear datasheet={datasheet} /> : null}
     </div>
   );
 };

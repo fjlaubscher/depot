@@ -16,6 +16,8 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
           datasheet={unit.datasheet}
           factionDatasheets={[]}
           abilitiesTestId="roster-unit-abilities"
+          showLeaderRules={false}
+          showWargear={false}
         />
 
         <div className="pt-2 border-t border-subtle">

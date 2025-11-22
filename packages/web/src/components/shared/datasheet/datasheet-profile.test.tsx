@@ -52,6 +52,9 @@ describe('DatasheetProfile', () => {
 
     expect(unitAbilityTag).toBeInTheDocument();
     expect(unitAbilityTag.querySelector('span')).toHaveClass('surface-success-strong');
+
+    expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();
   });
 
   it('hides abilities when none are available', () => {
@@ -60,5 +63,21 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
+  });
+
+  it('omits leader and wargear sections when disabled', () => {
+    const datasheet = createMockDatasheet();
+
+    render(
+      <DatasheetProfile
+        datasheet={datasheet}
+        factionDatasheets={[datasheet]}
+        showLeaderRules={false}
+        showWargear={false}
+      />
+    );
+
+    expect(screen.queryByTestId('datasheet-leader-rules')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('datasheet-wargear')).not.toBeInTheDocument();
   });
 });
