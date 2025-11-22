@@ -13,11 +13,12 @@ import {
   ErrorState,
   PageHeaderSkeleton,
   SkeletonCard,
-  SelectField
+  SelectField,
+  Tag
 } from '@/components/ui';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
-import { getWargearAbilities } from '@/utils/abilities';
+import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import { COLLECTION_STATE_META, COLLECTION_UNIT_STATES } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
@@ -52,7 +53,9 @@ const CollectionUnitEditView: React.FC = () => {
 
       setSelectedWargear(wargearToSelect);
       setSelectedModelCost(unit.modelCost);
-      setSelectedWargearAbilities(unit.selectedWargearAbilities ?? []);
+      setSelectedWargearAbilities(
+        normalizeSelectedWargearAbilities(unit.selectedWargearAbilities, unit.datasheet.abilities)
+      );
       setState(unit.state ?? 'sprue');
 
       initializedUnitRef.current = unitId;
@@ -75,6 +78,8 @@ const CollectionUnitEditView: React.FC = () => {
     () => getWargearAbilities(unit?.datasheet.abilities ?? []),
     [unit?.datasheet.abilities]
   );
+
+  const stateMeta = COLLECTION_STATE_META[state] ?? COLLECTION_STATE_META.sprue;
 
   if (!collectionId) {
     return (
@@ -197,6 +202,13 @@ const CollectionUnitEditView: React.FC = () => {
                 value={state}
                 onChange={(e) => setState(e.target.value as depot.CollectionUnitState)}
               />
+              <Tag
+                variant={stateMeta.variant}
+                className="mt-3 self-start"
+                data-testid="collection-unit-state-tag"
+              >
+                {stateMeta.label}
+              </Tag>
             </div>
           </Card>
 

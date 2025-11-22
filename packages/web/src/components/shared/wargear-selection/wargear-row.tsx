@@ -1,65 +1,51 @@
-import { useCallback } from 'react';
+import classNames from 'classnames';
+import { useCallback, useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { Tag } from '@/components/ui';
 
 interface WargearTableRowProps {
   weapon: depot.Wargear;
-  showSelectionColumn: boolean;
-  selectedWargear: depot.Wargear[];
+  showSelectionColumn?: boolean;
+  selectedWargear?: depot.Wargear[];
   onSelectionChange?: (wargear: depot.Wargear, selected: boolean) => void;
 }
 
 const WargearRow = ({
   weapon,
-  showSelectionColumn,
-  selectedWargear,
+  showSelectionColumn = false,
+  selectedWargear = [],
   onSelectionChange
 }: WargearTableRowProps) => {
   const isSelected = selectedWargear.some((selected) => selected.id === weapon.id);
+  const isInteractive = showSelectionColumn && Boolean(onSelectionChange);
 
-  const handleToggle = useCallback(
-    (event?: React.ChangeEvent<HTMLInputElement>) => {
-      event?.stopPropagation();
-      if (onSelectionChange) {
-        onSelectionChange(weapon, !isSelected);
-      }
-    },
-    [weapon, isSelected, onSelectionChange]
-  );
-
-  const handleCardClick = () => {
-    if (showSelectionColumn && onSelectionChange) {
+  const handleToggle = useCallback(() => {
+    if (isInteractive && onSelectionChange) {
       onSelectionChange(weapon, !isSelected);
     }
-  };
+  }, [isInteractive, onSelectionChange, weapon, isSelected]);
 
   return (
-    <div
-      className={`flex gap-3 p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors ${
-        showSelectionColumn ? 'cursor-pointer' : ''
-      }`}
-      onClick={handleCardClick}
-    >
-      {showSelectionColumn && (
-        <div className="flex-shrink-0 pt-1">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={handleToggle}
-            className="cursor-pointer rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-800"
-            data-testid={`wargear-checkbox-${weapon.id}`}
-          />
-        </div>
+    <button
+      type="button"
+      onClick={handleToggle}
+      className={classNames(
+        'inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface',
+        isInteractive ? 'cursor-pointer' : 'cursor-default opacity-60',
+        isSelected
+          ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'
+          : classNames(
+              'border-subtle bg-surface text-foreground',
+              isInteractive &&
+                'hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+            )
       )}
-      <div className="flex-grow flex flex-col gap-2">
-        <div className="font-medium text-foreground">{weapon.name}</div>
-        <div className="inline-flex items-center gap-1 text-xs uppercase tracking-wide text-subtle">
-          <Tag variant="secondary" size="sm" className="uppercase">
-            {weapon.type}
-          </Tag>
-        </div>
-      </div>
-    </div>
+      aria-pressed={isSelected}
+      data-testid={`wargear-pill-${weapon.id}`}
+      disabled={!isInteractive}
+    >
+      {weapon.name}
+    </button>
   );
 };
 

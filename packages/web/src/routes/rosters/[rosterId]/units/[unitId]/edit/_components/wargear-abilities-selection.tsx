@@ -1,6 +1,8 @@
 import React from 'react';
+import classNames from 'classnames';
+import { slugify } from '@depot/core/utils/slug';
 import type { depot } from '@depot/core';
-import { Tag } from '@/components/ui';
+
 import { formatAbilityName } from '@/utils/abilities';
 
 interface WargearAbilitiesSelectionProps {
@@ -9,18 +11,55 @@ interface WargearAbilitiesSelectionProps {
   onChange: (abilities: depot.Ability[]) => void;
 }
 
+interface AbilityEntry {
+  ability: depot.Ability;
+  key: string;
+  testId: string;
+}
+
 const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   abilities,
   selected,
   onChange
 }) => {
-  const handleToggle = (ability: depot.Ability) => {
-    const isSelected = selected.some((item) => item.id === ability.id);
-    if (isSelected) {
-      onChange(selected.filter((item) => item.id !== ability.id));
-    } else {
-      onChange([...selected, ability]);
+  const abilityEntries = React.useMemo<AbilityEntry[]>(() => {
+    return abilities.map((ability, index) => {
+      const friendlyName =
+        formatAbilityName(ability) ||
+        ability.name ||
+        ability.parameter ||
+        ability.description ||
+        `wargear-ability-${index}`;
+      const slugified = slugify(friendlyName);
+      const key = ability.id ?? slugified ?? `wargear-ability-${index}`;
+      const testId = slugified || `wargear-ability-${index}`;
+      return {
+        ability,
+        key,
+        testId
+      };
+    });
+  }, [abilities]);
+
+  const entryLookup = React.useMemo(
+    () => new Map(abilityEntries.map((entry) => [entry.ability, entry])),
+    [abilityEntries]
+  );
+
+  const normalizedSelected = React.useMemo(
+    () => selected.filter((ability) => abilityEntries.some((entry) => entry.ability === ability)),
+    [selected, abilityEntries]
+  );
+
+  const selectedSet = React.useMemo(() => new Set(normalizedSelected), [normalizedSelected]);
+
+  const handleToggle = (entry: AbilityEntry) => {
+    if (selectedSet.has(entry.ability)) {
+      onChange(normalizedSelected.filter((item) => item !== entry.ability));
+      return;
     }
+
+    onChange([...normalizedSelected, entry.ability]);
   };
 
   if (abilities.length === 0) {
@@ -32,35 +71,30 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {abilities.map((ability) => {
-        const isSelected = selected.some((item) => item.id === ability.id);
+    <div className="flex flex-wrap gap-2">
+      {abilityEntries.map((entry) => {
+        const isSelected = selectedSet.has(entry.ability);
         return (
-          <label
-            key={ability.id}
-            className="flex cursor-pointer gap-2 rounded border border-subtle bg-surface p-3 transition hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20"
-            data-testid={`wargear-ability-${ability.id}`}
+          <div
+            key={entry.key}
+            className="flex flex-wrap gap-2"
+            data-testid={`wargear-ability-${entry.testId}`}
           >
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={() => handleToggle(ability)}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800"
-              data-testid={`wargear-ability-checkbox-${ability.id}`}
-            />
-            <div className="flex flex-1 flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">{formatAbilityName(ability)}</span>
-                <Tag variant="warning" size="sm" className="uppercase">
-                  Wargear
-                </Tag>
-              </div>
-              <p
-                className="text-sm text-muted"
-                dangerouslySetInnerHTML={{ __html: ability.description }}
-              />
-            </div>
-          </label>
+            <button
+              type="button"
+              onClick={() => handleToggle(entry)}
+              className={classNames(
+                'inline-flex w-fit items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface cursor-pointer',
+                isSelected
+                  ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'
+                  : 'border-subtle bg-surface text-foreground hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+              )}
+              aria-pressed={isSelected}
+              data-testid={`wargear-ability-pill-${entry.testId}`}
+            >
+              {formatAbilityName(entry.ability)}
+            </button>
+          </div>
         );
       })}
     </div>

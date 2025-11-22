@@ -1,4 +1,4 @@
-import type { depot } from '@depot/core';
+import { wargear, type depot } from '@depot/core';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
