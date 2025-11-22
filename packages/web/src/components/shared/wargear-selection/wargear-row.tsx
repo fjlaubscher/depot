@@ -31,10 +31,13 @@ const WargearRow = ({
       onClick={handleToggle}
       className={classNames(
         'inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface',
-        isInteractive ? 'cursor-pointer' : 'cursor-default',
+        isInteractive ? 'cursor-pointer' : 'cursor-default opacity-60',
         isSelected
           ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'
-          : 'border-subtle bg-surface text-foreground hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+          : classNames(
+              'border-subtle bg-surface text-foreground',
+              isInteractive && 'hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+            )
       )}
       aria-pressed={isSelected}
       data-testid={`wargear-pill-${weapon.id}`}
