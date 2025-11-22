@@ -16,6 +16,7 @@ interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
   factionDatasheets?: DatasheetListItem[];
   abilitiesTestId?: string;
+  compact?: boolean;
   showLeaderRules?: boolean;
   showWargear?: boolean;
 }
@@ -24,6 +25,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = [],
   abilitiesTestId = 'datasheet-abilities',
+  compact = false,
   showLeaderRules = true,
   showWargear = true
 }) => {
@@ -37,10 +39,13 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-4" data-testid="datasheet-profile">
+    <div
+      className={`flex flex-col ${compact ? 'gap-2 sm:gap-3' : 'gap-2 sm:gap-4'}`}
+      data-testid="datasheet-profile"
+    >
       {/* Model Stats Rows */}
       {datasheet.models.map((model) => (
-        <ModelStatsRow key={model.line} model={model} />
+        <ModelStatsRow key={model.line} model={model} variant={compact ? 'compact' : 'default'} />
       ))}
       <DatasheetHero datasheet={datasheet} factionDatasheets={factionDatasheets} />
       <DatasheetAbilities

@@ -9,7 +9,7 @@ interface StatsRowProps {
 
 const StatsRow: FC<StatsRowProps> = ({ title, subtitle, children, variant = 'default' }) => {
   const containerGap = variant === 'compact' ? 'gap-1 sm:gap-2' : 'gap-2 sm:gap-4';
-  const rowGap = variant === 'compact' ? 'gap-1 sm:gap-2' : 'gap-2 sm:gap-4';
+  const rowGap = variant === 'compact' ? 'gap-0.5 sm:gap-2' : 'gap-2 sm:gap-4';
 
   return (
     <div className={`flex flex-col ${containerGap}`}>
