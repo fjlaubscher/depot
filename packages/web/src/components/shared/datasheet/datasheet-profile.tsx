@@ -5,6 +5,7 @@ import type { DatasheetListItem } from '@/types/datasheets';
 // components
 import DatasheetHero from './datasheet-hero';
 import DatasheetWargear from './datasheet-wargear';
+import DatasheetLeaderRules from './datasheet-leader-rules';
 import { ModelStatsRow } from '@/components/shared';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
 
@@ -15,12 +16,18 @@ interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
   factionDatasheets?: DatasheetListItem[];
   abilitiesTestId?: string;
+  compact?: boolean;
+  showLeaderRules?: boolean;
+  showWargear?: boolean;
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = [],
-  abilitiesTestId = 'datasheet-abilities'
+  abilitiesTestId = 'datasheet-abilities',
+  compact = false,
+  showLeaderRules = true,
+  showWargear = true
 }) => {
   const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
     return categorizeAbilities(datasheet.abilities);
@@ -32,10 +39,13 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-4" data-testid="datasheet-profile">
+    <div
+      className={`flex flex-col ${compact ? 'gap-2 sm:gap-3' : 'gap-2 sm:gap-4'}`}
+      data-testid="datasheet-profile"
+    >
       {/* Model Stats Rows */}
       {datasheet.models.map((model) => (
-        <ModelStatsRow key={model.line} model={model} />
+        <ModelStatsRow key={model.line} model={model} variant={compact ? 'compact' : 'default'} />
       ))}
       <DatasheetHero datasheet={datasheet} factionDatasheets={factionDatasheets} />
       <DatasheetAbilities
@@ -43,7 +53,10 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
         abilities={mergedAbilities}
         dataTestId={abilitiesTestId}
       />
-      <DatasheetWargear datasheet={datasheet} />
+      {showLeaderRules ? (
+        <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+      ) : null}
+      {showWargear ? <DatasheetWargear datasheet={datasheet} /> : null}
     </div>
   );
 };

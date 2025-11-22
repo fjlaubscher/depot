@@ -74,4 +74,23 @@ describe('ViewRosterUnitCard', () => {
 
     expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();
   });
+
+  it('omits leader and wargear sections in roster detail view', () => {
+    const datasheet = createMockDatasheet({
+      wargear: mockDatasheet.wargear,
+      leaders: mockDatasheet.leaders
+    });
+
+    const unit = createMockRosterUnit({
+      datasheet,
+      modelCost: datasheet.modelCosts[0]
+    });
+
+    render(<ViewRosterUnitCard unit={unit} />, { wrapper: TestWrapper });
+
+    fireEvent.click(screen.getByRole('heading', { name: unit.datasheet.name }));
+
+    expect(screen.queryByText(/wargear & options/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/attachment options/i)).not.toBeInTheDocument();
+  });
 });

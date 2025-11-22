@@ -6,7 +6,6 @@ import type { DatasheetListItem } from '@/types/datasheets';
 // components
 import { Tag, TagSection, TagGroup } from '@/components/ui';
 import { DatasheetComposition } from '@/components/shared';
-import DatasheetLeaderRules from './datasheet-leader-rules';
 
 // utils
 import { groupKeywords } from '@/utils/keywords';
@@ -37,8 +36,6 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets })
         transport={transport}
         data-testid="unit-composition"
       />
-
-      <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
 
       {pointTags.length > 0 ? (
         <TagGroup spacing="sm" className="flex-wrap" data-testid="datasheet-points">

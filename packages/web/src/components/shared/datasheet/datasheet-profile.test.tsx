@@ -4,6 +4,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { createMockDatasheet } from '@/test/mock-data';
 import DatasheetProfile from './datasheet-profile';
 
+const mockModelStatsRow = vi.fn();
+
 vi.mock('./datasheet-hero', () => ({
   default: () => <div data-testid="datasheet-hero">Hero</div>
 }));
@@ -16,7 +18,22 @@ vi.mock('./datasheet-leader-rules', () => ({
   default: () => <div data-testid="datasheet-leader-rules">Leader Rules</div>
 }));
 
+vi.mock('@/components/shared', () => ({
+  ModelStatsRow: (props: { model: unknown; variant?: string }) => {
+    mockModelStatsRow(props);
+    return (
+      <div data-testid="model-stats-row" data-variant={props.variant || 'default'}>
+        Model Row
+      </div>
+    );
+  }
+}));
+
 describe('DatasheetProfile', () => {
+  beforeEach(() => {
+    mockModelStatsRow.mockClear();
+  });
+
   it('renders combined abilities with type-specific tag styles', () => {
     const datasheet = createMockDatasheet({
       abilities: [
@@ -52,6 +69,9 @@ describe('DatasheetProfile', () => {
 
     expect(unitAbilityTag).toBeInTheDocument();
     expect(unitAbilityTag.querySelector('span')).toHaveClass('surface-success-strong');
+
+    expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();
   });
 
   it('hides abilities when none are available', () => {
@@ -60,5 +80,56 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
+  });
+
+  it('omits leader and wargear sections when disabled', () => {
+    const datasheet = createMockDatasheet();
+
+    render(
+      <DatasheetProfile
+        datasheet={datasheet}
+        factionDatasheets={[datasheet]}
+        showLeaderRules={false}
+        showWargear={false}
+      />
+    );
+
+    expect(screen.queryByTestId('datasheet-leader-rules')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('datasheet-wargear')).not.toBeInTheDocument();
+  });
+
+  it('renders model rows in compact mode when requested', () => {
+    const datasheet = createMockDatasheet({
+      models: [
+        {
+          line: '1',
+          datasheetId: 'model-1',
+          name: 'Test Model',
+          baseSize: '32mm',
+          baseSizeDescr: '',
+          m: '6"',
+          t: '4',
+          sv: '3+',
+          w: '2',
+          ld: '6+',
+          oc: '1',
+          invSv: '-',
+          invSvDescr: ''
+        }
+      ]
+    });
+
+    render(
+      <DatasheetProfile
+        datasheet={datasheet}
+        factionDatasheets={[datasheet]}
+        compact
+        showLeaderRules={false}
+        showWargear={false}
+      />
+    );
+
+    expect(screen.getByTestId('model-stats-row')).toHaveAttribute('data-variant', 'compact');
+    expect(mockModelStatsRow).toHaveBeenCalledWith(expect.objectContaining({ variant: 'compact' }));
   });
 });

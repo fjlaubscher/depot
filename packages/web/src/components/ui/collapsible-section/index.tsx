@@ -8,13 +8,15 @@ interface CollapsibleSectionProps {
   defaultExpanded?: boolean;
   children: ReactNode;
   className?: string;
+  dataTestId?: string;
 }
 
 const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   title,
   defaultExpanded = false,
   children,
-  className = ''
+  className = '',
+  dataTestId
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -26,7 +28,10 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   };
 
   return (
-    <div className={classNames('border border-subtle rounded-lg', className)}>
+    <div
+      className={classNames('border border-subtle rounded-lg', className)}
+      data-testid={dataTestId}
+    >
       <button
         onClick={toggleExpanded}
         className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"

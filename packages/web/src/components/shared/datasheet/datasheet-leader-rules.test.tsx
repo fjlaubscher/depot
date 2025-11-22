@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -49,6 +49,8 @@ describe('DatasheetLeaderRules', () => {
       </MemoryRouter>
     );
 
+    fireEvent.click(screen.getByRole('button', { name: /leader/i }));
+
     expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
     expect(
       screen.getByText('This model can be attached to one of the following units:')
@@ -77,6 +79,8 @@ describe('DatasheetLeaderRules', () => {
         <DatasheetLeaderRules datasheet={leaderDatasheet} factionDatasheets={[leaderDatasheet]} />
       </MemoryRouter>
     );
+
+    fireEvent.click(screen.getByRole('button', { name: /leader/i }));
 
     expect(screen.getByText('Reiver Squad')).toBeInTheDocument();
   });

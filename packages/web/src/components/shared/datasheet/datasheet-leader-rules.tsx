@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import type { DatasheetListItem } from '@/types/datasheets';
 
-import { Card } from '@/components/ui';
+import { Card, CollapsibleSection } from '@/components/ui';
 
 interface DatasheetLeaderRulesProps {
   datasheet: depot.Datasheet;
@@ -72,41 +72,48 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
   }
 
   return (
-    <section className="flex flex-col gap-2" data-testid="datasheet-leader-rules">
-      <div className="flex flex-col">
-        <span className="text-sm font-semibold text-foreground">Leader</span>
-        <div
-          className="text-xs text-body [&_p]:m-0"
-          dangerouslySetInnerHTML={{ __html: leaderHead }}
-        />
-      </div>
+    <CollapsibleSection
+      title="Leader"
+      defaultExpanded={false}
+      className="w-full"
+      dataTestId="datasheet-leader-rules"
+    >
+      <Card className="flex flex-col gap-3 p-4">
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-foreground">Attachment Options</span>
+          <div
+            className="text-xs text-body [&_p]:m-0"
+            dangerouslySetInnerHTML={{ __html: leaderHead }}
+          />
+        </div>
 
-      {leaderTargets.length ? (
-        <ul className="list-disc pl-5">
-          {leaderTargets.map((target) => (
-            <li key={target.key} className="text-sm text-body" data-testid="leader-target">
-              {target.path ? (
-                <Link
-                  to={target.path}
-                  className="text-primary-600 hover:underline focus:underline dark:text-primary-400"
-                >
-                  {target.name}
-                </Link>
-              ) : (
-                target.name
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+        {leaderTargets.length ? (
+          <ul className="list-disc pl-5">
+            {leaderTargets.map((target) => (
+              <li key={target.key} className="text-sm text-body" data-testid="leader-target">
+                {target.path ? (
+                  <Link
+                    to={target.path}
+                    className="text-primary-600 hover:underline focus:underline dark:text-primary-400"
+                  >
+                    {target.name}
+                  </Link>
+                ) : (
+                  target.name
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-      {leaderFooter?.trim() ? (
-        <div
-          className="text-xs text-body [&_p]:m-0"
-          dangerouslySetInnerHTML={{ __html: leaderFooter }}
-        />
-      ) : null}
-    </section>
+        {leaderFooter?.trim() ? (
+          <div
+            className="text-xs text-body [&_p]:m-0"
+            dangerouslySetInnerHTML={{ __html: leaderFooter }}
+          />
+        ) : null}
+      </Card>
+    </CollapsibleSection>
   );
 };
 
