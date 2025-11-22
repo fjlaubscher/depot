@@ -2,6 +2,7 @@ import type { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 import type { depot } from '@depot/core';
 import { Card, PointsTag, Tag, TagGroup } from '@/components/ui';
+import { COLLECTION_STATE_META } from '@/utils/collection';
 import { formatWargearDisplayName } from '@/utils/wargear';
 import { formatAbilityName } from '@/utils/abilities';
 
@@ -10,13 +11,17 @@ interface RosterUnitCardCompactProps {
   actions?: ReactNode;
   children?: ReactNode;
   onClick?: () => void;
+  state?: depot.CollectionUnitState;
+  dataTestId?: string;
 }
 
 const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   unit,
   actions,
   children,
-  onClick
+  onClick,
+  state,
+  dataTestId
 }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
   const wargearToDisplay = unit.selectedWargear.slice(0, 3);
@@ -24,12 +29,15 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   const wargearAbilities = unit.selectedWargearAbilities ?? [];
   const wargearAbilitiesToDisplay = wargearAbilities.slice(0, 3);
   const remainingWargearAbilities = wargearAbilities.length - wargearAbilitiesToDisplay.length;
+  const stateMeta = state ? COLLECTION_STATE_META[state] : null;
 
   return (
     <Card
       padding="sm"
       className={classNames('relative flex flex-col gap-2', onClick && 'cursor-pointer')}
       onClick={onClick}
+      data-testid={dataTestId}
+      data-state={state}
     >
       <Card.Header className="items-start gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -43,6 +51,11 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
           ) : null}
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
+          {stateMeta ? (
+            <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
+              {stateMeta.label}
+            </Tag>
+          ) : null}
           <PointsTag points={unitPoints} className="whitespace-nowrap" />
           {actions ? <div className="flex items-center gap-1">{actions}</div> : null}
         </div>
