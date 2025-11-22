@@ -11,6 +11,8 @@ interface RosterUnitCardEditProps {
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
   basePath?: string;
+  state?: depot.CollectionUnitState;
+  dataTestId?: string;
 }
 
 const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
@@ -18,7 +20,9 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   rosterId,
   onRemove,
   onDuplicate,
-  basePath = '/rosters'
+  basePath = '/rosters',
+  state,
+  dataTestId
 }) => {
   const navigate = useNavigate();
 
@@ -54,7 +58,15 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
     </div>
   );
 
-  return <RosterUnitCardCompact unit={unit} actions={actions} onClick={handleCardClick} />;
+  return (
+    <RosterUnitCardCompact
+      unit={unit}
+      actions={actions}
+      onClick={handleCardClick}
+      state={state}
+      dataTestId={dataTestId}
+    />
+  );
 };
 
 export default RosterUnitCardEdit;

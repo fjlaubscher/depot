@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, ClipboardPlus } from 'lucide-react';
 import type { depot } from '@depot/core';
+import classNames from 'classnames';
 
 import AppLayout from '@/components/layout';
 import { BackButton } from '@/components/shared';
@@ -13,25 +14,83 @@ import {
   RosterHeader
 } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
-import { calculateCollectionPoints } from '@/utils/collection';
+import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
+import {
+  COLLECTION_STATE_META,
+  COLLECTION_UNIT_STATES,
+  calculateCollectionPoints
+} from '@/utils/collection';
+
+const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
+  const {
+    selection: persistedStateFilter,
+    setSelection: setPersistedStateFilter,
+    clearSelection: clearPersistedStateFilter
+  } = usePersistedTagSelection<depot.CollectionUnitState | 'all'>(
+    COLLECTION_STATE_FILTER_KEY,
+    'all',
+    (value) => value === 'all' || COLLECTION_UNIT_STATES.includes(value)
+  );
 
-  const groupedByRole = useMemo(() => {
+  const stateCounts = useMemo(() => {
     if (!collection) {
-      return {};
+      return {} as Record<depot.CollectionUnitState, number>;
     }
 
-    return collection.items.reduce<Record<string, depot.CollectionUnit[]>>((acc, item) => {
-      const role = item.datasheet.role || 'OTHER';
-      acc[role] = acc[role] ? [...acc[role], item] : [item];
-      return acc;
-    }, {});
+    return collection.items.reduce<Record<depot.CollectionUnitState, number>>(
+      (acc, item) => ({
+        ...acc,
+        [item.state]: (acc[item.state] ?? 0) + 1
+      }),
+      {
+        sprue: 0,
+        built: 0,
+        'battle-ready': 0,
+        'parade-ready': 0
+      }
+    );
   }, [collection]);
 
-  const roleKeys = useMemo(() => Object.keys(groupedByRole).sort(), [groupedByRole]);
+  const stateFilters = useMemo(
+    () =>
+      collection
+        ? [
+            { state: 'all' as const, label: 'All', count: collection.items.length },
+            ...COLLECTION_UNIT_STATES.map((state) => ({
+              state,
+              label: COLLECTION_STATE_META[state].label,
+              count: stateCounts[state]
+            }))
+          ]
+        : [],
+    [collection, stateCounts]
+  );
+
+  const activeStateFilter = useMemo(() => {
+    if (!persistedStateFilter || persistedStateFilter === 'all') {
+      return 'all';
+    }
+
+    if (COLLECTION_UNIT_STATES.includes(persistedStateFilter)) {
+      return persistedStateFilter;
+    }
+
+    return 'all';
+  }, [persistedStateFilter]);
+
+  useEffect(() => {
+    if (persistedStateFilter !== activeStateFilter) {
+      if (activeStateFilter === 'all') {
+        clearPersistedStateFilter();
+      } else {
+        setPersistedStateFilter(activeStateFilter);
+      }
+    }
+  }, [activeStateFilter, clearPersistedStateFilter, persistedStateFilter, setPersistedStateFilter]);
   const points = useMemo(
     () => (collection ? calculateCollectionPoints(collection) : 0),
     [collection]
@@ -49,6 +108,18 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const rosterLike: { points: { current: number } } = {
     points: { current: points }
   };
+
+  const filteredItems = useMemo(() => {
+    if (!collection) {
+      return [] as depot.CollectionUnit[];
+    }
+
+    if (activeStateFilter === 'all') {
+      return collection.items;
+    }
+
+    return collection.items.filter((item) => item.state === activeStateFilter);
+  }, [activeStateFilter, collection]);
 
   const handleRemove = async (unitId: string) => {
     if (!collection) return;
@@ -153,13 +224,47 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
       {collection.items.length > 0 ? (
         <div className="flex flex-col gap-4">
-          {roleKeys.map((role) => (
-            <RosterSection
-              key={role}
-              title={`${role.toUpperCase()} (${groupedByRole[role].length})`}
-              data-testid="collection-role-section"
-            >
-              {groupedByRole[role].map((item) => (
+          <RosterSection
+            title="Units"
+            data-testid="collection-units-section"
+            className="gap-3"
+            headerContent={
+              <div className="flex flex-wrap items-center gap-2">
+                {stateFilters.map((filter) => {
+                  const isActive = filter.state === activeStateFilter;
+
+                  return (
+                    <button
+                      key={`collection-state-${filter.state}`}
+                      type="button"
+                      className={classNames(
+                        'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
+                          : 'border-subtle text-secondary hover:text-foreground hover:border-border'
+                      )}
+                      onClick={() => setPersistedStateFilter(filter.state)}
+                      data-testid={`collection-state-filter-${filter.state}`}
+                    >
+                      <span>{filter.label}</span>
+                      <span
+                        className={classNames(
+                          'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
+                          isActive
+                            ? 'bg-white text-primary-600 dark:text-primary-500'
+                            : 'bg-soft text-muted'
+                        )}
+                      >
+                        {filter.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            }
+          >
+            <div className="flex flex-col gap-3" data-testid="collection-unit-cards">
+              {filteredItems.map((item) => (
                 <RosterUnitCardEdit
                   key={item.id}
                   unit={toRosterUnit(item)}
@@ -167,10 +272,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
                   basePath="/collections"
                   onRemove={handleRemove}
                   onDuplicate={handleDuplicate}
+                  state={item.state}
+                  dataTestId="collection-unit-card"
                 />
               ))}
-            </RosterSection>
-          ))}
+            </div>
+          </RosterSection>
         </div>
       ) : (
         <RosterEmptyState

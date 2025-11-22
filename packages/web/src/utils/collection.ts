@@ -15,7 +15,7 @@ export const COLLECTION_STATE_META: Record<
   { label: string; variant: TagVariant }
 > = {
   sprue: { label: 'Sprue', variant: 'warning' },
-  built: { label: 'Built', variant: 'secondary' },
+  built: { label: 'Assembled', variant: 'secondary' },
   'battle-ready': { label: 'Battle Ready', variant: 'primary' },
   'parade-ready': { label: 'Parade Ready', variant: 'success' }
 };
