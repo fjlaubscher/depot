@@ -50,7 +50,25 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
     }
 
     case 'CREATE_ROSTER':
-      return {
+      const initialUnits =
+        action.payload.units?.map((unit) => {
+          const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
+          return {
+            ...unit,
+            datasheet: normalizedDatasheet,
+            selectedWargear: normalizeSelectedWargear(
+              unit.selectedWargear,
+              normalizedDatasheet.wargear
+            ),
+            selectedWargearAbilities: normalizeSelectedWargearAbilities(
+              unit.selectedWargearAbilities,
+              normalizedDatasheet.abilities
+            ),
+            datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
+          };
+        }) ?? [];
+
+      const createdRoster: depot.Roster = {
         ...initialState,
         id: action.payload.id,
         name: action.payload.name,
@@ -59,10 +77,20 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         faction: action.payload.faction,
         detachment: action.payload.detachment,
         points: {
-          ...initialState.points,
+          current: initialUnits.length > 0 ? 0 : initialState.points.current,
           max: action.payload.maxPoints
         },
-        warlordUnitId: null
+        warlordUnitId: null,
+        units: initialUnits,
+        enhancements: []
+      };
+
+      return {
+        ...createdRoster,
+        points: {
+          ...createdRoster.points,
+          current: calculateTotalPoints(createdRoster)
+        }
       };
 
     case 'UPDATE_DETAILS': {

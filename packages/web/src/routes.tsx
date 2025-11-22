@@ -16,6 +16,10 @@ import ViewRoster from './routes/rosters/[rosterId]';
 import AddRosterUnits from './routes/rosters/[rosterId]/add-units';
 import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
 import PrivacyPolicy from './routes/privacy';
+import Collections from './routes/collections';
+import CreateCollection from './routes/collections/create';
+import CollectionView from './routes/collections/[collectionId]/view';
+import CollectionDetail from './routes/collections/[collectionId]';
 
 const AppRoutes = () => (
   <Routes>
@@ -26,6 +30,10 @@ const AppRoutes = () => (
     <Route path="/faction/:factionSlug" element={<Faction />} />
     <Route path="/faction/:factionSlug/datasheet/:datasheetSlug" element={<Datasheet />} />
     <Route path="/settings" element={<Settings />} />
+    <Route path="/collections" element={<Collections />} />
+    <Route path="/collections/create" element={<CreateCollection />} />
+    <Route path="/collections/:collectionId" element={<CollectionView />} />
+    <Route path="/collections/:collectionId/edit" element={<CollectionDetail />} />
     <Route path="/privacy" element={<PrivacyPolicy />} />
     <Route path="/rosters" element={<Rosters />} />
     <Route path="/rosters/:rosterId/details" element={<RosterDetails />} />

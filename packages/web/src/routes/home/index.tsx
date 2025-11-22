@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { Search, Star, Settings, List, Users, ClipboardList, Boxes } from 'lucide-react';
@@ -43,46 +43,51 @@ const highlights: Array<{
   }
 ];
 
-const actionTiles: Array<{
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  path: string;
-  testId: string;
-}> = [
-  {
-    icon: Users,
-    title: 'Factions',
-    description: 'Browse every detachment, rule, and enhancement.',
-    path: '/factions',
-    testId: 'browse-factions-button'
-  },
-  {
-    icon: ClipboardList,
-    title: 'Rosters',
-    description: 'Build, tweak, and store lists offline.',
-    path: '/rosters',
-    testId: 'roster-builder-button'
-  },
-  {
-    icon: Boxes,
-    title: 'Collections',
-    description: 'Track your pile of shame and prep future lists.',
-    path: '/collections',
-    testId: 'collections-button'
-  },
-  {
-    icon: Settings,
-    title: 'Settings',
-    description: 'Toggle data refreshes, theme, and cache options.',
-    path: '/settings',
-    testId: 'settings-button'
-  }
-];
-
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { state } = useAppContext();
+
+  const collectionLabel = useMemo(
+    () => ((state.settings?.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections'),
+    [state.settings?.usePileOfShameLabel]
+  );
+
+  const actionTiles: Array<{
+    icon: LucideIcon;
+    title: string;
+    description: string;
+    path: string;
+    testId: string;
+  }> = [
+    {
+      icon: Users,
+      title: 'Factions',
+      description: 'Browse every detachment, rule, and enhancement.',
+      path: '/factions',
+      testId: 'browse-factions-button'
+    },
+    {
+      icon: ClipboardList,
+      title: 'Rosters',
+      description: 'Build, tweak, and store lists offline.',
+      path: '/rosters',
+      testId: 'roster-builder-button'
+    },
+    {
+      icon: Boxes,
+      title: collectionLabel,
+      description: 'Track your pile of shame and prep future lists.',
+      path: '/collections',
+      testId: 'collections-button'
+    },
+    {
+      icon: Settings,
+      title: 'Settings',
+      description: 'Toggle data refreshes, theme, and cache options.',
+      path: '/settings',
+      testId: 'settings-button'
+    }
+  ];
 
   const hasMyFactions = state.myFactions && state.myFactions.length > 0;
 

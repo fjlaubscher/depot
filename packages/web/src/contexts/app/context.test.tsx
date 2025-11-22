@@ -211,7 +211,8 @@ const mockSettings: depot.Settings = {
   showUnaligned: false,
   showFluff: true,
   includeWargearOnExport: true,
-  useNativeShare: true
+  useNativeShare: true,
+  usePileOfShameLabel: true
 };
 
 const mockMyFactionOption: depot.Option = {

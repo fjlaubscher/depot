@@ -78,6 +78,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       maxPoints: number;
       name: string;
       detachment: depot.Detachment;
+      units?: depot.RosterUnit[];
     }): string => {
       const newId = crypto.randomUUID();
       dispatch({ type: 'CREATE_ROSTER', payload: { ...payload, id: newId } });

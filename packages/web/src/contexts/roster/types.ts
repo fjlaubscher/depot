@@ -14,6 +14,7 @@ export type RosterAction =
         maxPoints: number;
         name: string;
         detachment: depot.Detachment;
+        units?: depot.RosterUnit[];
       };
     }
   | {
@@ -47,6 +48,7 @@ export interface RosterContextValue {
     maxPoints: number;
     name: string;
     detachment: depot.Detachment;
+    units?: depot.RosterUnit[];
   }) => string;
   setDetachment: (detachment: depot.Detachment) => void;
   updateRosterDetails: (payload: {

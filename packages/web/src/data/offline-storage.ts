@@ -7,7 +7,7 @@ import type { CachedFaction } from '@/types/offline';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 8 // Force cache destroy/rebuild after offline schema changes
+  VERSION: 9 // Force cache destroy/rebuild after offline schema changes
 } as const;
 
 const STORES = {
@@ -16,7 +16,8 @@ const STORES = {
   DATASHEETS: 'datasheets',
   SETTINGS: 'settings',
   USER_DATA: 'userData',
-  ROSTERS: 'rosters'
+  ROSTERS: 'rosters',
+  COLLECTIONS: 'collections'
 } as const;
 
 const KEYS = {
@@ -51,6 +52,42 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
         datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
       };
     })
+  };
+};
+
+const normalizeCollection = (collection: depot.Collection): depot.Collection => {
+  const factionSlug = collection.factionSlug ?? collection.faction?.slug ?? collection.factionId;
+
+  return {
+    ...collection,
+    factionSlug,
+    faction: collection.faction
+      ? { ...collection.faction, slug: collection.faction.slug ?? factionSlug }
+      : collection.faction,
+    items: collection.items.map((item) => {
+      const normalizedDatasheet = normalizeDatasheetWargear(item.datasheet);
+      return {
+        ...item,
+        datasheet: normalizedDatasheet,
+        selectedWargear: normalizeSelectedWargear(
+          item.selectedWargear,
+          normalizedDatasheet.wargear
+        ),
+        selectedWargearAbilities: normalizeSelectedWargearAbilities(
+          item.selectedWargearAbilities,
+          normalizedDatasheet.abilities
+        ),
+        datasheetSlug: item.datasheetSlug ?? normalizedDatasheet.slug
+      };
+    }),
+    points: {
+      current:
+        collection.points?.current ??
+        collection.items.reduce(
+          (total, item) => total + (parseInt(item.modelCost.cost, 10) || 0),
+          0
+        )
+    }
   };
 };
 
@@ -113,11 +150,32 @@ class OfflineStorage {
           } else {
             upgradeTransaction?.objectStore(STORES.ROSTERS).clear();
           }
+
+          // Create or reset collections store
+          if (!db.objectStoreNames.contains(STORES.COLLECTIONS)) {
+            db.createObjectStore(STORES.COLLECTIONS, { keyPath: 'id' });
+          } else {
+            upgradeTransaction?.objectStore(STORES.COLLECTIONS).clear();
+          }
         };
       });
     }
 
     return this.dbPromise;
+  }
+
+  /**
+   * Ensures the requested object store exists; if not, reset the DB and recreate.
+   */
+  private async getDBWithStore(storeName: (typeof STORES)[keyof typeof STORES]): Promise<IDBDatabase> {
+    const db = await this.getDB();
+    if (db.objectStoreNames.contains(storeName)) {
+      return db;
+    }
+
+    console.warn(`IndexedDB missing store ${storeName}, resetting database.`);
+    await this.destroy();
+    return this.getDB();
   }
 
   // Faction Index Operations
@@ -251,6 +309,81 @@ class OfflineStorage {
       });
     } catch (error) {
       console.error(`Failed to set datasheet ${datasheet.id} in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  // Collections
+  async getCollections(): Promise<depot.Collection[]> {
+    try {
+      const db = await this.getDBWithStore(STORES.COLLECTIONS);
+      const transaction = db.transaction([STORES.COLLECTIONS], 'readonly');
+      const store = transaction.objectStore(STORES.COLLECTIONS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => {
+          const result = (request.result as depot.Collection[] | undefined) ?? [];
+          resolve(result.map((collection) => normalizeCollection(collection)));
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error('Failed to get collections from IndexedDB:', error);
+      return [];
+    }
+  }
+
+  async getCollection(id: string): Promise<depot.Collection | null> {
+    try {
+      const db = await this.getDBWithStore(STORES.COLLECTIONS);
+      const transaction = db.transaction([STORES.COLLECTIONS], 'readonly');
+      const store = transaction.objectStore(STORES.COLLECTIONS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.get(id);
+        request.onsuccess = () => {
+          const result = request.result as depot.Collection | undefined;
+          resolve(result ? normalizeCollection(result) : null);
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to get collection ${id} from IndexedDB:`, error);
+      return null;
+    }
+  }
+
+  async saveCollection(collection: depot.Collection): Promise<void> {
+    try {
+      const db = await this.getDBWithStore(STORES.COLLECTIONS);
+      const transaction = db.transaction([STORES.COLLECTIONS], 'readwrite');
+      const store = transaction.objectStore(STORES.COLLECTIONS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.put(normalizeCollection(collection));
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to save collection ${collection.id} in IndexedDB:`, error);
+      throw error;
+    }
+  }
+
+  async deleteCollection(id: string): Promise<void> {
+    try {
+      const db = await this.getDBWithStore(STORES.COLLECTIONS);
+      const transaction = db.transaction([STORES.COLLECTIONS], 'readwrite');
+      const store = transaction.objectStore(STORES.COLLECTIONS);
+
+      return new Promise((resolve, reject) => {
+        const request = store.delete(id);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.error(`Failed to delete collection ${id} from IndexedDB:`, error);
       throw error;
     }
   }
@@ -529,17 +662,17 @@ class OfflineStorage {
   async clearAllData(): Promise<void> {
     try {
       const db = await this.getDB();
-      const transaction = db.transaction(
-        [
-          STORES.FACTION_INDEX,
-          STORES.FACTION_MANIFESTS,
-          STORES.DATASHEETS,
-          STORES.SETTINGS,
-          STORES.USER_DATA,
-          STORES.ROSTERS
-        ],
-        'readwrite'
-      );
+      const storesToClear = [
+        STORES.FACTION_INDEX,
+        STORES.FACTION_MANIFESTS,
+        STORES.DATASHEETS,
+        STORES.SETTINGS,
+        STORES.USER_DATA,
+        STORES.ROSTERS,
+        STORES.COLLECTIONS
+      ].filter((store) => db.objectStoreNames.contains(store));
+
+      const transaction = db.transaction(storesToClear, 'readwrite');
 
       const promises = [
         new Promise<void>((resolve, reject) => {
@@ -571,7 +704,14 @@ class OfflineStorage {
           const request = transaction.objectStore(STORES.ROSTERS).clear();
           request.onsuccess = () => resolve();
           request.onerror = () => reject(request.error);
-        })
+        }),
+        db.objectStoreNames.contains(STORES.COLLECTIONS)
+          ? new Promise<void>((resolve, reject) => {
+              const request = transaction.objectStore(STORES.COLLECTIONS).clear();
+              request.onsuccess = () => resolve();
+              request.onerror = () => reject(request.error);
+            })
+          : Promise.resolve()
       ];
 
       await Promise.all(promises);

@@ -243,7 +243,8 @@ describe('CreateRoster', () => {
         name: 'Space Marines'
       }),
       maxPoints: 2000,
-      detachment: expect.any(Object)
+      detachment: expect.any(Object),
+      units: []
     });
   });
 
@@ -284,7 +285,8 @@ describe('CreateRoster', () => {
         name: 'Space Marines'
       }),
       maxPoints: 1500,
-      detachment: expect.any(Object)
+      detachment: expect.any(Object),
+      units: []
     });
     expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id/edit');
   });

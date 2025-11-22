@@ -106,6 +106,12 @@ const Settings = () => {
                 enabled={state.settings?.useNativeShare ?? true}
                 onChange={(value) => handleSettingsChange('useNativeShare', value)}
               />
+              <SettingToggleItem
+                title="Call It What It Is"
+                description="Use “Pile of Shame” instead of “Collection” across the app."
+                enabled={state.settings?.usePileOfShameLabel ?? true}
+                onChange={(value) => handleSettingsChange('usePileOfShameLabel', value)}
+              />
             </div>
           </SettingsCard>
 

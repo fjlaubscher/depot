@@ -7,7 +7,8 @@ import {
   Users,
   Settings,
   Star,
-  ClipboardList
+  ClipboardList,
+  Boxes
 } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -25,6 +26,7 @@ const AppLayout = ({ children, title }: Props) => {
   const [isMyFactionsExpanded, setIsMyFactionsExpanded] = useState(true);
   const { closeSidebar } = useLayoutContext();
   const appVersion = import.meta.env.VITE_APP_VERSION?.trim() || 'dev';
+  const collectionLabel = (state.settings?.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections';
 
   const hasMyFactions = state.myFactions && state.myFactions.length > 0;
 
@@ -42,6 +44,10 @@ const AppLayout = ({ children, title }: Props) => {
         <Link to="/rosters" onClick={closeSidebar} className="sidebar-item">
           <ClipboardList size={16} />
           <span>Rosters</span>
+        </Link>
+        <Link to="/collections" onClick={closeSidebar} className="sidebar-item">
+          <Boxes size={16} />
+          <span>{collectionLabel}</span>
         </Link>
         <Link to="/settings" onClick={closeSidebar} className="sidebar-item">
           <Settings size={16} />
