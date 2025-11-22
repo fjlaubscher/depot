@@ -262,6 +262,24 @@ export const mockEnhancement: depot.Enhancement = {
   detachment: 'Gladius Task Force'
 };
 
+export const mockWargearAbility: depot.Ability = {
+  id: 'wargear-ability-1',
+  name: 'Frag Grenades',
+  legend: 'Frag Grenades',
+  factionId: 'SM',
+  description: 'Explosive shrapnel blooms outward.',
+  type: 'Wargear',
+  parameter: ''
+};
+
+export const createMockWargearAbility = (
+  overrides: Partial<depot.Ability> = {}
+): depot.Ability => ({
+  ...mockWargearAbility,
+  ...overrides,
+  id: overrides.id ?? mockWargearAbility.id
+});
+
 export const mockDetachmentAbility: depot.DetachmentAbility = {
   id: 'combat-doctrines',
   name: 'Combat Doctrines',

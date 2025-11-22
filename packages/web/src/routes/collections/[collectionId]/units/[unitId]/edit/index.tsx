@@ -13,11 +13,12 @@ import {
   ErrorState,
   PageHeaderSkeleton,
   SkeletonCard,
-  SelectField
+  SelectField,
+  Tag
 } from '@/components/ui';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
-import { getWargearAbilities } from '@/utils/abilities';
+import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import { COLLECTION_STATE_META, COLLECTION_UNIT_STATES } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
@@ -52,7 +53,9 @@ const CollectionUnitEditView: React.FC = () => {
 
       setSelectedWargear(wargearToSelect);
       setSelectedModelCost(unit.modelCost);
-      setSelectedWargearAbilities(unit.selectedWargearAbilities ?? []);
+      setSelectedWargearAbilities(
+        normalizeSelectedWargearAbilities(unit.selectedWargearAbilities, unit.datasheet.abilities)
+      );
       setState(unit.state ?? 'sprue');
 
       initializedUnitRef.current = unitId;
@@ -238,6 +241,16 @@ const CollectionUnitEditView: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-4">
+          <div className="flex justify-end">
+            <Tag
+              variant={COLLECTION_STATE_META[state].variant}
+              size="sm"
+              data-testid="collection-unit-state-tag"
+            >
+              {COLLECTION_STATE_META[state].label}
+            </Tag>
+          </div>
+
           <Card data-testid="wargear-section">
             <div className="flex flex-col gap-4">
               <h3 className="text-lg font-semibold text-foreground">Wargear</h3>

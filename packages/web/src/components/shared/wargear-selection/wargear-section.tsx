@@ -25,7 +25,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
       data-testid={`${title.toLowerCase().replace(/\s+/g, '-')}-section`}
     >
       <h4 className="text-base font-semibold text-foreground">{title}</h4>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
         {wargear.map((weapon) => (
           <WargearRow
             key={weapon.id}

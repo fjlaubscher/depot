@@ -25,7 +25,7 @@ import WarlordSelection from './_components/warlord-selection';
 import WargearAbilitiesSelection from './_components/wargear-abilities-selection';
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
-import { getWargearAbilities } from '@/utils/abilities';
+import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import { getRosterFactionName } from '@/utils/roster';
 
 const EditRosterUnitView: React.FC = () => {
@@ -76,7 +76,9 @@ const EditRosterUnitView: React.FC = () => {
 
       setSelectedWargear(wargearToSelect);
       setSelectedModelCost(unit.modelCost);
-      setSelectedWargearAbilities(unit.selectedWargearAbilities ?? []);
+      setSelectedWargearAbilities(
+        normalizeSelectedWargearAbilities(unit.selectedWargearAbilities, unit.datasheet.abilities)
+      );
       const unitEnhancements = roster.enhancements
         .filter((e) => e.unitId === unitId)
         .map((e) => e.enhancement.id);
