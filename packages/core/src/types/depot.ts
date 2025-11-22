@@ -223,6 +223,11 @@ export interface RosterUnit {
   datasheet: Datasheet;
   modelCost: ModelCost; // The selected model/unit count and its point cost
   selectedWargear: Wargear[];
+  /**
+   * Selected abilities that are tied to wargear (toggleable per unit).
+   * Optional for backward compatibility with older saved rosters.
+   */
+  selectedWargearAbilities?: Ability[];
   datasheetSlug?: string;
 }
 

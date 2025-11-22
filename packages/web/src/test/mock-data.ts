@@ -404,6 +404,7 @@ export const mockRosterUnit: depot.RosterUnit = {
   datasheet: mockDatasheet,
   modelCost: mockDatasheet.modelCosts[0],
   selectedWargear: [],
+  selectedWargearAbilities: [],
   datasheetSlug: mockDatasheet.slug
 };
 

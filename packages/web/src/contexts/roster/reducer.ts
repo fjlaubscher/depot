@@ -4,6 +4,7 @@ import {
   normalizeDatasheetWargear,
   normalizeSelectedWargear
 } from '@/utils/wargear';
+import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
 import { calculateTotalPoints } from './utils';
@@ -29,6 +30,10 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
             selectedWargear: normalizeSelectedWargear(
               unit.selectedWargear,
               normalizedDatasheet.wargear
+            ),
+            selectedWargearAbilities: normalizeSelectedWargearAbilities(
+              unit.selectedWargearAbilities,
+              normalizedDatasheet.abilities
             ),
             datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
           };
@@ -94,6 +99,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         datasheet: normalizedDatasheet,
         modelCost: action.payload.modelCost,
         selectedWargear: defaultWargear,
+        selectedWargearAbilities: [],
         datasheetSlug: normalizedDatasheet.slug
       };
 
@@ -157,6 +163,25 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         units: state.units.map((unit) =>
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargear: action.payload.wargear }
+            : unit
+        )
+      };
+
+      return {
+        ...updatedState,
+        points: {
+          ...updatedState.points,
+          current: calculateTotalPoints(updatedState)
+        }
+      };
+    }
+
+    case 'UPDATE_UNIT_WARGEAR_ABILITIES': {
+      const updatedState = {
+        ...state,
+        units: state.units.map((unit) =>
+          unit.id === action.payload.rosterUnitId
+            ? { ...unit, selectedWargearAbilities: action.payload.abilities }
             : unit
         )
       };

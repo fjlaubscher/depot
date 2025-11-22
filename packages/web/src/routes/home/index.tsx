@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { Search, Star, Settings, List, Users, ClipboardList } from 'lucide-react';
+import { Search, Star, Settings, List, Users, ClipboardList, Boxes } from 'lucide-react';
 
 import { getImageUrl } from '@/utils/paths';
 
@@ -65,6 +65,13 @@ const actionTiles: Array<{
     testId: 'roster-builder-button'
   },
   {
+    icon: Boxes,
+    title: 'Collections',
+    description: 'Track your pile of shame and prep future lists.',
+    path: '/collections',
+    testId: 'collections-button'
+  },
+  {
     icon: Settings,
     title: 'Settings',
     description: 'Toggle data refreshes, theme, and cache options.',
@@ -114,21 +121,21 @@ const Home: React.FC = () => {
                 </Link>
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            <div className="grid grid-cols-2 grid-rows-2 gap-4">
               {actionTiles.map(({ icon: Icon, title, description, path, testId }) => (
                 <button
                   key={title}
                   type="button"
                   onClick={() => navigate(path)}
                   data-testid={testId}
-                  className="group flex h-full min-h-[150px] cursor-pointer flex-col justify-between rounded-2xl border border-white/15 bg-white/10 p-5 text-left text-white shadow-lg shadow-primary-900/20 transition hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700 dark:bg-gray-900/60 dark:hover:bg-gray-900/50"
+                  className="group flex h-full min-h-[120px] cursor-pointer flex-col justify-between rounded-xl border border-white/15 bg-white/10 p-4 text-left text-white shadow-lg shadow-primary-900/20 transition hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700 dark:bg-gray-900/60 dark:hover:bg-gray-900/50"
                 >
-                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white transition group-hover:bg-white/25">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:bg-white/25">
                     <Icon className="h-6 w-6" />
                   </span>
                   <div className="flex flex-col gap-1">
-                    <span className="text-lg font-semibold">{title}</span>
-                    <span className="text-sm text-white/80">{description}</span>
+                    <span className="text-base font-semibold">{title}</span>
+                    <span className="text-sm text-white/80 leading-snug">{description}</span>
                   </div>
                 </button>
               ))}

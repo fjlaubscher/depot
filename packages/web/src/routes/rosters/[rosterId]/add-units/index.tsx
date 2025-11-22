@@ -37,7 +37,8 @@ const AddRosterUnitsView: FC = () => {
   const {
     datasheets: factionDatasheets,
     loading: datasheetLoading,
-    error: datasheetError
+    error: datasheetError,
+    progress: datasheetProgress
   } = useFactionDatasheets(rosterFactionSlug, factionData?.datasheets);
 
   const {
@@ -171,7 +172,31 @@ const AddRosterUnitsView: FC = () => {
 
       <div className="flex flex-col gap-4">
         {factionLoading || datasheetLoading ? (
-          <DatasheetBrowserSkeleton />
+          <div className="flex flex-col gap-2" data-testid="datasheet-loading">
+            <DatasheetBrowserSkeleton />
+            <div className="rounded border border-subtle bg-muted p-3">
+              <div className="flex items-center justify-between text-sm text-subtle">
+                <span>Loading datasheets</span>
+                <span>
+                  {datasheetProgress.loaded}/{datasheetProgress.total || '…'}
+                </span>
+              </div>
+              <div className="mt-2 h-2 rounded bg-muted">
+                <div
+                  className="h-full rounded bg-primary-500 transition-all"
+                  style={{
+                    width:
+                      datasheetProgress.total > 0
+                        ? `${Math.min(
+                            100,
+                            (datasheetProgress.loaded / datasheetProgress.total) * 100
+                          )}%`
+                        : '10%'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
           <DatasheetBrowser
             datasheets={factionDatasheets}

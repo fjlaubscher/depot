@@ -9,6 +9,10 @@ interface UseFactionDatasheetsResult {
   datasheets: depot.Datasheet[];
   loading: boolean;
   error: string | null;
+  progress: {
+    loaded: number;
+    total: number;
+  };
 }
 
 const useFactionDatasheets = (
@@ -19,6 +23,7 @@ const useFactionDatasheets = (
   const [datasheets, setDatasheets] = useState<depot.Datasheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadedCount, setLoadedCount] = useState(0);
 
   const targets = useMemo(() => {
     if (!datasheetRefs || datasheetRefs.length === 0) {
@@ -40,6 +45,7 @@ const useFactionDatasheets = (
       setDatasheets([]);
       setLoading(false);
       setError(null);
+      setLoadedCount(0);
       return;
     }
 
@@ -48,6 +54,7 @@ const useFactionDatasheets = (
     const loadDatasheets = async () => {
       setLoading(true);
       setError(null);
+      setLoadedCount(0);
 
       try {
         const results: depot.Datasheet[] = [];
@@ -64,6 +71,7 @@ const useFactionDatasheets = (
             throw new Error(`Failed to load datasheet ${target.id}`);
           }
           results.push(sheet);
+          setLoadedCount((count) => count + 1);
           await runNext();
         };
 
@@ -98,7 +106,11 @@ const useFactionDatasheets = (
   return {
     datasheets,
     loading,
-    error
+    error,
+    progress: {
+      loaded: loadedCount,
+      total: targets.length
+    }
   };
 };
 

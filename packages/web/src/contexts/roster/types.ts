@@ -26,6 +26,10 @@ export type RosterAction =
   | { type: 'REMOVE_UNIT'; payload: { rosterUnitId: string } }
   | { type: 'UPDATE_UNIT_WARGEAR'; payload: { rosterUnitId: string; wargear: depot.Wargear[] } }
   | {
+      type: 'UPDATE_UNIT_WARGEAR_ABILITIES';
+      payload: { rosterUnitId: string; abilities: depot.Ability[] };
+    }
+  | {
       type: 'UPDATE_UNIT_MODEL_COST';
       payload: { rosterUnitId: string; modelCost: depot.ModelCost };
     }
@@ -54,6 +58,7 @@ export interface RosterContextValue {
   duplicateUnit: (unit: depot.RosterUnit) => void;
   removeUnit: (rosterUnitId: string) => void;
   updateUnitWargear: (rosterUnitId: string, wargear: depot.Wargear[]) => void;
+  updateUnitWargearAbilities: (rosterUnitId: string, abilities: depot.Ability[]) => void;
   updateUnitModelCost: (rosterUnitId: string, modelCost: depot.ModelCost) => void;
   applyEnhancement: (enhancement: depot.Enhancement, targetUnitId: string) => void;
   removeEnhancement: (enhancementId: string) => void;

@@ -19,6 +19,8 @@ interface DatasheetProfileProps {
   compact?: boolean;
   showLeaderRules?: boolean;
   showWargear?: boolean;
+  additionalAbilities?: depot.Ability[];
+  excludeAbilityTypes?: string[];
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
@@ -27,11 +29,24 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   abilitiesTestId = 'datasheet-abilities',
   compact = false,
   showLeaderRules = true,
-  showWargear = true
+  showWargear = true,
+  additionalAbilities = [],
+  excludeAbilityTypes = []
 }) => {
+  const abilitiesForDisplay = useMemo(() => {
+    const excluded = new Set(excludeAbilityTypes.map((type) => type.toLowerCase()));
+    const baseAbilities = excluded.size
+      ? datasheet.abilities.filter(
+          (ability) => !excluded.has(ability.type?.toLowerCase() ?? '')
+        )
+      : datasheet.abilities;
+
+    return [...baseAbilities, ...additionalAbilities];
+  }, [datasheet.abilities, additionalAbilities, excludeAbilityTypes]);
+
   const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
-    return categorizeAbilities(datasheet.abilities);
-  }, [datasheet.abilities]);
+    return categorizeAbilities(abilitiesForDisplay);
+  }, [abilitiesForDisplay]);
 
   const mergedAbilities = useMemo(
     () => [...coreAbilities, ...inlineAbilities],
@@ -40,7 +55,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
 
   return (
     <div
-      className={`flex flex-col ${compact ? 'gap-2 sm:gap-3' : 'gap-2 sm:gap-4'}`}
+      className={`flex flex-col ${compact ? 'gap-2' : 'gap-2 sm:gap-4'}`}
       data-testid="datasheet-profile"
     >
       {/* Model Stats Rows */}

@@ -148,3 +148,31 @@ export const formatAbilityName = (ability: depot.Ability): string => {
 
   return name;
 };
+
+export const getWargearAbilities = (abilities: depot.Ability[]): depot.Ability[] => {
+  return abilities.filter((ability) => normalizeAbilityType(ability.type) === 'wargear');
+};
+
+export const normalizeSelectedWargearAbilities = (
+  selectedAbilities: depot.Ability[] | undefined,
+  datasheetAbilities: depot.Ability[]
+): depot.Ability[] => {
+  if (!selectedAbilities || selectedAbilities.length === 0) {
+    return [];
+  }
+
+  const wargearAbilities = getWargearAbilities(datasheetAbilities);
+  const availableIds = new Set(wargearAbilities.map((ability) => ability.id));
+  const uniqueAbilities: depot.Ability[] = [];
+
+  selectedAbilities.forEach((ability) => {
+    if (!ability?.id) return;
+    if (!availableIds.has(ability.id)) return;
+    if (uniqueAbilities.some((existing) => existing.id === ability.id)) return;
+
+    const normalized = wargearAbilities.find((available) => available.id === ability.id) ?? ability;
+    uniqueAbilities.push(normalized);
+  });
+
+  return uniqueAbilities;
+};

@@ -11,6 +11,15 @@ import {
   createMockRoster
 } from '@/test/mock-data';
 
+const mockWargearAbility: depot.Ability = {
+  id: 'wg-1',
+  name: 'Relic Blade',
+  legend: '',
+  factionId: 'SM',
+  description: 'When equipped, improves weapon damage.',
+  type: 'Wargear'
+};
+
 describe('rosterReducer', () => {
   it('should return initial state for unknown action', () => {
     const result = rosterReducer(initialState, { type: 'UNKNOWN_ACTION' } as any);
@@ -92,6 +101,37 @@ describe('rosterReducer', () => {
       expect(result.points.current).toBe(90);
       expect(result.points.max).toBe(2000);
     });
+
+    it('normalizes wargear abilities against the datasheet', () => {
+      const datasheetWithWargearAbility = createMockDatasheet({
+        abilities: [
+          ...createMockDatasheet().abilities,
+          mockWargearAbility
+        ]
+      });
+
+      const rosterUnit: depot.RosterUnit = {
+        ...mockRosterUnit,
+        datasheet: datasheetWithWargearAbility,
+        selectedWargearAbilities: [
+          mockWargearAbility,
+          { ...mockWargearAbility, id: 'missing-ability' }
+        ]
+      };
+
+      const action: RosterAction = {
+        type: 'SET_ROSTER',
+        payload: {
+          ...initialState,
+          units: [rosterUnit],
+          enhancements: []
+        }
+      };
+
+      const result = rosterReducer(initialState, action);
+
+      expect(result.units[0].selectedWargearAbilities).toEqual([mockWargearAbility]);
+    });
   });
 
   describe('CREATE_ROSTER', () => {
@@ -170,6 +210,26 @@ describe('rosterReducer', () => {
       const result = rosterReducer(initialState, action);
 
       expect(result.detachment).toEqual(mockDetachment);
+    });
+  });
+
+  describe('UPDATE_UNIT_WARGEAR_ABILITIES', () => {
+    it('updates selected wargear abilities for a unit', () => {
+      const roster = createMockRoster({
+        units: [{ ...mockRosterUnit, selectedWargearAbilities: [] }]
+      });
+
+      const action: RosterAction = {
+        type: 'UPDATE_UNIT_WARGEAR_ABILITIES',
+        payload: {
+          rosterUnitId: mockRosterUnit.id,
+          abilities: [mockWargearAbility]
+        }
+      };
+
+      const result = rosterReducer(roster, action);
+
+      expect(result.units[0].selectedWargearAbilities).toEqual([mockWargearAbility]);
     });
   });
 

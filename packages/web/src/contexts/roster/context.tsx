@@ -113,6 +113,13 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     dispatch({ type: 'UPDATE_UNIT_WARGEAR', payload: { rosterUnitId, wargear } });
   }, []);
 
+  const updateUnitWargearAbilities = useCallback(
+    (rosterUnitId: string, abilities: depot.Ability[]): void => {
+      dispatch({ type: 'UPDATE_UNIT_WARGEAR_ABILITIES', payload: { rosterUnitId, abilities } });
+    },
+    []
+  );
+
   const updateUnitModelCost = useCallback(
     (rosterUnitId: string, modelCost: depot.ModelCost): void => {
       dispatch({ type: 'UPDATE_UNIT_MODEL_COST', payload: { rosterUnitId, modelCost } });
@@ -150,6 +157,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         duplicateUnit,
         removeUnit,
         updateUnitWargear,
+        updateUnitWargearAbilities,
         updateUnitModelCost,
         applyEnhancement,
         removeEnhancement,

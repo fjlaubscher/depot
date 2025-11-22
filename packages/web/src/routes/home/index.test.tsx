@@ -78,6 +78,16 @@ describe('Home', () => {
     expect(screen.getByText(/Toggle data refreshes/i)).toBeInTheDocument();
   });
 
+  it('should render collections action and navigate', async () => {
+    const user = userEvent.setup();
+
+    render(<Home />, { wrapper: TestWrapper });
+
+    expect(screen.getByTestId('collections-button')).toBeInTheDocument();
+    await user.click(screen.getByTestId('collections-button'));
+    expect(mockNavigate).toHaveBeenCalledWith('/collections');
+  });
+
   it('should render app info section', () => {
     render(<Home />, { wrapper: TestWrapper });
 

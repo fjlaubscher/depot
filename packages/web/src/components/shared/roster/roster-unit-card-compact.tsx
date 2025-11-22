@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import type { depot } from '@depot/core';
 import { Card, PointsTag, Tag, TagGroup } from '@/components/ui';
 import { formatWargearDisplayName } from '@/utils/wargear';
+import { formatAbilityName } from '@/utils/abilities';
 
 interface RosterUnitCardCompactProps {
   unit: depot.RosterUnit;
@@ -20,6 +21,9 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
   const wargearToDisplay = unit.selectedWargear.slice(0, 3);
   const remainingWargearCount = unit.selectedWargear.length - wargearToDisplay.length;
+  const wargearAbilities = unit.selectedWargearAbilities ?? [];
+  const wargearAbilitiesToDisplay = wargearAbilities.slice(0, 3);
+  const remainingWargearAbilities = wargearAbilities.length - wargearAbilitiesToDisplay.length;
 
   return (
     <Card
@@ -60,6 +64,28 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
             {remainingWargearCount > 0 ? (
               <Tag variant="default" size="sm">
                 +{remainingWargearCount} more
+              </Tag>
+            ) : null}
+          </TagGroup>
+        </Card.Content>
+      ) : null}
+
+      {wargearAbilities.length > 0 ? (
+        <Card.Content className="pt-0">
+          <TagGroup spacing="sm" className="gap-1">
+            {wargearAbilitiesToDisplay.map((ability, index) => (
+              <Tag
+                key={`compact-wargear-ability-${index}`}
+                variant="warning"
+                size="sm"
+                className="capitalize"
+              >
+                {formatAbilityName(ability).toLowerCase()}
+              </Tag>
+            ))}
+            {remainingWargearAbilities > 0 ? (
+              <Tag variant="default" size="sm">
+                +{remainingWargearAbilities} more
               </Tag>
             ) : null}
           </TagGroup>

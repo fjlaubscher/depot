@@ -1,12 +1,13 @@
 import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
+import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import type { CachedFaction } from '@/types/offline';
 
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 7 // Force cache destroy/rebuild after offline schema changes
+  VERSION: 8 // Force cache destroy/rebuild after offline schema changes
 } as const;
 
 const STORES = {
@@ -42,6 +43,10 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
         selectedWargear: normalizeSelectedWargear(
           unit.selectedWargear,
           normalizedDatasheet.wargear
+        ),
+        selectedWargearAbilities: normalizeSelectedWargearAbilities(
+          unit.selectedWargearAbilities,
+          normalizedDatasheet.abilities
         ),
         datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
       };
