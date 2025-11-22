@@ -249,7 +249,7 @@ export interface Roster {
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
 }
 
-export type CollectionUnitState = 'built' | 'battle ready' | 'parade ready';
+export type CollectionUnitState = 'sprue' | 'built' | 'battle-ready' | 'parade-ready';
 
 export interface CollectionUnit {
   id: string;
