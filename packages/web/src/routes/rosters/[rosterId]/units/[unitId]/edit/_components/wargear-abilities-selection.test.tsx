@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
+import { slugify } from '@depot/core/utils/slug';
 
 import WargearAbilitiesSelection from './wargear-abilities-selection';
 import { TestWrapper } from '@/test/test-utils';
@@ -30,8 +31,10 @@ describe('WargearAbilitiesSelection', () => {
 
     render(<TestComponent />, { wrapper: TestWrapper });
 
-    const firstPill = screen.getByTestId('wargear-ability-pill-ability-1');
-    const secondPill = screen.getByTestId('wargear-ability-pill-ability-2');
+    const firstPillId = `wargear-ability-pill-${slugify('Grenade Volley')}`;
+    const secondPillId = `wargear-ability-pill-${slugify('Armour Piercer')}`;
+    const firstPill = screen.getByTestId(firstPillId);
+    const secondPill = screen.getByTestId(secondPillId);
 
     expect(firstPill).toHaveAttribute('aria-pressed', 'false');
     expect(secondPill).toHaveAttribute('aria-pressed', 'false');
@@ -42,7 +45,7 @@ describe('WargearAbilitiesSelection', () => {
     expect(secondPill).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('renders tags for selected wargear abilities', async () => {
+  it('allows selecting multiple abilities separately', async () => {
     const TestComponent = () => {
       const [selected, setSelected] = React.useState([abilities[0]]);
 
@@ -59,12 +62,17 @@ describe('WargearAbilitiesSelection', () => {
 
     render(<TestComponent />, { wrapper: TestWrapper });
 
-    const tagList = screen.getByTestId('selected-wargear-ability-tags');
-    expect(tagList).toHaveTextContent('Grenade Volley');
-    expect(tagList).not.toHaveTextContent('Armour Piercer');
+    const firstPillId = `wargear-ability-pill-${slugify('Grenade Volley')}`;
+    const secondPillId = `wargear-ability-pill-${slugify('Armour Piercer')}`;
+    const firstPill = screen.getByTestId(firstPillId);
+    const secondPill = screen.getByTestId(secondPillId);
 
-    await user.click(screen.getByTestId('wargear-ability-pill-ability-2'));
+    expect(firstPill).toHaveAttribute('aria-pressed', 'true');
+    expect(secondPill).toHaveAttribute('aria-pressed', 'false');
 
-    expect(screen.getByTestId('selected-wargear-ability-tags')).toHaveTextContent('Armour Piercer');
+    await user.click(secondPill);
+
+    expect(firstPill).toHaveAttribute('aria-pressed', 'true');
+    expect(secondPill).toHaveAttribute('aria-pressed', 'true');
   });
 });

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { Tag } from '@/components/ui';
 
@@ -36,17 +36,15 @@ const WargearRow = ({
           ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'
           : classNames(
               'border-subtle bg-surface text-foreground',
-              isInteractive && 'hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+              isInteractive &&
+                'hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
             )
       )}
       aria-pressed={isSelected}
       data-testid={`wargear-pill-${weapon.id}`}
       disabled={!isInteractive}
     >
-      <span>{weapon.name}</span>
-      <Tag variant="secondary" size="sm" className="uppercase">
-        {weapon.type}
-      </Tag>
+      {weapon.name}
     </button>
   );
 };

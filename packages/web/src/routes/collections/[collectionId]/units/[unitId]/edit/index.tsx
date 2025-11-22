@@ -79,6 +79,8 @@ const CollectionUnitEditView: React.FC = () => {
     [unit?.datasheet.abilities]
   );
 
+  const stateMeta = COLLECTION_STATE_META[state] ?? COLLECTION_STATE_META.sprue;
+
   if (!collectionId) {
     return (
       <AppLayout title="Edit Collection Unit">
@@ -200,6 +202,13 @@ const CollectionUnitEditView: React.FC = () => {
                 value={state}
                 onChange={(e) => setState(e.target.value as depot.CollectionUnitState)}
               />
+              <Tag
+                variant={stateMeta.variant}
+                className="mt-3 self-start"
+                data-testid="collection-unit-state-tag"
+              >
+                {stateMeta.label}
+              </Tag>
             </div>
           </Card>
 
@@ -241,16 +250,6 @@ const CollectionUnitEditView: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="flex justify-end">
-            <Tag
-              variant={COLLECTION_STATE_META[state].variant}
-              size="sm"
-              data-testid="collection-unit-state-tag"
-            >
-              {COLLECTION_STATE_META[state].label}
-            </Tag>
-          </div>
-
           <Card data-testid="wargear-section">
             <div className="flex flex-col gap-4">
               <h3 className="text-lg font-semibold text-foreground">Wargear</h3>

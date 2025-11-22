@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { slugify } from '@depot/core/utils/slug';
 
 import CollectionUnitEditPage from './index';
 import { TestWrapper } from '@/test/test-utils';
@@ -72,6 +73,7 @@ describe('CollectionUnitEditPage', () => {
     render(<CollectionUnitEditPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('collection-unit-state-tag')).toHaveTextContent('Battle Ready');
-    expect(screen.getByTestId('selected-wargear-ability-tags')).toHaveTextContent('Blade Storm');
+    const abilityTestId = `wargear-ability-pill-${slugify('Blade Storm')}`;
+    expect(screen.getByTestId(abilityTestId)).toHaveAttribute('aria-pressed', 'true');
   });
 });

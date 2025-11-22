@@ -31,7 +31,7 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   }
 
   return (
-    <div className={`flex flex-col gap-6 ${className || ''}`} data-testid="wargear-table">
+    <div className={`flex flex-col gap-4 ${className || ''}`} data-testid="wargear-table">
       <WargearSection
         wargear={rangedWargear}
         title="Ranged Wargear"
