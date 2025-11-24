@@ -8,9 +8,20 @@ interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   onChange?: (index: number) => void;
   className?: string;
   children: ReactNode;
+  tabTestIdPrefix?: string;
 }
 
-const Tabs: FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, ...props }) => {
+const slugify = (value: string) => value.toLowerCase().replace(/\s+/g, '-');
+
+const Tabs: FC<TabsProps> = ({
+  tabs,
+  active = 0,
+  onChange,
+  className,
+  children,
+  tabTestIdPrefix,
+  ...props
+}) => {
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
@@ -34,6 +45,7 @@ const Tabs: FC<TabsProps> = ({ tabs, active = 0, onChange, className, children, 
             <button
               key={`tab-${index}`}
               onClick={() => handleTabClick(index)}
+              data-testid={tabTestIdPrefix ? `${tabTestIdPrefix}-${slugify(tab)}` : undefined}
               className={classNames(
                 'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0 cursor-pointer',
                 {

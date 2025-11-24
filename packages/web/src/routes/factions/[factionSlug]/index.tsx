@@ -116,7 +116,12 @@ const Faction: React.FC = () => {
           }}
         />
 
-        <Tabs tabs={['Datasheets', 'Detachments']} active={activeTab} onChange={setActiveTab}>
+        <Tabs
+          tabs={['Datasheets', 'Detachments']}
+          active={activeTab}
+          onChange={setActiveTab}
+          tabTestIdPrefix="faction-tab"
+        >
           <FactionDatasheets datasheets={faction.datasheets} filters={datasheetFilters} />
           <FactionDetachments detachments={faction.detachments} />
         </Tabs>

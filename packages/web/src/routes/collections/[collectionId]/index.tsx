@@ -222,70 +222,68 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         Add Units
       </Button>
 
-      {collection.items.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          <RosterSection
-            title="Units"
-            data-testid="collection-units-section"
-            className="gap-3"
-            headerContent={
-              <div className="flex flex-wrap items-center gap-2">
-                {stateFilters.map((filter) => {
-                  const isActive = filter.state === activeStateFilter;
+      <RosterSection
+        title="Units"
+        data-testid="collection-units-section"
+        className="gap-3"
+        headerContent={
+          <div className="flex flex-wrap items-center gap-2">
+            {stateFilters.map((filter) => {
+              const isActive = filter.state === activeStateFilter;
 
-                  return (
-                    <button
-                      key={`collection-state-${filter.state}`}
-                      type="button"
-                      className={classNames(
-                        'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
-                          : 'border-subtle text-secondary hover:text-foreground hover:border-border'
-                      )}
-                      onClick={() => setPersistedStateFilter(filter.state)}
-                      data-testid={`collection-state-filter-${filter.state}`}
-                    >
-                      <span>{filter.label}</span>
-                      <span
-                        className={classNames(
-                          'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
-                          isActive
-                            ? 'bg-white text-primary-600 dark:text-primary-500'
-                            : 'bg-soft text-muted'
-                        )}
-                      >
-                        {filter.count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            }
-          >
-            <div className="flex flex-col gap-3" data-testid="collection-unit-cards">
-              {filteredItems.map((item) => (
-                <RosterUnitCardEdit
-                  key={item.id}
-                  unit={toRosterUnit(item)}
-                  rosterId={collection.id}
-                  basePath="/collections"
-                  onRemove={handleRemove}
-                  onDuplicate={handleDuplicate}
-                  state={item.state}
-                  dataTestId="collection-unit-card"
-                />
-              ))}
-            </div>
-          </RosterSection>
-        </div>
-      ) : (
-        <RosterEmptyState
-          title="No units in this collection"
-          description="Add units to start tracking your pile"
-          dataTestId="empty-collection-state"
-        />
-      )}
+              return (
+                <button
+                  key={`collection-state-${filter.state}`}
+                  type="button"
+                  className={classNames(
+                    'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
+                      : 'border-subtle text-secondary hover:text-foreground hover:border-border'
+                  )}
+                  onClick={() => setPersistedStateFilter(filter.state)}
+                  data-testid={`collection-state-filter-${filter.state}`}
+                >
+                  <span>{filter.label}</span>
+                  <span
+                    className={classNames(
+                      'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
+                      isActive
+                        ? 'bg-white text-primary-600 dark:text-primary-500'
+                        : 'bg-soft text-muted'
+                    )}
+                  >
+                    {filter.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        }
+      >
+        {filteredItems.length > 0 ? (
+          <div className="flex flex-col gap-3" data-testid="collection-unit-cards">
+            {filteredItems.map((item) => (
+              <RosterUnitCardEdit
+                key={item.id}
+                unit={toRosterUnit(item)}
+                rosterId={collection.id}
+                basePath="/collections"
+                onRemove={handleRemove}
+                onDuplicate={handleDuplicate}
+                state={item.state}
+                dataTestId="collection-unit-card"
+              />
+            ))}
+          </div>
+        ) : (
+          <RosterEmptyState
+            title="No units in this collection"
+            description="Add units to start tracking your pile"
+            dataTestId="empty-collection-state"
+          />
+        )}
+      </RosterSection>
     </div>
   );
 };

@@ -19,7 +19,14 @@ const SettingToggleItem: React.FC<SettingToggleItemProps> = ({
         <div className="text-sm font-medium text-foreground">{title}</div>
         <div className="text-xs text-subtle">{description}</div>
       </div>
-      <ToggleSwitch label="" enabled={enabled} onChange={onChange} size="sm" />
+      <ToggleSwitch
+        label=""
+        ariaLabel={title}
+        testId={`${title.toLowerCase().replace(/\s+/g, '-')}-toggle`}
+        enabled={enabled}
+        onChange={onChange}
+        size="sm"
+      />
     </div>
   );
 };

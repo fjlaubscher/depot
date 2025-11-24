@@ -6,9 +6,10 @@ interface FiltersProps {
   showClear: boolean;
   onClear: () => void;
   className?: string;
+  clearTestId?: string;
 }
 
-const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className }) => (
+const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className, clearTestId }) => (
   <div
     className={classNames(
       'flex flex-col sm:flex-row sm:items-center justify-between gap-4',
@@ -19,6 +20,7 @@ const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className }) 
     {showClear && (
       <button
         onClick={onClear}
+        data-testid={clearTestId}
         className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 font-medium text-sm whitespace-nowrap self-start sm:self-center"
       >
         Clear

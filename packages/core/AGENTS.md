@@ -3,76 +3,40 @@
 Shared TypeScript types + lightweight utilities. This package is the single source of truth for all structures flowing between the CLI and the web app.
 
 ## Key Commands
-
-```bash
-# Build once
-pnpm --filter @depot/core build
-
-# Watch mode
-pnpm --filter @depot/core dev
-
-# Format code
-pnpm --filter @depot/core format
-
-# Lint code
-pnpm --filter @depot/core lint
-
-# Type check
-pnpm --filter @depot/core typecheck
-
-# Clean dist folder
-pnpm --filter @depot/core clean
-```
+- `pnpm --filter @depot/core build` — emit `dist/`
+- `pnpm --filter @depot/core dev` — tsc watch
+- `pnpm --filter @depot/core format` — prettier write
+- `pnpm --filter @depot/core lint` — tsc noEmit + prettier check
+- `pnpm --filter @depot/core typecheck` — type-only check
+- `pnpm --filter @depot/core clean` — remove `dist/`
 
 ## File Structure
+- `src/index.ts` — exports types + utils
+- `src/types/depot.ts` — application-ready types
+- `src/types/wahapedia.ts` — raw Wahapedia CSV types
+- `src/utils/slug.ts` — shared slug helper
+- `src/constants/` — reserved for shared constants
 
-```
-src/
-├── index.ts              # Package exports (types + utils)
-├── types/
-│   ├── depot.ts          # Application-ready types
-│   └── wahapedia.ts      # Raw CSV data types
-├── utils/
-│   └── slug.ts           # Shared slug helper used by CLI/web
-└── constants/            # Any future shared constants live here
-```
+## Type Domains
+- `depot.*` — web-consumption shapes (factions, datasheets, stratagems, enhancements, settings, rosters)
+- `wahapedia.*` — raw CSV schemas as downloaded from Wahapedia
 
-## Type System
+Data flow: `Wahapedia CSV -> wahapedia.* -> CLI processing -> depot.* -> web app`.
 
-### `depot.*` Types
-Application-ready data structures for web consumption:
-- `depot.Faction` - Complete faction with nested data
-- `depot.Datasheet` - Unit cards with abilities, profiles, wargear
-- `depot.Stratagem` - Faction stratagems with CP costs
-- `depot.Enhancement` - Character upgrades
-- `depot.Settings` - User preferences
-
-### `wahapedia.*` Types
-Raw CSV data structure from Wahapedia exports:
-- `wahapedia.Datasheet` - Raw datasheet CSV format
-- `wahapedia.Ability` - Raw ability CSV format
-- `wahapedia.Stratagem` - Raw stratagem CSV format
-
-## Data Flow
-
-```
-Wahapedia CSV → wahapedia.* → CLI processing → depot.* → Web app
-```
-
-## Usage
-
+## Usage Patterns
 ```typescript
 // CLI package
-import { wahapedia, depot } from '@depot/core';
+import type { wahapedia, depot } from '@depot/core';
 
 // Web package
-import { depot } from '@depot/core';
+import type { depot } from '@depot/core';
 
 // Shared utility
 import { slug } from '@depot/core/utils/slug';
 ```
 
 ## Guidelines
-- Treat `types/depot.ts` as canonical—update here first, then propagate to CLI/web.
+- Treat `src/types/depot.ts` as canonical—update here first, then propagate changes to CLI/web.
 - Keep utilities side-effect free and framework agnostic.
-- Prefer type re-exports via `src/index.ts` so consumers can import from `@depot/core` without deep linking.
+- Prefer re-exports via `src/index.ts` so consumers import from `@depot/core` without deep links.
+- Avoid runtime coupling to Node/browser APIs; this package must stay portable.

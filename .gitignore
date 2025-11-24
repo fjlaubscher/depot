@@ -27,3 +27,7 @@ packages/web/public/data/*
 *.tsbuildinfo
 plans
 .claude
+playwright-report/
+playwright/.cache/
+playwright/.auth/
+test-results/

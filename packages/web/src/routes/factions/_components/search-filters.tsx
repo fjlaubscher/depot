@@ -10,8 +10,13 @@ interface SearchFiltersProps {
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({ query, onQueryChange, onClear }) => {
   return (
-    <Filters showClear={!!query} onClear={onClear}>
-      <Search label="Search by name" value={query} onChange={onQueryChange} />
+    <Filters showClear={!!query} onClear={onClear} clearTestId="faction-search-clear">
+      <Search
+        label="Search by name"
+        value={query}
+        onChange={onQueryChange}
+        testId="faction-search"
+      />
     </Filters>
   );
 };

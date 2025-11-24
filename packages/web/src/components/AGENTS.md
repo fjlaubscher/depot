@@ -3,57 +3,29 @@
 Component library organized by reusability and domain specificity. Components lean on Tailwind utility tokens defined in `src/styles/main.css` (e.g., `text-foreground`, `surface-card`, `focus-ring-*`, status palettes).
 
 ## Directory Structure
+- `ui/` — Base UI primitives with no business logic (buttons, cards, alerts, table, layout, search, filters, tags, select, steppers, collapsible sections, dashboards, loaders, page headers, skeletons, tabs, etc.). Exported via `@/components/ui`.
+- `shared/` — Domain-aware components that accept `depot.*` types (e.g., `AbilityModal`, `Datasheet`, `StratagemCard`, `Roster`, wargear components, error boundaries).
+- `shared/roster/` — Roster-focused components for building/editing units and lists.
+- `layout/` — Core application layout components.
+- `logo/` — Branding assets.
 
-### `ui/` - Base UI Components
-Fundamental building blocks with no business logic:
-- Built with Tailwind CSS
-- Dark mode support
-- Accessible by default
-- TypeScript interfaces
-- **Exported via**: `@/components/ui` index file
-- Styling should lean on shared utilities from `src/styles/main.css` before adding raw Tailwind colour classes.
-- When a look & feel repeats, add an `@utility` entry in `styles/main.css` so JSX stays terse.
-
-Key components: `Button`, `Card`, `Alert`, `Table`, `Toast`, `Layout`, `Search`, `Filters`, `Tag`, `SelectField`, `QuantityStepper`, `CollapsibleSection`, `ContentCard`, `DashboardCard`, `ErrorState`, `Field`, `Grid`, `IconButton`, `LinkCard`, `Loader`, `PageHeader`, `PointsTag`, `Skeleton`, `StatCard`, `StatsRow`, `Tabs`, `ToastContainer`, `ToggleSwitch`.
-
-**Recent additions**
-- `LinkCard` supports optional `icon` + `description` props for richer quick links (used on Home favourites).
-- `DashboardCard` slots icons/actions for hero tiles. Use these before crafting bespoke card markup.
-
-### `shared/` - Domain Components
-Reusable components with depot-specific logic:
-- Accept `depot.*` types as props
-- Contain domain rendering logic
-- Reusable across pages
-
-Examples: `AbilityModal`, `ModelStatsRow`, `StratagemCard`, `BackButton`, `Datasheet`, `ErrorBoundary`, `Roster`, `WargearRow`, `WargearSelection`, `WargearTable`.
-
-### `shared/roster/` - Roster Components
-Roster-specific components for building/editing:
-- Handle `depot.Roster` and `depot.RosterUnit` types
-- Shared between roster pages
-- Complex roster business logic
-
-### `layout/` - Layout Components
-Main application layout structure
-
-### `logo/` - Brand Components
-Depot branding and logo assets
+## Styling Guidance
+- Prefer shared utilities from `src/styles/main.css` over raw Tailwind colors.
+- Use flex/grid `gap` for spacing instead of margins wherever possible. Stick to `gap-0.5`, `gap-1`, `gap-2`, `gap-4` (rarely `gap-6`); the same scale applies to padding.
+- When a visual pattern repeats, promote it to an `@utility` entry so JSX stays terse and consistent.
 
 ## File Naming
-- **kebab-case** for directories and files
-- **PascalCase** for component exports
-- Optional `.test.tsx` for unit tests
+- kebab-case filenames/directories, PascalCase exports
+- Optional `.test.tsx` for behavioral components; pure presentational pieces can rely on route-level integration tests
 
 ## Props Pattern
-
 ```typescript
 interface ComponentProps {
-  // Required props first
+  // Required first
   data: depot.SomeType;
   onAction: (id: string) => void;
 
-  // Optional props with defaults
+  // Optional with defaults
   variant?: 'primary' | 'secondary';
   className?: string;
   children?: React.ReactNode;
@@ -61,19 +33,9 @@ interface ComponentProps {
 ```
 
 ## Export Patterns
-
-### UI Components
-```typescript
-// ui/index.ts
-export { default as Button } from './button';
-```
-
-### Shared Components
-```typescript
-import { Datasheet } from '@/components/shared/datasheet';
-import { Roster } from '@/components/shared/roster';
-```
+- UI: re-export via `ui/index.ts`
+- Shared: import directly (`import { Datasheet } from '@/components/shared/datasheet'`)
 
 ## Testing Guidelines
-- UI components live close to `ui/` should include focused tests when they encapsulate behavior (e.g., `search`, `filters`). Pure presentational components can rely on integration tests in routes.
-- Shared components with domain logic (datasheet cards, roster tiles) should have colocated tests validating props handling and rendering edge cases.
+- UI primitives with behavior (search, filters, steppers, complex cards) should have focused tests.
+- Domain components with logic (datasheet/roster cards) need colocated tests covering props handling and edge cases.

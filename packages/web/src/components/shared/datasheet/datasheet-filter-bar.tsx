@@ -10,6 +10,8 @@ interface DatasheetFilterBarProps {
   showClear: boolean;
   className?: string;
   children?: ReactNode;
+  searchTestId?: string;
+  clearTestId?: string;
 }
 
 export const DatasheetFilterBar: FC<DatasheetFilterBarProps> = ({
@@ -19,15 +21,18 @@ export const DatasheetFilterBar: FC<DatasheetFilterBarProps> = ({
   searchPlaceholder,
   showClear,
   className,
-  children
+  children,
+  searchTestId,
+  clearTestId
 }) => (
   <div className={classNames('flex flex-col gap-3', className)}>
-    <Filters showClear={showClear} onClear={onClear}>
+    <Filters showClear={showClear} onClear={onClear} clearTestId={clearTestId}>
       <Search
         label="Search datasheets"
         value={query}
         onChange={onQueryChange}
         placeholder={searchPlaceholder}
+        testId={searchTestId}
       />
       {children}
     </Filters>

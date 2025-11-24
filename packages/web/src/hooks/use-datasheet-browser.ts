@@ -7,6 +7,7 @@ import {
 } from '@/utils/datasheet-filters';
 import { sortByName } from '@/utils/array';
 import useDebounce from './use-debounce';
+import usePersistedTagSelection from './use-persisted-tag-selection';
 
 export type DatasheetFilters = DatasheetVisibilityFilters;
 
@@ -44,7 +45,27 @@ export const useDatasheetBrowser = <T extends DatasheetListItem>(
   initialRole: string | null = null
 ): UseDatasheetBrowserResult<T> => {
   const [query, setQuery] = useState('');
-  const [activeRole, setActiveRole] = useState<string | null>(initialRole);
+  const roleKey = 'datasheet-role-filter';
+  const sentinelAll = initialRole ?? 'all';
+  const {
+    selection: persistedRole,
+    setSelection: setPersistedRole,
+    clearSelection: clearPersistedRole
+  } = usePersistedTagSelection<string>(roleKey, sentinelAll, () => true);
+
+  const [activeRole, setActiveRoleState] = useState<string | null>(
+    persistedRole === 'all' ? null : persistedRole
+  );
+
+  const setActiveRole = (role: string | null) => {
+    const next = role ?? 'all';
+    setActiveRoleState(role);
+    if (next === 'all') {
+      clearPersistedRole();
+    } else {
+      setPersistedRole(next);
+    }
+  };
 
   const debouncedQuery = useDebounce(query, debounceMs);
   const normalizedQuery = normalizeQuery(debouncedQuery);

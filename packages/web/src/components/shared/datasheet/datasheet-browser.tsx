@@ -240,7 +240,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     hasResults,
     totalCount,
     clearFilters
-  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters, 300, initialRole);
+  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters, 300, initialRole ?? null);
 
   const visibleDatasheets = useMemo(() => {
     if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {
@@ -358,6 +358,8 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
           onClear={handleClearFilters}
           searchPlaceholder={searchPlaceholder}
           showClear={showClear}
+          searchTestId="datasheet-search"
+          clearTestId="datasheet-search-clear"
         />
         {supplementSummary ? (
           <span className="text-xs text-subtle" data-testid="supplement-summary">

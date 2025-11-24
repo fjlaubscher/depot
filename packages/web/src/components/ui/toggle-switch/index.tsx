@@ -6,9 +6,18 @@ interface ToggleSwitchProps {
   enabled: boolean;
   onChange: (enabled: boolean) => void;
   size?: 'sm' | 'md' | 'lg';
+  ariaLabel?: string;
+  testId?: string;
 }
 
-const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, enabled, onChange, size = 'md' }) => {
+const ToggleSwitch: FC<ToggleSwitchProps> = ({
+  label,
+  enabled,
+  onChange,
+  size = 'md',
+  ariaLabel,
+  testId
+}) => {
   const sizeClasses = {
     sm: { container: 'h-5 w-9', knob: 'h-4 w-4', translate: 'translate-x-4' },
     md: { container: 'h-6 w-11', knob: 'h-5 w-5', translate: 'translate-x-5' },
@@ -30,6 +39,10 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({ label, enabled, onChange, size = 
             'bg-gray-200 dark:bg-gray-700': !enabled
           }
         )}
+        role="switch"
+        aria-checked={enabled}
+        aria-label={ariaLabel || label}
+        data-testid={testId}
         onClick={() => onChange(!enabled)}
       >
         <span className="sr-only">{label}</span>
