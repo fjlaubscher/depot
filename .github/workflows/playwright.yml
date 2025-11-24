@@ -30,15 +30,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Playwright (workspace)
+        run: pnpm --filter @depot/web exec playwright install --with-deps chromium
+
       - name: Build core + CLI and generate data
         run: |
           pnpm --filter @depot/core build
           pnpm --filter @depot/cli build
           pnpm --filter @depot/cli start
           node scripts/copy-data.mjs
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run Playwright tests
         run: pnpm --filter @depot/web test:e2e
