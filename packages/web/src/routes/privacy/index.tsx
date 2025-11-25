@@ -46,7 +46,12 @@ const PrivacyPolicy = () => (
         <h2 className="text-lg font-semibold text-foreground">Error reporting (Sentry)</h2>
         <p className="text-sm text-body">
           Crash reports are powered by{' '}
-          <a className="underline text-primary-500" href="https://sentry.io" target="_blank">
+          <a
+            className="underline text-primary-500"
+            href="https://sentry.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Sentry
           </a>
           . Error telemetry is only sent when a Sentry DSN is configured in the deployment

@@ -17,6 +17,16 @@ interface AbilityEntry {
   testId: string;
 }
 
+const getAbilityKey = (ability: depot.Ability, index: number) => {
+  const friendlyName =
+    formatAbilityName(ability) ||
+    ability.name ||
+    ability.parameter ||
+    ability.description ||
+    `wargear-ability-${index}`;
+  return slugify(friendlyName);
+};
+
 const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   abilities,
   selected,
@@ -25,13 +35,7 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   const abilityEntries = React.useMemo<AbilityEntry[]>(() => {
     return abilities
       .map((ability, index) => {
-        const friendlyName =
-          formatAbilityName(ability) ||
-          ability.name ||
-          ability.parameter ||
-          ability.description ||
-          `wargear-ability-${index}`;
-        const slugified = slugify(friendlyName);
+        const slugified = getAbilityKey(ability, index);
         if (!slugified) return null;
         return {
           ability,
@@ -47,13 +51,7 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
       new Set(
         selected
           .map((ability, index) => {
-            const friendlyName =
-              formatAbilityName(ability) ||
-              ability.name ||
-              ability.parameter ||
-              ability.description ||
-              `selected-ability-${index}`;
-            return slugify(friendlyName);
+            return getAbilityKey(ability, index);
           })
           .filter(Boolean) as string[]
       ),
@@ -64,13 +62,7 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
     if (selectedKeys.has(entry.key)) {
       onChange(
         selected.filter((ability, index) => {
-          const friendlyName =
-            formatAbilityName(ability) ||
-            ability.name ||
-            ability.parameter ||
-            ability.description ||
-            `selected-ability-${index}`;
-          return slugify(friendlyName) !== entry.key;
+          return getAbilityKey(ability, index) !== entry.key;
         })
       );
       return;

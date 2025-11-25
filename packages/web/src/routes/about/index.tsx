@@ -10,7 +10,7 @@ const About = () => (
       />
 
       <blockquote className="rounded-md border border-primary-500/40 bg-gray-50 p-4 text-sm italic text-gray-800 dark:border-primary-400/40 dark:bg-gray-900/40 dark:text-gray-200">
-        I'm Francois-a passionate software engineer, lifelong hobbyist, and believer in free,
+        I'm Francois — a passionate software engineer, lifelong hobbyist, and believer in free,
         privacy-respecting apps. My first proper army came out of a Catachan Jungle Fighters Battle
         Force back in 4th edition, and I've been tinkering with tools for the grimdark ever since.
         depot exists because I wanted to keep my tech skills sharp by experimenting with new web
