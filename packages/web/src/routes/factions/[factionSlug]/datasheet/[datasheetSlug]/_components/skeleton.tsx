@@ -12,7 +12,7 @@ const PillRow: React.FC = () => (
 
 const DatasheetSkeleton: React.FC = () => {
   return (
-    <AppLayout title="Datasheet">
+    <AppLayout title="Loading Datasheet">
       <div className="flex flex-col gap-4" data-testid="datasheet-loader">
         <UISkeleton width="70%" height={28} className="rounded-md" />
         <UISkeleton width="45%" height={14} className="rounded-md" />

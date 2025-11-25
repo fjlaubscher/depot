@@ -58,7 +58,14 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
 }: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState<string>('all');
 
-  const supplementMetadata = useMemo(() => deriveSupplementMetadata(datasheets), [datasheets]);
+  const metadataDatasets = useMemo(
+    () => filterDatasheetsBySettings(datasheets, filters),
+    [datasheets, filters]
+  );
+  const supplementMetadata = useMemo(
+    () => deriveSupplementMetadata(metadataDatasets),
+    [metadataDatasets]
+  );
   const normalizedSelectedSupplement = useMemo(
     () => normalizeSupplementValue(selectedSupplement || 'all'),
     [selectedSupplement]

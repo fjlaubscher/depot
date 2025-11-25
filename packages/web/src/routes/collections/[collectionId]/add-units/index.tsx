@@ -18,6 +18,7 @@ import useCollection from '@/hooks/use-collection';
 import useFaction from '@/hooks/use-faction';
 import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { calculateCollectionPoints, createCollectionUnitFromDatasheet } from '@/utils/collection';
 import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
@@ -112,6 +113,11 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     }),
     [collection]
   );
+
+  const pageTitle = collection
+    ? `${collection.name} - Add Collection Units`
+    : 'Add Collection Units';
+  useDocumentTitle(pageTitle);
 
   if (loading) {
     return <Loader />;
@@ -258,7 +264,7 @@ const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
 
   return (
-    <AppLayout title="Add Units">
+    <AppLayout title="Add Units to Collection">
       <AddCollectionUnitsView collectionId={collectionId} />
     </AppLayout>
   );

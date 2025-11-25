@@ -1,9 +1,10 @@
 import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Eye, Plus } from 'lucide-react';
+import { Eye, Plus, Pencil } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
@@ -12,7 +13,8 @@ import {
   RosterHeader,
   RosterSection,
   RosterUnitCardEdit,
-  RosterEmptyState
+  RosterEmptyState,
+  RosterUnitGrid
 } from '@/components/shared/roster';
 import { getRosterFactionName, groupRosterUnitsByRole } from '@/utils/roster';
 
@@ -22,6 +24,8 @@ const RosterEdit: FC = () => {
 
   const groupedUnits = groupRosterUnitsByRole(roster.units);
   const roleKeys = Object.keys(groupedUnits).sort();
+
+  useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
 
   if (!roster.id) {
     return <Loader />;
@@ -36,6 +40,10 @@ const RosterEdit: FC = () => {
 
   const handleViewRoster = () => {
     navigate(`/rosters/${roster.id}`);
+  };
+
+  const handleEditDetails = () => {
+    navigate(`/rosters/${roster.id}/details`);
   };
 
   const handleAddUnits = () => {
@@ -61,20 +69,33 @@ const RosterEdit: FC = () => {
         subtitle={subtitle}
         stats={<RosterHeader roster={roster} />}
         action={{
-          icon: <Eye size={16} />,
-          onClick: handleViewRoster,
-          ariaLabel: 'View roster'
+          icon: <Pencil size={16} />,
+          onClick: handleEditDetails,
+          ariaLabel: 'Edit roster details'
         }}
       />
 
-      <Button
-        onClick={handleAddUnits}
-        className="w-full flex items-center gap-2"
-        data-testid="add-units-button"
-      >
-        <Plus size={16} />
-        Add Units
-      </Button>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-4">
+          <Button
+            onClick={handleAddUnits}
+            className="flex items-center gap-2"
+            data-testid="add-units-button"
+          >
+            <Plus size={16} />
+            Add Units
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleViewRoster}
+            className="flex items-center gap-2"
+            data-testid="view-roster-button"
+          >
+            <Eye size={16} />
+            View Roster
+          </Button>
+        </div>
+      </div>
 
       {/* Units List */}
       {roster.units.length > 0 ? (
@@ -85,15 +106,17 @@ const RosterEdit: FC = () => {
               title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
               data-testid="unit-role-section"
             >
-              {groupedUnits[role].map((unit) => (
-                <RosterUnitCardEdit
-                  key={unit.id}
-                  unit={unit}
-                  rosterId={roster.id}
-                  onRemove={removeUnit}
-                  onDuplicate={duplicateUnit}
-                />
-              ))}
+              <RosterUnitGrid>
+                {groupedUnits[role].map((unit) => (
+                  <RosterUnitCardEdit
+                    key={unit.id}
+                    unit={unit}
+                    rosterId={roster.id}
+                    onRemove={removeUnit}
+                    onDuplicate={duplicateUnit}
+                  />
+                ))}
+              </RosterUnitGrid>
             </RosterSection>
           ))}
         </div>
@@ -112,7 +135,7 @@ const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Roster">
+    <AppLayout title="Manage Roster Units">
       <RosterProvider rosterId={rosterId}>
         <RosterEdit />
       </RosterProvider>

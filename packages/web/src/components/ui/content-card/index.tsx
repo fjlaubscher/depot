@@ -22,6 +22,7 @@ interface ContentCardProps {
   title: string;
   subtitle?: string;
   legend?: string;
+  titleClassName?: string;
   badges?: Badge[];
   actions?: ReactNode;
   expandable?: boolean;
@@ -29,6 +30,7 @@ interface ContentCardProps {
   children?: ReactNode;
   className?: string;
   padding?: 'sm' | 'md' | 'lg';
+  contentGap?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
   'data-testid'?: string;
 }
@@ -37,6 +39,7 @@ export const ContentCard: FC<ContentCardProps> = ({
   title,
   subtitle,
   legend,
+  titleClassName,
   badges,
   actions,
   expandable = false,
@@ -44,10 +47,12 @@ export const ContentCard: FC<ContentCardProps> = ({
   children,
   className,
   padding = 'md',
+  contentGap = 'md',
   onClick,
   'data-testid': dataTestId
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const gapClass = contentGap === 'lg' ? 'gap-4' : 'gap-2';
 
   const handleToggleExpand = () => {
     if (expandable) {
@@ -63,10 +68,10 @@ export const ContentCard: FC<ContentCardProps> = ({
       onClick={onClick}
       data-testid={dataTestId}
     >
-      <div className="flex flex-col gap-3">
+      <div className={classNames('flex flex-col', gapClass)}>
         <Card.Header className="gap-4">
           <div className="min-w-0 flex-1">
-            <Card.Title className="truncate">{title}</Card.Title>
+            <Card.Title className={classNames('truncate', titleClassName)}>{title}</Card.Title>
             {subtitle ? <Card.Subtitle>{subtitle}</Card.Subtitle> : null}
           </div>
 

@@ -41,7 +41,7 @@ const Settings = () => {
   }, [clearOfflineData, showToast]);
 
   return (
-    <AppLayout title="Settings">
+    <AppLayout title="Settings & Preferences">
       <div className="flex flex-col gap-4">
         <PageHeader
           title="Settings"

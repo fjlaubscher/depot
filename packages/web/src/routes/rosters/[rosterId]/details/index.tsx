@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState, type FC, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Eye, List } from 'lucide-react';
+import { Save } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useFaction from '@/hooks/use-faction';
 
@@ -33,6 +34,7 @@ const RosterDetailsContent: FC = () => {
   const [name, setName] = useState('');
   const [selectedDetachment, setSelectedDetachment] = useState('');
   const [maxPoints, setMaxPoints] = useState(2000);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     if (roster.id) {
@@ -55,16 +57,15 @@ const RosterDetailsContent: FC = () => {
 
   const isLoading = !roster.id || (!faction && factionLoading);
 
+  const pageTitle = roster.name ? `${roster.name} - Roster Details` : 'Roster Details';
+  useDocumentTitle(pageTitle);
+
   if (isLoading) {
     return <Loader />;
   }
 
   const handleViewRoster = () => {
     navigate(`/rosters/${roster.id}`);
-  };
-
-  const handleManageUnits = () => {
-    navigate(`/rosters/${roster.id}/edit`);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -121,6 +122,8 @@ const RosterDetailsContent: FC = () => {
       title: 'Roster Updated',
       message: 'Roster details have been saved.'
     });
+
+    navigate(`/rosters/${roster.id}/edit`);
   };
 
   const subtitle = roster.detachment?.name
@@ -148,24 +151,16 @@ const RosterDetailsContent: FC = () => {
         subtitle={subtitle}
         stats={<RosterHeader roster={roster} />}
         action={{
-          icon: <Eye size={16} />,
-          onClick: handleViewRoster,
-          ariaLabel: 'View roster'
+          icon: <Save size={16} />,
+          onClick: () => formRef.current?.requestSubmit(),
+          ariaLabel: 'Save roster details',
+          disabled: saveDisabled
         }}
       />
 
-      <Button
-        onClick={handleManageUnits}
-        variant="secondary"
-        className="flex items-center justify-center gap-2"
-        data-testid="manage-units-button"
-      >
-        <List size={16} />
-        Manage Units
-      </Button>
-
       <Card>
         <form
+          ref={formRef}
           className="flex flex-col gap-4"
           onSubmit={handleSubmit}
           data-testid="roster-details-form"
@@ -219,17 +214,18 @@ const RosterDetailsContent: FC = () => {
             onChange={setMaxPoints}
             data-testid="max-points-field"
           />
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button type="button" variant="secondary" onClick={handleViewRoster}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saveDisabled} data-testid="save-roster-details">
-              Save Changes
-            </Button>
-          </div>
         </form>
       </Card>
+
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={handleViewRoster}
+        className="flex items-center justify-center gap-2"
+        data-testid="cancel-roster-details"
+      >
+        Cancel
+      </Button>
     </div>
   );
 };
@@ -238,7 +234,7 @@ const RosterDetailsPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Edit Roster">
+    <AppLayout title="Roster Details">
       <RosterProvider rosterId={rosterId}>
         <RosterDetailsContent />
       </RosterProvider>

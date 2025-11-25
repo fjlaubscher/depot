@@ -11,9 +11,10 @@ import {
   RosterSection,
   RosterUnitCardEdit,
   RosterEmptyState,
-  RosterHeader
+  RosterUnitGrid
 } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import {
   COLLECTION_STATE_META,
@@ -105,10 +106,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     datasheetSlug: item.datasheetSlug
   });
 
-  const rosterLike: { points: { current: number } } = {
-    points: { current: points }
-  };
-
   const filteredItems = useMemo(() => {
     if (!collection) {
       return [] as depot.CollectionUnit[];
@@ -164,6 +161,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     }
   };
 
+  const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
+  useDocumentTitle(pageTitle);
+
   if (loading) {
     return (
       <div className="flex flex-col gap-4">
@@ -180,9 +180,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     );
   }
 
-  const subtitle = `${collection.items.length} unit${collection.items.length === 1 ? '' : 's'} - ${
-    collection.faction?.name || collection.factionSlug
-  }`;
+  const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
+  const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
+  const totalUnits = collection.items.length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -202,31 +202,34 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         />
       </div>
 
-      <PageHeader
-        title={collection.name}
-        subtitle={subtitle}
-        stats={<RosterHeader roster={rosterLike} showEnhancements={false} />}
-        action={{
-          icon: <ClipboardPlus size={16} />,
-          onClick: handleCreateRoster,
-          ariaLabel: 'Create roster from collection'
-        }}
-      />
+      <PageHeader title={collection.name} subtitle={subtitle} />
 
-      <Button
-        onClick={handleAddUnits}
-        className="w-full flex items-center gap-2"
-        data-testid="add-collection-units-button"
-      >
-        <Plus size={16} />
-        Add Units
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        <Button
+          onClick={handleAddUnits}
+          variant="secondary"
+          className="flex items-center gap-2"
+          data-testid="add-collection-units-button"
+        >
+          <Plus size={16} />
+          Add Units
+        </Button>
+        <Button
+          onClick={handleCreateRoster}
+          variant="secondary"
+          className="flex items-center gap-2"
+          data-testid="create-roster-from-collection-button"
+        >
+          <ClipboardPlus size={16} />
+          Create Roster
+        </Button>
+      </div>
 
       <RosterSection
-        title="Units"
+        title={`Units (${totalUnits})`}
         data-testid="collection-units-section"
-        className="gap-3"
-        headerContent={
+        className="gap-4"
+        belowContent={
           <div className="flex flex-wrap items-center gap-2">
             {stateFilters.map((filter) => {
               const isActive = filter.state === activeStateFilter;
@@ -262,7 +265,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         }
       >
         {filteredItems.length > 0 ? (
-          <div className="flex flex-col gap-3" data-testid="collection-unit-cards">
+          <RosterUnitGrid data-testid="collection-unit-cards">
             {filteredItems.map((item) => (
               <RosterUnitCardEdit
                 key={item.id}
@@ -275,7 +278,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
                 dataTestId="collection-unit-card"
               />
             ))}
-          </div>
+          </RosterUnitGrid>
         ) : (
           <RosterEmptyState
             title="No units in this collection"
@@ -292,7 +295,7 @@ const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
 
   return (
-    <AppLayout title="Collection">
+    <AppLayout title="Collection Overview">
       <CollectionPageContent collectionId={collectionId} />
     </AppLayout>
   );

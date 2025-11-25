@@ -20,6 +20,7 @@ import {
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const RosterView: FC = () => {
   const { state: roster } = useRoster();
@@ -37,14 +38,6 @@ const RosterView: FC = () => {
   const useNativeShare = appState.settings?.useNativeShare ?? true;
   const canUseNativeShare =
     useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
-  const shareText = useMemo(
-    () =>
-      generateRosterShareText(roster, factionName, {
-        includeWargear: includeWargearOnExport
-      }),
-    [factionName, includeWargearOnExport, roster]
-  );
-
   const handleExportMarkdown = () => {
     const markdown = generateRosterMarkdown(roster, factionName, {
       includeWargear: includeWargearOnExport
@@ -59,25 +52,14 @@ const RosterView: FC = () => {
     showToast({ title: 'Roster exported', type: 'success' });
   };
 
-  const handleShareRoster = async () => {
-    if (useNativeShare && navigator.share) {
-      try {
-        await navigator.share({
-          title: roster.name,
-          text: shareText
-        });
-        showToast({ title: 'Roster shared', type: 'success' });
-      } catch (err) {
-        await copyToClipboard(shareText);
-      }
-    } else {
-      await copyToClipboard(shareText);
-    }
-  };
-
-  const handleCopyRoster = async () => {
-    await copyToClipboard(shareText);
-  };
+  const shareText = useMemo(
+    () =>
+      generateRosterShareText(roster, factionName, {
+        includeWargear: includeWargearOnExport,
+        includeWargearAbilities: includeWargearOnExport
+      }),
+    [factionName, includeWargearOnExport, roster]
+  );
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -87,6 +69,26 @@ const RosterView: FC = () => {
       showToast({ title: 'Failed to copy', type: 'error' });
     }
   };
+
+  const handleShareRoster = async () => {
+    if (canUseNativeShare) {
+      try {
+        await navigator.share({
+          title: roster.name,
+          text: shareText
+        });
+        showToast({ title: 'Roster shared', type: 'success' });
+        return;
+      } catch {
+        // fall through to copy
+      }
+    }
+
+    await copyToClipboard(shareText);
+  };
+
+  const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
+  useDocumentTitle(pageTitle);
 
   if (!roster.id) {
     return <Loader />;
@@ -144,10 +146,10 @@ const RosterView: FC = () => {
         subtitle={subtitle}
         stats={<RosterHeader roster={roster} />}
         action={{
-          icon: <Pencil size={16} />,
-          onClick: () => navigate(`/rosters/${roster.id}/details`),
-          ariaLabel: 'Edit roster details',
-          testId: 'edit-roster-button'
+          icon: canUseNativeShare ? <Share size={16} /> : <Copy size={16} />,
+          onClick: () => void handleShareRoster(),
+          ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
+          testId: 'share-roster-button'
         }}
       />
 
@@ -160,8 +162,8 @@ const RosterView: FC = () => {
             className="flex items-center gap-2"
             data-testid="manage-units-button"
           >
-            <List size={16} />
-            Manage Units
+            <Pencil size={16} />
+            Edit
           </Button>
           <Button
             variant="secondary"
@@ -172,27 +174,6 @@ const RosterView: FC = () => {
             <Download size={16} />
             Export
           </Button>
-          {canUseNativeShare ? (
-            <Button
-              variant="secondary"
-              onClick={handleShareRoster}
-              className="flex items-center gap-2"
-              data-testid="share-button"
-            >
-              <Share size={16} />
-              Share
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              onClick={handleCopyRoster}
-              className="flex items-center gap-2"
-              data-testid="copy-button"
-            >
-              <Copy size={16} />
-              Copy
-            </Button>
-          )}
         </div>
         <p className="text-xs text-subtle">
           Exports and sharing follow your Settings preferences (wargear visibility, sharing method).
@@ -213,7 +194,7 @@ const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Roster">
+    <AppLayout title="Roster Overview">
       <RosterProvider rosterId={rosterId}>
         <RosterView />
       </RosterProvider>

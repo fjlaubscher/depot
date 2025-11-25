@@ -179,11 +179,11 @@ describe('EditRosterPage', () => {
     expect(screen.getByText('Space Marines • Gladius Task Force')).toBeInTheDocument();
   });
 
-  it('renders page header with view and add units actions', () => {
+  it('renders page header with edit action', () => {
     render(<EditRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('page-header')).toBeInTheDocument();
-    expect(screen.getByLabelText('View roster')).toBeInTheDocument();
+    expect(screen.getByLabelText('Edit roster details')).toBeInTheDocument();
   });
 
   it('renders mobile back button', () => {
@@ -208,6 +208,7 @@ describe('EditRosterPage', () => {
     render(<EditRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('add-units-button')).toBeInTheDocument();
+    expect(screen.getByTestId('view-roster-button')).toBeInTheDocument();
   });
 
   it('handles unit duplication correctly', () => {

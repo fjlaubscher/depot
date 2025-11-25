@@ -59,7 +59,7 @@ const Factions: React.FC = () => {
   }
 
   return (
-    <AppLayout title="Factions">
+    <AppLayout title="Browse Factions">
       <div className="flex flex-col gap-4">
         <PageHeader
           title="Factions"

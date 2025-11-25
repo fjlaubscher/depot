@@ -19,7 +19,7 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
   const { sidebarOpen } = state;
 
   // Set document title
-  useDocumentTitle(`${title} | depot`);
+  useDocumentTitle(title);
 
   // Close sidebar when resizing to desktop on mobile
   useEffect(() => {
