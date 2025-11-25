@@ -75,8 +75,10 @@ const DatasheetPage: FC = () => {
     );
   }
 
+  const pageTitle = `${datasheet.name} - ${faction.name}`;
+
   return (
-    <AppLayout title="Datasheet">
+    <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
         <BackButton
           to={`/faction/${faction.slug}`}

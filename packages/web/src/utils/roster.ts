@@ -147,6 +147,7 @@ export const generateRosterMarkdown = (
 
 interface GenerateRosterShareTextOptions {
   includeWargear?: boolean;
+  includeWargearAbilities?: boolean;
 }
 
 export const generateRosterShareText = (
@@ -154,7 +155,8 @@ export const generateRosterShareText = (
   factionName?: string,
   options: GenerateRosterShareTextOptions = {}
 ): string => {
-  const { includeWargear = false } = options;
+  const includeWargear = options.includeWargear ?? false;
+  const includeWargearAbilities = options.includeWargearAbilities ?? includeWargear;
   const lines: string[] = [];
 
   // Title (no heading syntax)
@@ -192,7 +194,7 @@ export const generateRosterShareText = (
           lines.push(`  - ${formatWargearDisplayName(wargear)}`);
         });
       }
-      if (includeWargear && unit.selectedWargearAbilities?.length) {
+      if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
         unit.selectedWargearAbilities.forEach((ability) => {
           lines.push(`  - [Wargear Ability] ${formatAbilityName(ability)}`);
         });

@@ -36,14 +36,6 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
     return matched ?? datasheet.modelCosts[0];
   }, [datasheet.modelCosts, selectedCostLine]);
 
-  const count = useMemo(() => {
-    if (!selectedModelCost) {
-      return 0;
-    }
-
-    return getUnitCount(datasheet, selectedModelCost);
-  }, [datasheet, selectedModelCost, getUnitCount]);
-
   const factionKeywords = useMemo(() => {
     return groupKeywords(datasheet.keywords).faction;
   }, [datasheet.keywords]);
@@ -59,22 +51,13 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
       title={datasheet.name}
       actions={selectedModelCost ? <PointsTag points={selectedModelCost.cost} /> : undefined}
       padding="sm"
+      contentGap="sm"
+      titleClassName="text-base md:text-lg"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-col gap-2">
-          {datasheet.modelCosts.length > 1 ? (
-            <SelectField
-              fullWidth={false}
-              className="max-w-xs md:max-w-sm"
-              options={modelCostOptions}
-              value={selectedModelCost?.line ?? ''}
-              onChange={(event) => setSelectedCostLine(event.target.value)}
-              aria-label={`Select ${datasheet.name} loadout`}
-            />
-          ) : null}
-
+      <div className="flex h-full flex-col gap-2 text-sm md:text-base">
+        <div className="flex min-w-0 flex-col gap-1">
           {(datasheet.isLegends || datasheet.isForgeWorld) && (
-            <div className="flex flex-wrap gap-2 w-fit self-start">
+            <div className="flex w-fit flex-wrap gap-2 self-start">
               {datasheet.isLegends ? (
                 <Tag size="sm" variant="warning">
                   Warhammer Legends
@@ -88,10 +71,10 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
             </div>
           )}
 
-          {factionKeywords.length > 0 ? (
+          {factionKeywords.length > 1 ? (
             <div className="flex flex-wrap gap-2" data-testid="faction-keywords">
               {factionKeywords.map((keyword) => (
-                <Tag key={keyword} size="sm" variant="primary">
+                <Tag key={keyword} size="sm" variant="secondary">
                   {keyword}
                 </Tag>
               ))}
@@ -99,10 +82,23 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           ) : null}
         </div>
 
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="accent" onClick={handleAdd} disabled={!selectedModelCost}>
-            Add
-          </Button>
+        <div className="mt-auto flex flex-wrap items-center gap-2">
+          {datasheet.modelCosts.length > 1 ? (
+            <SelectField
+              fullWidth={false}
+              className="max-w-xs md:max-w-sm"
+              options={modelCostOptions}
+              value={selectedModelCost?.line ?? ''}
+              onChange={(event) => setSelectedCostLine(event.target.value)}
+              aria-label={`Select ${datasheet.name} loadout`}
+            />
+          ) : null}
+
+          <div className="ml-auto">
+            <Button size="sm" variant="accent" onClick={handleAdd} disabled={!selectedModelCost}>
+              Add
+            </Button>
+          </div>
         </div>
       </div>
     </ContentCard>

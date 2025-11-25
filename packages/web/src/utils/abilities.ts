@@ -1,4 +1,5 @@
 import { wargear, type depot } from '@depot/core';
+import { slugify } from '@depot/core/utils/slug';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
@@ -162,16 +163,44 @@ export const normalizeSelectedWargearAbilities = (
   }
 
   const wargearAbilities = getWargearAbilities(datasheetAbilities);
-  const availableIds = new Set(wargearAbilities.map((ability) => ability.id));
+  const availableIds = new Set(wargearAbilities.map((ability) => ability.id).filter(Boolean));
+  const availableBySlug = new Map(
+    wargearAbilities
+      .map(
+        (ability) => [slugify(formatAbilityName(ability) || ability.name || ''), ability] as const
+      )
+      .filter(([slug]) => Boolean(slug))
+  );
   const uniqueAbilities: depot.Ability[] = [];
 
   selectedAbilities.forEach((ability) => {
-    if (!ability?.id) return;
-    if (!availableIds.has(ability.id)) return;
-    if (uniqueAbilities.some((existing) => existing.id === ability.id)) return;
+    if (!ability) return;
+    const abilityId = ability.id;
+    const abilitySlug = slugify(formatAbilityName(ability) || ability.name || '');
 
-    const normalized = wargearAbilities.find((available) => available.id === ability.id) ?? ability;
-    uniqueAbilities.push(normalized);
+    let normalized: depot.Ability | null = null;
+
+    if (abilityId && availableIds.has(abilityId)) {
+      if (uniqueAbilities.some((existing) => existing.id === abilityId)) return;
+      normalized = wargearAbilities.find((available) => available.id === abilityId) ?? ability;
+    } else if (abilitySlug && availableBySlug.has(abilitySlug)) {
+      if (
+        uniqueAbilities.some(
+          (existing) => slugify(formatAbilityName(existing) || existing.name || '') === abilitySlug
+        )
+      ) {
+        return;
+      }
+      normalized = availableBySlug.get(abilitySlug) ?? ability;
+    }
+
+    if (normalized) {
+      // Ensure we persist an id for later normalization
+      if (!normalized.id && abilitySlug) {
+        normalized = { ...normalized, id: abilitySlug };
+      }
+      uniqueAbilities.push(normalized);
+    }
   });
 
   return uniqueAbilities;

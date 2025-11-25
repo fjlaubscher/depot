@@ -69,9 +69,13 @@ const CollectionNewRoster: React.FC = () => {
     navigate(`/rosters/create?fromCollection=${collection.id}`);
   };
 
+  const pageTitle = collection
+    ? `${collection.name} - Build Roster`
+    : 'Build Roster from Collection';
+
   if (loading) {
     return (
-      <AppLayout title="Create Roster">
+      <AppLayout title={pageTitle}>
         <div className="flex flex-col gap-4">
           <Loader />
         </div>
@@ -81,7 +85,7 @@ const CollectionNewRoster: React.FC = () => {
 
   if (error || !collection) {
     return (
-      <AppLayout title="Create Roster">
+      <AppLayout title={pageTitle}>
         <Card>
           <p className="text-sm text-danger-600">Unable to load collection.</p>
         </Card>
@@ -97,7 +101,7 @@ const CollectionNewRoster: React.FC = () => {
   const selectedCount = selectedIds.size;
 
   return (
-    <AppLayout title="Create Roster">
+    <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
         <BackButton to={`/collections/${collection.id}`} label="Back" className="md:hidden" />
 

@@ -19,11 +19,12 @@ describe('generateRosterShareText', () => {
     enhancements: [{ enhancement: mockEnhancement, unitId: unit.id }]
   });
 
-  it('excludes wargear by default', () => {
+  it('excludes wargear and wargear abilities by default', () => {
     const shareText = generateRosterShareText(roster, 'Test Faction');
 
     expect(shareText).toContain('- Captain - Captain (80 pts)');
     expect(shareText).not.toContain('Bolt pistol');
+    expect(shareText).not.toContain('[Wargear Ability]');
     expect(shareText).toContain(`${window.location.origin}/`);
     expect(shareText).toContain(`  - [Enhancement] ${mockEnhancement.name} (10 pts)`);
     expect(shareText).not.toContain('*Enhancements*');
@@ -36,6 +37,56 @@ describe('generateRosterShareText', () => {
 
     expect(shareText).toContain(formatWargearDisplayName(wargearSelection[0]));
     expect(shareText).toContain(`  - [Enhancement] ${mockEnhancement.name} (10 pts)`);
+  });
+
+  it('includes wargear abilities when enabled', () => {
+    const abilityRoster = createMockRoster({
+      units: [
+        createMockRosterUnit({
+          selectedWargearAbilities: [
+            {
+              id: 'wa-1',
+              name: 'Test Ability',
+              description: 'Adds extra attacks',
+              legend: '',
+              type: 'Wargear',
+              factionId: 'test'
+            }
+          ]
+        })
+      ]
+    });
+
+    const shareText = generateRosterShareText(abilityRoster, 'Test Faction', {
+      includeWargearAbilities: true
+    });
+
+    expect(shareText).toContain('[Wargear Ability] Test Ability');
+  });
+
+  it('includes wargear abilities when wargear sharing is enabled', () => {
+    const abilityRoster = createMockRoster({
+      units: [
+        createMockRosterUnit({
+          selectedWargearAbilities: [
+            {
+              id: 'wa-1',
+              name: 'Test Ability',
+              description: 'Adds extra attacks',
+              legend: '',
+              type: 'Wargear',
+              factionId: 'test'
+            }
+          ]
+        })
+      ]
+    });
+
+    const shareText = generateRosterShareText(abilityRoster, 'Test Faction', {
+      includeWargear: true
+    });
+
+    expect(shareText).toContain('[Wargear Ability] Test Ability');
   });
 
   it('marks the warlord in the exported text', () => {

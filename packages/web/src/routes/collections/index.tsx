@@ -7,7 +7,7 @@ import { useCollections } from '@/hooks/use-collections';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, Button, Loader, ErrorState } from '@/components/ui';
+import { PageHeader, Card, Button, Loader, ErrorState, Alert } from '@/components/ui';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@/utils/collection';
 import CollectionCard from './_components/collection-card';
@@ -19,6 +19,7 @@ const CollectionsPage: React.FC = () => {
   const { showToast } = useToast();
   const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
+  const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
 
   const handleCreate = () => navigate('/collections/create');
 
@@ -70,7 +71,7 @@ const CollectionsPage: React.FC = () => {
   };
 
   return (
-    <AppLayout title={label}>
+    <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
         <PageHeader
           title={label}
@@ -82,6 +83,11 @@ const CollectionsPage: React.FC = () => {
             testId: 'create-collection-button'
           }}
         />
+
+        <Alert variant="warning" title="Work in progress">
+          This collection experience is still evolving, so expect layouts, counts, or features to
+          shift as work continues. Feedback is very welcome!
+        </Alert>
 
         {loading ? (
           <div className="flex justify-center py-8">

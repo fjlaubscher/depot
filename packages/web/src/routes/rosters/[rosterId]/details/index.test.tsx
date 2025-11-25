@@ -138,7 +138,7 @@ describe('RosterDetailsPage', () => {
     await user.selectOptions(screen.getByTestId('detachment-select-select'), 'ironstorm-spearhead');
     await user.selectOptions(screen.getByTestId('max-points-field-select'), 'incursion');
 
-    await user.click(screen.getByTestId('save-roster-details'));
+    await user.click(screen.getByLabelText('Save roster details'));
 
     expect(mockUpdateRosterDetails).toHaveBeenCalledWith({
       name: 'Updated Name',
@@ -166,6 +166,6 @@ describe('RosterDetailsPage', () => {
       message: 'Please enter a roster name.'
     });
     expect(mockUpdateRosterDetails).not.toHaveBeenCalled();
-    expect(screen.getByTestId('save-roster-details')).toBeDisabled();
+    expect(screen.getByLabelText('Save roster details')).toBeDisabled();
   });
 });

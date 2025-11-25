@@ -52,7 +52,6 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           <PointsTag points={unitPoints} className="whitespace-nowrap" />
-          {actions ? <div className="flex items-center gap-1">{actions}</div> : null}
         </div>
       </Card.Header>
 
@@ -102,11 +101,16 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
 
       {children ? <Card.Content separated>{children}</Card.Content> : null}
 
-      {stateMeta ? (
-        <Card.Footer>
-          <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
-            {stateMeta.label}
-          </Tag>
+      {stateMeta || actions ? (
+        <Card.Footer className="flex items-center justify-between gap-2">
+          <div className="flex flex-1 items-center gap-2">
+            {stateMeta ? (
+              <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
+                {stateMeta.label}
+              </Tag>
+            ) : null}
+          </div>
+          {actions ? <div className="flex items-center gap-1">{actions}</div> : null}
         </Card.Footer>
       ) : null}
     </Card>

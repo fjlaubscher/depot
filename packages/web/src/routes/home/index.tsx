@@ -90,7 +90,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <AppLayout title="Home">
+    <AppLayout title="depot - Offline Warhammer 40,000 Companion">
       <div className="flex flex-col gap-12">
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
           <img

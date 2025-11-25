@@ -63,7 +63,7 @@ const CreateCollectionPage: React.FC = () => {
   };
 
   return (
-    <AppLayout title="Create Collection">
+    <AppLayout title="Create Collection Entry">
       <div className="flex flex-col gap-4">
         <PageHeader title="Create Collection" />
         <Card>

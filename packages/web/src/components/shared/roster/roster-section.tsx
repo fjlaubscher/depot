@@ -6,6 +6,7 @@ interface RosterSectionProps {
   className?: string;
   'data-testid'?: string;
   headerContent?: ReactNode;
+  belowContent?: ReactNode;
 }
 
 const RosterSection: FC<RosterSectionProps> = ({
@@ -13,15 +14,17 @@ const RosterSection: FC<RosterSectionProps> = ({
   children,
   className = '',
   'data-testid': dataTestId,
-  headerContent
+  headerContent,
+  belowContent
 }) => {
   return (
-    <div className={`flex flex-col gap-2 ${className}`} data-testid={dataTestId}>
+    <div className={`flex flex-col gap-3 ${className}`} data-testid={dataTestId}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         {headerContent ? <div className="flex items-center gap-2">{headerContent}</div> : null}
       </div>
-      <div className="flex flex-col gap-2">{children}</div>
+      {belowContent ? <div className="flex flex-col gap-2">{belowContent}</div> : null}
+      <div className="flex flex-col gap-3">{children}</div>
     </div>
   );
 };

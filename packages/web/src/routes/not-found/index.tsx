@@ -14,7 +14,7 @@ const NotFound: React.FC = () => {
   };
 
   return (
-    <AppLayout title="Not Found">
+    <AppLayout title="Page Not Found">
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="max-w-md text-center">
           <div className="space-y-6">

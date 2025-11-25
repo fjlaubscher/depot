@@ -99,16 +99,13 @@ vi.mock('@/contexts/toast/use-toast-context', () => ({
 // Mock roster utils
 const mockGroupRosterUnitsByRole = vi.hoisted(() => vi.fn());
 const mockGenerateRosterMarkdown = vi.hoisted(() => vi.fn(() => 'mock markdown'));
-const mockGenerateRosterShareText = vi.hoisted(() => vi.fn(() => 'mock share text'));
-
 vi.mock('@/utils/roster', async () => {
   const actual = await vi.importActual<typeof import('@/utils/roster')>('@/utils/roster');
 
   return {
     ...actual,
     groupRosterUnitsByRole: mockGroupRosterUnitsByRole,
-    generateRosterMarkdown: mockGenerateRosterMarkdown,
-    generateRosterShareText: mockGenerateRosterShareText
+    generateRosterMarkdown: mockGenerateRosterMarkdown
   };
 });
 
@@ -163,33 +160,38 @@ describe('ViewRosterPage', () => {
     expect(screen.getByText('Space Marines • Gladius Task Force')).toBeInTheDocument();
   });
 
-  it('renders page header with edit action', () => {
+  it('renders page header with share action', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('page-header')).toBeInTheDocument();
-    const editButton = screen.getByLabelText('Edit roster details');
-    expect(editButton).toBeInTheDocument();
-    fireEvent.click(editButton);
-    expect(mockNavigate).toHaveBeenCalledWith('/rosters/test-roster-id/details');
+    const shareButton = screen.getByLabelText('Share roster');
+    expect(shareButton).toBeInTheDocument();
+    fireEvent.click(shareButton);
+    expect(navigator.share).toHaveBeenCalled();
     expect(screen.getByTestId('manage-units-button')).toBeInTheDocument();
   });
 
-  it('renders export and share buttons', () => {
+  it('renders export button and share action', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Export')).toBeInTheDocument();
-    expect(screen.getByText('Share')).toBeInTheDocument();
+    expect(screen.getByLabelText('Share roster')).toBeInTheDocument();
   });
 
-  it('falls back to copy button when native share is unavailable', () => {
+  it('falls back to copy action when native share is unavailable', () => {
     Object.assign(navigator, {
-      share: undefined
+      share: undefined,
+      clipboard: {
+        writeText: vi.fn().mockResolvedValue(undefined)
+      }
     });
 
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('Export')).toBeInTheDocument();
-    expect(screen.getByText('Copy')).toBeInTheDocument();
+    expect(screen.getByLabelText('Copy roster share text')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('share-roster-button'));
+    expect((navigator.clipboard as any).writeText).toHaveBeenCalled();
   });
 
   it('displays units in sections by role', () => {
@@ -321,7 +323,7 @@ describe('ViewRosterPage', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('export-button')).toBeInTheDocument();
-    expect(screen.getByTestId('share-button')).toBeInTheDocument();
+    expect(screen.getByTestId('share-roster-button')).toBeInTheDocument();
   });
 
   it('shows unit details in proper sections', () => {

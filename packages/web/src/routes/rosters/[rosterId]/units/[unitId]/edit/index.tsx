@@ -6,6 +6,7 @@ import type { depot } from '@depot/core';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 import AppLayout from '@/components/layout';
 import {
@@ -107,6 +108,12 @@ const EditRosterUnitView: React.FC = () => {
     () => getWargearAbilities(unit?.datasheet.abilities ?? []),
     [unit?.datasheet.abilities]
   );
+
+  const pageTitle = unit?.datasheet?.name
+    ? `${unit.datasheet.name} - Edit Roster Unit`
+    : 'Edit Roster Unit';
+
+  useDocumentTitle(pageTitle);
 
   // Loading state while roster loads
   if (!roster.id) {
@@ -353,7 +360,7 @@ const EditRosterUnitPage: React.FC = () => {
 
   if (!rosterId) {
     return (
-      <AppLayout title="Edit Unit">
+      <AppLayout title="Edit Roster Unit">
         <ErrorState
           title="Invalid Roster"
           message="The roster ID provided is invalid."
@@ -364,7 +371,7 @@ const EditRosterUnitPage: React.FC = () => {
   }
 
   return (
-    <AppLayout title="Edit Unit">
+    <AppLayout title="Edit Roster Unit">
       <RosterProvider rosterId={rosterId}>
         <EditRosterUnitView />
       </RosterProvider>

@@ -85,8 +85,10 @@ const Faction: React.FC = () => {
   }
 
   // Main Content
+  const pageTitle = `${faction.name} - Faction Overview`;
+
   return (
-    <AppLayout title="Faction">
+    <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
         <BackButton
           to="/factions"

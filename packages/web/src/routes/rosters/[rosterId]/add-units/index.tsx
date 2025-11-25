@@ -22,6 +22,7 @@ import {
 } from '@/components/shared';
 import SelectionSummary from './_components/selection-summary';
 import type { SelectionGroup } from './_components/selection-summary';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -105,6 +106,9 @@ const AddRosterUnitsView: FC = () => {
     }),
     [showLegends, showForgeWorld]
   );
+
+  const pageTitle = roster.id ? `${roster.name} - Add Roster Units` : 'Add Roster Units';
+  useDocumentTitle(pageTitle);
 
   if (!roster.id) {
     return <Loader />;
@@ -235,7 +239,7 @@ const AddRosterUnitsPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Add Units">
+    <AppLayout title="Add Units to Roster">
       <RosterProvider rosterId={rosterId}>
         <AddRosterUnitsView />
       </RosterProvider>

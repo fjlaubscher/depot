@@ -4,7 +4,7 @@ import { PageHeaderSkeleton, TabsSkeleton, SkeletonCard } from '@/components/ui'
 
 const LoadingSkeleton: React.FC = () => {
   return (
-    <AppLayout title="Faction">
+    <AppLayout title="Loading Faction">
       <div className="flex flex-col gap-4">
         <PageHeaderSkeleton />
         <TabsSkeleton tabCount={2} />

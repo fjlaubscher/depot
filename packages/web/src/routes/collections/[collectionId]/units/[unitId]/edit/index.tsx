@@ -21,6 +21,7 @@ import { parseLoadoutWargear } from '@/utils/wargear';
 import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
 import { COLLECTION_STATE_META, COLLECTION_UNIT_STATES } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
 import ModelCostSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/model-cost-selection';
 import WargearAbilitiesSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-abilities-selection';
@@ -124,6 +125,8 @@ const CollectionUnitEditView: React.FC = () => {
       </div>
     );
   }
+
+  useDocumentTitle(`${collection.name} - Edit Collection Unit`);
 
   const handleSave = async () => {
     if (!collection || !unitId) return;

@@ -23,43 +23,61 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   onChange
 }) => {
   const abilityEntries = React.useMemo<AbilityEntry[]>(() => {
-    return abilities.map((ability, index) => {
-      const friendlyName =
-        formatAbilityName(ability) ||
-        ability.name ||
-        ability.parameter ||
-        ability.description ||
-        `wargear-ability-${index}`;
-      const slugified = slugify(friendlyName);
-      const key = ability.id ?? slugified ?? `wargear-ability-${index}`;
-      const testId = slugified || `wargear-ability-${index}`;
-      return {
-        ability,
-        key,
-        testId
-      };
-    });
+    return abilities
+      .map((ability, index) => {
+        const friendlyName =
+          formatAbilityName(ability) ||
+          ability.name ||
+          ability.parameter ||
+          ability.description ||
+          `wargear-ability-${index}`;
+        const slugified = slugify(friendlyName);
+        if (!slugified) return null;
+        return {
+          ability,
+          key: slugified,
+          testId: slugified
+        };
+      })
+      .filter((entry): entry is AbilityEntry => entry !== null);
   }, [abilities]);
 
-  const entryLookup = React.useMemo(
-    () => new Map(abilityEntries.map((entry) => [entry.ability, entry])),
-    [abilityEntries]
+  const selectedKeys = React.useMemo(
+    () =>
+      new Set(
+        selected
+          .map((ability, index) => {
+            const friendlyName =
+              formatAbilityName(ability) ||
+              ability.name ||
+              ability.parameter ||
+              ability.description ||
+              `selected-ability-${index}`;
+            return slugify(friendlyName);
+          })
+          .filter(Boolean) as string[]
+      ),
+    [selected]
   );
-
-  const normalizedSelected = React.useMemo(
-    () => selected.filter((ability) => abilityEntries.some((entry) => entry.ability === ability)),
-    [selected, abilityEntries]
-  );
-
-  const selectedSet = React.useMemo(() => new Set(normalizedSelected), [normalizedSelected]);
 
   const handleToggle = (entry: AbilityEntry) => {
-    if (selectedSet.has(entry.ability)) {
-      onChange(normalizedSelected.filter((item) => item !== entry.ability));
+    if (selectedKeys.has(entry.key)) {
+      onChange(
+        selected.filter((ability, index) => {
+          const friendlyName =
+            formatAbilityName(ability) ||
+            ability.name ||
+            ability.parameter ||
+            ability.description ||
+            `selected-ability-${index}`;
+          return slugify(friendlyName) !== entry.key;
+        })
+      );
       return;
     }
 
-    onChange([...normalizedSelected, entry.ability]);
+    const abilityWithId = entry.ability.id ? entry.ability : { ...entry.ability, id: entry.key };
+    onChange([...selected, abilityWithId]);
   };
 
   if (abilities.length === 0) {
@@ -73,7 +91,7 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
   return (
     <div className="flex flex-wrap gap-2">
       {abilityEntries.map((entry) => {
-        const isSelected = selectedSet.has(entry.ability);
+        const isSelected = selectedKeys.has(entry.key);
         return (
           <div
             key={entry.key}

@@ -57,7 +57,7 @@ const Rosters: React.FC = () => {
 
   if (loading) {
     return (
-      <AppLayout title="My Rosters">
+      <AppLayout title="Roster Library">
         <div className="flex flex-col gap-4">
           <PageHeader
             title="My Rosters"
@@ -76,7 +76,7 @@ const Rosters: React.FC = () => {
 
   if (error) {
     return (
-      <AppLayout title="My Rosters">
+      <AppLayout title="Roster Library">
         <div className="flex flex-col gap-4">
           <PageHeader
             title="My Rosters"
@@ -94,7 +94,7 @@ const Rosters: React.FC = () => {
   }
 
   return (
-    <AppLayout title="My Rosters">
+    <AppLayout title="Roster Library">
       <div className="flex flex-col gap-4">
         <PageHeader
           title="My Rosters"
