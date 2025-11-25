@@ -1,6 +1,6 @@
 const CANONICAL_ORIGIN = 'https://godepot.dev';
-const HERO_IMAGE_URL = `${CANONICAL_ORIGIN}/images/depot-hero.jpg`;
-const HERO_IMAGE_ALT = 'Screenshot of depot, the Warhammer 40,000 companion app';
+const HERO_IMAGE_URL = `${CANONICAL_ORIGIN}/maskable-icon-512x512.png`;
+const HERO_IMAGE_ALT = 'depot app icon';
 
 type AssetBinding = {
   fetch: (request: Request) => Promise<Response>;
