@@ -38,4 +38,65 @@ test.describe('Collections', () => {
     );
     expect(storedAfterReload).toBe('parade-ready');
   });
+
+  test('add Astra Militarum units to a collection', async ({ page }) => {
+    await page.goto('/collections');
+
+    await page.getByTestId('create-collection-button').click();
+    await expect(page).toHaveURL(/\/collections\/create/);
+
+    const uniqueName = `Astra Militarum E2E ${Date.now()}`;
+    await page.getByLabel('Name').fill(uniqueName);
+
+    const factionSelect = page.getByLabel('Faction');
+    await factionSelect.selectOption('astra-militarum');
+
+    await page.getByTestId('create-collection-submit').click();
+    await expect(page).toHaveURL(/\/collections\/[a-z0-9-]+$/i);
+
+    const collectionUrl = page.url();
+    await expect(page.getByRole('heading', { name: uniqueName })).toBeVisible();
+
+    await page.getByTestId('add-collection-units-button').click();
+    await expect(page).toHaveURL(`${collectionUrl}/add-units`);
+
+    const loadingLocator = page.locator('[data-testid="datasheet-loading"]');
+    await loadingLocator.waitFor({ state: 'attached', timeout: 15000 }).catch(() => {});
+    await loadingLocator.waitFor({ state: 'hidden', timeout: 60000 }).catch(() => {});
+
+    const searchInput = page.getByTestId('datasheet-search');
+    await expect(searchInput).toBeVisible({ timeout: 60000 });
+
+    // Add a Leman Russ Commander
+    await searchInput.fill('Leman Russ Commander');
+    const lemanAddButton = page.getByTestId('add-datasheet-leman-russ-commander');
+    await expect(lemanAddButton).toBeVisible();
+    await lemanAddButton.click();
+
+    // Queue two Heavy Weapons Squads
+    await searchInput.fill('Cadian Heavy Weapons Squad');
+    const cadianAddButton = page.getByTestId('add-datasheet-cadian-heavy-weapons-squad');
+    await expect(cadianAddButton).toBeVisible();
+    await cadianAddButton.click();
+    await cadianAddButton.click();
+
+    const reviewButton = page.getByRole('button', { name: /Review Selection/i });
+    await expect(reviewButton).toBeVisible();
+    await reviewButton.click();
+
+    const summaryDrawer = page.getByTestId('unit-selection-summary');
+    await expect(summaryDrawer).toBeVisible();
+    await expect(summaryDrawer.getByText('Leman Russ Commander')).toBeVisible();
+    await expect(summaryDrawer.getByText('Cadian Heavy Weapons Squad')).toBeVisible();
+    await expect(summaryDrawer.getByText(/3 units/i)).toBeVisible();
+
+    await summaryDrawer.getByRole('button', { name: 'Confirm' }).click();
+    await expect(page).toHaveURL(collectionUrl);
+
+    const unitCards = page.getByTestId('collection-unit-card');
+    await expect(unitCards).toHaveCount(3);
+    await expect(page.getByText('Leman Russ Commander')).toBeVisible();
+    const cadianCards = unitCards.filter({ hasText: 'Cadian Heavy Weapons Squad' });
+    await expect(cadianCards).toHaveCount(2);
+  });
 });

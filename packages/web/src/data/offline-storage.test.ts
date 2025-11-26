@@ -61,6 +61,7 @@ const mockFactionIndex: depot.Index[] = [
     path: '/data/factions/chaos-space-marines/faction.json'
   }
 ];
+const [mockSpaceMarinesIndex] = mockFactionIndex;
 
 const mockFaction: depot.Faction = {
   id: 'SM',
@@ -148,6 +149,31 @@ const mockSettings: depot.Settings = {
   usePileOfShameLabel: true
 };
 
+const mockCollection: depot.Collection = {
+  id: 'collection-1',
+  name: 'Test Collection',
+  factionId: 'SM',
+  factionSlug: 'space-marines',
+  faction: mockSpaceMarinesIndex,
+  items: [
+    {
+      id: 'unit-1',
+      datasheet: { ...mockFaction.datasheets[0] },
+      datasheetSlug: 'captain',
+      modelCost: {
+        datasheetId: 'captain',
+        line: 'line-1',
+        description: '1 model',
+        cost: '100'
+      },
+      selectedWargear: [],
+      selectedWargearAbilities: [],
+      state: 'sprue'
+    }
+  ],
+  points: { current: 0 }
+};
+
 describe('OfflineStorage', () => {
   beforeEach(() => {
     // Setup IndexedDB mock
@@ -164,6 +190,7 @@ describe('OfflineStorage', () => {
           mockDatabase.objectStoreNames.contains.mockReturnValue(false);
           request.result = mockDatabase;
           request.onupgradeneeded();
+          mockDatabase.objectStoreNames.contains.mockReturnValue(true);
         }
         if (request.onsuccess) {
           request.result = mockDatabase;
@@ -716,6 +743,49 @@ describe('OfflineStorage', () => {
       );
 
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('Collection Operations', () => {
+    it('should normalize datasheet fields when saving collections', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const legacyCollection = JSON.parse(JSON.stringify(mockCollection)) as depot.Collection;
+      delete (legacyCollection.items[0].datasheet as any).unitComposition;
+      (legacyCollection.items[0].datasheet as any).options = undefined;
+      (legacyCollection.items[0].datasheet as any).modelCosts = undefined;
+
+      await expect(offlineStorage.saveCollection(legacyCollection)).resolves.toBeUndefined();
+
+      const saved = mockObjectStore.put.mock.calls[0][0] as depot.Collection;
+      expect(saved.items[0].datasheet.unitComposition).toEqual([]);
+      expect(saved.items[0].datasheet.options).toEqual([]);
+      expect(saved.items[0].datasheet.modelCosts).toEqual([]);
+    });
+
+    it('should normalize datasheet fields when loading collections', async () => {
+      mockObjectStore.get.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          const stored = JSON.parse(JSON.stringify(mockCollection));
+          delete (stored.items[0].datasheet as any).unitComposition;
+          (stored.items[0].datasheet as any).options = undefined;
+          request.result = stored;
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      const result = await offlineStorage.getCollection('collection-1');
+
+      expect(result?.items[0].datasheet.unitComposition).toEqual([]);
+      expect(result?.items[0].datasheet.options).toEqual([]);
     });
   });
 

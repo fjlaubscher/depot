@@ -1,4 +1,5 @@
 import { defineConfig, loadEnv } from 'vite';
+import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -12,6 +13,19 @@ export default defineConfig(({ mode }) => {
     !!env.SENTRY_AUTH_TOKEN && !!env.SENTRY_ORG && !!env.SENTRY_PROJECT;
   const basePath = getAppBasePath(env.VITE_APP_BASE_PATH);
   const urlPrefix = basePath ? `~${basePath}/` : '~/';
+  const releaseId =
+    env.VITE_SENTRY_RELEASE ||
+    env.VITE_APP_VERSION ||
+    env.CF_PAGES_COMMIT_SHA ||
+    env.CF_PAGES_BUILD_ID ||
+    env.GITHUB_SHA;
+
+  if (releaseId && !env.VITE_SENTRY_RELEASE) {
+    process.env.VITE_SENTRY_RELEASE = releaseId;
+    env.VITE_SENTRY_RELEASE = releaseId;
+  }
+
+  const distPath = resolve(process.cwd(), 'dist');
 
   return {
     base: getViteBasePath(env.VITE_APP_BASE_PATH),
@@ -68,8 +82,8 @@ export default defineConfig(({ mode }) => {
               org: env.SENTRY_ORG,
               project: env.SENTRY_PROJECT,
               authToken: env.SENTRY_AUTH_TOKEN,
-              release: env.VITE_SENTRY_RELEASE ?? env.VITE_APP_VERSION ?? env.GITHUB_SHA,
-              include: './packages/web/dist',
+              release: env.VITE_SENTRY_RELEASE,
+              include: distPath,
               rewrite: true,
               urlPrefix
             })

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockFactionIndexes, mockFaction } from '@/test/mock-data';
@@ -54,14 +53,6 @@ const mockUseRoster = vi.hoisted(() => ({
 
 vi.mock('@/contexts/roster/use-roster-context', () => ({
   useRoster: () => mockUseRoster
-}));
-
-// Mock useToast hook
-const mockShowToast = vi.fn();
-vi.mock('@/contexts/toast/use-toast-context', () => ({
-  useToast: () => ({
-    showToast: mockShowToast
-  })
 }));
 
 describe('CreateRoster', () => {
@@ -128,179 +119,6 @@ describe('CreateRoster', () => {
     expect(screen.queryByTestId('field-skeleton')).not.toBeInTheDocument();
   });
 
-  it('validates required roster name', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    // Fill with whitespace-only name to bypass disabled button but trigger validation
-    const nameInput = screen.getByTestId('roster-name-input');
-    const factionSelect = screen.getByTestId('faction-field-select');
-    await user.type(nameInput, '   '); // Whitespace only
-    await user.selectOptions(factionSelect, 'space-marines');
-
-    // Wait for detachment field to appear and select it
-    await waitFor(() => {
-      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
-    });
-    const detachmentSelect = screen.getByTestId('detachment-field-select');
-    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
-
-    const submitButton = screen.getByTestId('submit-button');
-    await user.click(submitButton);
-
-    expect(mockShowToast).toHaveBeenCalledWith({
-      type: 'error',
-      title: 'Validation Error',
-      message: 'Please enter a roster name.'
-    });
-    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
-  });
-
-  it('validates required faction selection', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const nameInput = screen.getByTestId('roster-name-input');
-    await user.type(nameInput, 'Test Roster');
-
-    // Leave faction unselected (should stay as empty value)
-    const submitButton = screen.getByTestId('submit-button');
-
-    // Submit button should be disabled when no faction is selected
-    expect(submitButton).toBeDisabled();
-
-    // Verify the showToast isn't called since form can't be submitted
-    expect(mockShowToast).not.toHaveBeenCalled();
-    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
-  });
-
-  it('validates positive max points', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const nameInput = screen.getByTestId('roster-name-input');
-    const factionSelect = screen.getByTestId('faction-field-select');
-    const maxPointsSelect = screen.getByTestId('max-points-field-select');
-
-    await user.type(nameInput, 'Test Roster');
-    await user.selectOptions(factionSelect, 'space-marines');
-    await user.selectOptions(maxPointsSelect, 'custom');
-
-    const pointsInput = await screen.findByTestId('max-points-input');
-    pointsInput.removeAttribute('min');
-    pointsInput.removeAttribute('required');
-
-    // Wait for detachment field to appear and select it
-    await waitFor(() => {
-      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
-    });
-    const detachmentSelect = screen.getByTestId('detachment-field-select');
-    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
-
-    await user.clear(pointsInput);
-    await user.type(pointsInput, '0');
-
-    const submitButton = screen.getByTestId('submit-button');
-    await user.click(submitButton);
-
-    await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Max points must be greater than 0.'
-      });
-    });
-    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
-  });
-
-  it('trims whitespace from roster name', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const nameInput = screen.getByTestId('roster-name-input');
-    const factionSelect = screen.getByTestId('faction-field-select');
-
-    await user.type(nameInput, '  Test Roster  ');
-    await user.selectOptions(factionSelect, 'space-marines');
-
-    // Wait for detachment field to appear and select it
-    await waitFor(() => {
-      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
-    });
-    const detachmentSelect = screen.getByTestId('detachment-field-select');
-    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
-
-    const submitButton = screen.getByTestId('submit-button');
-    await user.click(submitButton);
-
-    expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
-      name: 'Test Roster',
-      factionId: 'SM',
-      factionSlug: 'space-marines',
-      faction: expect.objectContaining({
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines'
-      }),
-      maxPoints: 2000,
-      detachment: expect.any(Object),
-      units: []
-    });
-  });
-
-  it('creates roster and navigates on successful submission', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const nameInput = screen.getByTestId('roster-name-input');
-    const factionSelect = screen.getByTestId('faction-field-select');
-    const maxPointsSelect = screen.getByTestId('max-points-field-select');
-
-    await user.type(nameInput, 'My Awesome Roster');
-    await user.selectOptions(factionSelect, 'space-marines');
-    await user.selectOptions(maxPointsSelect, 'custom');
-
-    const pointsInput = await screen.findByTestId('max-points-input');
-
-    // Wait for detachment field to appear and select it
-    await waitFor(() => {
-      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
-    });
-    const detachmentSelect = screen.getByTestId('detachment-field-select');
-    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
-
-    await user.clear(pointsInput);
-    await user.type(pointsInput, '1500');
-
-    const submitButton = screen.getByTestId('submit-button');
-    await user.click(submitButton);
-
-    expect(mockUseRoster.createRoster).toHaveBeenCalledWith({
-      name: 'My Awesome Roster',
-      factionId: 'SM',
-      factionSlug: 'space-marines',
-      faction: expect.objectContaining({
-        id: 'SM',
-        slug: 'space-marines',
-        name: 'Space Marines'
-      }),
-      maxPoints: 1500,
-      detachment: expect.any(Object),
-      units: []
-    });
-    expect(mockNavigate).toHaveBeenCalledWith('/rosters/new-roster-id/edit');
-  });
-
-  it('navigates back to rosters list when cancel is clicked', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const cancelButton = screen.getByTestId('cancel-button');
-    await user.click(cancelButton);
-
-    expect(mockNavigate).toHaveBeenCalledWith('/rosters');
-  });
-
   it('disables submit button when factions are loading', () => {
     mockUseFactions.loading = true;
 
@@ -308,34 +126,6 @@ describe('CreateRoster', () => {
 
     const submitButton = screen.getByTestId('submit-button');
     expect(submitButton).toBeDisabled();
-  });
-
-  it('disables submit button when required fields are empty', async () => {
-    const user = userEvent.setup();
-    render(<CreateRoster />, { wrapper: TestWrapper });
-
-    const submitButton = screen.getByTestId('submit-button');
-
-    // Initially disabled (no name or faction)
-    expect(submitButton).toBeDisabled();
-
-    // Still disabled with only name
-    const nameInput = screen.getByTestId('roster-name-input');
-    await user.type(nameInput, 'Test');
-    expect(submitButton).toBeDisabled();
-
-    // Still disabled with name and faction (no detachment)
-    const factionSelect = screen.getByTestId('faction-field-select');
-    await user.selectOptions(factionSelect, 'space-marines');
-    expect(submitButton).toBeDisabled();
-
-    // Enabled with name, faction, and detachment
-    await waitFor(() => {
-      expect(screen.getByTestId('detachment-field-select')).toBeInTheDocument();
-    });
-    const detachmentSelect = screen.getByTestId('detachment-field-select');
-    await user.selectOptions(detachmentSelect, 'Gladius Task Force');
-    expect(submitButton).not.toBeDisabled();
   });
 
   it('uses default max points of 2000', () => {

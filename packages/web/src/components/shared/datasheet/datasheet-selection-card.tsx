@@ -53,6 +53,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
       padding="sm"
       contentGap="sm"
       titleClassName="text-base md:text-lg"
+      data-testid={`datasheet-card-${datasheet.slug}`}
     >
       <div className="flex h-full flex-col gap-2 text-sm md:text-base">
         <div className="flex min-w-0 flex-col gap-1">
@@ -95,7 +96,13 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           ) : null}
 
           <div className="ml-auto">
-            <Button size="sm" variant="accent" onClick={handleAdd} disabled={!selectedModelCost}>
+            <Button
+              size="sm"
+              variant="accent"
+              onClick={handleAdd}
+              disabled={!selectedModelCost}
+              data-testid={`add-datasheet-${datasheet.slug}`}
+            >
               Add
             </Button>
           </div>

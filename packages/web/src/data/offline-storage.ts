@@ -25,6 +25,33 @@ const KEYS = {
   DATA_VERSION: 'data-version'
 } as const;
 
+const ensureArray = <T>(value: T[] | undefined): T[] => (Array.isArray(value) ? value : []);
+const ensureString = (value: string | undefined): string => value ?? '';
+
+const normalizeDatasheetStructure = (datasheet: depot.Datasheet): depot.Datasheet => {
+  const normalized = normalizeDatasheetWargear(datasheet);
+  return {
+    ...normalized,
+    abilities: ensureArray(normalized.abilities),
+    keywords: ensureArray(normalized.keywords),
+    models: ensureArray(normalized.models),
+    options: ensureArray(normalized.options),
+    wargear: ensureArray(normalized.wargear),
+    unitComposition: ensureArray(normalized.unitComposition),
+    modelCosts: ensureArray(normalized.modelCosts),
+    stratagems: ensureArray(normalized.stratagems),
+    enhancements: ensureArray(normalized.enhancements),
+    detachmentAbilities: ensureArray(normalized.detachmentAbilities),
+    leaders: ensureArray(normalized.leaders),
+    loadout: ensureString(normalized.loadout),
+    transport: ensureString(normalized.transport),
+    leaderHead: ensureString(normalized.leaderHead),
+    leaderFooter: ensureString(normalized.leaderFooter),
+    damagedW: ensureString(normalized.damagedW),
+    damagedDescription: ensureString(normalized.damagedDescription)
+  };
+};
+
 const normalizeRoster = (roster: depot.Roster): depot.Roster => {
   const factionSlug = roster.factionSlug ?? roster.faction?.slug ?? roster.factionId;
 
@@ -36,7 +63,7 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
       : roster.faction,
     warlordUnitId: roster.warlordUnitId ?? null,
     units: roster.units.map((unit) => {
-      const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
+      const normalizedDatasheet = normalizeDatasheetStructure(unit.datasheet);
       return {
         ...unit,
         datasheet: normalizedDatasheet,
@@ -64,7 +91,7 @@ const normalizeCollection = (collection: depot.Collection): depot.Collection => 
       ? { ...collection.faction, slug: collection.faction.slug ?? factionSlug }
       : collection.faction,
     items: collection.items.map((item) => {
-      const normalizedDatasheet = normalizeDatasheetWargear(item.datasheet);
+      const normalizedDatasheet = normalizeDatasheetStructure(item.datasheet);
       return {
         ...item,
         datasheet: normalizedDatasheet,
@@ -303,7 +330,7 @@ class OfflineStorage {
         const request = store.get(datasheetId);
         request.onsuccess = () => {
           const result = request.result as depot.Datasheet | undefined;
-          resolve(result ? normalizeDatasheetWargear(result) : null);
+          resolve(result ? normalizeDatasheetStructure(result) : null);
         };
         request.onerror = () => reject(request.error);
       });
@@ -320,7 +347,7 @@ class OfflineStorage {
       const store = transaction.objectStore(STORES.DATASHEETS);
 
       return new Promise((resolve, reject) => {
-        const request = store.put(normalizeDatasheetWargear(datasheet), datasheet.id);
+        const request = store.put(normalizeDatasheetStructure(datasheet), datasheet.id);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
