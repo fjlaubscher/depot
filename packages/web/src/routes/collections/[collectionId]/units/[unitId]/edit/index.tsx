@@ -82,6 +82,12 @@ const CollectionUnitEditView: React.FC = () => {
 
   const stateMeta = COLLECTION_STATE_META[state] ?? COLLECTION_STATE_META.sprue;
 
+  const pageTitle = collection?.name
+    ? `${collection.name} - Edit Collection Unit`
+    : 'Edit Collection Unit';
+
+  useDocumentTitle(pageTitle);
+
   if (!collectionId) {
     return (
       <AppLayout title="Edit Collection Unit">
@@ -125,8 +131,6 @@ const CollectionUnitEditView: React.FC = () => {
       </div>
     );
   }
-
-  useDocumentTitle(`${collection.name} - Edit Collection Unit`);
 
   const handleSave = async () => {
     if (!collection || !unitId) return;
