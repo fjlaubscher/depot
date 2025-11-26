@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Depot has moved</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content="3; url=https://godepot.dev" />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #050816;
+        --fg: #f9fafb;
+        --accent: #38bdf8;
+        --muted: #9ca3af;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: radial-gradient(circle at top, #0f172a, var(--bg));
+        color: var(--fg);
+      }
+      main {
+        max-width: 32rem;
+        text-align: center;
+      }
+      h1 {
+        font-size: clamp(2rem, 3vw, 2.5rem);
+        margin-bottom: 0.75rem;
+      }
+      p {
+        margin: 0.25rem 0;
+        color: var(--muted);
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      a:hover,
+      a:focus-visible {
+        text-decoration: underline;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="badge">
+        <span>🚀</span>
+        <span>Depot has moved</span>
+      </div>
+      <h1>Depot is now at <a href="https://godepot.dev">godepot.dev</a></h1>
+      <p>You’ll be redirected automatically in a few seconds.</p>
+      <p>
+        If nothing happens,
+        <a href="https://godepot.dev">click here to open godepot.dev</a>.
+      </p>
+    </main>
+  </body>
+</html>
+
