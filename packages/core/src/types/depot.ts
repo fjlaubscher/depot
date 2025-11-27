@@ -234,6 +234,8 @@ export interface Settings {
 export interface Detachment {
   slug: string;
   name: string;
+  supplementKey?: string;
+  supplementLabel?: string;
   abilities: DetachmentAbility[];
   enhancements: Enhancement[];
   stratagems: Stratagem[];

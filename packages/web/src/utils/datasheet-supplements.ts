@@ -157,6 +157,38 @@ export const shouldResetSupplementSelection = (
   filtersAppliedDatasheets: DatasheetListItem[]
 ) => supplementaryDatasheets.length > 0 && filtersAppliedDatasheets.length === 0;
 
+export const formatDetachmentSupplementLabel = (
+  supplementKey?: string | null,
+  supplementLabel?: string | null
+): string | null => {
+  if (!supplementKey && !supplementLabel) {
+    return null;
+  }
+
+  if (supplementLabel && supplementLabel !== 'None') {
+    return supplementLabel;
+  }
+
+  if (supplementKey && normalizeSupplementValue(supplementKey) !== CODEX_SLUG) {
+    return toTitleCase(supplementKey);
+  }
+
+  return 'Codex';
+};
+
+export const formatDetachmentOptionLabel = (
+  name: string,
+  supplementKey?: string | null,
+  supplementLabel?: string | null
+): string => {
+  const formatted = formatDetachmentSupplementLabel(supplementKey, supplementLabel);
+  if (!formatted) {
+    return name;
+  }
+
+  return `${name} [${formatted}]`;
+};
+
 export const sortDatasheetsBySupplementPreference = <T extends DatasheetListItem>(
   datasheets: T[],
   normalizedSelectedSupplement: string,

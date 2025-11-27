@@ -85,6 +85,16 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
             {roster.detachment.name}
           </Card.Badge>
         ) : null}
+        {roster.detachment?.supplementLabel ? (
+          <Card.Badge
+            variant="muted"
+            size="sm"
+            data-testid="roster-detachment-supplement"
+            data-supplement-key={roster.detachment.supplementKey}
+          >
+            {roster.detachment.supplementLabel}
+          </Card.Badge>
+        ) : null}
         <span className="inline-flex items-center gap-1">
           <Users className="h-3.5 w-3.5" aria-hidden="true" />
           {roster.units.length} {roster.units.length === 1 ? 'unit' : 'units'}

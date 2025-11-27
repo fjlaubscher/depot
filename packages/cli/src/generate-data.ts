@@ -268,11 +268,72 @@ const buildDatasheet = (
 const sortByName = <T extends { name: string }>(items: T[]) =>
   items.sort((a, b) => a.name.localeCompare(b.name));
 
+type DetachmentSupplementSource = Pick<
+  depot.Datasheet,
+  'id' | 'supplementKey' | 'supplementSlug' | 'supplementName'
+>;
+
+export const buildDetachmentSupplementIndex = (
+  datasheets: DetachmentSupplementSource[],
+  datasheetDetachmentAbilities: wahapedia.DatasheetDetachmentAbility[],
+  detachmentAbilities: wahapedia.DetachmentAbility[]
+): Map<string, { supplementKey: string; supplementLabel: string }> => {
+  const detachmentAbilityById = new Map(
+    detachmentAbilities.map((ability) => [ability.id, ability])
+  );
+  const datasheetById = new Map(datasheets.map((sheet) => [sheet.id, sheet]));
+  const detachmentVotes = new Map<string, string[]>();
+  const labelCache = new Map<string, string>();
+
+  datasheets.forEach((sheet) => {
+    const key = normalizeSupplementKey(sheet.supplementKey ?? sheet.supplementSlug ?? CODEX_SLUG);
+    const label = buildSupplementLabel(sheet.supplementSlug ?? key, sheet.supplementName);
+    labelCache.set(key, label);
+  });
+
+  datasheetDetachmentAbilities.forEach((link) => {
+    const ability = detachmentAbilityById.get(link.detachmentAbilityId);
+    if (!ability?.detachment) {
+      return;
+    }
+
+    const sheet = datasheetById.get(link.datasheetId);
+    if (!sheet) {
+      return;
+    }
+
+    const key = normalizeSupplementKey(sheet.supplementKey ?? sheet.supplementSlug ?? CODEX_SLUG);
+    const votes = detachmentVotes.get(ability.detachment) ?? [];
+    votes.push(key);
+    detachmentVotes.set(ability.detachment, votes);
+  });
+
+  const result = new Map<string, { supplementKey: string; supplementLabel: string }>();
+
+  detachmentVotes.forEach((keys, detachmentName) => {
+    if (keys.length === 0) {
+      return;
+    }
+
+    const preferredKey = keys.find((value) => value !== CODEX_SLUG) ?? keys[0];
+    const preferredLabel =
+      labelCache.get(preferredKey) ?? buildSupplementLabel(preferredKey, undefined);
+
+    result.set(detachmentName, {
+      supplementKey: preferredKey,
+      supplementLabel: preferredLabel
+    });
+  });
+
+  return result;
+};
+
 const buildDetachments = (
   detachmentAbilities: wahapedia.DetachmentAbility[],
   enhancements: wahapedia.Enhancement[],
   stratagems: wahapedia.Stratagem[],
-  createSlug: (value: string) => string
+  createSlug: (value: string) => string,
+  supplementIndex?: Map<string, { supplementKey: string; supplementLabel: string }>
 ): depot.Detachment[] => {
   const detachments = new Map<string, depot.Detachment>();
 
@@ -286,9 +347,12 @@ const buildDetachments = (
     }
 
     if (!detachments.has(name)) {
+      const supplementMeta = supplementIndex?.get(name);
       detachments.set(name, {
         slug: createSlug(name),
         name,
+        supplementKey: supplementMeta?.supplementKey,
+        supplementLabel: supplementMeta?.supplementLabel,
         abilities: [],
         enhancements: [],
         stratagems: []
@@ -351,11 +415,21 @@ const buildFactionData = (
   );
   const detachmentAbilities = data.detachmentAbilities.filter((da) => da.factionId === faction.id);
   const detachmentSlugGenerator = slugUtils.createSlugGenerator(`${factionSlug}-detachment`);
+  const factionDatasheetIds = new Set(datasheets.map((sheet) => sheet.id));
+  const factionDatasheetDetachmentAbilities = data.datasheetDetachmentAbilities.filter((dda) =>
+    factionDatasheetIds.has(dda.datasheetId)
+  );
+  const detachmentSupplementIndex = buildDetachmentSupplementIndex(
+    datasheets,
+    factionDatasheetDetachmentAbilities,
+    detachmentAbilities
+  );
   const detachments = buildDetachments(
     detachmentAbilities,
     enhancements,
     stratagems,
-    detachmentSlugGenerator
+    detachmentSlugGenerator,
+    detachmentSupplementIndex
   );
 
   return {

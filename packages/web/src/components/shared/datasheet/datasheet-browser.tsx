@@ -15,9 +15,11 @@ import DatasheetEmptyState from './datasheet-empty-state';
 import {
   CODEX_SLUG,
   buildSupplementLabel,
+  getSupplementKey,
   isSupplementEntry,
   sortDatasheetsBySupplementPreference
 } from '@/utils/datasheet-supplements';
+import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetBrowserProps<T extends DatasheetListItem> {
   datasheets: T[];
@@ -125,11 +127,19 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     }
 
     if (supplementMetadata.hasSupplements && isSupplementEntry(datasheet)) {
+      const supplementKey = getSupplementKey(datasheet);
+      const supplementStyles = getSupplementStyles(supplementKey);
       const label = datasheet.supplementLabel
         ? datasheet.supplementLabel
         : buildSupplementLabel(datasheet.supplementSlug ?? CODEX_SLUG, datasheet.supplementName);
       tags.push(
-        <Tag key="supplement" size="sm" variant="primary">
+        <Tag
+          key="supplement"
+          size="sm"
+          variant="default"
+          className={supplementStyles.tagClass}
+          data-supplement-key={supplementKey}
+        >
           {label}
         </Tag>
       );

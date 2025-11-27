@@ -7,6 +7,7 @@ import type { DetachmentSectionKey } from './types';
 
 interface DetachmentCardProps {
   detachmentName: string;
+  supplementLabel?: string;
   abilities: depot.DetachmentAbility[];
   enhancements: depot.Enhancement[];
   stratagems: depot.Stratagem[];
@@ -16,6 +17,7 @@ interface DetachmentCardProps {
 
 const DetachmentCard: React.FC<DetachmentCardProps> = ({
   detachmentName,
+  supplementLabel,
   abilities,
   enhancements,
   stratagems,
@@ -72,7 +74,12 @@ const DetachmentCard: React.FC<DetachmentCardProps> = ({
   };
 
   return (
-    <DetachmentAccordion title={detachmentName} isOpen={isOpen} onToggle={onToggle}>
+    <DetachmentAccordion
+      title={detachmentName}
+      subtitle={supplementLabel ? `${supplementLabel} supplement` : undefined}
+      isOpen={isOpen}
+      onToggle={onToggle}
+    >
       <div className="flex flex-col gap-4">
         <DetachmentPillNav
           sections={sections}

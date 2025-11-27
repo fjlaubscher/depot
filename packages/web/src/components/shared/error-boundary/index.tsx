@@ -15,6 +15,12 @@ interface ErrorBoundaryProps {
   fallbackMessage?: string;
   showRetry?: boolean;
   homeUrl?: string;
+  /**
+   * How the boundary should recover when Retry is pressed.
+   * - 'reload': full window reload (useful for root boundary to reset storage/providers)
+   * - 'remount': reset internal error state and re-render children
+   */
+  resetStrategy?: 'reload' | 'remount';
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
@@ -43,6 +49,17 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render() {
     if (this.state.hasError) {
+      const handleRetry = () => {
+        if (this.props.resetStrategy === 'reload') {
+          if (typeof window !== 'undefined' && typeof window.location?.reload === 'function') {
+            window.location.reload();
+          }
+          return;
+        }
+
+        this.setState({ hasError: false });
+      };
+
       return (
         <AppLayout title="Application Error">
           <ErrorState
@@ -54,7 +71,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             showRetry={this.props.showRetry}
             showHome={!!this.props.homeUrl}
             homeUrl={this.props.homeUrl}
-            onRetry={() => this.setState({ hasError: false })}
+            onRetry={handleRetry}
           />
         </AppLayout>
       );

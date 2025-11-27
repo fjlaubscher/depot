@@ -33,6 +33,7 @@ export const DatasheetFilterBar: FC<DatasheetFilterBarProps> = ({
         onChange={onQueryChange}
         placeholder={searchPlaceholder}
         testId={searchTestId}
+        className="w-full sm:max-w-3xl"
       />
       {children}
     </Filters>

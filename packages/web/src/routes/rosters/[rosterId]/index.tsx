@@ -96,10 +96,14 @@ const RosterView: FC = () => {
     return <Loader />;
   }
 
+  const detachmentLabel = roster.detachment?.name
+    ? roster.detachment?.supplementLabel
+      ? `${roster.detachment.name} (${roster.detachment.supplementLabel})`
+      : roster.detachment.name
+    : null;
+
   const subtitle =
-    factionName && roster.detachment?.name
-      ? `${factionName} • ${roster.detachment.name}`
-      : factionName;
+    factionName && detachmentLabel ? `${factionName} • ${detachmentLabel}` : factionName;
 
   const tabLabels: string[] = ['Units'];
   const tabPanels: ReactNode[] = [<UnitsTab key="units" units={roster.units} />];

@@ -16,6 +16,7 @@ import ViewRoster from './routes/rosters/[rosterId]';
 import AddRosterUnits from './routes/rosters/[rosterId]/add-units';
 import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
 import PrivacyPolicy from './routes/privacy';
+import { ErrorBoundary } from './components/shared';
 import Collections from './routes/collections';
 import CreateCollection from './routes/collections/create';
 import CollectionView from './routes/collections/[collectionId]';
@@ -44,7 +45,19 @@ const AppRoutes = () => (
     <Route path="/rosters/:rosterId/edit" element={<EditRoster />} />
     <Route path="/rosters/:rosterId/add-units" element={<AddRosterUnits />} />
     <Route path="/rosters/:rosterId/units/:unitId/edit" element={<EditRosterUnit />} />
-    <Route path="/rosters/:rosterId" element={<ViewRoster />} />
+    <Route
+      path="/rosters/:rosterId"
+      element={
+        <ErrorBoundary
+          fallbackTitle="Roster failed to load"
+          fallbackMessage="We hit a snag while rendering this roster. Try again to reload the page."
+          showRetry
+          resetStrategy="remount"
+        >
+          <ViewRoster />
+        </ErrorBoundary>
+      }
+    />
     <Route path="/rosters/create" element={<CreateRoster />} />
 
     {/* Catch all */}
