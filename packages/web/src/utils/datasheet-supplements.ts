@@ -161,19 +161,21 @@ export const formatDetachmentSupplementLabel = (
   supplementKey?: string | null,
   supplementLabel?: string | null
 ): string | null => {
-  if (!supplementKey && !supplementLabel) {
+  const normalizedKey = supplementKey ? normalizeSupplementValue(supplementKey) : null;
+
+  if (!normalizedKey || normalizedKey === CODEX_SLUG) {
     return null;
   }
 
   if (supplementLabel && supplementLabel !== 'None') {
-    return supplementLabel;
+    return supplementLabel.replace(/\s*\(Legends\)$/i, '').replace(/ Legends$/i, '');
   }
 
-  if (supplementKey && normalizeSupplementValue(supplementKey) !== CODEX_SLUG) {
-    return toTitleCase(supplementKey);
-  }
+  const baseKey = normalizedKey.endsWith('-legends')
+    ? normalizedKey.replace(/-legends$/, '')
+    : normalizedKey;
 
-  return 'Codex';
+  return toTitleCase(baseKey);
 };
 
 export const formatDetachmentOptionLabel = (

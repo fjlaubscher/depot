@@ -12,7 +12,6 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
-import { buildDetachmentOptions } from '@/routes/rosters/_components/detachment-options';
 
 const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
@@ -42,11 +41,13 @@ const CreateRoster: React.FC = () => {
   );
 
   const detachmentOptions = useMemo(
-    () => buildDetachmentOptions(sortedDetachments),
+    () =>
+      sortedDetachments.map((detachment) => ({
+        value: detachment.slug,
+        label: detachment.name
+      })),
     [sortedDetachments]
   );
-
-  console.log('[@depot/web]: detachments', detachmentOptions);
 
   // Reset detachment when faction changes
   useEffect(() => {

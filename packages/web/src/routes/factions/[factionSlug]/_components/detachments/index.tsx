@@ -37,8 +37,6 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachments }) 
           <DetachmentCard
             key={detachment.slug}
             detachmentName={detachment.name}
-            supplementKey={detachment.supplementKey}
-            supplementLabel={detachment.supplementLabel}
             abilities={detachment.abilities}
             enhancements={detachment.enhancements}
             stratagems={detachment.stratagems}
