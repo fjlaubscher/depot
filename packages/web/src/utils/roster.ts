@@ -3,6 +3,7 @@ import { calculateTotalPoints } from '@/contexts/roster/utils';
 import { formatWargearDisplayName } from '@/utils/wargear';
 import { formatAbilityName } from '@/utils/abilities';
 import { buildAbsoluteUrl } from '@/utils/paths';
+import { rosterShare } from '@depot/core';
 
 const stripHtml = (html?: string): string => {
   if (!html) return '';
@@ -41,32 +42,8 @@ export const groupRosterUnitsByRole = (units: depot.RosterUnit[]) => {
   return dictionary;
 };
 
-const titleCaseSlug = (slug?: string): string => {
-  if (!slug) {
-    return '';
-  }
-
-  return slug
-    .split('-')
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-};
-
 export const getRosterFactionName = (roster: depot.Roster): string => {
-  if (roster.faction?.name) {
-    return roster.faction.name;
-  }
-
-  if (roster.factionSlug) {
-    return titleCaseSlug(roster.factionSlug) || roster.factionSlug;
-  }
-
-  if (roster.faction?.slug) {
-    return titleCaseSlug(roster.faction.slug) || roster.faction.slug;
-  }
-
-  return '';
+  return rosterShare.getRosterFactionName(roster);
 };
 
 interface GenerateRosterMarkdownOptions {
@@ -155,62 +132,8 @@ export const generateRosterShareText = (
   factionName?: string,
   options: GenerateRosterShareTextOptions = {}
 ): string => {
-  const includeWargear = options.includeWargear ?? false;
-  const includeWargearAbilities = options.includeWargearAbilities ?? includeWargear;
-  const lines: string[] = [];
-
-  // Title (no heading syntax)
-  lines.push(`*${roster.name}*`);
-  lines.push('');
-
-  // Basic info
-  if (factionName) {
-    lines.push(`*Faction:* ${factionName}`);
-  }
-  if (roster.detachment?.name) {
-    lines.push(`*Detachment:* ${roster.detachment.name}`);
-  }
-  lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
-  lines.push('');
-
-  // Units grouped by role
-  const unitsByRole: { [role: string]: depot.RosterUnit[] } = {};
-  roster.units.forEach((unit) => {
-    const role = unit.datasheet.role;
-    if (!unitsByRole[role]) unitsByRole[role] = [];
-    unitsByRole[role].push(unit);
-  });
-
-  const sortedRoles = Object.keys(unitsByRole).sort();
-  sortedRoles.forEach((role) => {
-    lines.push(`*${role}*`);
-    unitsByRole[role].forEach((unit) => {
-      const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
-      const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
-      const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
-      lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
-      if (includeWargear && unit.selectedWargear.length > 0) {
-        unit.selectedWargear.forEach((wargear) => {
-          lines.push(`  - ${formatWargearDisplayName(wargear)}`);
-        });
-      }
-      if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
-        unit.selectedWargearAbilities.forEach((ability) => {
-          lines.push(`  - [Wargear Ability] ${formatAbilityName(ability)}`);
-        });
-      }
-      const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
-      unitEnhancements.forEach(({ enhancement }) => {
-        const enhancementCost = parseInt(enhancement.cost, 10) || 0;
-        lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
-      });
-    });
-    lines.push('');
-  });
-
-  lines.push(buildAbsoluteUrl('/'));
-
-  return lines.join('\n');
+  const shareText = rosterShare.generateRosterShareText(roster, factionName, options);
+  return `${shareText}\n${buildAbsoluteUrl('/')}`;
 };
 
 interface DuplicateRosterOptions {

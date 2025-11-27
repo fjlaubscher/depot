@@ -7,3 +7,4 @@ VITE_SENTRY_DSN = "https://73df263c819aab27ccfc839aae038315@o4510237573971968.in
 VITE_SENTRY_ENVIRONMENT = "production"
 SENTRY_ORG = "francoislaubscherdev"
 SENTRY_PROJECT = "depot"
+OPENAI_MODEL = "gpt-4.1-mini"

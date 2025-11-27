@@ -23,6 +23,7 @@
     "@sentry/react": "^10.21.0",
     "classnames": "^2.5.1",
     "lucide-react": "^0.543.0",
+    "react-markdown": "^10.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.3"

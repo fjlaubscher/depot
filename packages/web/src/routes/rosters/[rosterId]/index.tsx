@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Download, List, Pencil, Share } from 'lucide-react';
+import { Copy, Download, Pencil, Share } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -20,6 +20,7 @@ import {
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
+import CogitatorTab from './_components/cogitator-tab';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const RosterView: FC = () => {
@@ -27,6 +28,7 @@ const RosterView: FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { state: appState } = useAppContext();
+  const isCogitatorEnabled = appState.settings?.enableCogitator ?? false;
   const {
     stratagems: coreStratagems,
     loading: loadingCoreStratagems,
@@ -125,6 +127,11 @@ const RosterView: FC = () => {
       coreError={coreStratagemsError}
     />
   );
+
+  if (isCogitatorEnabled) {
+    tabLabels.push('Cogitator');
+    tabPanels.push(<CogitatorTab key="cogitator" roster={roster} />);
+  }
 
   return (
     <div className="flex flex-col gap-4">

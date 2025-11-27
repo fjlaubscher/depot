@@ -207,6 +207,7 @@ export interface Settings {
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
   usePileOfShameLabel?: boolean;
+  enableCogitator?: boolean;
 }
 
 // Detachment, composed from other types
