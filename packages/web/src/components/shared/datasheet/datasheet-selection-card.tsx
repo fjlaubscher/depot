@@ -52,7 +52,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
       actions={selectedModelCost ? <PointsTag points={selectedModelCost.cost} /> : undefined}
       padding="sm"
       contentGap="sm"
-      titleClassName="text-base md:text-lg"
+      titleClassName="text-base"
       data-testid={`datasheet-card-${datasheet.slug}`}
     >
       <div className="flex h-full flex-col gap-2 text-sm md:text-base">

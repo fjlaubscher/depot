@@ -1,7 +1,16 @@
 import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { Search, Star, Settings, List, Users, ClipboardList, Boxes } from 'lucide-react';
+import {
+  Search,
+  Star,
+  Settings,
+  List,
+  Users,
+  ClipboardList,
+  Boxes,
+  Construction
+} from 'lucide-react';
 
 import { getImageUrl } from '@/utils/paths';
 
@@ -53,6 +62,7 @@ const Home: React.FC = () => {
   );
 
   const actionTiles: Array<{
+    key: 'collections' | 'factions' | 'rosters' | 'settings';
     icon: LucideIcon;
     title: string;
     description: string;
@@ -60,20 +70,7 @@ const Home: React.FC = () => {
     testId: string;
   }> = [
     {
-      icon: Users,
-      title: 'Factions',
-      description: 'Browse every detachment, rule, and enhancement.',
-      path: '/factions',
-      testId: 'browse-factions-button'
-    },
-    {
-      icon: ClipboardList,
-      title: 'Rosters',
-      description: 'Build, tweak, and store lists offline.',
-      path: '/rosters',
-      testId: 'roster-builder-button'
-    },
-    {
+      key: 'collections',
       icon: Boxes,
       title: collectionLabel,
       description: 'Track your pile of shame and prep future lists.',
@@ -81,6 +78,23 @@ const Home: React.FC = () => {
       testId: 'collections-button'
     },
     {
+      key: 'factions',
+      icon: Users,
+      title: 'Factions',
+      description: 'Browse every detachment, rule, and enhancement.',
+      path: '/factions',
+      testId: 'browse-factions-button'
+    },
+    {
+      key: 'rosters',
+      icon: ClipboardList,
+      title: 'Rosters',
+      description: 'Build, tweak, and store lists offline.',
+      path: '/rosters',
+      testId: 'roster-builder-button'
+    },
+    {
+      key: 'settings',
       icon: Settings,
       title: 'Settings',
       description: 'Toggle data refreshes, theme, and cache options.',
@@ -125,23 +139,43 @@ const Home: React.FC = () => {
               </p>
             </div>
             <div className="grid grid-cols-2 grid-rows-2 gap-4">
-              {actionTiles.map(({ icon: Icon, title, description, path, testId }) => (
-                <button
-                  key={title}
-                  type="button"
-                  onClick={() => navigate(path)}
-                  data-testid={testId}
-                  className="group flex h-full min-h-[120px] cursor-pointer flex-col justify-between rounded-xl border border-white/15 bg-white/10 p-4 text-left text-white shadow-lg shadow-primary-900/20 transition hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700 dark:bg-gray-900/60 dark:hover:bg-gray-900/50"
-                >
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:bg-white/25">
-                    <Icon className="h-6 w-6" />
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-base font-semibold">{title}</span>
-                    <span className="text-sm text-white/80 leading-snug">{description}</span>
-                  </div>
-                </button>
-              ))}
+              {actionTiles.map(({ key, icon: Icon, title, description, path, testId }) => {
+                const isCollections = key === 'collections';
+
+                return (
+                  <button
+                    key={title}
+                    type="button"
+                    onClick={() => navigate(path)}
+                    data-testid={testId}
+                    className={`
+                    group relative flex h-full min-h-[120px] cursor-pointer flex-col justify-between rounded-xl
+                    border border-white/15 bg-white/10 p-4 text-left text-white shadow-lg shadow-primary-900/20 transition
+                    hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline focus-visible:outline-2
+                    focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700
+                    dark:bg-gray-900/60 dark:hover:bg-gray-900/50
+                    ${isCollections ? 'border-primary-300/60 bg-white/15 dark:border-primary-500/60' : ''}
+                  `}
+                  >
+                    {isCollections ? (
+                      <span
+                        className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-amber-400/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-950 shadow-md dark:bg-amber-300 dark:text-amber-900"
+                        data-testid="collections-wip-indicator"
+                      >
+                        <Construction className="h-3 w-3" aria-hidden />
+                        WIP
+                      </span>
+                    ) : null}
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:bg-white/25">
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-base font-semibold">{title}</span>
+                      <span className="text-sm text-white/80 leading-snug">{description}</span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>

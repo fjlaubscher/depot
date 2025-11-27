@@ -9,6 +9,7 @@ interface ScrollableTabRowProps {
   innerClassName?: string;
   label?: string;
   description?: string;
+  testId?: string;
   containerProps?: HTMLAttributes<HTMLDivElement>;
 }
 
@@ -23,6 +24,7 @@ const ScrollableTabRow: FC<ScrollableTabRowProps> = ({
   innerClassName,
   label,
   description,
+  testId,
   containerProps
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -83,6 +85,7 @@ const ScrollableTabRow: FC<ScrollableTabRowProps> = ({
   return (
     <div
       {...restContainerProps}
+      data-testid={testId}
       className={classNames('flex flex-col gap-2', className, containerClassName)}
     >
       {label ? <span className="text-sm font-medium text-secondary">{label}</span> : null}

@@ -29,7 +29,7 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, description, ico
             </span>
           ) : null}
           <div className="min-w-0 flex-1">
-            <Card.Title as="p" className="truncate text-base text-foreground">
+            <Card.Title as="h2" className="truncate text-base text-foreground">
               {children}
             </Card.Title>
             {description ? (

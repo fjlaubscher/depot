@@ -1,6 +1,22 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Collections', () => {
+  test('collection form waits for factions and enables submit once filled', async ({ page }) => {
+    await page.goto('/collections/create');
+
+    const skeleton = page.getByTestId('field-skeleton');
+    await skeleton.first().waitFor({ state: 'attached', timeout: 5000 }).catch(() => {});
+    await page.getByTestId('collection-faction-field-select').waitFor({ state: 'visible' });
+
+    const submitButton = page.getByTestId('create-collection-submit');
+    await expect(submitButton).toBeDisabled();
+
+    await page.getByTestId('collection-name-input').fill(`E2E Collection ${Date.now()}`);
+    await page.getByTestId('collection-faction-field-select').selectOption({ index: 1 });
+
+    await expect(submitButton).not.toBeDisabled();
+  });
+
   test('create collection and persist state filter selection', async ({ page }) => {
     await page.goto('/collections');
 

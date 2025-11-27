@@ -62,13 +62,13 @@ export const ContentCard: FC<ContentCardProps> = ({
 
   return (
     <Card
-      className={classNames('h-full', className)}
+      className={classNames('flex h-full flex-col', className)}
       padding={padding}
       interactive={Boolean(onClick)}
       onClick={onClick}
       data-testid={dataTestId}
     >
-      <div className={classNames('flex flex-col', gapClass)}>
+      <div className={classNames('flex flex-1 flex-col', gapClass)}>
         <Card.Header className="gap-4">
           <div className="min-w-0 flex-1">
             <Card.Title className={classNames('truncate', titleClassName)}>{title}</Card.Title>
@@ -120,10 +120,14 @@ export const ContentCard: FC<ContentCardProps> = ({
                 </>
               )}
             </button>
-            {isExpanded && children ? <Card.Content separated>{children}</Card.Content> : null}
+            {isExpanded && children ? (
+              <Card.Content separated className="flex-1">
+                {children}
+              </Card.Content>
+            ) : null}
           </>
         ) : children ? (
-          <Card.Content>{children}</Card.Content>
+          <Card.Content className="flex-1">{children}</Card.Content>
         ) : null}
       </div>
     </Card>

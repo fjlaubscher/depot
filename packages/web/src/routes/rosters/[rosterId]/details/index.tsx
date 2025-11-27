@@ -21,7 +21,7 @@ import {
 } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { BackButton, RosterHeader } from '@/components/shared';
-import MaxPointsField from '@/routes/rosters/create/_components/max-points-field';
+import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 
 const RosterDetailsContent: FC = () => {
   const { state: roster, updateRosterDetails } = useRoster();

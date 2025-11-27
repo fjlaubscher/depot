@@ -34,7 +34,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   return (
     <Card
       padding="sm"
-      className={classNames('relative flex flex-col gap-2', onClick && 'cursor-pointer')}
+      className={classNames('relative flex h-full flex-col gap-2', onClick && 'cursor-pointer')}
       onClick={onClick}
       data-testid={dataTestId}
       data-state={state}
@@ -59,12 +59,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         <Card.Content className="pt-0">
           <TagGroup spacing="sm" className="gap-1">
             {wargearToDisplay.map((wargear, index) => (
-              <Tag
-                key={`compact-wargear-${index}`}
-                variant="secondary"
-                size="sm"
-                className="capitalize"
-              >
+              <Tag key={`compact-wargear-${index}`} size="sm" className="capitalize">
                 {formatWargearDisplayName(wargear).toLowerCase()}
               </Tag>
             ))}
@@ -83,8 +78,8 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
             {wargearAbilitiesToDisplay.map((ability, index) => (
               <Tag
                 key={`compact-wargear-ability-${index}`}
-                variant="warning"
                 size="sm"
+                variant="warning"
                 className="capitalize"
               >
                 {formatAbilityName(ability).toLowerCase()}
@@ -102,7 +97,10 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
       {children ? <Card.Content separated>{children}</Card.Content> : null}
 
       {stateMeta || actions ? (
-        <Card.Footer className="flex items-center justify-between gap-2">
+        <Card.Footer
+          separated={false}
+          className="mt-auto flex items-center justify-between gap-2 border-t border-subtle pt-3"
+        >
           <div className="flex flex-1 items-center gap-2">
             {stateMeta ? (
               <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">

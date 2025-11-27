@@ -1,5 +1,11 @@
 import type { FC } from 'react';
 import classNames from 'classnames';
+import { CODEX_SLUG } from '@/utils/datasheet-supplements';
+import {
+  DEFAULT_TAB_ACTIVE_CLASS,
+  DEFAULT_TAB_INACTIVE_CLASS,
+  getSupplementStyles
+} from '@/utils/supplement-styles';
 import ScrollableTabRow from './scrollable-tab-row';
 
 export interface SupplementTab {
@@ -29,11 +35,20 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
     <ScrollableTabRow
       className={className}
       label="Supplements"
-      containerProps={{ role: 'tablist', 'aria-label': 'Datasheet supplements' }}
+      testId="supplement-tabs"
+      containerProps={{
+        role: 'tablist',
+        'aria-label': 'Datasheet supplements'
+      }}
     >
       {tabs.map((tab) => {
         const isActive = tab.value === activeValue;
         const tabId = `datasheet-supplement-${tab.value}`;
+        const isNeutral = tab.value === 'all' || tab.value === CODEX_SLUG;
+        const styles = getSupplementStyles(isNeutral ? null : tab.value);
+
+        const activeClass = styles.tabActiveClass || DEFAULT_TAB_ACTIVE_CLASS;
+        const inactiveClass = styles.tabInactiveClass || DEFAULT_TAB_INACTIVE_CLASS;
 
         return (
           <button
@@ -43,11 +58,11 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
             aria-selected={isActive}
             aria-controls="datasheet-results"
             onClick={() => onChange(tab.value)}
+            data-testid={`supplement-tab-${tab.value}`}
+            data-supplement-key={isNeutral ? undefined : tab.value}
             className={classNames(
               'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
-              isActive
-                ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
-                : 'border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white'
+              isActive ? activeClass : inactiveClass
             )}
           >
             <span>{tab.label}</span>

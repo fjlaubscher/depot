@@ -73,6 +73,44 @@ export default defineConfig(({ mode }) => {
               type: 'image/png',
               purpose: 'maskable'
             }
+          ],
+          shortcuts: [
+            {
+              name: 'Collections',
+              short_name: 'Collections',
+              url: '/collections',
+              icons: [
+                {
+                  src: 'pwa-192x192.png',
+                  sizes: '192x192',
+                  type: 'image/png'
+                }
+              ]
+            },
+            {
+              name: 'Factions',
+              short_name: 'Factions',
+              url: '/factions',
+              icons: [
+                {
+                  src: 'pwa-192x192.png',
+                  sizes: '192x192',
+                  type: 'image/png'
+                }
+              ]
+            },
+            {
+              name: 'Rosters',
+              short_name: 'Rosters',
+              url: '/rosters',
+              icons: [
+                {
+                  src: 'pwa-192x192.png',
+                  sizes: '192x192',
+                  type: 'image/png'
+                }
+              ]
+            }
           ]
         }
       }),

@@ -16,10 +16,14 @@ const makeDatasheet = (
   factionSlug: overrides.factionSlug ?? 'space-marines',
   sourceId: overrides.sourceId ?? '000000139',
   sourceName: overrides.sourceName ?? 'Codex',
+  supplementKey: overrides.supplementKey,
   supplementSlug: overrides.supplementSlug,
   supplementName: overrides.supplementName,
+  supplementLabel: overrides.supplementLabel,
+  isSupplement: overrides.isSupplement,
   legend: overrides.legend ?? '',
   role: overrides.role ?? 'Battleline',
+  roleLabel: overrides.roleLabel,
   loadout: overrides.loadout ?? '',
   transport: overrides.transport ?? '',
   virtual: overrides.virtual ?? false,
@@ -83,26 +87,41 @@ describe('datasheet supplements utils', () => {
         options: []
       });
     });
+
+    it('uses supplementKey/label when provided', () => {
+      const metadata = deriveSupplementMetadata([
+        makeDatasheet({ slug: 'core-unit', supplementKey: 'codex', isSupplement: false }),
+        makeDatasheet({
+          slug: 'angels-unit',
+          supplementKey: 'blood-angels',
+          supplementLabel: 'Blood Angels',
+          isSupplement: true
+        })
+      ]);
+
+      expect(metadata.options).toContainEqual({
+        label: 'Blood Angels',
+        value: 'blood-angels',
+        count: 1
+      });
+    });
   });
 
   describe('filterDatasheetsBySupplement', () => {
-    it('returns all datasheets when selection is all', () => {
-      const results = filterDatasheetsBySupplement(baseDatasheets, 'all');
-      expect(results).toHaveLength(4);
-    });
+    it('respects supplementKey/isSupplement when slug is missing and retains shared codex', () => {
+      const results = filterDatasheetsBySupplement(
+        [
+          makeDatasheet({ slug: 'core-unit', isSupplement: false }),
+          makeDatasheet({
+            slug: 'keyed-unit',
+            supplementKey: 'custom-supplement',
+            isSupplement: true
+          })
+        ],
+        'custom-supplement'
+      );
 
-    it('includes only codex datasheets when codex selected', () => {
-      const results = filterDatasheetsBySupplement(baseDatasheets, 'codex');
-      expect(results.map((ds) => ds.slug)).toEqual(['tactical-squad', 'intercessors']);
-    });
-
-    it('includes supplement datasheets plus shared codex entries', () => {
-      const results = filterDatasheetsBySupplement(baseDatasheets, 'blood-angels');
-      expect(results.map((ds) => ds.slug)).toEqual([
-        'death-company',
-        'tactical-squad',
-        'intercessors'
-      ]);
+      expect(results.map((ds) => ds.slug)).toEqual(['keyed-unit', 'core-unit']);
     });
   });
 

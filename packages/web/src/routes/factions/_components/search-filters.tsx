@@ -16,6 +16,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ query, onQueryChange, onC
         value={query}
         onChange={onQueryChange}
         testId="faction-search"
+        className="w-full sm:max-w-3xl"
       />
     </Filters>
   );

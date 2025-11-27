@@ -11,7 +11,7 @@ import type { depot } from '@depot/core';
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
-import MaxPointsField from './_components/max-points-field';
+import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 
 const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
