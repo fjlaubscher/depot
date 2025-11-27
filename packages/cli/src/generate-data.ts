@@ -343,7 +343,8 @@ const buildFactionData = (
     .map((datasheet) =>
       buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs, classifySource)
     )
-    .toSorted((a, b) => a.name.localeCompare(b.name));
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
   const enhancements = data.enhancements.filter(
