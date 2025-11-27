@@ -128,10 +128,26 @@ export interface Datasheet {
   factionSlug: string;
   sourceId: string;
   sourceName: string;
+  /**
+   * Normalized supplement identifier (lowercase). Defaults to 'codex' when absent.
+   */
+  supplementKey?: string;
   supplementSlug?: string;
   supplementName?: string;
+  /**
+   * Prebuilt, user-facing supplement label (e.g. 'Blood Angels', 'None').
+   */
+  supplementLabel?: string;
+  /**
+   * True when the datasheet belongs to a supplement (i.e. not the core codex).
+   */
+  isSupplement?: boolean;
   legend: string;
   role: string;
+  /**
+   * User-facing role label (title-cased, dash-preserving).
+   */
+  roleLabel?: string;
   loadout: string;
   transport: string;
   virtual: boolean;
@@ -162,9 +178,13 @@ export interface DatasheetSummary {
   factionId: string;
   factionSlug: string;
   role: string;
+  roleLabel?: string;
   path: string;
+  supplementKey?: string;
   supplementSlug?: string;
   supplementName?: string;
+  supplementLabel?: string;
+  isSupplement?: boolean;
   link: string;
   isForgeWorld: boolean;
   isLegends: boolean;

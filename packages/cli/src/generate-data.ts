@@ -10,9 +10,47 @@ import { getSupplementInfo } from './config/supplements.js';
 const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST_DIR = join(PKG_ROOT, 'dist');
 const JSON_DIR = join(DIST_DIR, 'json');
+const CODEX_SLUG = 'codex';
 
 const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(join(JSON_DIR, fileName), { encoding: 'utf-8' }));
+
+const normalizeSupplementKey = (value?: string) => (value ?? CODEX_SLUG).toLowerCase();
+
+const toTitleCase = (slug: string) =>
+  slug
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+const buildSupplementLabel = (slug?: string, name?: string) => {
+  const normalizedSlug = normalizeSupplementKey(slug);
+  if (normalizedSlug === CODEX_SLUG) {
+    return 'None';
+  }
+
+  if (name) {
+    return name;
+  }
+
+  return slug ? toTitleCase(slug) : 'Supplement';
+};
+
+const formatRoleLabel = (value: string | null | undefined) => {
+  if (!value) {
+    return null;
+  }
+
+  return value
+    .split(' ')
+    .map((word) =>
+      word
+        .split('-')
+        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
+        .join('-')
+    )
+    .join(' ');
+};
 
 const consolidateFiles = (): wahapedia.Data => {
   const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');
@@ -120,6 +158,9 @@ const buildDatasheet = (
 
   const { isForgeWorld, isLegends } = classifySource(datasheet.sourceId);
   const supplementInfo = getSupplementInfo(datasheet.factionId, datasheet.sourceId);
+  const supplementKey = normalizeSupplementKey(supplementInfo?.slug);
+  const supplementLabel = buildSupplementLabel(supplementInfo?.slug, supplementInfo?.name);
+  const isSupplement = supplementKey !== CODEX_SLUG;
   const source = data.sources.find((entry) => entry.id === datasheet.sourceId);
   if (!source) {
     throw new Error(`Missing source for datasheet ${datasheet.id} (${datasheet.name})`);
@@ -201,6 +242,7 @@ const buildDatasheet = (
     slug: datasheetSlug,
     factionSlug,
     virtual: datasheet.virtual === 'true',
+    supplementKey,
     abilities,
     keywords,
     models,
@@ -214,6 +256,9 @@ const buildDatasheet = (
     leaders,
     supplementSlug: supplementInfo?.slug,
     supplementName: supplementInfo?.name,
+    supplementLabel,
+    isSupplement,
+    roleLabel: formatRoleLabel(datasheet.role) ?? datasheet.role,
     sourceName: `${source.type}: ${source.name}`,
     isForgeWorld,
     isLegends
@@ -298,6 +343,7 @@ const buildFactionData = (
     .map((datasheet) =>
       buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs, classifySource)
     );
+  datasheets.sort((a, b) => a.name.localeCompare(b.name));
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
   const enhancements = data.enhancements.filter(

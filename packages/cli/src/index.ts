@@ -14,6 +14,11 @@ const JSON_DIR = join(DIST_DIR, 'json');
 const DATA_DIR = join(DIST_DIR, 'data');
 const FACTIONS_DIR = join(DATA_DIR, 'factions');
 const SOURCE_DATA_DIR = join(DIST_DIR, 'source_data');
+const LOG_PREFIX = '[@depot/cli]';
+
+const log = (message: string) => console.log(`${LOG_PREFIX} ${message}`);
+const logError = (message: string, error?: unknown) =>
+  console.error(`${LOG_PREFIX} ${message}`, error);
 
 const getFileName = (input: string) =>
   input.toLowerCase().replace(/_/g, '-').replace('.csv', '.json');
@@ -59,11 +64,11 @@ const init = async () => {
   const shouldDownload = forceDownload || !sourceDataExists;
 
   if (forceDownload && sourceDataExists) {
-    console.log('Force download flag detected, removing existing source data');
+    log('Force download flag detected, removing existing source data');
     rmSync(SOURCE_DATA_DIR, { recursive: true, force: true });
   }
 
-  console.log('Creating Directories');
+  log('Creating directories');
   mkdirSync(JSON_DIR);
   if (!existsSync(SOURCE_DATA_DIR)) {
     mkdirSync(SOURCE_DATA_DIR);
@@ -74,36 +79,36 @@ const init = async () => {
   let results: string[];
 
   if (shouldDownload) {
-    console.log('Fetching CSV data from Wahapedia');
+    log('Fetching CSV data from Wahapedia');
     const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
       fetchCSV(`http://wahapedia.ru/wh40k10ed/${fileName}`)
     );
     results = await Promise.all(requests);
 
-    console.log('Saving raw CSV files for debugging');
+    log('Saving raw CSV files for debugging');
     for (let i = 0; i < results.length; i++) {
       const csvPath = join(SOURCE_DATA_DIR, csvFileNames[i]);
-      console.log(`Saving ${csvPath}`);
+      log(`Saving ${csvPath}`);
       writeFileSync(csvPath, results[i]);
     }
   } else {
-    console.log('Using existing source data files');
+    log('Using existing source data files');
     results = csvFileNames.map((fileName) => {
       const csvPath = join(SOURCE_DATA_DIR, fileName);
-      console.log(`Reading ${csvPath}`);
+      log(`Reading ${csvPath}`);
       return readFileSync(csvPath, 'utf-8');
     });
   }
 
-  console.log('Parsing data from CSV');
+  log('Parsing data from CSV');
   for (let i = 0; i < results.length; i++) {
     const parsedData = convertToJSON(results[i]);
     const jsonPath = join(JSON_DIR, fileNames[i]);
-    console.log(`Creating ${jsonPath}`);
+    log(`Creating ${jsonPath}`);
     writeFileSync(jsonPath, JSON.stringify(parsedData));
   }
 
-  console.log('Generating faction files');
+  log('Generating faction files');
   mkdirSync(DATA_DIR, { recursive: true });
   mkdirSync(FACTIONS_DIR, { recursive: true });
 
@@ -123,13 +128,22 @@ const init = async () => {
       factionId: faction.id,
       factionSlug: faction.slug,
       role: datasheet.role,
+      roleLabel: datasheet.roleLabel,
+      supplementKey: datasheet.supplementKey,
       path: `/data/factions/${faction.slug}/datasheets/${datasheet.id}.json`,
       supplementSlug: datasheet.supplementSlug,
       supplementName: datasheet.supplementName,
+      supplementLabel: datasheet.supplementLabel,
+      isSupplement: datasheet.isSupplement,
       link: datasheet.link,
       isForgeWorld: datasheet.isForgeWorld,
       isLegends: datasheet.isLegends
     }));
+
+    if (manifestDatasheets.length === 0) {
+      log(`Skipping ${faction.slug} (no datasheets)`);
+      return;
+    }
 
     const manifest: depot.FactionManifest = {
       id: faction.id,
@@ -143,10 +157,10 @@ const init = async () => {
     };
 
     const manifestPath = join(factionDir, 'faction.json');
-    console.log(`Creating ${manifestPath}`);
+    log(`Creating ${manifestPath}`);
     writeFileSync(manifestPath, JSON.stringify(manifest));
 
-    console.log(`Creating ${manifestDatasheets.length} datasheets for ${faction.slug}`);
+    log(`Creating ${manifestDatasheets.length} datasheets for ${faction.slug}`);
     faction.datasheets.forEach((datasheet) => {
       const datasheetPath = join(datasheetsDir, `${datasheet.id}.json`);
       writeFileSync(datasheetPath, JSON.stringify(datasheet));
@@ -162,13 +176,13 @@ const init = async () => {
     });
   });
 
-  console.log('Generating index file');
+  log('Generating index file');
   writeFileSync(join(DATA_DIR, 'index.json'), JSON.stringify(index));
 
-  console.log('Creating core stratagems file');
+  log('Creating core stratagems file');
   writeFileSync(join(DATA_DIR, 'core-stratagems.json'), JSON.stringify(coreStratagems));
 };
 
 init()
-  .then(() => console.log('Done!'))
-  .catch((e) => console.error(e));
+  .then(() => log('Done!'))
+  .catch((e) => logError('CLI failed', e));

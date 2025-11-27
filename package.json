@@ -10,7 +10,8 @@
     "clean": "pnpm -r clean",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "dev": "pnpm --filter @depot/web dev"
+    "dev": "pnpm --filter @depot/web dev",
+    "dev:wrangler": "pnpm --filter @depot/web build && wrangler pages dev packages/web/dist"
   },
   "devDependencies": {
     "@fjlaubscher/agent-rules-mcp": "^0.4.1",

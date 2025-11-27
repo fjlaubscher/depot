@@ -1,7 +1,9 @@
-import { type ReactNode, useMemo, useState, useEffect, useRef } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { LinkCard } from '@/components/ui';
 import Tag from '@/components/ui/tag';
 import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datasheet-browser';
+import { useSupplementSelectionGuard } from '@/hooks/use-supplement-selection-guard';
+import { useSupplementState } from '@/hooks/use-supplement-state';
 import type { DatasheetListItem } from '@/types/datasheets';
 import DatasheetSupplementTabs, {
   type SupplementTab as SupplementTabsOption
@@ -10,15 +12,11 @@ import DatasheetRoleTabs from './datasheet-role-tabs';
 import DatasheetFilterBar from './datasheet-filter-bar';
 import DatasheetResultsGrid from './datasheet-results-grid';
 import DatasheetEmptyState from './datasheet-empty-state';
-import { filterDatasheetsBySettings } from '@/utils/datasheet-filters';
 import {
   CODEX_SLUG,
   buildSupplementLabel,
-  deriveSupplementMetadata,
-  filterDatasheetsBySupplement,
-  isCodexEntry,
-  normalizeSupplementValue,
-  shouldResetSupplementSelection
+  isSupplementEntry,
+  sortDatasheetsBySupplementPreference
 } from '@/utils/datasheet-supplements';
 
 interface DatasheetBrowserProps<T extends DatasheetListItem> {
@@ -58,183 +56,31 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
 }: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState<string>('all');
 
-  const metadataDatasets = useMemo(
-    () => filterDatasheetsBySettings(datasheets, filters),
-    [datasheets, filters]
-  );
-  const supplementMetadata = useMemo(
-    () => deriveSupplementMetadata(metadataDatasets),
-    [metadataDatasets]
-  );
-  const normalizedSelectedSupplement = useMemo(
-    () => normalizeSupplementValue(selectedSupplement || 'all'),
-    [selectedSupplement]
-  );
-  const supplementTabs = useMemo<SupplementTabsOption[]>(() => {
-    if (!supplementMetadata.hasSupplements) {
-      return [];
-    }
-
-    return supplementMetadata.options;
-  }, [supplementMetadata]);
-
-  useEffect(() => {
-    if (!supplementMetadata.hasSupplements && selectedSupplement !== 'all') {
-      setSelectedSupplement('all');
-    }
-  }, [supplementMetadata.hasSupplements, selectedSupplement]);
-
-  const codexDatasheets = useMemo(() => {
-    if (!supplementMetadata.hasSupplements) {
-      return [];
-    }
-
-    return datasheets.filter((sheet) => isCodexEntry(sheet.supplementSlug));
-  }, [datasheets, supplementMetadata.hasSupplements]);
-
-  const activeSupplementDatasheets = useMemo(() => {
-    if (!supplementMetadata.hasSupplements) {
-      return [];
-    }
-
-    if (normalizedSelectedSupplement === 'all') {
-      return [];
-    }
-
-    if (normalizedSelectedSupplement === CODEX_SLUG) {
-      return codexDatasheets;
-    }
-
-    return datasheets.filter((sheet) => {
-      if (!sheet.supplementSlug) {
-        return false;
-      }
-
-      return normalizeSupplementValue(sheet.supplementSlug) === normalizedSelectedSupplement;
-    });
-  }, [
+  const {
+    supplementMetadata,
+    normalizedSelectedSupplement,
+    supplementTabs,
     codexDatasheets,
-    datasheets,
-    normalizedSelectedSupplement,
-    supplementMetadata.hasSupplements
-  ]);
-
-  const supplementFilteredDatasheets = useMemo(() => {
-    if (!supplementMetadata.hasSupplements) {
-      return datasheets;
-    }
-
-    return filterDatasheetsBySupplement(datasheets, selectedSupplement);
-  }, [datasheets, selectedSupplement, supplementMetadata.hasSupplements]);
-
-  const filteredActiveSupplementDatasheets = useMemo(
-    () => filterDatasheetsBySettings(activeSupplementDatasheets, filters),
-    [activeSupplementDatasheets, filters]
-  );
-
-  const filteredCodexDatasheets = useMemo(() => {
-    if (
-      !supplementMetadata.hasSupplements ||
-      normalizedSelectedSupplement === 'all' ||
-      normalizedSelectedSupplement === CODEX_SLUG
-    ) {
-      return [];
-    }
-
-    return filterDatasheetsBySettings(codexDatasheets, filters);
-  }, [codexDatasheets, filters, normalizedSelectedSupplement, supplementMetadata.hasSupplements]);
-
-  const selectedSupplementLabel = useMemo(() => {
-    if (!supplementMetadata.hasSupplements) {
-      return null;
-    }
-
-    const option = supplementMetadata.options.find(
-      (optionItem) => optionItem.value === selectedSupplement
-    );
-
-    if (option) {
-      return option.label;
-    }
-
-    if (selectedSupplement && selectedSupplement !== 'all') {
-      return buildSupplementLabel(selectedSupplement);
-    }
-
-    return null;
-  }, [selectedSupplement, supplementMetadata.hasSupplements, supplementMetadata.options]);
-
-  const supplementSummary = useMemo(() => {
-    if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {
-      return null;
-    }
-
-    if (!selectedSupplementLabel) {
-      return null;
-    }
-
-    if (normalizedSelectedSupplement === CODEX_SLUG) {
-      return `${selectedSupplementLabel} (core datasheets): ${filteredActiveSupplementDatasheets.length} datasheets`;
-    }
-
-    const sharedCount = filteredCodexDatasheets.length;
-    const primaryCount = filteredActiveSupplementDatasheets.length;
-
-    if (sharedCount === 0) {
-      return `${selectedSupplementLabel}: ${primaryCount} datasheets`;
-    }
-
-    return `${selectedSupplementLabel}: ${primaryCount} datasheets + ${sharedCount} shared core datasheets`;
-  }, [
-    filteredActiveSupplementDatasheets.length,
-    filteredCodexDatasheets.length,
-    normalizedSelectedSupplement,
+    activeSupplementDatasheets,
+    supplementFilteredDatasheets,
+    filteredActiveSupplementDatasheets,
+    filteredCodexDatasheets,
     selectedSupplementLabel,
-    supplementMetadata.hasSupplements
-  ]);
+    supplementSummary
+  } = useSupplementState<T>({
+    datasheets,
+    filters,
+    selectedSupplement
+  });
 
-  const prevFiltersRef = useRef<DatasheetFilters | undefined>(filters);
-  const prevActiveSupplementDatasheetsRef = useRef<T[]>(activeSupplementDatasheets);
-
-  useEffect(() => {
-    const prevFilters = prevFiltersRef.current;
-    const prevActiveDatasheets = prevActiveSupplementDatasheetsRef.current;
-
-    prevFiltersRef.current = filters;
-    prevActiveSupplementDatasheetsRef.current = activeSupplementDatasheets;
-
-    if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {
-      return;
-    }
-
-    const lostActiveDatasheets =
-      prevActiveDatasheets.length > 0 && activeSupplementDatasheets.length === 0;
-
-    if (lostActiveDatasheets) {
-      setSelectedSupplement('all');
-      return;
-    }
-
-    const filtersInitialized = prevFilters !== undefined;
-    const legendsChanged = prevFilters?.showLegends !== filters?.showLegends;
-    const forgeWorldChanged = prevFilters?.showForgeWorld !== filters?.showForgeWorld;
-
-    if (!filtersInitialized || (!legendsChanged && !forgeWorldChanged)) {
-      return;
-    }
-
-    if (
-      shouldResetSupplementSelection(activeSupplementDatasheets, filteredActiveSupplementDatasheets)
-    ) {
-      setSelectedSupplement('all');
-    }
-  }, [
+  useSupplementSelectionGuard({
+    filters,
+    supplementMetadata,
+    normalizedSelectedSupplement,
     activeSupplementDatasheets,
     filteredActiveSupplementDatasheets,
-    filters,
-    normalizedSelectedSupplement,
-    supplementMetadata.hasSupplements
-  ]);
+    onResetSelection: () => setSelectedSupplement('all')
+  });
 
   const {
     query,
@@ -250,29 +96,11 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters, 300, initialRole ?? null);
 
   const visibleDatasheets = useMemo(() => {
-    if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {
-      return filteredDatasheets;
-    }
-
-    const getPriority = (sheet: T) => {
-      const slug = sheet.supplementSlug
-        ? normalizeSupplementValue(sheet.supplementSlug)
-        : CODEX_SLUG;
-
-      if (normalizedSelectedSupplement === CODEX_SLUG) {
-        return slug === CODEX_SLUG ? 0 : 1;
-      }
-
-      return slug === normalizedSelectedSupplement ? 0 : 1;
-    };
-
-    return filteredDatasheets.slice().sort((a, b) => {
-      const priorityDiff = getPriority(a) - getPriority(b);
-      if (priorityDiff !== 0) {
-        return priorityDiff;
-      }
-      return a.name.localeCompare(b.name);
-    });
+    return sortDatasheetsBySupplementPreference(
+      filteredDatasheets,
+      normalizedSelectedSupplement,
+      supplementMetadata.hasSupplements
+    );
   }, [filteredDatasheets, normalizedSelectedSupplement, supplementMetadata.hasSupplements]);
 
   const handleSupplementChange = (value: string) => {
@@ -286,7 +114,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
 
   const defaultRenderDatasheet = (datasheet: DatasheetListItem) => {
     const tags: ReactNode[] = [];
-    const roleLabel = formatRoleLabel(datasheet.role);
+    const roleLabel = datasheet.roleLabel ?? formatRoleLabel(datasheet.role);
 
     if (roleLabel) {
       tags.push(
@@ -296,13 +124,10 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       );
     }
 
-    if (
-      supplementMetadata.hasSupplements &&
-      datasheet.supplementSlug &&
-      normalizeSupplementValue(datasheet.supplementSlug) !== CODEX_SLUG
-    ) {
-      const rawSlug = datasheet.supplementSlug;
-      const label = buildSupplementLabel(rawSlug, datasheet.supplementName);
+    if (supplementMetadata.hasSupplements && isSupplementEntry(datasheet)) {
+      const label = datasheet.supplementLabel
+        ? datasheet.supplementLabel
+        : buildSupplementLabel(datasheet.supplementSlug ?? CODEX_SLUG, datasheet.supplementName);
       tags.push(
         <Tag key="supplement" size="sm" variant="primary">
           {label}
