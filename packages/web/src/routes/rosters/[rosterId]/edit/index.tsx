@@ -114,6 +114,7 @@ const RosterEdit: FC = () => {
                     rosterId={roster.id}
                     onRemove={removeUnit}
                     onDuplicate={duplicateUnit}
+                    dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
                   />
                 ))}
               </RosterUnitGrid>

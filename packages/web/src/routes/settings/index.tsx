@@ -108,9 +108,24 @@ const Settings = () => {
               />
               <SettingToggleItem
                 title="Call It What It Is"
-                description="Use “Pile of Shame” instead of “Collection” across the app."
+                description={`Use "Pile of Shame" instead of "Collection" across the app.`}
                 enabled={state.settings?.usePileOfShameLabel ?? true}
                 onChange={(value) => handleSettingsChange('usePileOfShameLabel', value)}
+              />
+            </div>
+          </SettingsCard>
+
+          {/* Experimental Features Card */}
+          <SettingsCard
+            title="Experimental Features"
+            description="Enable work-in-progress tools (may change or break)"
+          >
+            <div className="flex flex-col gap-4">
+              <SettingToggleItem
+                title="Cogitator"
+                description="Experimental: Enable the roster analysis Cogitator tab powered by GPT."
+                enabled={state.settings?.enableCogitator ?? false}
+                onChange={(value) => handleSettingsChange('enableCogitator', value)}
               />
             </div>
           </SettingsCard>

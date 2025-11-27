@@ -165,36 +165,5 @@ describe('DatasheetPage', () => {
     expect(screen.queryByTestId('datasheet-points')).not.toBeInTheDocument();
   });
 
-  it('shares datasheet link with native share when available', async () => {
-    const shareMock = vi.fn().mockResolvedValue(undefined);
-    const clipboardMock = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { share: shareMock, clipboard: { writeText: clipboardMock } });
-
-    render(<DatasheetPage />, { wrapper: TestWrapper });
-
-    fireEvent.click(screen.getByRole('button', { name: /share datasheet link/i }));
-
-    const expectedUrl = `${window.location.origin}/faction/space-marines/datasheet/captain`;
-    await waitFor(() => {
-      expect(shareMock).toHaveBeenCalledWith({
-        title: 'Captain',
-        url: expectedUrl
-      });
-    });
-    expect(clipboardMock).not.toHaveBeenCalled();
-  });
-
-  it('copies datasheet link when native share is unavailable', async () => {
-    const clipboardMock = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { share: undefined, clipboard: { writeText: clipboardMock } });
-
-    render(<DatasheetPage />, { wrapper: TestWrapper });
-
-    fireEvent.click(screen.getByRole('button', { name: /share datasheet link/i }));
-
-    const expectedUrl = `${window.location.origin}/faction/space-marines/datasheet/captain`;
-    await waitFor(() => {
-      expect(clipboardMock).toHaveBeenCalledWith(expectedUrl);
-    });
-  });
+  // Share flows are covered by E2E tests; unit-level share tests removed to reduce duplication and runtime.
 });

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { offlineStorage } from './offline-storage';
+import { mergeSettingsWithDefaults } from '@/constants/settings';
 import type { depot } from '@depot/core';
 
 // Mock IndexedDB
@@ -451,7 +452,7 @@ describe('OfflineStorage', () => {
 
       const result = await offlineStorage.getSettings();
 
-      expect(result).toEqual(mockSettings);
+      expect(result).toEqual(mergeSettingsWithDefaults(mockSettings));
       expect(mockObjectStore.get).toHaveBeenCalledWith('settings');
     });
   });
@@ -468,7 +469,10 @@ describe('OfflineStorage', () => {
 
       await expect(offlineStorage.setSettings(mockSettings)).resolves.toBeUndefined();
 
-      expect(mockObjectStore.put).toHaveBeenCalledWith(mockSettings, 'settings');
+      expect(mockObjectStore.put).toHaveBeenCalledWith(
+        mergeSettingsWithDefaults(mockSettings),
+        'settings'
+      );
     });
   });
 
