@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { getSupplementStyles, supplementColorKeys } from './supplement-styles';
+import {
+  DEFAULT_TAB_ACTIVE_CLASS,
+  DEFAULT_TAB_INACTIVE_CLASS,
+  getSupplementStyles,
+  supplementColorKeys
+} from './supplement-styles';
 
 describe('getSupplementStyles', () => {
   it('returns mapped styles for known supplements', () => {
@@ -10,11 +15,11 @@ describe('getSupplementStyles', () => {
     expect(styles.tabInactiveClass).toContain('border-red-200');
   });
 
-  it('is case-insensitive and returns empty styles for unknown keys', () => {
+  it('is case-insensitive and returns default styles for unknown keys', () => {
     const styles = getSupplementStyles('UNKNOWN');
     expect(styles.tagClass).toBe('');
-    expect(styles.tabActiveClass).toBe('');
-    expect(styles.tabInactiveClass).toBe('');
+    expect(styles.tabActiveClass).toBe(DEFAULT_TAB_ACTIVE_CLASS);
+    expect(styles.tabInactiveClass).toBe(DEFAULT_TAB_INACTIVE_CLASS);
   });
 
   it('exposes a stable list of mapped keys', () => {

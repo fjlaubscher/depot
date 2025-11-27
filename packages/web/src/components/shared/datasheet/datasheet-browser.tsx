@@ -66,8 +66,6 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     activeSupplementDatasheets,
     supplementFilteredDatasheets,
     filteredActiveSupplementDatasheets,
-    filteredCodexDatasheets,
-    selectedSupplementLabel,
     supplementSummary
   } = useSupplementState<T>({
     datasheets,

@@ -18,6 +18,32 @@ interface UseSupplementStateArgs<T extends DatasheetListItem> {
   selectedSupplement: string;
 }
 
+type SupplementMetadata = ReturnType<typeof deriveSupplementMetadata>;
+
+const getSelectedSupplementLabel = (
+  supplementMetadata: SupplementMetadata,
+  selectedSupplement: string,
+  normalizedSelectedSupplement: string
+): string | null => {
+  if (!supplementMetadata.hasSupplements) {
+    return null;
+  }
+
+  const option = supplementMetadata.options.find(
+    (optionItem) => optionItem.value === selectedSupplement
+  );
+
+  if (option) {
+    return option.label;
+  }
+
+  if (selectedSupplement && normalizedSelectedSupplement !== 'all') {
+    return buildSupplementLabel(selectedSupplement);
+  }
+
+  return null;
+};
+
 export const useSupplementState = <T extends DatasheetListItem>({
   datasheets,
   filters,
@@ -67,25 +93,11 @@ export const useSupplementState = <T extends DatasheetListItem>({
         ? []
         : filterDatasheetsBySettings(codexDatasheets, filters);
 
-    const selectedSupplementLabel = (() => {
-      if (!supplementMetadata.hasSupplements) {
-        return null;
-      }
-
-      const option = supplementMetadata.options.find(
-        (optionItem) => optionItem.value === selectedSupplement
-      );
-
-      if (option) {
-        return option.label;
-      }
-
-      if (selectedSupplement && selectedSupplement !== 'all') {
-        return buildSupplementLabel(selectedSupplement);
-      }
-
-      return null;
-    })();
+    const selectedSupplementLabel = getSelectedSupplementLabel(
+      supplementMetadata,
+      selectedSupplement,
+      normalizedSelectedSupplement
+    );
 
     const supplementSummary = (() => {
       if (!supplementMetadata.hasSupplements || normalizedSelectedSupplement === 'all') {

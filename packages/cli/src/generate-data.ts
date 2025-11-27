@@ -342,8 +342,8 @@ const buildFactionData = (
     .filter((datasheet) => datasheet.factionId === faction.id && datasheet.virtual === 'false')
     .map((datasheet) =>
       buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs, classifySource)
-    );
-  datasheets.sort((a, b) => a.name.localeCompare(b.name));
+    )
+    .toSorted((a, b) => a.name.localeCompare(b.name));
 
   const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
   const enhancements = data.enhancements.filter(

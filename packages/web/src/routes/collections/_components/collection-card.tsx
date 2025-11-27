@@ -74,7 +74,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
       onClick={handleView}
       data-testid={`collection-card-${collection.id}`}
     >
-      <Card.Header className="items-start gap-3">
+      <Card.Header className="items-start gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <Card.Title as="h3" className="truncate text-base font-semibold sm:text-lg">
             {collection.name}
@@ -101,10 +101,15 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
         </Card.Content>
       ) : null}
 
-      <Card.Footer align="end" className="flex items-center justify-between gap-3">
-        <Tag size="sm" variant="default">
-          {collection.items.length} {collection.items.length === 1 ? 'unit' : 'units'}
-        </Tag>
+      <Card.Footer
+        separated={false}
+        className="mt-auto flex w-full items-center gap-3 border-t border-subtle pt-3"
+      >
+        <div className="flex flex-1 items-center">
+          <Tag size="sm" variant="default">
+            {collection.items.length} {collection.items.length === 1 ? 'unit' : 'units'}
+          </Tag>
+        </div>
         <ActionGroup
           spacing="tight"
           actions={[

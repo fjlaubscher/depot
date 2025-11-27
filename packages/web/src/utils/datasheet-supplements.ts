@@ -168,7 +168,7 @@ export const formatDetachmentSupplementLabel = (
   }
 
   if (supplementLabel && supplementLabel !== 'None') {
-    return supplementLabel.replace(/\s*\(Legends\)$/i, '').replace(/ Legends$/i, '');
+    return supplementLabel.replace(/\s*\(?Legends\)?$/i, '');
   }
 
   const baseKey = normalizedKey.endsWith('-legends')
