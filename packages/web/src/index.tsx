@@ -26,7 +26,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 fallbackMessage="Something went wrong with the application. Please refresh the page or try again later."
                 homeUrl="/"
                 showRetry
-                resetStrategy="reload"
               >
                 <Routes />
               </ErrorBoundary>
