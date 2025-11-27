@@ -21,7 +21,8 @@ import {
 } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { BackButton, RosterHeader } from '@/components/shared';
-import MaxPointsField from '@/routes/rosters/create/_components/max-points-field';
+import MaxPointsField from '@/routes/rosters/_components/max-points-field';
+import { formatDetachmentOptionLabel } from '@/utils/datasheet-supplements';
 
 const RosterDetailsContent: FC = () => {
   const { state: roster, updateRosterDetails } = useRoster();
@@ -51,7 +52,11 @@ const RosterDetailsContent: FC = () => {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((detachment) => ({
         value: detachment.slug,
-        label: detachment.name
+        label: formatDetachmentOptionLabel(
+          detachment.name,
+          detachment.supplementKey,
+          detachment.supplementLabel
+        )
       }));
   }, [faction?.detachments]);
 

@@ -4,9 +4,11 @@ import DetachmentAccordion from './detachment-accordion';
 import DetachmentPillNav from './detachment-pill-nav';
 import DetachmentSectionContent from './detachment-section-content';
 import type { DetachmentSectionKey } from './types';
+import { formatDetachmentOptionLabel } from '@/utils/datasheet-supplements';
 
 interface DetachmentCardProps {
   detachmentName: string;
+  supplementKey?: string;
   supplementLabel?: string;
   abilities: depot.DetachmentAbility[];
   enhancements: depot.Enhancement[];
@@ -17,6 +19,7 @@ interface DetachmentCardProps {
 
 const DetachmentCard: React.FC<DetachmentCardProps> = ({
   detachmentName,
+  supplementKey,
   supplementLabel,
   abilities,
   enhancements,
@@ -73,9 +76,15 @@ const DetachmentCard: React.FC<DetachmentCardProps> = ({
     setActiveSection(target.key);
   };
 
+  const detachmentDisplayName = formatDetachmentOptionLabel(
+    detachmentName,
+    supplementKey,
+    supplementLabel
+  );
+
   return (
     <DetachmentAccordion
-      title={detachmentName}
+      title={detachmentDisplayName}
       subtitle={supplementLabel ? `${supplementLabel} supplement` : undefined}
       isOpen={isOpen}
       onToggle={onToggle}
