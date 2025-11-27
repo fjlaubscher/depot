@@ -86,11 +86,8 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
         <PointsTag points={points} className="whitespace-nowrap" />
       </Card.Header>
 
-      <Card.Content separated className="flex flex-wrap items-center gap-2 text-xs text-subtle">
-        <Tag size="sm" variant="primary">
-          {collection.items.length} {collection.items.length === 1 ? 'unit' : 'units'}
-        </Tag>
-        {Object.entries(stateSummary).length > 0 ? (
+      {Object.entries(stateSummary).length > 0 ? (
+        <Card.Content separated className="flex flex-wrap items-center gap-2 text-xs text-subtle">
           <div className="flex flex-wrap items-center gap-1">
             {Object.entries(stateSummary).map(([state, count]) => {
               const meta = COLLECTION_STATE_META[state as depot.CollectionUnitState];
@@ -101,10 +98,13 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
               );
             })}
           </div>
-        ) : null}
-      </Card.Content>
+        </Card.Content>
+      ) : null}
 
-      <Card.Footer align="end">
+      <Card.Footer align="end" className="flex items-center justify-between gap-3">
+        <Tag size="sm" variant="default">
+          {collection.items.length} {collection.items.length === 1 ? 'unit' : 'units'}
+        </Tag>
         <ActionGroup
           spacing="tight"
           actions={[

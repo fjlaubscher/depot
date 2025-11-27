@@ -59,12 +59,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         <Card.Content className="pt-0">
           <TagGroup spacing="sm" className="gap-1">
             {wargearToDisplay.map((wargear, index) => (
-              <Tag
-                key={`compact-wargear-${index}`}
-                variant="secondary"
-                size="sm"
-                className="capitalize"
-              >
+              <Tag key={`compact-wargear-${index}`} size="sm" className="capitalize">
                 {formatWargearDisplayName(wargear).toLowerCase()}
               </Tag>
             ))}
@@ -81,12 +76,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         <Card.Content className="pt-0">
           <TagGroup spacing="sm" className="gap-1">
             {wargearAbilitiesToDisplay.map((ability, index) => (
-              <Tag
-                key={`compact-wargear-ability-${index}`}
-                variant="warning"
-                size="sm"
-                className="capitalize"
-              >
+              <Tag key={`compact-wargear-ability-${index}`} size="sm" className="capitalize">
                 {formatAbilityName(ability).toLowerCase()}
               </Tag>
             ))}

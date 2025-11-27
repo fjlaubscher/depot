@@ -5,7 +5,6 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import useFactions from '@/hooks/use-factions';
-import useFaction from '@/hooks/use-faction';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
@@ -16,7 +15,6 @@ const CreateCollectionPage: React.FC = () => {
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
 
   const { factions, loading: factionsLoading } = useFactions();
-  const { loading: factionLoading } = useFaction(factionSlug || undefined);
 
   const factionOptions =
     factions
@@ -77,6 +75,7 @@ const CreateCollectionPage: React.FC = () => {
                 type="text"
                 className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
                 value={name}
+                data-testid="collection-name-input"
                 onChange={(e) => setName(e.target.value)}
                 placeholder="My Pile of Shame"
                 required
@@ -88,6 +87,7 @@ const CreateCollectionPage: React.FC = () => {
             ) : (
               <SelectField
                 label="Faction"
+                data-testid="collection-faction-field"
                 options={factionOptions}
                 value={factionSlug || ''}
                 onChange={(e) => setFactionSlug(e.target.value || null)}
@@ -96,15 +96,13 @@ const CreateCollectionPage: React.FC = () => {
               />
             )}
 
-            {factionLoading && factionSlug ? <FieldSkeleton /> : null}
-
             <div className="flex justify-end gap-4">
               <Button variant="secondary" onClick={() => navigate('/collections')}>
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={!name || !factionSlug || factionsLoading || factionLoading}
+                disabled={!name || !factionSlug || factionsLoading}
                 data-testid="create-collection-submit"
               >
                 Create
