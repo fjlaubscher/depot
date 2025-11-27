@@ -18,7 +18,7 @@ const UnitDetails: React.FC<UnitDetailsProps> = ({ unit }) => {
           abilitiesTestId="roster-unit-abilities"
           compact
           showLeaderRules={false}
-          showWargear={false}
+          showWargear
           excludeAbilityTypes={['wargear']}
           additionalAbilities={unit.selectedWargearAbilities ?? []}
         />
