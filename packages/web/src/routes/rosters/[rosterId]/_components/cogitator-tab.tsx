@@ -1,20 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Play } from 'lucide-react';
 
 import type { depot } from '@depot/core';
 import { Button } from '@/components/ui';
+import { useRoster } from '@/contexts/roster/use-roster-context';
 
 type CogitatorTabProps = {
   roster: depot.Roster;
 };
 
 const CogitatorTab: FC<CogitatorTabProps> = ({ roster }) => {
-  const [analysis, setAnalysis] = useState<string | null>(null);
+  const { setCogitatorAnalysis } = useRoster();
+
+  const [analysis, setAnalysis] = useState<string | null>(roster.cogitatorAnalysis?.output ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(
+    roster.cogitatorAnalysis?.updatedAt ?? null
+  );
+
+  useEffect(() => {
+    setAnalysis(roster.cogitatorAnalysis?.output ?? null);
+    setLastUpdated(roster.cogitatorAnalysis?.updatedAt ?? null);
+  }, [roster.cogitatorAnalysis]);
 
   const handleRunCogitator = async () => {
     setLoading(true);
@@ -41,8 +51,14 @@ const CogitatorTab: FC<CogitatorTabProps> = ({ roster }) => {
         throw new Error(data.error || 'Cogitator did not return any output.');
       }
 
+      const updatedAt = new Date().toLocaleString();
+
       setAnalysis(data.output);
-      setLastUpdated(new Date().toLocaleTimeString());
+      setLastUpdated(updatedAt);
+      setCogitatorAnalysis({
+        output: data.output,
+        updatedAt
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to run cogitator.';
       console.error('Cogitator error', error);
@@ -51,8 +67,6 @@ const CogitatorTab: FC<CogitatorTabProps> = ({ roster }) => {
       setLoading(false);
     }
   };
-
-  const buttonLabel = analysis ? 'Repeat data-rite' : 'Begin data-rite';
 
   return (
     <div className="flex flex-col gap-3">
@@ -68,15 +82,17 @@ const CogitatorTab: FC<CogitatorTabProps> = ({ roster }) => {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button
-          variant="secondary"
-          onClick={() => void handleRunCogitator()}
-          disabled={loading}
-          className="flex items-center gap-2"
-        >
-          <Play size={16} aria-hidden="true" />
-          <span>{loading ? 'Consulting the machine-spirit.' : buttonLabel}</span>
-        </Button>
+        {!analysis && (
+          <Button
+            variant="secondary"
+            onClick={() => void handleRunCogitator()}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <Play size={16} aria-hidden="true" />
+            <span>{loading ? 'Consulting the machine-spirit.' : 'Begin data-rite'}</span>
+          </Button>
+        )}
         {lastUpdated && <p className="text-xs text-subtle">Last updated at {lastUpdated}</p>}
       </div>
 

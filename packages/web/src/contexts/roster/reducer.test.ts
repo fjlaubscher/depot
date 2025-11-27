@@ -55,7 +55,8 @@ describe('rosterReducer', () => {
         },
         warlordUnitId: null,
         units: [rosterUnit],
-        enhancements: []
+        enhancements: [],
+        cogitatorAnalysis: null
       };
 
       const action: RosterAction = {

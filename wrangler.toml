@@ -3,8 +3,4 @@ compatibility_date = "2024-12-31"
 pages_build_output_dir = "packages/web/dist"
 
 [vars]
-VITE_SENTRY_DSN = "https://73df263c819aab27ccfc839aae038315@o4510237573971968.ingest.de.sentry.io/4510237593305168"
-VITE_SENTRY_ENVIRONMENT = "production"
-SENTRY_ORG = "francoislaubscherdev"
-SENTRY_PROJECT = "depot"
 OPENAI_MODEL = "gpt-4.1-mini"

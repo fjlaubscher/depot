@@ -37,7 +37,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
             ),
             datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
           };
-        })
+        }),
+        cogitatorAnalysis: action.payload.cogitatorAnalysis ?? null
       };
 
       return {
@@ -82,7 +83,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         },
         warlordUnitId: null,
         units: initialUnits,
-        enhancements: []
+        enhancements: [],
+        cogitatorAnalysis: null
       };
 
       return {
@@ -101,7 +103,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: {
           ...state.points,
           max: action.payload.maxPoints
-        }
+        },
+        cogitatorAnalysis: null
       };
 
       return {
@@ -116,7 +119,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
     case 'SET_DETACHMENT':
       return {
         ...state,
-        detachment: action.payload
+        detachment: action.payload,
+        cogitatorAnalysis: null
       };
 
     case 'ADD_UNIT': {
@@ -133,7 +137,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       const updatedState = {
         ...state,
-        units: [...state.units, newUnit]
+        units: [...state.units, newUnit],
+        cogitatorAnalysis: null
       };
 
       return {
@@ -153,7 +158,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       const updatedState = {
         ...state,
-        units: [...state.units, duplicatedUnit]
+        units: [...state.units, duplicatedUnit],
+        cogitatorAnalysis: null
       };
 
       return {
@@ -173,7 +179,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           (enhancement) => enhancement.unitId !== action.payload.rosterUnitId
         ),
         warlordUnitId:
-          state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId
+          state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId,
+        cogitatorAnalysis: null
       };
 
       return {
@@ -192,7 +199,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargear: action.payload.wargear }
             : unit
-        )
+        ),
+        cogitatorAnalysis: null
       };
 
       return {
@@ -211,7 +219,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargearAbilities: action.payload.abilities }
             : unit
-        )
+        ),
+        cogitatorAnalysis: null
       };
 
       return {
@@ -230,7 +239,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, modelCost: action.payload.modelCost }
             : unit
-        )
+        ),
+        cogitatorAnalysis: null
       };
 
       return {
@@ -251,7 +261,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
             enhancement: action.payload.enhancement,
             unitId: action.payload.targetUnitId
           }
-        ]
+        ],
+        cogitatorAnalysis: null
       };
 
       return {
@@ -268,7 +279,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         ...state,
         enhancements: state.enhancements.filter(
           ({ enhancement }) => enhancement.id !== action.payload.enhancementId
-        )
+        ),
+        cogitatorAnalysis: null
       };
 
       return {
@@ -285,16 +297,10 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
       const nextWarlordId =
         unitId && state.units.some((unit) => unit.id === unitId) ? unitId : null;
 
-      if (state.warlordUnitId === nextWarlordId) {
-        return {
-          ...state,
-          warlordUnitId: state.warlordUnitId ?? null
-        };
-      }
-
       return {
         ...state,
-        warlordUnitId: nextWarlordId
+        warlordUnitId: nextWarlordId,
+        cogitatorAnalysis: null
       };
     }
 
@@ -304,7 +310,14 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: {
           ...state.points,
           current: calculateTotalPoints(state)
-        }
+        },
+        cogitatorAnalysis: null
+      };
+
+    case 'SET_COGITATOR_ANALYSIS':
+      return {
+        ...state,
+        cogitatorAnalysis: action.payload
       };
 
     default:
