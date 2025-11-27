@@ -72,11 +72,7 @@ const DetachmentCard: React.FC<DetachmentCardProps> = ({
   };
 
   return (
-    <DetachmentAccordion
-      title={detachmentName}
-      isOpen={isOpen}
-      onToggle={onToggle}
-    >
+    <DetachmentAccordion title={detachmentName} isOpen={isOpen} onToggle={onToggle}>
       <div className="flex flex-col gap-4">
         <DetachmentPillNav
           sections={sections}
