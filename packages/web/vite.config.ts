@@ -110,6 +110,7 @@ export default defineConfig(({ mode }) => {
   if (enableSentryUpload) {
     plugins.push(
       sentryVitePlugin({
+        debug: true,
         org: env.SENTRY_ORG,
         project: env.SENTRY_PROJECT,
         authToken: env.SENTRY_AUTH_TOKEN,
