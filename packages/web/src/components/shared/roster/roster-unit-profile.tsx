@@ -5,7 +5,7 @@ import type { depot } from '@depot/core';
 import { ModelStatsRow } from '@/components/shared';
 import DatasheetHero from '@/components/shared/datasheet/datasheet-hero';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
-import { categorizeAbilities, formatAbilityName } from '@/utils/abilities';
+import { categorizeAbilities } from '@/utils/abilities';
 import WargearTable from '@/components/shared/wargear-table';
 
 interface RosterUnitProfileProps {
@@ -39,7 +39,6 @@ const RosterUnitProfile: FC<RosterUnitProfileProps> = ({
   );
 
   const selectedWargear = unit.selectedWargear ?? [];
-  const selectedWargearAbilities = unit.selectedWargearAbilities ?? [];
 
   return (
     <div className="flex flex-col gap-2" data-testid="roster-unit-profile">
