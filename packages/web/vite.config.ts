@@ -10,9 +10,9 @@ import { getAppBasePath, getViteBasePath } from './src/utils/paths';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const enableSentryUpload =
-    !!env.SENTRY_AUTH_TOKEN &&
-    !!env.SENTRY_ORG &&
-    !!env.SENTRY_PROJECT &&
+    !!env.VITE_SENTRY_AUTH_TOKEN &&
+    !!env.VITE_SENTRY_ORG &&
+    !!env.VITE_SENTRY_PROJECT &&
     !!env.VITE_SENTRY_RELEASE;
 
   const basePath = getAppBasePath(env.VITE_APP_BASE_PATH);
@@ -111,9 +111,9 @@ export default defineConfig(({ mode }) => {
     plugins.push(
       sentryVitePlugin({
         debug: true,
-        org: env.SENTRY_ORG,
-        project: env.SENTRY_PROJECT,
-        authToken: env.SENTRY_AUTH_TOKEN,
+        org: env.VITE_SENTRY_ORG,
+        project: env.VITE_SENTRY_PROJECT,
+        authToken: env.VITE_SENTRY_AUTH_TOKEN,
         release: { name: env.VITE_SENTRY_RELEASE, create: true },
         sourcemaps: {
           assets: [distPath],
