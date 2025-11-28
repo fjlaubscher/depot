@@ -146,12 +146,14 @@ span.hi_custom {
 
   .ability-rich-text table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin: 0.75rem 0;
+    @apply border border-subtle rounded-lg bg-gray-50 dark:bg-gray-900 p-4;
   }
 
   .ability-rich-text td {
-    @apply border border-subtle rounded-lg bg-gray-50 dark:bg-gray-900 px-3 py-2;
+    @apply border-t border-subtle px-3 py-2;
   }
 
   .ability-rich-text p {
@@ -178,6 +180,24 @@ span.hi_custom {
     @apply text-sm font-bold text-foreground;
   }
 
+  .ability-rich-text .BreakInsideAvoid {
+    break-inside: avoid;
+    margin-top: 0.75rem;
+  }
+
+  .ability-rich-text .td_w {
+    @apply border-0 bg-transparent p-0;
+  }
+
+  .ability-rich-text .ShowFluff,
+  .ability-rich-text .legend2 {
+    @apply text-xs italic text-muted mb-2;
+  }
+
+  .ability-rich-text tr:first-child td {
+    border-top-width: 0;
+  }
+
   .ability-rich-text ul,
   .ability-rich-text ol {
     @apply list-disc pl-6 my-2;
@@ -189,6 +209,10 @@ span.hi_custom {
 
   .ability-rich-text li {
     @apply mb-1;
+  }
+
+  .ability-rich-text td > :last-child {
+    margin-bottom: 0;
   }
 
   .markdown-content {

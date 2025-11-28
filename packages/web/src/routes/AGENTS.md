@@ -27,6 +27,7 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
 - Use shared Tailwind utilities (`text-foreground`, `text-muted`, status surfaces/borders, `focus-ring-*`) to align with the design system.
 - Prefer flex/grid `gap` over margins for spacing; stick to `gap-0.5`, `gap-1`, `gap-2`, `gap-4` (rarely `gap-6`) and the same scale for padding.
 - Keep hero/primary actions inside the route root and expose stable `data-testid` hooks for layout-critical elements.
+ - For roster + collections unit views, prefer composing shared roster components (`RosterUnitCardCompact`, `RosterUnitProfilePanel`, `RosterUnitList`) rather than duplicating layout/expansion logic in route-level `_components`.
 
 ## State & Data Patterns
 - Context integration: `useAppContext`, `useToastContext`, `useRoster`.

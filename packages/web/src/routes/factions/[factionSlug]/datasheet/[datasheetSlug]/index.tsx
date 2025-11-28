@@ -114,7 +114,7 @@ const DatasheetPage: FC = () => {
           data-testid="datasheet-header"
         />
 
-        {settings?.showFluff ? (
+        {settings?.showFluff && datasheet.legend?.trim() ? (
           <p className="text-sm text-muted font-medium italic">{datasheet.legend}</p>
         ) : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />

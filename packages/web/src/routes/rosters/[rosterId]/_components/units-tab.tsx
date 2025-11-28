@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { RosterEmptyState, RosterSection } from '@/components/shared';
+import { RosterUnitList } from '@/components/shared/roster';
 import { groupRosterUnitsByRole } from '@/utils/roster';
 import ViewRosterUnitCard from './view-roster-unit-card';
 
@@ -30,9 +31,10 @@ const UnitsTab: React.FC<UnitsTabProps> = ({ units }) => {
           title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
           data-testid="unit-role-section"
         >
-          {groupedUnits[role].map((unit) => (
-            <ViewRosterUnitCard key={unit.id} unit={unit} />
-          ))}
+          <RosterUnitList
+            units={groupedUnits[role]}
+            renderUnit={(unit) => <ViewRosterUnitCard key={unit.id} unit={unit} />}
+          />
         </RosterSection>
       ))}
     </div>

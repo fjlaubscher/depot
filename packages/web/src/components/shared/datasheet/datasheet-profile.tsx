@@ -15,36 +15,15 @@ import { categorizeAbilities } from '@/utils/abilities';
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
   factionDatasheets?: DatasheetListItem[];
-  abilitiesTestId?: string;
-  compact?: boolean;
-  showLeaderRules?: boolean;
-  showWargear?: boolean;
-  additionalAbilities?: depot.Ability[];
-  excludeAbilityTypes?: string[];
 }
 
 const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
-  factionDatasheets = [],
-  abilitiesTestId = 'datasheet-abilities',
-  compact = false,
-  showLeaderRules = true,
-  showWargear = true,
-  additionalAbilities = [],
-  excludeAbilityTypes = []
+  factionDatasheets = []
 }) => {
-  const abilitiesForDisplay = useMemo(() => {
-    const excluded = new Set(excludeAbilityTypes.map((type) => type.toLowerCase()));
-    const baseAbilities = excluded.size
-      ? datasheet.abilities.filter((ability) => !excluded.has(ability.type?.toLowerCase() ?? ''))
-      : datasheet.abilities;
-
-    return [...baseAbilities, ...additionalAbilities];
-  }, [datasheet.abilities, additionalAbilities, excludeAbilityTypes]);
-
   const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
-    return categorizeAbilities(abilitiesForDisplay);
-  }, [abilitiesForDisplay]);
+    return categorizeAbilities(datasheet.abilities);
+  }, [datasheet.abilities]);
 
   const mergedAbilities = useMemo(
     () => [...coreAbilities, ...inlineAbilities],
@@ -52,24 +31,23 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   );
 
   return (
-    <div
-      className={`flex flex-col ${compact ? 'gap-2' : 'gap-2 sm:gap-4'}`}
-      data-testid="datasheet-profile"
-    >
+    <div className="flex flex-col gap-2 sm:gap-4" data-testid="datasheet-profile">
       {/* Model Stats Rows */}
       {datasheet.models.map((model) => (
-        <ModelStatsRow key={model.line} model={model} variant={compact ? 'compact' : 'default'} />
+        <ModelStatsRow key={model.line} model={model} variant="default" />
       ))}
+
       <DatasheetHero datasheet={datasheet} factionDatasheets={factionDatasheets} />
+
       <DatasheetAbilities
         title="Abilities"
         abilities={mergedAbilities}
-        dataTestId={abilitiesTestId}
+        dataTestId="datasheet-abilities"
       />
-      {showLeaderRules ? (
-        <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
-      ) : null}
-      {showWargear ? <DatasheetWargear datasheet={datasheet} /> : null}
+
+      <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+
+      <DatasheetWargear datasheet={datasheet} />
     </div>
   );
 };

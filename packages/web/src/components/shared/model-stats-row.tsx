@@ -10,7 +10,7 @@ interface ModelStatsRowProps {
 }
 
 const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model, variant = 'default' }) => {
-  const statCardSize = variant === 'compact' ? 'compact' : 'default';
+  const statCardSize = 'compact';
   const normalizedInv = normalizeInvulnerable(model.invSv);
   const showInvulnerable = Boolean(normalizedInv);
 
@@ -27,12 +27,10 @@ const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model, variant = 'default
 
       {showInvulnerable ? (
         <div
-          className={`flex items-center gap-2 text-foreground ${
-            variant === 'compact' ? 'text-xs' : 'text-sm'
-          }`}
+          className="flex items-center gap-2 text-sm text-foreground"
           data-testid="model-invulnerable-save"
         >
-          <Shield size={variant === 'compact' ? 14 : 16} className="text-subtle" />
+          <Shield size={16} className="text-subtle" />
           <span className="font-medium">Invulnerable Save</span>{' '}
           <span className="font-bold text-primary-500">{normalizedInv}</span>
           {model.invSvDescr ? (

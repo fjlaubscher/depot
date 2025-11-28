@@ -7,12 +7,8 @@ import classNames from 'classnames';
 import AppLayout from '@/components/layout';
 import { BackButton } from '@/components/shared';
 import { PageHeader, Loader, Breadcrumbs, Button, Alert } from '@/components/ui';
-import {
-  RosterSection,
-  RosterUnitCardEdit,
-  RosterEmptyState,
-  RosterUnitGrid
-} from '@/components/shared/roster';
+import { RosterSection, RosterEmptyState, RosterUnitList } from '@/components/shared/roster';
+import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
@@ -117,6 +113,11 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
     return collection.items.filter((item) => item.state === activeStateFilter);
   }, [activeStateFilter, collection]);
+
+  const filteredRosterUnits = useMemo(
+    () => filteredItems.map((item) => toRosterUnit(item)),
+    [filteredItems]
+  );
 
   const handleRemove = async (unitId: string) => {
     if (!collection) return;
@@ -264,21 +265,22 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           </div>
         }
       >
-        {filteredItems.length > 0 ? (
-          <RosterUnitGrid data-testid="collection-unit-cards">
-            {filteredItems.map((item) => (
-              <RosterUnitCardEdit
-                key={item.id}
-                unit={toRosterUnit(item)}
-                rosterId={collection.id}
-                basePath="/collections"
+        {filteredRosterUnits.length > 0 ? (
+          <RosterUnitList
+            units={filteredRosterUnits}
+            dataTestId="collection-unit-cards"
+            renderUnit={(unit) => (
+              <CollectionUnitCard
+                key={unit.id}
+                unit={unit}
+                collectionId={collection.id}
                 onRemove={handleRemove}
                 onDuplicate={handleDuplicate}
-                state={item.state}
+                state={collection.items.find((item) => item.id === unit.id)?.state}
                 dataTestId="collection-unit-card"
               />
-            ))}
-          </RosterUnitGrid>
+            )}
+          />
         ) : (
           <RosterEmptyState
             title="No units in this collection"
