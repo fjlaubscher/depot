@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Download, Pencil, Share } from 'lucide-react';
+import { Copy, Download, Pencil, Share2 } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -153,7 +153,7 @@ const RosterView: FC = () => {
         subtitle={subtitle}
         stats={<RosterHeader roster={roster} />}
         action={{
-          icon: canUseNativeShare ? <Share size={16} /> : <Copy size={16} />,
+          icon: canUseNativeShare ? <Share2 size={16} /> : <Copy size={16} />,
           onClick: () => void handleShareRoster(),
           ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
           testId: 'share-roster-button'

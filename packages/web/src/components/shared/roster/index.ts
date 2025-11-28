@@ -5,3 +5,5 @@ export { default as RosterUnitCardEdit } from './roster-unit-card-edit';
 export { default as RosterEmptyState } from './roster-empty-state';
 export { default as RosterUnitGrid } from './roster-unit-grid';
 export { default as RosterUnitProfile } from './roster-unit-profile';
+export { default as RosterUnitProfilePanel } from './roster-unit-profile-panel';
+export { default as RosterUnitList } from './roster-unit-list';
