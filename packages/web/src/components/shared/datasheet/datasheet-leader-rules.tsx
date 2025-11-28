@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import type { DatasheetListItem } from '@/types/datasheets';
 
-import { Card, CollapsibleSection } from '@/components/ui';
+import { CollapsibleSection } from '@/components/ui';
 
 interface DatasheetLeaderRulesProps {
   datasheet: depot.Datasheet;
@@ -32,7 +32,7 @@ const formatLeaderName = (slug: string, fallback: string) => {
 const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factionDatasheets }) => {
   const { leaderFooter, leaders } = datasheet;
   const leaderHead =
-    datasheet.leaderHead?.trim() || 'This model can be attached to the following units:';
+    datasheet.leaderHead?.trim() || 'This leader can be attached to the following units.';
 
   const leaderTargets = useMemo<LeaderTarget[]>(() => {
     if (!leaders.length) {
@@ -78,19 +78,13 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
       className="w-full"
       dataTestId="datasheet-leader-rules"
     >
-      <Card className="flex flex-col gap-3 p-4">
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold text-foreground">Attachment Options</span>
-          <div
-            className="text-xs text-body [&_p]:m-0"
-            dangerouslySetInnerHTML={{ __html: leaderHead }}
-          />
-        </div>
+      <div className="flex flex-col gap-2 text-sm text-body">
+        <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderHead }} />
 
         {leaderTargets.length ? (
-          <ul className="list-disc pl-5">
+          <ul className="mt-1 list-disc pl-5">
             {leaderTargets.map((target) => (
-              <li key={target.key} className="text-sm text-body" data-testid="leader-target">
+              <li key={target.key} data-testid="leader-target">
                 {target.path ? (
                   <Link
                     to={target.path}
@@ -107,12 +101,9 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
         ) : null}
 
         {leaderFooter?.trim() ? (
-          <div
-            className="text-xs text-body [&_p]:m-0"
-            dangerouslySetInnerHTML={{ __html: leaderFooter }}
-          />
+          <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderFooter }} />
         ) : null}
-      </Card>
+      </div>
     </CollapsibleSection>
   );
 };

@@ -74,25 +74,25 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
         <table className="w-full text-xs table-fixed">
           <thead>
             <tr className="border-b border-subtle">
-              <th className="text-left py-1 font-medium text-primary-600 dark:text-primary-400 w-2/5 md:w-3/5">
+              <th className="text-left py-1 font-semibold text-primary-600 dark:text-primary-400 w-2/5 md:w-3/5">
                 {title}
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 Range
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 A
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 {type === 'Ranged' ? 'BS' : type === 'Melee' ? 'WS' : 'BS/WS'}
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 S
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 AP
               </th>
-              <th className="text-center py-1 font-medium text-primary-600 dark:text-primary-400">
+              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
                 D
               </th>
             </tr>
@@ -124,11 +124,11 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
                           {row.keywords.map((keyword, keywordIndex) => (
                             <Tag
                               key={`${row.key}-kw-${keywordIndex}`}
-                              variant="secondary"
+                              variant="default"
                               size="sm"
                               className="capitalize"
                             >
-                              {keyword}
+                              {keyword.toLowerCase()}
                             </Tag>
                           ))}
                         </TagGroup>

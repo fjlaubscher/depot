@@ -28,7 +28,7 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
       )}
 
       <div
-        className="text-sm text-body leading-relaxed"
+        className="ability-rich-text"
         dangerouslySetInnerHTML={{ __html: ability.description }}
       />
     </Card>

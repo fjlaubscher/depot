@@ -22,6 +22,7 @@ const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
       unit={unit}
       actions={actions}
       onClick={() => setIsExpanded((prev) => !prev)}
+      showWargearSummary={!isExpanded}
     >
       {isExpanded ? (
         <div

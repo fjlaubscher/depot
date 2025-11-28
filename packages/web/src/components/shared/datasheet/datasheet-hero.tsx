@@ -15,7 +15,9 @@ interface DatasheetHeroProps {
   factionDatasheets: DatasheetListItem[];
 }
 
-const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets }) => {
+const DatasheetHero: FC<
+  DatasheetHeroProps & { showPoints?: boolean; compositionVariant?: 'default' | 'compact' }
+> = ({ datasheet, factionDatasheets, showPoints = true, compositionVariant = 'default' }) => {
   const { keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
   const keywordTags = useMemo(
@@ -29,15 +31,16 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, factionDatasheets })
   }));
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-4">
+    <div className="flex flex-col gap-2">
       <DatasheetComposition
         composition={unitComposition}
         loadout={loadout}
         transport={transport}
+        variant={compositionVariant}
         data-testid="unit-composition"
       />
 
-      {pointTags.length > 0 ? (
+      {showPoints && pointTags.length > 0 ? (
         <TagGroup spacing="sm" className="flex-wrap" data-testid="datasheet-points">
           {pointTags.map((entry) => (
             <Tag key={entry.key} variant="primary" size="sm">

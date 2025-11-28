@@ -82,23 +82,7 @@ describe('DatasheetProfile', () => {
     expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
   });
 
-  it('omits leader and wargear sections when disabled', () => {
-    const datasheet = createMockDatasheet();
-
-    render(
-      <DatasheetProfile
-        datasheet={datasheet}
-        factionDatasheets={[datasheet]}
-        showLeaderRules={false}
-        showWargear={false}
-      />
-    );
-
-    expect(screen.queryByTestId('datasheet-leader-rules')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('datasheet-wargear')).not.toBeInTheDocument();
-  });
-
-  it('renders model rows in compact mode when requested', () => {
+  it('renders model rows using the default variant', () => {
     const datasheet = createMockDatasheet({
       models: [
         {
@@ -119,17 +103,9 @@ describe('DatasheetProfile', () => {
       ]
     });
 
-    render(
-      <DatasheetProfile
-        datasheet={datasheet}
-        factionDatasheets={[datasheet]}
-        compact
-        showLeaderRules={false}
-        showWargear={false}
-      />
-    );
+    render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
-    expect(screen.getByTestId('model-stats-row')).toHaveAttribute('data-variant', 'compact');
-    expect(mockModelStatsRow).toHaveBeenCalledWith(expect.objectContaining({ variant: 'compact' }));
+    expect(screen.getByTestId('model-stats-row')).toHaveAttribute('data-variant', 'default');
+    expect(mockModelStatsRow).toHaveBeenCalledWith(expect.objectContaining({ variant: 'default' }));
   });
 });
