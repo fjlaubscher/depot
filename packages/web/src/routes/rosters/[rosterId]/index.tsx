@@ -1,17 +1,21 @@
 import { Fragment, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Download, Pencil, Share2 } from 'lucide-react';
+import { Copy, Pencil, Share2 } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
+import { safeSlug } from '@/utils/strings';
+import type { ExportedRoster } from '@/types/export';
+import { offlineStorage } from '@/data/offline-storage';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
+import ExportButton from '@/components/shared/export-button';
 import {
   generateRosterMarkdown,
   generateRosterShareText,
@@ -40,15 +44,27 @@ const RosterView: FC = () => {
   const useNativeShare = appState.settings?.useNativeShare ?? true;
   const canUseNativeShare =
     useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
-  const handleExportMarkdown = () => {
-    const markdown = generateRosterMarkdown(roster, factionName, {
-      includeWargear: includeWargearOnExport
-    });
-    const blob = new Blob([markdown], { type: 'text/markdown' });
+
+  const handleExportJson = async () => {
+    let dataVersion: string | null = null;
+    try {
+      dataVersion = await offlineStorage.getDataVersion();
+    } catch {
+      dataVersion = null;
+    }
+
+    const payload: ExportedRoster = {
+      kind: 'roster',
+      version: 1,
+      dataVersion,
+      roster
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${roster.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md`;
+    a.download = `roster-${safeSlug(roster.name)}-${roster.id}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast({ title: 'Roster exported', type: 'success' });
@@ -162,7 +178,7 @@ const RosterView: FC = () => {
 
       {/* Actions */}
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="secondary"
             onClick={() => navigate(`/rosters/${roster.id}/edit`)}
@@ -172,18 +188,11 @@ const RosterView: FC = () => {
             <Pencil size={16} />
             Edit
           </Button>
-          <Button
-            variant="secondary"
-            onClick={handleExportMarkdown}
-            className="flex items-center gap-2"
-            data-testid="export-button"
-          >
-            <Download size={16} />
-            Export
-          </Button>
+          <ExportButton onClick={handleExportJson} />
         </div>
         <p className="text-xs text-subtle">
-          Exports and sharing follow your Settings preferences (wargear visibility, sharing method).
+          Export downloads a JSON you can import on another device. Sharing still follows your
+          Settings preferences (wargear visibility, sharing method).
         </p>
       </div>
 

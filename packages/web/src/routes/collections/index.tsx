@@ -10,6 +10,9 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Button, Loader, ErrorState, Alert } from '@/components/ui';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@/utils/collection';
+import { readJsonFile } from '@/utils/file';
+import { isExportedCollection } from '@/types/export';
+import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
 
 const CollectionsPage: React.FC = () => {
@@ -70,6 +73,53 @@ const CollectionsPage: React.FC = () => {
     }
   };
 
+  const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
+    const items = collection.items.map((item) => ({
+      ...item,
+      id: crypto.randomUUID()
+    }));
+
+    const imported: depot.Collection = {
+      ...collection,
+      id: crypto.randomUUID(),
+      items,
+      points: { current: calculateCollectionPoints({ ...collection, items }) }
+    };
+
+    return imported;
+  };
+
+  const handleImportCollectionFile = async (file: File) => {
+    try {
+      const parsed = await readJsonFile<unknown>(file);
+      if (!isExportedCollection(parsed) || parsed.version !== 1) {
+        showToast({
+          type: 'error',
+          title: 'Import failed',
+          message: 'This file does not look like a depot collection export.'
+        });
+        return;
+      }
+
+      const imported = remapCollectionIds(parsed.collection);
+      await offlineStorage.saveCollection(imported);
+      await refresh();
+
+      showToast({
+        type: 'success',
+        title: usePileLabel ? 'Pile entry imported' : 'Collection imported',
+        message: `Imported "${imported.name}".`
+      });
+    } catch (err) {
+      console.error('Failed to import collection', err);
+      showToast({
+        type: 'error',
+        title: 'Import failed',
+        message: 'Could not import this collection. Please check the file and try again.'
+      });
+    }
+  };
+
   return (
     <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
@@ -83,6 +133,14 @@ const CollectionsPage: React.FC = () => {
             testId: 'create-collection-button'
           }}
         />
+        <div className="flex flex-wrap gap-3">
+          <ImportButton
+            label="Import collection"
+            onFileSelected={handleImportCollectionFile}
+            buttonTestId="import-collection-button"
+            inputTestId="import-collection-input"
+          />
+        </div>
 
         <Alert variant="warning" title="Work in progress">
           This collection experience is still evolving, so expect layouts, counts, or features to

@@ -4,6 +4,7 @@ import type { depot } from '@depot/core';
 
 import { ContentCard, PointsTag, Tag, SelectField, Button } from '@/components/ui';
 import { groupKeywords } from '@/utils/keywords';
+import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetSelectionCardProps {
   datasheet: depot.Datasheet;
@@ -40,6 +41,30 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
     return groupKeywords(datasheet.keywords).faction;
   }, [datasheet.keywords]);
 
+  const supplementStyles = useMemo(
+    () => getSupplementStyles(datasheet.supplementKey),
+    [datasheet.supplementKey]
+  );
+
+  const isSupplementKeyword = (keyword: string): boolean => {
+    if (!datasheet.supplementKey && !datasheet.supplementLabel && !datasheet.supplementName) {
+      return false;
+    }
+
+    const normalize = (value: string) => value.toLowerCase().replace(/[\s-]+/g, '');
+    const keywordNorm = normalize(keyword);
+    const candidates = [
+      datasheet.supplementLabel,
+      datasheet.supplementName,
+      datasheet.supplementSlug,
+      datasheet.supplementKey
+    ].filter((value): value is string => Boolean(value));
+
+    const normalizedCandidates = candidates.map(normalize);
+
+    return normalizedCandidates.some((candidate) => candidate === keywordNorm);
+  };
+
   const handleAdd = () => {
     if (selectedModelCost) {
       onAdd(datasheet, selectedModelCost);
@@ -75,7 +100,12 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           {factionKeywords.length > 1 ? (
             <div className="flex flex-wrap gap-2" data-testid="faction-keywords">
               {factionKeywords.map((keyword) => (
-                <Tag key={keyword} size="sm" variant="secondary">
+                <Tag
+                  key={keyword}
+                  size="sm"
+                  variant="default"
+                  className={isSupplementKeyword(keyword) ? supplementStyles.tagClass : undefined}
+                >
                   {keyword}
                 </Tag>
               ))}
@@ -87,7 +117,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           {datasheet.modelCosts.length > 1 ? (
             <SelectField
               fullWidth={false}
-              className="max-w-xs md:max-w-sm"
+              className="max-w-[14rem] md:max-w-[18rem]"
               options={modelCostOptions}
               value={selectedModelCost?.line ?? ''}
               onChange={(event) => setSelectedCostLine(event.target.value)}

@@ -97,7 +97,7 @@ const Home: React.FC = () => {
       key: 'settings',
       icon: Settings,
       title: 'Settings',
-      description: 'Toggle data refreshes, theme, and cache options.',
+      description: 'Tweak the app to your liking.',
       path: '/settings',
       testId: 'settings-button'
     }
@@ -151,7 +151,7 @@ const Home: React.FC = () => {
                     className={`
                     group relative flex h-full min-h-[120px] cursor-pointer flex-col justify-between rounded-xl
                     border border-white/15 bg-white/10 p-4 text-left text-white shadow-lg shadow-primary-900/20 transition
-                    hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline focus-visible:outline-2
+                    hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline
                     focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700
                     dark:bg-gray-900/60 dark:hover:bg-gray-900/50
                     ${isCollections ? 'border-primary-300/60 bg-white/15 dark:border-primary-500/60' : ''}
