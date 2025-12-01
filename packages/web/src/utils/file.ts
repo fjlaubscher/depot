@@ -1,8 +1,8 @@
 export const readJsonFile = async <T>(file: File): Promise<T> => {
-  const contents = await file.text();
   try {
+    const contents = await file.text();
     return JSON.parse(contents) as T;
-  } catch (error) {
+  } catch {
     throw new Error('Invalid JSON file');
   }
 };

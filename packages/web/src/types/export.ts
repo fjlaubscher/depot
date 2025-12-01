@@ -21,21 +21,31 @@ const isObject = (value: unknown): value is UnknownRecord =>
 
 const hasRosterShape = (value: unknown): value is depot.Roster => {
   if (!isObject(value)) return false;
+  const points = (value as UnknownRecord).points;
+  const detachment = (value as UnknownRecord).detachment;
   return (
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.factionId === 'string' &&
-    Array.isArray(value.units)
+    Array.isArray(value.units) &&
+    Array.isArray(value.enhancements) &&
+    isObject(detachment) &&
+    isObject(points) &&
+    typeof points.current === 'number' &&
+    typeof points.max === 'number'
   );
 };
 
 const hasCollectionShape = (value: unknown): value is depot.Collection => {
   if (!isObject(value)) return false;
+  const points = (value as UnknownRecord).points;
   return (
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.factionId === 'string' &&
-    Array.isArray(value.items)
+    Array.isArray(value.items) &&
+    isObject(points) &&
+    typeof points.current === 'number'
   );
 };
 
