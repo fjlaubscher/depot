@@ -16,7 +16,12 @@ const ExportButton: FC<ExportButtonProps> = ({
   testId = 'export-button',
   variant = 'secondary'
 }) => (
-  <Button variant={variant} onClick={onClick} className="flex items-center gap-2" data-testid={testId}>
+  <Button
+    variant={variant}
+    onClick={onClick}
+    className="flex items-center gap-2"
+    data-testid={testId}
+  >
     <Download size={16} />
     {label}
   </Button>
