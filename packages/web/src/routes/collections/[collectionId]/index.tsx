@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, ClipboardPlus, Download } from 'lucide-react';
+import { Plus, ClipboardPlus } from 'lucide-react';
 import type { depot } from '@depot/core';
 import classNames from 'classnames';
 
@@ -16,6 +16,7 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { ExportedCollection } from '@/types/export';
 import { safeSlug } from '@/utils/strings';
+import ExportButton from '@/components/shared/export-button';
 import {
   COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
@@ -256,15 +257,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           <ClipboardPlus size={16} />
           Create Roster
         </Button>
-        <Button
-          onClick={handleExportCollection}
-          variant="secondary"
-          className="flex items-center gap-2"
-          data-testid="export-collection-button"
-        >
-          <Download size={16} />
-          Export
-        </Button>
+        <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
       </div>
 
       <RosterSection

@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderOpen, Download, Upload } from 'lucide-react';
+import { Plus, FolderOpen } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
@@ -12,6 +12,7 @@ import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@/utils/collection';
 import { readJsonFile } from '@/utils/file';
 import { isExportedCollection } from '@/types/export';
+import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
 
 const CollectionsPage: React.FC = () => {
@@ -19,7 +20,6 @@ const CollectionsPage: React.FC = () => {
   const { collections, loading, error, refresh } = useCollections();
   const { state } = useAppContext();
   const { showToast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
   const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
@@ -89,11 +89,7 @@ const CollectionsPage: React.FC = () => {
     return imported;
   };
 
-  const handleImportCollection = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const [file] = event.target.files ?? [];
-    event.target.value = '';
-    if (!file) return;
-
+  const handleImportCollectionFile = async (file: File) => {
     try {
       const parsed = await readJsonFile<unknown>(file);
       if (!isExportedCollection(parsed) || parsed.version !== 1) {
@@ -138,25 +134,13 @@ const CollectionsPage: React.FC = () => {
           }}
         />
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant="secondary"
-            onClick={() => fileInputRef.current?.click()}
-            data-testid="import-collection-button"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Upload size={16} />
-              Import collection
-            </span>
-          </Button>
+          <ImportButton
+            label="Import collection"
+            onFileSelected={handleImportCollectionFile}
+            buttonTestId="import-collection-button"
+            inputTestId="import-collection-input"
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          className="hidden"
-          type="file"
-          accept="application/json,.json"
-          onChange={handleImportCollection}
-          data-testid="import-collection-input"
-        />
 
         <Alert variant="warning" title="Work in progress">
           This collection experience is still evolving, so expect layouts, counts, or features to

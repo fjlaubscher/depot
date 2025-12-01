@@ -58,11 +58,11 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
       datasheet.supplementName,
       datasheet.supplementSlug,
       datasheet.supplementKey
-    ]
-      .filter(Boolean)
-      .map(normalize);
+    ].filter((value): value is string => Boolean(value));
 
-    return candidates.some((candidate) => candidate === keywordNorm);
+    const normalizedCandidates = candidates.map(normalize);
+
+    return normalizedCandidates.some((candidate) => candidate === keywordNorm);
   };
 
   const handleAdd = () => {

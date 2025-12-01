@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Download, Pencil, Share2 } from 'lucide-react';
+import { Copy, Pencil, Share2 } from 'lucide-react';
 
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -15,6 +15,7 @@ import { offlineStorage } from '@/data/offline-storage';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
+import ExportButton from '@/components/shared/export-button';
 import {
   generateRosterMarkdown,
   generateRosterShareText,
@@ -187,15 +188,7 @@ const RosterView: FC = () => {
             <Pencil size={16} />
             Edit
           </Button>
-          <Button
-            variant="secondary"
-            onClick={handleExportJson}
-            className="flex items-center gap-2"
-            data-testid="export-button"
-          >
-            <Download size={16} />
-            Export
-          </Button>
+          <ExportButton onClick={handleExportJson} />
         </div>
         <p className="text-xs text-subtle">
           Export downloads a JSON you can import on another device. Sharing still follows your

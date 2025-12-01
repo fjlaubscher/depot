@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Plus, Upload } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
 import { useToast } from '@/contexts/toast/use-toast-context';
@@ -10,14 +10,14 @@ import { readJsonFile } from '@/utils/file';
 import { isExportedRoster } from '@/types/export';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, ErrorState, Button } from '@/components/ui';
+import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import ImportButton from '@/components/shared/import-button';
 import { RosterCard } from './_components/roster-card';
 
 const Rosters: React.FC = () => {
   const navigate = useNavigate();
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleCreate = () => {
     navigate('/rosters/create');
@@ -91,11 +91,7 @@ const Rosters: React.FC = () => {
     };
   };
 
-  const handleImportRoster = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const [file] = event.target.files ?? [];
-    event.target.value = '';
-    if (!file) return;
-
+  const handleImportRosterFile = async (file: File) => {
     try {
       const parsed = await readJsonFile<unknown>(file);
       if (!isExportedRoster(parsed) || parsed.version !== 1) {
@@ -176,25 +172,13 @@ const Rosters: React.FC = () => {
           }}
         />
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant="secondary"
-            onClick={() => fileInputRef.current?.click()}
-            data-testid="import-roster-button"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Upload size={16} />
-              Import roster
-            </span>
-          </Button>
+          <ImportButton
+            label="Import roster"
+            onFileSelected={handleImportRosterFile}
+            buttonTestId="import-roster-button"
+            inputTestId="import-roster-input"
+          />
         </div>
-        <input
-          ref={fileInputRef}
-          className="hidden"
-          type="file"
-          accept="application/json,.json"
-          onChange={handleImportRoster}
-          data-testid="import-roster-input"
-        />
         {rosters.length === 0 ? (
           <div
             data-testid="empty-state"
