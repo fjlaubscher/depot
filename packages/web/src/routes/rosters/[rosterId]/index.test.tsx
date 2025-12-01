@@ -177,7 +177,6 @@ describe('ViewRosterPage', () => {
     expect(screen.getByText('Export')).toBeInTheDocument();
     expect(screen.getByLabelText('Share roster')).toBeInTheDocument();
   });
-
   it('falls back to copy action when native share is unavailable', () => {
     Object.assign(navigator, {
       share: undefined,

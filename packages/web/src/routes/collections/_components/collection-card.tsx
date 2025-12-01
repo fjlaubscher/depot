@@ -114,15 +114,6 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
           spacing="tight"
           actions={[
             {
-              icon: <Pencil size={16} />,
-              onClick: (event) => {
-                event?.stopPropagation();
-                handleEdit();
-              },
-              ariaLabel: 'Edit collection',
-              variant: 'primary'
-            },
-            {
               icon: <Copy size={16} />,
               onClick: (event) => {
                 event?.stopPropagation();
@@ -131,6 +122,15 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
               ariaLabel: 'Duplicate collection',
               variant: 'secondary',
               disabled: isDuplicating
+            },
+            {
+              icon: <Pencil size={16} />,
+              onClick: (event) => {
+                event?.stopPropagation();
+                handleEdit();
+              },
+              ariaLabel: 'Edit collection',
+              variant: 'primary'
             },
             {
               icon: <Trash2 size={16} />,

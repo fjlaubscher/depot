@@ -18,14 +18,14 @@ const DEFAULT_STYLE: SupplementStyle = {
 const SUPPLEMENT_COLOR_MAP: Record<string, SupplementStyle> = {
   'blood-angels': {
     tagClass:
-      'border border-red-200 bg-red-100 text-red-800 dark:border-red-800 dark:bg-red-900 dark:text-red-200',
+      '!bg-red-100 !text-red-800 border border-red-200 dark:!bg-red-900 dark:!text-red-200 dark:border-red-800',
     tabActiveClass: 'bg-red-600 text-white border-red-600 dark:bg-red-500 dark:border-red-500',
     tabInactiveClass:
       'border-red-200 text-red-700 hover:text-red-900 hover:border-red-300 dark:border-red-800 dark:text-red-200 dark:hover:text-red-100'
   },
   'dark-angels': {
     tagClass:
-      'border border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+      '!bg-emerald-700 !text-white border border-emerald-700 dark:!bg-emerald-600 dark:!text-white dark:border-emerald-600',
     tabActiveClass:
       'bg-emerald-600 text-white border-emerald-600 dark:bg-emerald-500 dark:border-emerald-500',
     tabInactiveClass:
@@ -33,14 +33,14 @@ const SUPPLEMENT_COLOR_MAP: Record<string, SupplementStyle> = {
   },
   'space-wolves': {
     tagClass:
-      'border border-sky-200 bg-sky-100 text-sky-800 dark:border-sky-800 dark:bg-sky-900 dark:text-sky-200',
+      '!bg-sky-100 !text-sky-800 border border-sky-200 dark:!bg-sky-900 dark:!text-sky-200 dark:border-sky-800',
     tabActiveClass: 'bg-sky-600 text-white border-sky-600 dark:bg-sky-500 dark:border-sky-500',
     tabInactiveClass:
       'border-sky-200 text-sky-700 hover:text-sky-900 hover:border-sky-300 dark:border-sky-800 dark:text-sky-200 dark:hover:text-sky-100'
   },
   'black-templars': {
     tagClass:
-      'border border-gray-300 bg-gray-100 text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100',
+      '!bg-gray-100 !text-gray-900 border border-white dark:!bg-gray-900 dark:!text-gray-100 dark:border-white',
     tabActiveClass:
       'bg-gray-800 text-white border-gray-800 dark:bg-gray-200 dark:text-gray-900 dark:border-gray-200',
     tabInactiveClass:
@@ -48,7 +48,7 @@ const SUPPLEMENT_COLOR_MAP: Record<string, SupplementStyle> = {
   },
   deathwatch: {
     tagClass:
-      'border border-indigo-200 bg-indigo-100 text-indigo-800 dark:border-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+      '!bg-indigo-100 !text-indigo-800 border border-indigo-200 dark:!bg-indigo-900 dark:!text-indigo-200 dark:border-indigo-800',
     tabActiveClass:
       'bg-indigo-600 text-white border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500',
     tabInactiveClass:
@@ -56,14 +56,14 @@ const SUPPLEMENT_COLOR_MAP: Record<string, SupplementStyle> = {
   },
   'ultramarines-legends': {
     tagClass:
-      'border border-blue-200 bg-blue-100 text-blue-800 dark:border-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      '!bg-blue-100 !text-blue-800 border border-blue-200 dark:!bg-blue-900 dark:!text-blue-200 dark:border-blue-800',
     tabActiveClass: 'bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:border-blue-500',
     tabInactiveClass:
       'border-blue-200 text-blue-700 hover:text-blue-900 hover:border-blue-300 dark:border-blue-800 dark:text-blue-200 dark:hover:text-blue-100'
   },
   'imperial-agents-legends': {
     tagClass:
-      'border border-amber-200 bg-amber-100 text-amber-800 dark:border-amber-800 dark:bg-amber-900 dark:text-amber-200',
+      '!bg-amber-100 !text-amber-800 border border-amber-200 dark:!bg-amber-900 dark:!text-amber-200 dark:border-amber-800',
     tabActiveClass:
       'bg-amber-600 text-white border-amber-600 dark:bg-amber-500 dark:border-amber-500',
     tabInactiveClass:

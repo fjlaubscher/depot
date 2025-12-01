@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Download, Plus, Upload } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import type { depot } from '@depot/core';
+import { offlineStorage } from '@/data/offline-storage';
+import { readJsonFile } from '@/utils/file';
+import { isExportedRoster } from '@/types/export';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import { PageHeader, Loader, ErrorState, Button } from '@/components/ui';
 import { RosterCard } from './_components/roster-card';
 
 const Rosters: React.FC = () => {
   const navigate = useNavigate();
-  const { rosters, loading, error, deleteRoster, duplicateRoster } = useRosters();
+  const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleCreate = () => {
     navigate('/rosters/create');
@@ -51,6 +55,72 @@ const Rosters: React.FC = () => {
         type: 'error',
         title: 'Duplicate Failed',
         message: 'Could not duplicate the roster. Please try again.'
+      });
+    }
+  };
+
+  const remapRosterIds = (roster: depot.Roster): depot.Roster => {
+    const unitIdMap = new Map<string, string>();
+    const units = roster.units.map((unit) => {
+      const newId = crypto.randomUUID();
+      unitIdMap.set(unit.id, newId);
+      return { ...unit, id: newId };
+    });
+
+    const enhancements = roster.enhancements
+      .map((enhancement) => {
+        const newUnitId = unitIdMap.get(enhancement.unitId);
+        if (!newUnitId) {
+          console.warn('Skipping enhancement with missing unit during import', enhancement.unitId);
+          return null;
+        }
+        return { ...enhancement, unitId: newUnitId };
+      })
+      .filter((value): value is NonNullable<typeof value> => Boolean(value));
+
+    const warlordUnitId = roster.warlordUnitId
+      ? (unitIdMap.get(roster.warlordUnitId) ?? null)
+      : null;
+
+    return {
+      ...roster,
+      id: crypto.randomUUID(),
+      units,
+      enhancements,
+      warlordUnitId
+    };
+  };
+
+  const handleImportRoster = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const [file] = event.target.files ?? [];
+    event.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = await readJsonFile<unknown>(file);
+      if (!isExportedRoster(parsed) || parsed.version !== 1) {
+        showToast({
+          type: 'error',
+          title: 'Import failed',
+          message: 'This file does not look like a depot roster export.'
+        });
+        return;
+      }
+
+      const imported = remapRosterIds(parsed.roster);
+      await offlineStorage.saveRoster(imported);
+      await refresh();
+      showToast({
+        type: 'success',
+        title: 'Roster imported',
+        message: `Imported "${imported.name}".`
+      });
+    } catch (err) {
+      console.error('Failed to import roster', err);
+      showToast({
+        type: 'error',
+        title: 'Import failed',
+        message: 'Could not import this roster. Please check the file and try again.'
       });
     }
   };
@@ -104,6 +174,26 @@ const Rosters: React.FC = () => {
             onClick: handleCreate,
             ariaLabel: 'Create new roster'
           }}
+        />
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            data-testid="import-roster-button"
+          >
+            <span className="inline-flex items-center gap-2">
+              <Upload size={16} />
+              Import roster
+            </span>
+          </Button>
+        </div>
+        <input
+          ref={fileInputRef}
+          className="hidden"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportRoster}
+          data-testid="import-roster-input"
         />
         {rosters.length === 0 ? (
           <div

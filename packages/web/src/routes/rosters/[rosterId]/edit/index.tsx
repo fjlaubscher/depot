@@ -76,8 +76,9 @@ const RosterEdit: FC = () => {
       />
 
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-2">
           <Button
+            variant="secondary"
             onClick={handleAddUnits}
             className="flex items-center gap-2"
             data-testid="add-units-button"

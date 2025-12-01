@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderOpen } from 'lucide-react';
+import { Plus, FolderOpen, Download, Upload } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
@@ -10,6 +10,8 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Button, Loader, ErrorState, Alert } from '@/components/ui';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@/utils/collection';
+import { readJsonFile } from '@/utils/file';
+import { isExportedCollection } from '@/types/export';
 import CollectionCard from './_components/collection-card';
 
 const CollectionsPage: React.FC = () => {
@@ -17,6 +19,7 @@ const CollectionsPage: React.FC = () => {
   const { collections, loading, error, refresh } = useCollections();
   const { state } = useAppContext();
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
   const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
@@ -70,6 +73,57 @@ const CollectionsPage: React.FC = () => {
     }
   };
 
+  const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
+    const items = collection.items.map((item) => ({
+      ...item,
+      id: crypto.randomUUID()
+    }));
+
+    const imported: depot.Collection = {
+      ...collection,
+      id: crypto.randomUUID(),
+      items,
+      points: { current: calculateCollectionPoints({ ...collection, items }) }
+    };
+
+    return imported;
+  };
+
+  const handleImportCollection = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const [file] = event.target.files ?? [];
+    event.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = await readJsonFile<unknown>(file);
+      if (!isExportedCollection(parsed) || parsed.version !== 1) {
+        showToast({
+          type: 'error',
+          title: 'Import failed',
+          message: 'This file does not look like a depot collection export.'
+        });
+        return;
+      }
+
+      const imported = remapCollectionIds(parsed.collection);
+      await offlineStorage.saveCollection(imported);
+      await refresh();
+
+      showToast({
+        type: 'success',
+        title: usePileLabel ? 'Pile entry imported' : 'Collection imported',
+        message: `Imported "${imported.name}".`
+      });
+    } catch (err) {
+      console.error('Failed to import collection', err);
+      showToast({
+        type: 'error',
+        title: 'Import failed',
+        message: 'Could not import this collection. Please check the file and try again.'
+      });
+    }
+  };
+
   return (
     <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
@@ -82,6 +136,26 @@ const CollectionsPage: React.FC = () => {
             ariaLabel: 'Create collection',
             testId: 'create-collection-button'
           }}
+        />
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            data-testid="import-collection-button"
+          >
+            <span className="inline-flex items-center gap-2">
+              <Upload size={16} />
+              Import collection
+            </span>
+          </Button>
+        </div>
+        <input
+          ref={fileInputRef}
+          className="hidden"
+          type="file"
+          accept="application/json,.json"
+          onChange={handleImportCollection}
+          data-testid="import-collection-input"
         />
 
         <Alert variant="warning" title="Work in progress">

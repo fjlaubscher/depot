@@ -96,15 +96,6 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
           spacing="tight"
           actions={[
             {
-              icon: <Pencil size={16} />,
-              onClick: (event) => {
-                event?.stopPropagation();
-                handleEdit();
-              },
-              ariaLabel: 'Edit roster details',
-              variant: 'primary'
-            },
-            {
               icon: <Copy size={16} />,
               onClick: (event) => {
                 event?.stopPropagation();
@@ -114,6 +105,15 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
               variant: 'secondary',
               disabled: isDuplicating,
               'data-testid': 'duplicate-roster-button'
+            },
+            {
+              icon: <Pencil size={16} />,
+              onClick: (event) => {
+                event?.stopPropagation();
+                handleEdit();
+              },
+              ariaLabel: 'Edit roster details',
+              variant: 'primary'
             },
             {
               icon: <Trash2 size={16} />,

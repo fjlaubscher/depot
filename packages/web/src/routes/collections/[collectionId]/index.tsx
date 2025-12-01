@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, ClipboardPlus } from 'lucide-react';
+import { Plus, ClipboardPlus, Download } from 'lucide-react';
 import type { depot } from '@depot/core';
 import classNames from 'classnames';
 
@@ -12,6 +12,10 @@ import CollectionUnitCard from '@/routes/collections/_components/collection-unit
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
+import { useToast } from '@/contexts/toast/use-toast-context';
+import { offlineStorage } from '@/data/offline-storage';
+import type { ExportedCollection } from '@/types/export';
+import { safeSlug } from '@/utils/strings';
 import {
   COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
@@ -23,6 +27,7 @@ const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
+  const { showToast } = useToast();
   const {
     selection: persistedStateFilter,
     setSelection: setPersistedStateFilter,
@@ -162,6 +167,33 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     }
   };
 
+  const handleExportCollection = async () => {
+    if (!collection) return;
+
+    let dataVersion: string | null = null;
+    try {
+      dataVersion = await offlineStorage.getDataVersion();
+    } catch {
+      dataVersion = null;
+    }
+
+    const payload: ExportedCollection = {
+      kind: 'collection',
+      version: 1,
+      dataVersion,
+      collection
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `collection-${safeSlug(collection.name)}-${collection.id}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+    showToast({ type: 'success', title: 'Collection exported' });
+  };
+
   const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
   useDocumentTitle(pageTitle);
 
@@ -205,7 +237,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
       <PageHeader title={collection.name} subtitle={subtitle} />
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         <Button
           onClick={handleAddUnits}
           variant="secondary"
@@ -223,6 +255,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         >
           <ClipboardPlus size={16} />
           Create Roster
+        </Button>
+        <Button
+          onClick={handleExportCollection}
+          variant="secondary"
+          className="flex items-center gap-2"
+          data-testid="export-collection-button"
+        >
+          <Download size={16} />
+          Export
         </Button>
       </div>
 

@@ -12,6 +12,7 @@ interface UseRosters {
   deleteRoster: (rosterId: string) => Promise<void>;
   getRoster: (rosterId: string) => Promise<depot.Roster | null>;
   duplicateRoster: (roster: depot.Roster) => Promise<depot.Roster>;
+  refresh: () => Promise<void>;
 }
 
 function useRosters(): UseRosters {
@@ -72,7 +73,8 @@ function useRosters(): UseRosters {
     updateRoster,
     deleteRoster,
     getRoster,
-    duplicateRoster
+    duplicateRoster,
+    refresh: loadRosters
   };
 }
 
