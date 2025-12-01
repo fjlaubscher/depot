@@ -4,8 +4,11 @@ import type { depot } from '@depot/core';
 import { Trash2, Pencil, Copy } from 'lucide-react';
 
 import { Card, ActionGroup, PointsTag, Tag } from '@/components/ui';
-import { COLLECTION_STATE_META } from '@/utils/collection';
-import { calculateCollectionPoints } from '@/utils/collection';
+import {
+  COLLECTION_STATE_META,
+  COLLECTION_UNIT_STATES,
+  calculateCollectionPoints
+} from '@/utils/collection';
 
 interface CollectionCardProps {
   collection: depot.Collection;
@@ -64,7 +67,12 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
       acc[item.state] = (acc[item.state] ?? 0) + 1;
       return acc;
     },
-    {} as Record<depot.CollectionUnitState, number>
+    {
+      sprue: 0,
+      built: 0,
+      'battle-ready': 0,
+      'parade-ready': 0
+    }
   );
 
   return (
@@ -89,11 +97,13 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
       {Object.entries(stateSummary).length > 0 ? (
         <Card.Content separated className="flex flex-wrap items-center gap-2 text-xs text-subtle">
           <div className="flex flex-wrap items-center gap-1">
-            {Object.entries(stateSummary).map(([state, count]) => {
-              const meta = COLLECTION_STATE_META[state as depot.CollectionUnitState];
+            {COLLECTION_UNIT_STATES.map((state) => {
+              const count = stateSummary[state];
+              if (!count) return null;
+              const meta = COLLECTION_STATE_META[state];
               return (
-                <Tag key={state} size="sm" variant={meta?.variant ?? 'ghost'}>
-                  {meta?.label ?? state}: {count}
+                <Tag key={state} size="sm" variant={meta.variant}>
+                  {meta.label}: {count}
                 </Tag>
               );
             })}

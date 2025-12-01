@@ -20,8 +20,11 @@ import ExportButton from '@/components/shared/export-button';
 import {
   COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
-  calculateCollectionPoints
+  calculateCollectionPoints,
+  getCollectionStateCounts,
+  getCollectionChartCopy
 } from '@/utils/collection';
+import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
 
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 
@@ -39,24 +42,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     (value) => value === 'all' || COLLECTION_UNIT_STATES.includes(value)
   );
 
-  const stateCounts = useMemo(() => {
-    if (!collection) {
-      return {} as Record<depot.CollectionUnitState, number>;
-    }
-
-    return collection.items.reduce<Record<depot.CollectionUnitState, number>>(
-      (acc, item) => ({
-        ...acc,
-        [item.state]: (acc[item.state] ?? 0) + 1
-      }),
-      {
-        sprue: 0,
-        built: 0,
-        'battle-ready': 0,
-        'parade-ready': 0
-      }
-    );
-  }, [collection]);
+  const stateCounts = useMemo(
+    () => getCollectionStateCounts(collection?.items ?? []),
+    [collection]
+  );
 
   const stateFilters = useMemo(
     () =>
@@ -195,8 +184,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     showToast({ type: 'success', title: 'Collection exported' });
   };
 
+  const totalUnits = collection?.items.length ?? 0;
   const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
   useDocumentTitle(pageTitle);
+  const { heading: collectionHeading, subheading: collectionSubheading } = collection
+    ? getCollectionChartCopy(collection, points)
+    : { heading: undefined, subheading: undefined };
 
   if (loading) {
     return (
@@ -216,7 +209,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
   const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
   const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
-  const totalUnits = collection.items.length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -259,6 +251,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         </Button>
         <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
       </div>
+
+      <CollectionStateChart
+        items={collection.items}
+        heading={collectionHeading}
+        subheading={collectionSubheading}
+      />
 
       <RosterSection
         title={`Units (${totalUnits})`}
