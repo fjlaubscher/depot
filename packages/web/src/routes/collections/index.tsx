@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderOpen } from 'lucide-react';
 import type { depot } from '@depot/core';
@@ -9,11 +9,12 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Button, Loader, ErrorState, Alert } from '@/components/ui';
 import { offlineStorage } from '@/data/offline-storage';
-import { calculateCollectionPoints } from '@/utils/collection';
+import { calculateCollectionPoints, getCollectionsSnapshotCopy } from '@/utils/collection';
 import { readJsonFile } from '@/utils/file';
 import { isExportedCollection } from '@/types/export';
 import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
+import CollectionStateChart from './_components/collection-state-chart';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,10 @@ const CollectionsPage: React.FC = () => {
   const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
   const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
+  const snapshot = useMemo(
+    () => getCollectionsSnapshotCopy(collections, usePileLabel),
+    [collections, usePileLabel]
+  );
 
   const handleCreate = () => navigate('/collections/create');
 
@@ -165,18 +170,26 @@ const CollectionsPage: React.FC = () => {
             <Button onClick={() => navigate('/collections/create')}>Create</Button>
           </Card>
         ) : (
-          <div
-            data-testid="collections-grid"
-            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {collections.map((collection) => (
-              <CollectionCard
-                key={collection.id}
-                collection={collection}
-                onDelete={handleDelete}
-                onDuplicate={handleDuplicate}
-              />
-            ))}
+          <div className="flex flex-col gap-4">
+            <CollectionStateChart
+              items={snapshot.items}
+              heading={snapshot.heading}
+              subheading={snapshot.subheading}
+            />
+
+            <div
+              data-testid="collections-grid"
+              className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+            >
+              {collections.map((collection) => (
+                <CollectionCard
+                  key={collection.id}
+                  collection={collection}
+                  onDelete={handleDelete}
+                  onDuplicate={handleDuplicate}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>

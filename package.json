@@ -16,7 +16,7 @@
   "devDependencies": {
     "@fjlaubscher/agent-rules-mcp": "^0.4.1",
     "prettier": "^2.8.8",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.10",
     "typescript": "^5.9.3",
     "wrangler": "^4.51.0"
   },
