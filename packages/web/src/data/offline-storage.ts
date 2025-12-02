@@ -57,6 +57,7 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
 
   return {
     ...roster,
+    dataVersion: roster.dataVersion ?? null,
     factionSlug,
     faction: roster.faction
       ? { ...roster.faction, slug: roster.faction.slug ?? factionSlug }
@@ -86,6 +87,7 @@ const normalizeCollection = (collection: depot.Collection): depot.Collection => 
 
   return {
     ...collection,
+    dataVersion: collection.dataVersion ?? null,
     factionSlug,
     faction: collection.faction
       ? { ...collection.faction, slug: collection.faction.slug ?? factionSlug }

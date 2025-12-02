@@ -26,15 +26,19 @@ const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model, variant = 'default
       </StatsRow>
 
       {showInvulnerable ? (
-        <div
-          className="flex items-center gap-2 text-sm text-foreground"
-          data-testid="model-invulnerable-save"
-        >
-          <Shield size={16} className="text-subtle" />
-          <span className="font-medium">Invulnerable Save</span>{' '}
-          <span className="font-bold text-primary-500">{normalizedInv}</span>
+        <div className="flex flex-col">
+          <div
+            className="flex items-center gap-2 text-sm text-foreground"
+            data-testid="model-invulnerable-save"
+          >
+            <Shield size={16} className="text-subtle" />
+            <span className="font-medium">Invulnerable Save</span>{' '}
+            <span className="font-bold text-primary-500">{normalizedInv}</span>
+          </div>
           {model.invSvDescr ? (
-            <span className="text-subtle">({model.invSvDescr.trim()})</span>
+            <span className="text-subtle text-xs" data-testid="model-invulnerable-save-description">
+              {model.invSvDescr.trim()}
+            </span>
           ) : null}
         </div>
       ) : null}

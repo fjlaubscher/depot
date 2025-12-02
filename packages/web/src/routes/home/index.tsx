@@ -1,22 +1,13 @@
 import React, { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import {
-  Search,
-  Star,
-  Settings,
-  List,
-  Users,
-  ClipboardList,
-  Boxes,
-  Construction
-} from 'lucide-react';
+import { Search, Star, Settings, List, Users, ClipboardList, Boxes } from 'lucide-react';
 
 import { getImageUrl } from '@/utils/paths';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Card, Grid, LinkCard } from '@/components/ui';
+import { Card, Grid } from '@/components/ui';
 
 // Custom hooks
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -60,6 +51,7 @@ const Home: React.FC = () => {
     () => ((state.settings?.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections'),
     [state.settings?.usePileOfShameLabel]
   );
+  const dataVersionLabel = state.dataVersion ?? 'Unknown';
 
   const actionTiles: Array<{
     key: 'collections' | 'factions' | 'rosters' | 'settings';
@@ -139,9 +131,7 @@ const Home: React.FC = () => {
               </p>
             </div>
             <div className="grid grid-cols-2 grid-rows-2 gap-4">
-              {actionTiles.map(({ key, icon: Icon, title, description, path, testId }) => {
-                const isCollections = key === 'collections';
-
+              {actionTiles.map(({ icon: Icon, title, description, path, testId }) => {
                 return (
                   <button
                     key={title}
@@ -154,18 +144,8 @@ const Home: React.FC = () => {
                     hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline
                     focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700
                     dark:bg-gray-900/60 dark:hover:bg-gray-900/50
-                    ${isCollections ? 'border-primary-300/60 bg-white/15 dark:border-primary-500/60' : ''}
                   `}
                   >
-                    {isCollections ? (
-                      <span
-                        className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-amber-400/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-950 shadow-md dark:bg-amber-300 dark:text-amber-900"
-                        data-testid="collections-wip-indicator"
-                      >
-                        <Construction className="h-3 w-3" aria-hidden />
-                        WIP
-                      </span>
-                    ) : null}
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:bg-white/25">
                       <Icon className="h-6 w-6" />
                     </span>
@@ -224,7 +204,7 @@ const Home: React.FC = () => {
           </Grid>
         </section>
 
-        <section className="flex flex-col items-center gap-2 py-6 text-center">
+        <section className="flex flex-col items-center text-center">
           <p className="text-sm text-subtle">
             Data sourced from{' '}
             <a
@@ -235,8 +215,8 @@ const Home: React.FC = () => {
             >
               Wahapedia
             </a>
-            .
           </p>
+          <p className="text-xs text-subtle">Last Updated: {dataVersionLabel}</p>
         </section>
       </div>
     </AppLayout>

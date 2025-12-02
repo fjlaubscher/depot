@@ -9,7 +9,7 @@ interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const Alert: FC<AlertProps> = ({ variant = 'info', title, children, className, ...props }) => {
-  const baseClasses = 'flex flex-col gap-3 p-4 rounded-lg border';
+  const baseClasses = 'flex flex-col gap-2 p-4 rounded-lg border';
 
   const variantClasses = {
     info: 'surface-info border-info text-info-strong',

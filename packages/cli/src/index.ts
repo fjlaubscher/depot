@@ -113,7 +113,7 @@ const init = async () => {
   mkdirSync(FACTIONS_DIR, { recursive: true });
 
   const index: depot.Index[] = [];
-  const { factions, coreStratagems } = generateData();
+  const { factions, coreStratagems, dataVersion } = generateData();
 
   factions.forEach((faction) => {
     const factionDir = join(FACTIONS_DIR, faction.slug);
@@ -152,6 +152,7 @@ const init = async () => {
       link: faction.link,
       datasheets: manifestDatasheets,
       detachments: faction.detachments,
+      dataVersion: dataVersion ?? undefined,
       datasheetCount: manifestDatasheets.length,
       detachmentCount: faction.detachments.length
     };
@@ -171,6 +172,7 @@ const init = async () => {
       slug: faction.slug,
       name: faction.name,
       path: `/data/factions/${faction.slug}/faction.json`,
+      dataVersion: dataVersion ?? undefined,
       datasheetCount: manifestDatasheets.length,
       detachmentCount: faction.detachments.length
     });

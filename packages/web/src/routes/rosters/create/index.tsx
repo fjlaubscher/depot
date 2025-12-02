@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useFactions from '@/hooks/use-factions';
 import useFaction from '@/hooks/use-faction';
 import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
 
@@ -16,6 +17,7 @@ const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
+  const { state: appState } = useAppContext();
 
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
@@ -163,6 +165,7 @@ const CreateRoster: React.FC = () => {
       factionId: selectedFactionIndex.id,
       factionSlug: selectedFactionIndex.slug,
       faction: selectedFactionIndex,
+      dataVersion: appState.dataVersion ?? null,
       maxPoints,
       detachment: detachment!,
       units: prefillUnits

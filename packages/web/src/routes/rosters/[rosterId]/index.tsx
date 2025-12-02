@@ -1,8 +1,7 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Pencil, Share2 } from 'lucide-react';
-
+import { Copy, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
@@ -11,10 +10,10 @@ import useCoreStratagems from '@/hooks/use-core-stratagems';
 import useDownloadFile from '@/hooks/use-download-file';
 import { safeSlug } from '@/utils/strings';
 import type { ExportedRoster } from '@/types/export';
-import { offlineStorage } from '@/data/offline-storage';
+import { refreshRosterData } from '@/utils/refresh-user-data';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button, Tabs } from '@/components/ui';
+import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
 import ExportButton from '@/components/shared/export-button';
 import {
@@ -29,10 +28,10 @@ import CogitatorTab from './_components/cogitator-tab';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const RosterView: FC = () => {
-  const { state: roster } = useRoster();
+  const { state: roster, setRoster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { state: appState } = useAppContext();
+  const { state: appState, getDatasheet, getFactionManifest } = useAppContext();
   const downloadFile = useDownloadFile();
   const isCogitatorEnabled = appState.settings?.enableCogitator ?? false;
   const {
@@ -40,6 +39,7 @@ const RosterView: FC = () => {
     loading: loadingCoreStratagems,
     error: coreStratagemsError
   } = useCoreStratagems();
+  const [refreshingRoster, setRefreshingRoster] = useState(false);
 
   const factionName = getRosterFactionName(roster);
   const includeWargearOnExport = appState.settings?.includeWargearOnExport ?? true;
@@ -48,13 +48,7 @@ const RosterView: FC = () => {
     useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   const handleExportJson = async () => {
-    let dataVersion: string | null = null;
-    try {
-      dataVersion = await offlineStorage.getDataVersion();
-    } catch {
-      dataVersion = null;
-    }
-
+    const dataVersion = roster.dataVersion ?? appState.dataVersion ?? null;
     const payload: ExportedRoster = {
       kind: 'roster',
       version: 1,
@@ -77,6 +71,48 @@ const RosterView: FC = () => {
       }),
     [factionName, includeWargearOnExport, roster]
   );
+
+  const rosterVersion = roster.dataVersion ?? null;
+  const currentDataVersion = appState.dataVersion ?? null;
+  const isRosterStale = Boolean(currentDataVersion && rosterVersion !== currentDataVersion);
+
+  const handleRefreshRosterData = async () => {
+    if (refreshingRoster) return;
+    if (!currentDataVersion) {
+      showToast({
+        type: 'warning',
+        title: 'No data version detected',
+        message: 'Unable to refresh because the current data version is unknown.'
+      });
+      return;
+    }
+
+    setRefreshingRoster(true);
+    try {
+      const refreshed = await refreshRosterData({
+        roster,
+        currentDataVersion,
+        getDatasheet,
+        getFactionManifest
+      });
+
+      setRoster(refreshed);
+      showToast({
+        title: 'Roster updated',
+        message: 'Refreshed with the latest Wahapedia data.',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Failed to refresh roster data', error);
+      showToast({
+        title: 'Refresh failed',
+        message: 'Could not refresh with the latest data.',
+        type: 'error'
+      });
+    } finally {
+      setRefreshingRoster(false);
+    }
+  };
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -194,6 +230,26 @@ const RosterView: FC = () => {
           Settings preferences (wargear visibility, sharing method).
         </p>
       </div>
+
+      {isRosterStale ? (
+        <Alert variant="warning" title="Roster uses older data" className="gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm text-secondary">
+              Refresh to pull the latest Wahapedia data into this roster.
+            </span>
+            <Button
+              variant="secondary"
+              onClick={() => void handleRefreshRosterData()}
+              disabled={refreshingRoster}
+              data-testid="refresh-roster-data"
+              className="inline-flex items-center gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {refreshingRoster ? 'Refreshing…' : 'Refresh with latest data'}
+            </Button>
+          </div>
+        </Alert>
+      ) : null}
 
       {/* Units, Detachment & Stratagems */}
       <Tabs tabs={tabLabels} data-testid="roster-tabs">

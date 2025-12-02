@@ -8,6 +8,7 @@ export const initialState: AppState = {
   offlineFactions: [],
   loading: false,
   error: null,
+  dataVersion: null,
   settings: DEFAULT_SETTINGS
 };
 
@@ -37,6 +38,9 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
 
     case APP_ACTIONS.UPDATE_SETTINGS:
       return { ...state, settings: action.payload };
+
+    case APP_ACTIONS.SET_DATA_VERSION:
+      return { ...state, dataVersion: action.payload };
 
     case APP_ACTIONS.CLEAR_ERROR:
       return { ...state, error: null };

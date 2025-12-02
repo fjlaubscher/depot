@@ -13,11 +13,15 @@ import { groupKeywords } from '@/utils/keywords';
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
   factionDatasheets: DatasheetListItem[];
+  showPoints?: boolean;
+  compositionVariant?: 'default' | 'compact';
 }
 
-const DatasheetHero: FC<
-  DatasheetHeroProps & { showPoints?: boolean; compositionVariant?: 'default' | 'compact' }
-> = ({ datasheet, factionDatasheets, showPoints = true, compositionVariant = 'default' }) => {
+const DatasheetHero: FC<DatasheetHeroProps> = ({
+  datasheet,
+  showPoints = true,
+  compositionVariant = 'default'
+}) => {
   const { keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
   const keywordTags = useMemo(

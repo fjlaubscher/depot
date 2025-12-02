@@ -7,7 +7,7 @@ import { useCollections } from '@/hooks/use-collections';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, Button, Loader, ErrorState, Alert } from '@/components/ui';
+import { PageHeader, Card, Button, Loader, ErrorState } from '@/components/ui';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints, getCollectionsSnapshotCopy } from '@/utils/collection';
 import { readJsonFile } from '@/utils/file';
@@ -52,11 +52,13 @@ const CollectionsPage: React.FC = () => {
 
   const handleDuplicate = async (collection: depot.Collection) => {
     try {
+      const currentDataVersion = state.dataVersion ?? null;
       const duplicated: depot.Collection = {
         ...collection,
         id: crypto.randomUUID(),
         name: `${collection.name} Copy`,
         items: collection.items.map((item) => ({ ...item, id: crypto.randomUUID() })),
+        dataVersion: currentDataVersion ?? collection.dataVersion ?? null,
         points: { current: calculateCollectionPoints(collection) }
       };
 
@@ -79,6 +81,7 @@ const CollectionsPage: React.FC = () => {
   };
 
   const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
+    const currentDataVersion = state.dataVersion ?? null;
     const items = collection.items.map((item) => ({
       ...item,
       id: crypto.randomUUID()
@@ -88,6 +91,7 @@ const CollectionsPage: React.FC = () => {
       ...collection,
       id: crypto.randomUUID(),
       items,
+      dataVersion: currentDataVersion ?? collection.dataVersion ?? null,
       points: { current: calculateCollectionPoints({ ...collection, items }) }
     };
 
@@ -146,11 +150,6 @@ const CollectionsPage: React.FC = () => {
             inputTestId="import-collection-input"
           />
         </div>
-
-        <Alert variant="warning" title="Work in progress">
-          This collection experience is still evolving, so expect layouts, counts, or features to
-          shift as work continues. Feedback is very welcome!
-        </Alert>
 
         {loading ? (
           <div className="flex justify-center py-8">

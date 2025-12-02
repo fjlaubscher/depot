@@ -26,6 +26,7 @@ export const useCollection = (collectionId?: string) => {
   const save = useCallback(async (updated: depot.Collection) => {
     const withPoints = {
       ...updated,
+      dataVersion: updated.dataVersion ?? null,
       points: { current: calculateCollectionPoints(updated) }
     };
     await offlineStorage.saveCollection(withPoints);

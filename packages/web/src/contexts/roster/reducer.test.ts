@@ -42,6 +42,7 @@ describe('rosterReducer', () => {
         factionId: 'SM',
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
+        dataVersion: null,
         detachment: {
           slug: 'test-detachment',
           name: 'Test Detachment',

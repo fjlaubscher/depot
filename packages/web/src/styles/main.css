@@ -139,6 +139,13 @@ span.hi_custom {
   @apply focus-visible:outline-2 focus-visible:outline-red-400;
 }
 
+/* Utility to suppress focus outlines for non-interactive chart surfaces */
+.no-focus-outline,
+.no-focus-outline *:focus,
+.no-focus-outline *:focus-visible {
+  outline: none !important;
+}
+
 @layer components {
   .ability-rich-text {
     @apply text-sm leading-relaxed text-body;

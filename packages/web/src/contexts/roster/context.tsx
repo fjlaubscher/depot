@@ -75,6 +75,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       factionId: string;
       factionSlug: string;
       faction: depot.Index;
+      dataVersion?: string | null;
       maxPoints: number;
       name: string;
       detachment: depot.Detachment;
@@ -154,6 +155,10 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     []
   );
 
+  const setRoster = useCallback((roster: depot.Roster) => {
+    dispatch({ type: 'SET_ROSTER', payload: roster });
+  }, []);
+
   return (
     <RosterContext.Provider
       value={{
@@ -171,7 +176,8 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         removeEnhancement,
         setWarlord,
         recalculatePoints,
-        setCogitatorAnalysis
+        setCogitatorAnalysis,
+        setRoster
       }}
     >
       {children}
