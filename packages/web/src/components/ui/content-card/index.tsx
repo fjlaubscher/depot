@@ -121,9 +121,7 @@ export const ContentCard: FC<ContentCardProps> = ({
               )}
             </button>
             {isExpanded && children ? (
-              <Card.Content separated className="flex-1">
-                {children}
-              </Card.Content>
+              <Card.Content className="flex-1">{children}</Card.Content>
             ) : null}
           </>
         ) : children ? (

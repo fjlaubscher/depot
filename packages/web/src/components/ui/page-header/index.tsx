@@ -67,18 +67,18 @@ const PageHeader: FC<PageHeaderProps> = ({
 
   return (
     <div
-      className={classNames('flex flex-col gap-3', className)}
+      className={classNames('flex flex-col', className)}
       data-testid={dataTestId || 'page-header'}
       {...props}
     >
       <div
         className={classNames(
-          'flex gap-3',
+          'flex gap-2',
           actionsIsInline ? 'items-center flex-wrap' : 'items-start justify-between'
         )}
       >
         <div
-          className={classNames('min-w-0 flex flex-col gap-1', {
+          className={classNames('min-w-0 flex flex-col', {
             'flex-1': !actionsIsInline
           })}
         >

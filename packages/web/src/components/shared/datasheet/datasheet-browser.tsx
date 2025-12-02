@@ -1,6 +1,4 @@
 import { type ReactNode, useMemo, useState } from 'react';
-import { LinkCard } from '@/components/ui';
-import Tag from '@/components/ui/tag';
 import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datasheet-browser';
 import { useSupplementSelectionGuard } from '@/hooks/use-supplement-selection-guard';
 import { useSupplementState } from '@/hooks/use-supplement-state';
@@ -12,14 +10,8 @@ import DatasheetRoleTabs from './datasheet-role-tabs';
 import DatasheetFilterBar from './datasheet-filter-bar';
 import DatasheetResultsGrid from './datasheet-results-grid';
 import DatasheetEmptyState from './datasheet-empty-state';
-import {
-  CODEX_SLUG,
-  buildSupplementLabel,
-  getSupplementKey,
-  isSupplementEntry,
-  sortDatasheetsBySupplementPreference
-} from '@/utils/datasheet-supplements';
-import { getSupplementStyles } from '@/utils/supplement-styles';
+import { sortDatasheetsBySupplementPreference } from '@/utils/datasheet-supplements';
+import DatasheetListItemCard from './datasheet-list-item-card';
 
 interface DatasheetBrowserProps<T extends DatasheetListItem> {
   datasheets: T[];
@@ -62,7 +54,6 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     supplementMetadata,
     normalizedSelectedSupplement,
     supplementTabs,
-    codexDatasheets,
     activeSupplementDatasheets,
     supplementFilteredDatasheets,
     filteredActiveSupplementDatasheets,
@@ -112,62 +103,13 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     clearFilters();
   };
 
-  const defaultRenderDatasheet = (datasheet: DatasheetListItem) => {
-    const tags: ReactNode[] = [];
-    const roleLabel = datasheet.roleLabel ?? formatRoleLabel(datasheet.role);
-
-    if (roleLabel) {
-      tags.push(
-        <Tag key="role" size="sm" variant="default">
-          {roleLabel}
-        </Tag>
-      );
-    }
-
-    if (supplementMetadata.hasSupplements && isSupplementEntry(datasheet)) {
-      const supplementKey = getSupplementKey(datasheet);
-      const supplementStyles = getSupplementStyles(supplementKey);
-      const label = datasheet.supplementLabel
-        ? datasheet.supplementLabel
-        : buildSupplementLabel(datasheet.supplementSlug ?? CODEX_SLUG, datasheet.supplementName);
-      tags.push(
-        <Tag
-          key="supplement"
-          size="sm"
-          variant="default"
-          className={supplementStyles.tagClass}
-          data-supplement-key={supplementKey}
-        >
-          {label}
-        </Tag>
-      );
-    }
-
-    if (datasheet.isLegends) {
-      tags.push(
-        <Tag key="legends" size="sm" variant="warning">
-          Warhammer Legends
-        </Tag>
-      );
-    }
-
-    if (datasheet.isForgeWorld) {
-      tags.push(
-        <Tag key="forgeWorld" size="sm" variant="secondary">
-          Forge World
-        </Tag>
-      );
-    }
-
-    return (
-      <LinkCard to={`/faction/${datasheet.factionSlug}/datasheet/${datasheet.slug}`}>
-        <div className="flex flex-col gap-2">
-          <span className="font-medium">{datasheet.name}</span>
-          {tags.length > 0 ? <div className="flex flex-wrap gap-2">{tags}</div> : null}
-        </div>
-      </LinkCard>
-    );
-  };
+  const defaultRenderDatasheet = (datasheet: DatasheetListItem) => (
+    <DatasheetListItemCard
+      datasheet={datasheet}
+      roleLabel={datasheet.roleLabel ?? formatRoleLabel(datasheet.role)}
+      supplementMetadataHasSupplements={supplementMetadata.hasSupplements}
+    />
+  );
 
   const renderItem: (datasheet: T) => ReactNode =
     renderDatasheet ?? ((item) => defaultRenderDatasheet(item));

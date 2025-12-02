@@ -83,7 +83,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
       data-testid={`collection-card-${collection.id}`}
     >
       <Card.Header className="items-start gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="flex min-w-0 flex-1 flex-col">
           <Card.Title as="h3" className="truncate text-base font-semibold sm:text-lg">
             {collection.name}
           </Card.Title>
@@ -95,7 +95,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
       </Card.Header>
 
       {Object.entries(stateSummary).length > 0 ? (
-        <Card.Content separated className="flex flex-wrap items-center gap-2 text-xs text-subtle">
+        <Card.Content className="flex flex-wrap items-center gap-2 text-xs text-subtle">
           <div className="flex flex-wrap items-center gap-1">
             {COLLECTION_UNIT_STATES.map((state) => {
               const count = stateSummary[state];
@@ -111,10 +111,7 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
         </Card.Content>
       ) : null}
 
-      <Card.Footer
-        separated={false}
-        className="mt-auto flex w-full items-center gap-3 border-t border-subtle pt-3"
-      >
+      <Card.Footer className="mt-auto flex w-full items-center gap-2">
         <div className="flex flex-1 items-center">
           <Tag size="sm" variant="default">
             {collection.items.length} {collection.items.length === 1 ? 'unit' : 'units'}

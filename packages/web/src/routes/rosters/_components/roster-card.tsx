@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
-import { Trash2, Pencil, Copy, Users } from 'lucide-react';
-import { Card, ActionGroup, PointsTag } from '@/components/ui';
+import { Trash2, Pencil, Copy } from 'lucide-react';
+import { Card, ActionGroup, PointsTag, Tag } from '@/components/ui';
 
 interface RosterCardProps {
   roster: depot.Roster;
@@ -63,12 +63,12 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
       onClick={handleView}
       data-testid="roster-card"
     >
-      <Card.Header className="items-start gap-3">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Card.Title as="h3" className="truncate text-base font-semibold sm:text-lg">
+      <Card.Header className="items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Card.Title as="h3" className="truncate text-base font-semibold md:text-lg">
             {roster.name}
           </Card.Title>
-          <Card.Subtitle as="span" className="truncate text-sm">
+          <Card.Subtitle as="span" className="truncate text-xs md:text-sm">
             {roster.faction?.name}
           </Card.Subtitle>
         </div>
@@ -79,19 +79,20 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
         />
       </Card.Header>
 
-      <Card.Content separated className="flex flex-wrap items-center gap-2 text-xs text-subtle">
-        {roster.detachment?.name ? (
-          <Card.Badge variant="accent" size="sm" className="uppercase tracking-wide">
+      {roster.detachment?.name ? (
+        <Card.Content className="flex flex-wrap items-center gap-2 text-xs text-subtle">
+          <Tag size="sm" variant="secondary" className="uppercase tracking-wide">
             {roster.detachment.name}
-          </Card.Badge>
-        ) : null}
-        <span className="inline-flex items-center gap-1">
-          <Users className="h-3.5 w-3.5" aria-hidden="true" />
-          {roster.units.length} {roster.units.length === 1 ? 'unit' : 'units'}
-        </span>
-      </Card.Content>
+          </Tag>
+        </Card.Content>
+      ) : null}
 
-      <Card.Footer align="end">
+      <Card.Footer className="mt-auto flex w-full items-center gap-2">
+        <div className="flex flex-1 items-center">
+          <Tag size="sm" variant="default">
+            {roster.units.length} {roster.units.length === 1 ? 'unit' : 'units'}
+          </Tag>
+        </div>
         <ActionGroup
           spacing="tight"
           actions={[

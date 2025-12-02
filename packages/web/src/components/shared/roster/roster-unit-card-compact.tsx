@@ -102,13 +102,10 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         </Card.Content>
       ) : null}
 
-      {children ? <Card.Content separated>{children}</Card.Content> : null}
+      {children ? <Card.Content>{children}</Card.Content> : null}
 
       {stateMeta || actions ? (
-        <Card.Footer
-          separated={false}
-          className="mt-auto flex items-center justify-between gap-2 border-t border-subtle pt-3"
-        >
+        <Card.Footer className="mt-auto flex items-center justify-between gap-2">
           <div className="flex flex-1 items-center gap-2">
             {stateMeta ? (
               <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">

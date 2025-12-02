@@ -17,7 +17,7 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
   showViewDatasheetLink = false
 }) => {
   return (
-    <div className="border-t border-subtle surface-muted p-4">
+    <div className="surface-muted p-4">
       <div className="flex flex-col gap-4">
         <RosterUnitProfile unit={unit} abilitiesTestId={abilitiesTestId} />
 

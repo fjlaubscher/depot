@@ -15,7 +15,7 @@ const AllianceSection: React.FC<AllianceSectionProps> = ({
 }) => {
   return (
     <section className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-xl font-semibold text-foreground capitalize">{alliance}</h2>
         <span className="inline-flex items-center rounded-full border border-subtle surface-soft px-3 py-1 text-xs font-medium text-secondary">
           {factions.length} {factions.length === 1 ? 'faction' : 'factions'}

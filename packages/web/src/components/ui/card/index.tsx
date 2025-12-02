@@ -50,7 +50,10 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={classNames('flex w-full flex-wrap items-start justify-between gap-3', className)}
+      className={classNames(
+        'flex w-full flex-wrap items-start justify-between gap-2 border-b border-subtle pb-2',
+        className
+      )}
       {...props}
     />
   )
@@ -99,29 +102,20 @@ const CardLegend = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraph
 
 CardLegend.displayName = 'Card.Legend';
 
-interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
-  separated?: boolean;
-}
+interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
 
-const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  ({ separated = false, className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={classNames(
-        'text-sm leading-relaxed text-body',
-        separated && 'border-t border-subtle pt-3',
-        className
-      )}
-      {...props}
-    />
-  )
-);
+const CardContent = forwardRef<HTMLDivElement, CardContentProps>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={classNames('text-sm leading-relaxed text-body', className)}
+    {...props}
+  />
+));
 
 CardContent.displayName = 'Card.Content';
 
 interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
   align?: 'start' | 'center' | 'end';
-  separated?: boolean;
 }
 
 const alignmentMap: Record<NonNullable<CardFooterProps['align']>, string> = {
@@ -131,12 +125,11 @@ const alignmentMap: Record<NonNullable<CardFooterProps['align']>, string> = {
 };
 
 const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ align = 'start', separated = true, className, ...props }, ref) => (
+  ({ align = 'start', className, ...props }, ref) => (
     <div
       ref={ref}
       className={classNames(
-        'flex w-full items-center gap-3',
-        separated && 'border-t border-subtle pt-4',
+        'flex w-full items-center gap-2 border-t border-subtle pt-2',
         alignmentMap[align],
         className
       )}
