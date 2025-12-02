@@ -12,6 +12,7 @@ import CollectionUnitCard from '@/routes/collections/_components/collection-unit
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
+import useDownloadFile from '@/hooks/use-download-file';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { ExportedCollection } from '@/types/export';
@@ -32,6 +33,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
   const { showToast } = useToast();
+  const downloadFile = useDownloadFile();
   const {
     selection: persistedStateFilter,
     setSelection: setPersistedStateFilter,
@@ -174,13 +176,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       collection
     };
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `collection-${safeSlug(collection.name)}-${collection.id}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadFile(
+      `collection-${safeSlug(collection.name)}-${collection.id}.json`,
+      JSON.stringify(payload, null, 2)
+    );
     showToast({ type: 'success', title: 'Collection exported' });
   };
 

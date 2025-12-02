@@ -7,6 +7,7 @@ type MaxPointsOption = 'incursion' | 'strike-force' | 'custom';
 interface MaxPointsFieldProps {
   value: number;
   onChange: (value: number) => void;
+  error?: string;
   'data-testid'?: string;
 }
 
@@ -28,6 +29,7 @@ const getOptionFromValue = (points: number): MaxPointsOption => {
 const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
   value,
   onChange,
+  error,
   'data-testid': dataTestId
 }) => {
   const [selectedOption, setSelectedOption] = useState<MaxPointsOption>(() =>
@@ -101,6 +103,11 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
           />
         </Field>
       )}
+      {error && selectedOption === 'custom' ? (
+        <p className="text-sm text-danger" data-testid="max-points-error">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 };

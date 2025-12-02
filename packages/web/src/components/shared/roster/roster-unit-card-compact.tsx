@@ -14,6 +14,7 @@ interface RosterUnitCardCompactProps {
   state?: depot.CollectionUnitState;
   dataTestId?: string;
   showWargearSummary?: boolean;
+  className?: string;
 }
 
 const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
@@ -23,7 +24,8 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   onClick,
   state,
   dataTestId,
-  showWargearSummary = true
+  showWargearSummary = true,
+  className
 }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
   const wargearToDisplay = unit.selectedWargear.slice(0, 3);
@@ -36,7 +38,11 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   return (
     <Card
       padding="sm"
-      className={classNames('relative flex h-full flex-col gap-2', onClick && 'cursor-pointer')}
+      className={classNames(
+        'relative flex h-full flex-col gap-2',
+        onClick && 'cursor-pointer',
+        className
+      )}
       onClick={onClick}
       data-testid={dataTestId}
       data-state={state}

@@ -8,6 +8,7 @@ import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
+import useDownloadFile from '@/hooks/use-download-file';
 import { safeSlug } from '@/utils/strings';
 import type { ExportedRoster } from '@/types/export';
 import { offlineStorage } from '@/data/offline-storage';
@@ -32,6 +33,7 @@ const RosterView: FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { state: appState } = useAppContext();
+  const downloadFile = useDownloadFile();
   const isCogitatorEnabled = appState.settings?.enableCogitator ?? false;
   const {
     stratagems: coreStratagems,
@@ -60,13 +62,10 @@ const RosterView: FC = () => {
       roster
     };
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `roster-${safeSlug(roster.name)}-${roster.id}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadFile(
+      `roster-${safeSlug(roster.name)}-${roster.id}.json`,
+      JSON.stringify(payload, null, 2)
+    );
     showToast({ title: 'Roster exported', type: 'success' });
   };
 
