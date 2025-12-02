@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import type { FC } from 'react';
 import type { depot } from '@depot/core';
-import type { DatasheetListItem } from '@/types/datasheets';
 
 // components
 import { Tag, TagSection, TagGroup } from '@/components/ui';
@@ -12,7 +11,6 @@ import { groupKeywords } from '@/utils/keywords';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
-  factionDatasheets: DatasheetListItem[];
   showPoints?: boolean;
   compositionVariant?: 'default' | 'compact';
 }

@@ -109,7 +109,7 @@ const CreateRoster: React.FC = () => {
   }, [collectionId]);
 
   const prefillTotal = useMemo(() => {
-    if (prefillUnits.length === 0) return;
+    if (prefillUnits.length === 0) return 0;
 
     return prefillUnits.reduce((acc, unit) => acc + parseInt(unit.modelCost.cost, 10) || 0, 0);
   }, [prefillUnits]);
@@ -139,7 +139,7 @@ const CreateRoster: React.FC = () => {
       nextErrors.detachment = 'Selected detachment not found.';
     }
 
-    const detachment: depot.Detachment | undefined = selectedDetachment;
+    const detachment = selectedDetachment;
 
     // Find the faction Index entry
     const selectedFactionIndex = factions?.find(
@@ -167,7 +167,7 @@ const CreateRoster: React.FC = () => {
       faction: selectedFactionIndex,
       dataVersion: appState.dataVersion ?? null,
       maxPoints,
-      detachment: detachment!,
+      detachment,
       units: prefillUnits
     });
     navigate(`/rosters/${newId}/edit`);

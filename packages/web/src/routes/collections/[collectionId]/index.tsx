@@ -27,8 +27,6 @@ import {
   getCollectionChartCopy
 } from '@/utils/collection';
 import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
-import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
 
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 

@@ -1,7 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import Tag from '@/components/ui/tag';
 import { LinkCard } from '@/components/ui';
-import { ArrowUpRight } from 'lucide-react';
 import type { DatasheetListItem } from '@/types/datasheets';
 import {
   CODEX_SLUG,

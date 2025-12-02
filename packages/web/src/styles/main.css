@@ -143,7 +143,7 @@ span.hi_custom {
 .no-focus-outline,
 .no-focus-outline *:focus,
 .no-focus-outline *:focus-visible {
-  outline: none !important;
+  outline: none;
 }
 
 @layer components {

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Card } from '@/components/ui';
 
 interface SettingsCardProps {
-  icon: ReactNode;
+  icon?: ReactNode;
   title: string;
   description: string;
   children: ReactNode;
@@ -13,8 +13,8 @@ const SettingsCard: React.FC<SettingsCardProps> = ({ icon, title, description, c
     <Card>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <div className="flex gap-2 items-center">
-            {icon}
+          <div className="flex items-center gap-2">
+            {icon ? <span className="text-subtle">{icon}</span> : null}
             <h3 className="text-lg font-semibold text-foreground">{title}</h3>
           </div>
           <p className="text-sm text-muted">{description}</p>
