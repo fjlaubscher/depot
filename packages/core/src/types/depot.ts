@@ -177,6 +177,7 @@ export interface DatasheetSummary {
   name: string;
   factionId: string;
   factionSlug: string;
+  dataVersion?: string;
   role: string;
   roleLabel?: string;
   path: string;
@@ -197,6 +198,7 @@ export interface FactionManifest {
   link: string;
   datasheets: DatasheetSummary[];
   detachments: Detachment[];
+  dataVersion?: string;
   datasheetCount: number;
   detachmentCount: number;
 }
@@ -215,6 +217,7 @@ export interface Index {
   slug: string;
   name: string;
   path: string;
+  dataVersion?: string;
   datasheetCount?: number;
   detachmentCount?: number;
 }
@@ -265,6 +268,7 @@ export interface Roster {
   factionId: string;
   factionSlug?: string;
   faction?: Index; // Faction metadata from the index (name, path, counts, etc.)
+  dataVersion?: string | null;
   detachment: Detachment;
   points: {
     current: number;
@@ -298,6 +302,7 @@ export interface Collection {
   factionId: string;
   factionSlug?: string;
   faction?: Index;
+  dataVersion?: string | null;
   items: CollectionUnit[];
   points: {
     current: number;

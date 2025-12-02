@@ -26,7 +26,9 @@ describe('ModelStatsRow', () => {
     render(<ModelStatsRow model={model} />);
 
     expect(screen.getByTestId('model-invulnerable-save')).toHaveTextContent('Invulnerable Save 4+');
-    expect(screen.getByText(/\(Ranged attacks only\)/i)).toBeInTheDocument();
+    expect(screen.getByTestId('model-invulnerable-save-description')).toHaveTextContent(
+      'Ranged attacks only'
+    );
   });
 
   it('does not render invulnerable section when not available', () => {

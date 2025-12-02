@@ -14,6 +14,7 @@ interface RosterUnitCardCompactProps {
   state?: depot.CollectionUnitState;
   dataTestId?: string;
   showWargearSummary?: boolean;
+  className?: string;
 }
 
 const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
@@ -23,7 +24,8 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   onClick,
   state,
   dataTestId,
-  showWargearSummary = true
+  showWargearSummary = true,
+  className
 }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
   const wargearToDisplay = unit.selectedWargear.slice(0, 3);
@@ -36,7 +38,11 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   return (
     <Card
       padding="sm"
-      className={classNames('relative flex h-full flex-col gap-2', onClick && 'cursor-pointer')}
+      className={classNames(
+        'relative flex h-full flex-col gap-2',
+        onClick && 'cursor-pointer',
+        className
+      )}
       onClick={onClick}
       data-testid={dataTestId}
       data-state={state}
@@ -96,13 +102,10 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         </Card.Content>
       ) : null}
 
-      {children ? <Card.Content separated>{children}</Card.Content> : null}
+      {children ? <Card.Content>{children}</Card.Content> : null}
 
       {stateMeta || actions ? (
-        <Card.Footer
-          separated={false}
-          className="mt-auto flex items-center justify-between gap-2 border-t border-subtle pt-3"
-        >
+        <Card.Footer className="mt-auto flex items-center justify-between gap-2">
           <div className="flex flex-1 items-center gap-2">
             {stateMeta ? (
               <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">

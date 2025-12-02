@@ -46,12 +46,7 @@ const RosterUnitProfile: FC<RosterUnitProfileProps> = ({
         <ModelStatsRow key={model.line} model={model} variant="compact" />
       ))}
 
-      <DatasheetHero
-        datasheet={datasheet}
-        factionDatasheets={[]}
-        showPoints={false}
-        compositionVariant="compact"
-      />
+      <DatasheetHero datasheet={datasheet} showPoints={false} compositionVariant="compact" />
 
       <DatasheetAbilities
         title="Abilities"

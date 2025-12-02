@@ -142,74 +142,91 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
 
   // Initialize app data on mount
   useEffect(() => {
+    const resolveIndexDataVersion = (index?: depot.Index[] | null): string | null =>
+      index?.find((entry) => Boolean(entry.dataVersion))?.dataVersion ?? null;
+
+    const fetchAndCacheIndex = async (): Promise<depot.Index[]> => {
+      const indexPath = getDataPath('index.json');
+      const response = await fetch(getDataUrl(indexPath));
+      if (!response.ok) {
+        throw new Error('Failed to load faction index');
+      }
+      const fetchedIndex = (await response.json()) as depot.Index[];
+
+      try {
+        await offlineStorage.setFactionIndex(fetchedIndex);
+      } catch (cacheError) {
+        console.warn('Failed to cache faction index:', cacheError);
+      }
+
+      return fetchedIndex;
+    };
+
+    const resetOfflineData = async () => {
+      try {
+        await offlineStorage.clearFactionData();
+      } catch (clearError) {
+        console.warn('Failed to clear cached faction data, attempting full reset.', clearError);
+        try {
+          await offlineStorage.destroy();
+        } catch (destroyError) {
+          console.error('Failed to reset offline storage.', destroyError);
+        }
+      }
+    };
+
     const initializeApp = async () => {
       // Load faction index
       dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
 
       try {
-        try {
-          const storedVersion = await offlineStorage.getDataVersion();
-          if (storedVersion !== DATA_VERSION) {
-            console.info('Resetting offline cache due to data version change', {
-              storedVersion,
-              dataVersion: DATA_VERSION
-            });
-            try {
-              await offlineStorage.clearFactionData();
-            } catch (clearError) {
-              console.warn(
-                'Failed to clear cached faction data, attempting full reset.',
-                clearError
-              );
-              try {
-                await offlineStorage.destroy();
-              } catch (destroyError) {
-                console.error('Failed to reset offline storage.', destroyError);
-              }
-            }
-          }
-        } catch (versionError) {
-          console.warn('Failed to verify cached data version, forcing reset.', versionError);
-          try {
-            await offlineStorage.clearFactionData();
-          } catch (clearError) {
-            console.warn('Failed to clear cached faction data, attempting full reset.', clearError);
-            try {
-              await offlineStorage.destroy();
-            } catch (destroyError) {
-              console.error('Failed to reset offline storage.', destroyError);
-            }
-          }
-        }
+        let storedVersion: string | null = null;
+        let versionReadError: unknown = null;
 
         try {
-          await offlineStorage.setDataVersion(DATA_VERSION);
-        } catch (persistError) {
-          console.warn('Failed to persist data version marker.', persistError);
+          storedVersion = await offlineStorage.getDataVersion();
+        } catch (versionError) {
+          versionReadError = versionError;
+          console.warn('Failed to verify cached data version, forcing reset.', versionError);
         }
 
         // Try IndexedDB first for index
         let index = await offlineStorage.getFactionIndex();
 
         if (!index) {
-          // Fallback to network
-          const indexPath = getDataPath('index.json');
-          const response = await fetch(getDataUrl(indexPath));
-          if (!response.ok) {
-            throw new Error('Failed to load faction index');
-          }
-          index = await response.json();
+          index = await fetchAndCacheIndex();
+        }
 
-          // Cache the index for offline use
-          try {
-            await offlineStorage.setFactionIndex(index as depot.Index[]);
-          } catch (cacheError) {
-            console.warn('Failed to cache faction index:', cacheError);
-          }
+        let dataVersion = resolveIndexDataVersion(index);
+
+        if (versionReadError) {
+          await resetOfflineData();
+          index = await fetchAndCacheIndex();
+          dataVersion = resolveIndexDataVersion(index);
+          storedVersion = dataVersion ?? storedVersion;
+        }
+
+        if (dataVersion && storedVersion !== dataVersion) {
+          console.info('Resetting offline cache due to data version change', {
+            storedVersion,
+            dataVersion
+          });
+          await resetOfflineData();
+          index = await fetchAndCacheIndex();
+          dataVersion = resolveIndexDataVersion(index);
+        }
+
+        const resolvedDataVersion = dataVersion ?? DATA_VERSION;
+
+        try {
+          await offlineStorage.setDataVersion(resolvedDataVersion);
+        } catch (persistError) {
+          console.warn('Failed to persist data version marker.', persistError);
         }
 
         if (index) {
           dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
+          dispatch({ type: APP_ACTIONS.SET_DATA_VERSION, payload: resolvedDataVersion });
         } else {
           throw new Error('No faction index found');
         }

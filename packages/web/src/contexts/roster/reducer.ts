@@ -17,6 +17,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       const normalisedRoster: depot.Roster = {
         ...action.payload,
+        dataVersion: action.payload.dataVersion ?? null,
         factionSlug: fallbackSlug,
         faction: action.payload.faction
           ? { ...action.payload.faction, slug: action.payload.faction.slug ?? fallbackSlug }
@@ -76,6 +77,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         factionId: action.payload.factionId,
         factionSlug: action.payload.factionSlug,
         faction: action.payload.faction,
+        dataVersion: action.payload.dataVersion ?? null,
         detachment: action.payload.detachment,
         points: {
           current: initialUnits.length > 0 ? 0 : initialState.points.current,

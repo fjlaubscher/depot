@@ -32,7 +32,6 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
       </Card.Badge>
 
       <Card.Content
-        separated
         className="flex-1"
         dangerouslySetInnerHTML={{ __html: stratagem.description }}
       />

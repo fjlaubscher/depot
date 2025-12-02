@@ -37,7 +37,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
         <ModelStatsRow key={model.line} model={model} variant="default" />
       ))}
 
-      <DatasheetHero datasheet={datasheet} factionDatasheets={factionDatasheets} />
+      <DatasheetHero datasheet={datasheet} />
 
       <DatasheetAbilities
         title="Abilities"

@@ -607,6 +607,7 @@ describe('OfflineStorage', () => {
         datasheetCount: 50,
         detachmentCount: 4
       },
+      dataVersion: null,
       detachment: {
         slug: 'test-detachment',
         name: 'Test Detachment',

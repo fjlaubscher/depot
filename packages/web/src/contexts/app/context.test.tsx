@@ -90,19 +90,22 @@ const mockFactionIndex: depot.Index[] = [
     id: 'SM',
     slug: 'space-marines',
     name: 'Space Marines',
-    path: '/data/factions/space-marines/faction.json'
+    path: '/data/factions/space-marines/faction.json',
+    dataVersion: DATA_VERSION
   },
   {
     id: 'CSM',
     slug: 'chaos-space-marines',
     name: 'Chaos Space Marines',
-    path: '/data/factions/chaos-space-marines/faction.json'
+    path: '/data/factions/chaos-space-marines/faction.json',
+    dataVersion: DATA_VERSION
   },
   {
     id: 'test-faction',
     slug: 'test-faction',
     name: 'Test Faction',
-    path: '/data/factions/test-faction/faction.json'
+    path: '/data/factions/test-faction/faction.json',
+    dataVersion: DATA_VERSION
   }
 ];
 
@@ -262,6 +265,27 @@ describe('AppProvider with IndexedDB Integration', () => {
       expect(mockOfflineStorage.getFactionIndex).toHaveBeenCalled();
       expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
       expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
+    });
+
+    it('should clear cached faction data when stored data version is missing but index has one', async () => {
+      mockOfflineStorage.getDataVersion.mockResolvedValue(null);
+      mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockFactionIndex
+      });
+
+      render(
+        <AppProvider>
+          <TestComponent />
+        </AppProvider>
+      );
+
+      await waitFor(() => {
+        expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
+        expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+      });
     });
 
     it('should load settings from IndexedDB on initialization', async () => {

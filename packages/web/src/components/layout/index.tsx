@@ -26,6 +26,10 @@ const AppLayout = ({ children, title }: Props) => {
           <Home size={16} />
           <span>Home</span>
         </Link>
+        <Link to="/collections" onClick={closeSidebar} className="sidebar-item">
+          <Boxes size={16} />
+          <span>{collectionLabel}</span>
+        </Link>
         <Link to="/factions" onClick={closeSidebar} className="sidebar-item">
           <Users size={16} />
           <span>Factions</span>
@@ -33,10 +37,6 @@ const AppLayout = ({ children, title }: Props) => {
         <Link to="/rosters" onClick={closeSidebar} className="sidebar-item">
           <ClipboardList size={16} />
           <span>Rosters</span>
-        </Link>
-        <Link to="/collections" onClick={closeSidebar} className="sidebar-item">
-          <Boxes size={16} />
-          <span>{collectionLabel}</span>
         </Link>
         <Link to="/settings" onClick={closeSidebar} className="sidebar-item">
           <Settings size={16} />

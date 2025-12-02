@@ -1,34 +1,117 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ClipboardPlus, X } from 'lucide-react';
+import { ClipboardPlus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
-import { BackButton } from '@/components/shared';
-import { Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
+import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/components/shared';
+import { Alert, Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import useCollection from '@/hooks/use-collection';
+import { useDocumentTitle } from '@/hooks/use-document-title';
+import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
+import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import { calculateCollectionPoints } from '@/utils/collection';
+import CollectionSelectionCard from './_components/collection-selection-card';
+
+type CollectionDatasheetListItem = depot.Datasheet & {
+  collectionUnitId: string;
+  unit: depot.CollectionUnit;
+};
 
 const SESSION_KEY = 'collection-roster-prefill';
 
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
+  const { state: appState } = useAppContext();
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
-  const groupedByRole = useMemo(() => {
-    if (!collection) return {};
-    return collection.items.reduce<Record<string, depot.CollectionUnit[]>>((acc, item) => {
-      const role = item.datasheet.role || 'OTHER';
-      acc[role] = acc[role] ? [...acc[role], item] : [item];
-      return acc;
-    }, {});
+  const pageTitle = collection
+    ? `${collection.name} - Build Roster`
+    : 'Build Roster from Collection';
+  useDocumentTitle(pageTitle);
+
+  useEffect(() => {
+    if (selectedIds.size === 0) {
+      setIsSummaryOpen(false);
+    }
+  }, [selectedIds.size]);
+
+  const collectionDatasheets = useMemo<CollectionDatasheetListItem[]>(() => {
+    if (!collection) return [];
+
+    return collection.items.map((item) => ({
+      ...item.datasheet,
+      slug: `${item.datasheet.slug}-${item.id}`,
+      collectionUnitId: item.id,
+      unit: item
+    }));
   }, [collection]);
 
-  const roleKeys = useMemo(() => Object.keys(groupedByRole).sort(), [groupedByRole]);
+  const selectedUnits = useMemo(
+    () => collection?.items.filter((item) => selectedIds.has(item.id)) ?? [],
+    [collection, selectedIds]
+  );
 
-  const toggleSelect = (id: string) => {
+  const selectedRosterUnits: depot.RosterUnit[] = useMemo(
+    () =>
+      selectedUnits.map((item) => ({
+        id: crypto.randomUUID(),
+        datasheet: item.datasheet,
+        modelCost: item.modelCost,
+        selectedWargear: item.selectedWargear,
+        selectedWargearAbilities: item.selectedWargearAbilities,
+        datasheetSlug: item.datasheetSlug ?? item.datasheet.slug
+      })),
+    [selectedUnits]
+  );
+
+  const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
+    const groups = new Map<string, SelectionGroup>();
+
+    selectedUnits.forEach((unit) => {
+      const key = `${unit.datasheet.id}-${unit.modelCost.line}`;
+      const existing = groups.get(key);
+
+      if (existing) {
+        existing.count += 1;
+      } else {
+        groups.set(key, {
+          count: 1,
+          datasheet: unit.datasheet,
+          modelCost: unit.modelCost
+        });
+      }
+    });
+
+    return Array.from(groups.values());
+  }, [selectedUnits]);
+
+  const totalSelectedPoints = useMemo(
+    () =>
+      selectedUnits.reduce(
+        (total: number, unit) => total + (parseInt(unit.modelCost.cost, 10) || 0),
+        0
+      ),
+    [selectedUnits]
+  );
+
+  const points = collection ? calculateCollectionPoints(collection) : 0;
+  const selectedCount = selectedIds.size;
+  const hasSelections = selectedCount > 0;
+
+  const datasheetFilters = useMemo(
+    () => ({
+      showLegends: appState.settings?.showLegends ?? false,
+      showForgeWorld: appState.settings?.showForgeWorld ?? false
+    }),
+    [appState.settings?.showLegends, appState.settings?.showForgeWorld]
+  );
+
+  const toggleSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -38,40 +121,78 @@ const CollectionNewRoster: React.FC = () => {
       }
       return next;
     });
-  };
+  }, []);
 
-  const clearSelection = () => setSelectedIds(new Set());
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
-  const selectedUnits: depot.RosterUnit[] = useMemo(() => {
-    if (!collection) return [];
-    return collection.items
-      .filter((item) => selectedIds.has(item.id))
-      .map((item) => ({
-        id: crypto.randomUUID(),
-        datasheet: item.datasheet,
-        modelCost: item.modelCost,
-        selectedWargear: item.selectedWargear,
-        selectedWargearAbilities: item.selectedWargearAbilities,
-        datasheetSlug: item.datasheetSlug ?? item.datasheet.slug
-      }));
-  }, [collection, selectedIds]);
+  const incrementSelection = useCallback(
+    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
+      if (!collection) return;
 
-  const handleCreateRoster = () => {
-    if (!collection) return;
+      setSelectedIds((prev) => {
+        const available = collection.items.find(
+          (item) =>
+            !prev.has(item.id) &&
+            item.datasheet.id === datasheet.id &&
+            item.modelCost.line === modelCost.line &&
+            item.modelCost.description === modelCost.description
+        );
+
+        if (!available) return prev;
+
+        const next = new Set(prev);
+        next.add(available.id);
+        return next;
+      });
+    },
+    [collection]
+  );
+
+  const decrementSelection = useCallback(
+    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
+      if (!collection) return;
+
+      setSelectedIds((prev) => {
+        const matching = collection.items
+          .filter(
+            (item) =>
+              prev.has(item.id) &&
+              item.datasheet.id === datasheet.id &&
+              item.modelCost.line === modelCost.line &&
+              item.modelCost.description === modelCost.description
+          )
+          .map((item) => item.id);
+
+        if (matching.length === 0) return prev;
+
+        const next = new Set(prev);
+        next.delete(matching[matching.length - 1]);
+        return next;
+      });
+    },
+    [collection]
+  );
+
+  const handleCreateRoster = useCallback(() => {
+    if (!collection || selectedRosterUnits.length === 0) return;
+
     const payload = {
       collectionId: collection.id,
       factionSlug: collection.factionSlug ?? collection.factionId,
       factionId: collection.factionId,
       name: `${collection.name} roster`,
-      units: selectedUnits
+      units: selectedRosterUnits
     };
+
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
     navigate(`/rosters/create?fromCollection=${collection.id}`);
-  };
+  }, [collection, navigate, selectedRosterUnits]);
 
-  const pageTitle = collection
-    ? `${collection.name} - Build Roster`
-    : 'Build Roster from Collection';
+  const subtitle = collection
+    ? `${collection.items.length} units - ${
+        collection.faction?.name || collection.factionSlug || collection.factionId
+      }`
+    : undefined;
 
   if (loading) {
     return (
@@ -86,23 +207,16 @@ const CollectionNewRoster: React.FC = () => {
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle}>
-        <Card>
-          <p className="text-sm text-danger-600">Unable to load collection.</p>
-        </Card>
+        <Alert variant="error" title="Unable to load collection">
+          {error || 'Collection not found'}
+        </Alert>
       </AppLayout>
     );
   }
 
-  const points = calculateCollectionPoints(collection);
-  const subtitle = `${collection.items.length} unit${collection.items.length === 1 ? '' : 's'} - ${
-    collection.faction?.name || collection.factionSlug
-  }`;
-
-  const selectedCount = selectedIds.size;
-
   return (
     <AppLayout title={pageTitle}>
-      <div className="flex flex-col gap-4">
+      <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
         <BackButton to={`/collections/${collection.id}`} label="Back" className="md:hidden" />
 
         <div className="hidden md:block">
@@ -115,45 +229,12 @@ const CollectionNewRoster: React.FC = () => {
           />
         </div>
 
-        <PageHeader
-          title="Build roster from collection"
-          subtitle={`${collection.name} · ${subtitle}`}
-          action={{
-            icon: <ClipboardPlus size={16} />,
-            onClick: handleCreateRoster,
-            ariaLabel: 'Create roster from selected units',
-            disabled: selectedCount === 0
-          }}
-        />
+        <PageHeader title="Build roster from collection" subtitle={subtitle} />
 
-        <Card padding="lg" className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Tag size="sm" variant="primary">
-                {selectedCount} selected
-              </Tag>
-              <span className="text-sm text-subtle">
-                {selectedCount > 0
-                  ? 'Proceed to roster creation with these units.'
-                  : 'Select units to include in your roster.'}
-              </span>
-            </div>
-            {selectedCount > 0 ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={clearSelection}
-                className="flex items-center gap-1"
-              >
-                <X size={14} />
-                Clear
-              </Button>
-            ) : null}
-          </div>
-          <div className="text-sm text-muted">
-            Collection total: {collection.items.length} units · {points} pts
-          </div>
-        </Card>
+        <Alert variant="info" title="Prefill a new roster">
+          Select units from your collection to prefill a roster. Use the summary drawer to review
+          points before creating the roster.
+        </Alert>
 
         {collection.items.length === 0 ? (
           <Card>
@@ -161,52 +242,36 @@ const CollectionNewRoster: React.FC = () => {
           </Card>
         ) : (
           <div className="flex flex-col gap-4">
-            {roleKeys.map((role) => (
-              <Card key={role} padding="lg" data-testid="collection-role-section">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    {role.toUpperCase()} ({groupedByRole[role].length})
-                  </h3>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {groupedByRole[role].map((item) => {
-                    const isSelected = selectedIds.has(item.id);
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => toggleSelect(item.id)}
-                        className={`flex flex-col gap-2 rounded-lg border p-3 text-left transition ${
-                          isSelected
-                            ? 'border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-900/30'
-                            : 'border-gray-200 hover:border-primary-200 dark:border-gray-700 dark:hover:border-primary-700'
-                        }`}
-                        data-testid={`collection-unit-${item.id}`}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex flex-col gap-1 min-w-0">
-                            <span className="text-sm font-semibold text-foreground truncate">
-                              {item.datasheet.name}
-                            </span>
-                            <span className="text-xs text-subtle capitalize">{item.state}</span>
-                          </div>
-                          <Tag size="sm" variant={isSelected ? 'primary' : 'secondary'}>
-                            {item.modelCost.cost} pts
-                          </Tag>
-                        </div>
-                        {item.selectedWargear.length > 0 ? (
-                          <p className="text-xs text-muted line-clamp-2">
-                            {item.selectedWargear.map((wg) => wg.name).join(', ')}
-                          </p>
-                        ) : (
-                          <p className="text-xs text-subtle">Default wargear</p>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </Card>
-            ))}
+            {collectionDatasheets.length === 0 ? (
+              <DatasheetBrowserSkeleton />
+            ) : (
+              <DatasheetBrowser<CollectionDatasheetListItem>
+                datasheets={collectionDatasheets}
+                searchPlaceholder="Search collection units..."
+                emptyStateMessage="No units match your filters."
+                filters={datasheetFilters}
+                showItemCount={false}
+                renderDatasheet={(datasheet) => (
+                  <CollectionSelectionCard
+                    unit={datasheet.unit}
+                    selected={selectedIds.has(datasheet.collectionUnitId)}
+                    onToggle={toggleSelect}
+                  />
+                )}
+              />
+            )}
+
+            <SelectionSummary
+              groups={aggregatedSelection}
+              selectedUnitsCount={selectedUnits.length}
+              totalPoints={totalSelectedPoints}
+              onClear={clearSelection}
+              onConfirm={handleCreateRoster}
+              onIncrement={incrementSelection}
+              onDecrement={decrementSelection}
+              isOpen={isSummaryOpen}
+              onOpenChange={setIsSummaryOpen}
+            />
           </div>
         )}
       </div>

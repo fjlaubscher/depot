@@ -138,6 +138,7 @@ export const generateRosterShareText = (
 
 interface DuplicateRosterOptions {
   name?: string;
+  dataVersion?: string | null;
 }
 
 export const createRosterDuplicate = (
@@ -170,6 +171,7 @@ export const createRosterDuplicate = (
     ...roster,
     id: crypto.randomUUID(),
     name: options.name ?? `${roster.name} (Copy)`,
+    dataVersion: options.dataVersion ?? roster.dataVersion ?? null,
     units: duplicatedUnits,
     enhancements: duplicatedEnhancements,
     warlordUnitId: roster.warlordUnitId ? (unitIdMap.get(roster.warlordUnitId) ?? null) : null,

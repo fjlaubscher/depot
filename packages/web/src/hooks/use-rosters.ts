@@ -11,7 +11,7 @@ interface UseRosters {
   updateRoster: (roster: depot.Roster) => Promise<void>;
   deleteRoster: (rosterId: string) => Promise<void>;
   getRoster: (rosterId: string) => Promise<depot.Roster | null>;
-  duplicateRoster: (roster: depot.Roster) => Promise<depot.Roster>;
+  duplicateRoster: (roster: depot.Roster, dataVersion?: string | null) => Promise<depot.Roster>;
   refresh: () => Promise<void>;
 }
 
@@ -58,8 +58,8 @@ function useRosters(): UseRosters {
     return await offlineStorage.getRoster(rosterId);
   };
 
-  const duplicateRoster = async (roster: depot.Roster) => {
-    const duplicatedRoster = createRosterDuplicate(roster);
+  const duplicateRoster = async (roster: depot.Roster, dataVersion?: string | null) => {
+    const duplicatedRoster = createRosterDuplicate(roster, { dataVersion });
     await offlineStorage.saveRoster(duplicatedRoster);
     await loadRosters();
     return duplicatedRoster;

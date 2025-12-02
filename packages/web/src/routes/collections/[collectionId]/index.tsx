@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, ClipboardPlus } from 'lucide-react';
+import { Plus, ClipboardPlus, RefreshCw } from 'lucide-react';
 import type { depot } from '@depot/core';
 import classNames from 'classnames';
 
@@ -12,11 +12,13 @@ import CollectionUnitCard from '@/routes/collections/_components/collection-unit
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
+import useDownloadFile from '@/hooks/use-download-file';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import { offlineStorage } from '@/data/offline-storage';
 import type { ExportedCollection } from '@/types/export';
 import { safeSlug } from '@/utils/strings';
 import ExportButton from '@/components/shared/export-button';
+import { useAppContext } from '@/contexts/app/use-app-context';
+import { refreshCollectionData } from '@/utils/refresh-user-data';
 import {
   COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
@@ -31,7 +33,10 @@ const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
+  const { state: appState, getDatasheet } = useAppContext();
   const { showToast } = useToast();
+  const downloadFile = useDownloadFile();
+  const [refreshing, setRefreshing] = useState(false);
   const {
     selection: persistedStateFilter,
     setSelection: setPersistedStateFilter,
@@ -87,6 +92,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     () => (collection ? calculateCollectionPoints(collection) : 0),
     [collection]
   );
+  const currentDataVersion = appState.dataVersion ?? null;
+  const isStale =
+    !!currentDataVersion && collection ? collection.dataVersion !== currentDataVersion : false;
 
   const toRosterUnit = (item: depot.CollectionUnit): depot.RosterUnit => ({
     id: item.id,
@@ -113,6 +121,43 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     () => filteredItems.map((item) => toRosterUnit(item)),
     [filteredItems]
   );
+
+  const handleRefreshCollectionData = async () => {
+    if (refreshing || !collection) return;
+    if (!currentDataVersion) {
+      showToast({
+        type: 'warning',
+        title: 'No data version detected',
+        message: 'Unable to refresh because the current data version is unknown.'
+      });
+      return;
+    }
+
+    setRefreshing(true);
+    try {
+      const updatedCollection = await refreshCollectionData({
+        collection,
+        currentDataVersion,
+        getDatasheet
+      });
+
+      await save(updatedCollection);
+      showToast({
+        type: 'success',
+        title: 'Collection updated',
+        message: 'Refreshed with the latest Wahapedia data.'
+      });
+    } catch (err) {
+      console.error('Failed to refresh collection data', err);
+      showToast({
+        type: 'error',
+        title: 'Refresh failed',
+        message: 'Could not refresh this collection. Please try again.'
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleRemove = async (unitId: string) => {
     if (!collection) return;
@@ -160,12 +205,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const handleExportCollection = async () => {
     if (!collection) return;
 
-    let dataVersion: string | null = null;
-    try {
-      dataVersion = await offlineStorage.getDataVersion();
-    } catch {
-      dataVersion = null;
-    }
+    const dataVersion = collection.dataVersion ?? appState.dataVersion ?? null;
 
     const payload: ExportedCollection = {
       kind: 'collection',
@@ -174,13 +214,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       collection
     };
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `collection-${safeSlug(collection.name)}-${collection.id}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    downloadFile(
+      `collection-${safeSlug(collection.name)}-${collection.id}.json`,
+      JSON.stringify(payload, null, 2)
+    );
     showToast({ type: 'success', title: 'Collection exported' });
   };
 
@@ -228,18 +265,18 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         />
       </div>
 
-      <PageHeader title={collection.name} subtitle={subtitle} />
+      <PageHeader
+        title={collection.name}
+        subtitle={subtitle}
+        action={{
+          icon: <Plus size={16} />,
+          onClick: handleAddUnits,
+          ariaLabel: 'Add units',
+          testId: 'add-collection-units-button'
+        }}
+      />
 
       <div className="flex flex-wrap gap-2">
-        <Button
-          onClick={handleAddUnits}
-          variant="secondary"
-          className="flex items-center gap-2"
-          data-testid="add-collection-units-button"
-        >
-          <Plus size={16} />
-          Add Units
-        </Button>
         <Button
           onClick={handleCreateRoster}
           variant="secondary"
@@ -251,6 +288,28 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         </Button>
         <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
       </div>
+
+      {isStale ? (
+        <Alert variant="warning" title="Collection uses older data">
+          <div className="flex flex-col gap-2">
+            <span className="text-sm text-secondary">
+              Refresh to pull the latest Wahapedia data for these units.
+            </span>
+            <div>
+              <Button
+                variant="secondary"
+                onClick={() => void handleRefreshCollectionData()}
+                disabled={refreshing}
+                data-testid="refresh-collection-data"
+                className="inline-flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {refreshing ? 'Refreshing…' : 'Refresh with latest data'}
+              </Button>
+            </div>
+          </div>
+        </Alert>
+      ) : null}
 
       <CollectionStateChart
         items={collection.items}

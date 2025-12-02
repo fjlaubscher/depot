@@ -162,6 +162,10 @@ export interface DetachmentAbility {
   detachment: string;
 }
 
+export interface LastUpdate {
+  lastUpdate: string;
+}
+
 export interface Data {
   factions: Faction[];
   sources: Source[];
@@ -181,4 +185,5 @@ export interface Data {
   abilities: Ability[];
   enhancements: Enhancement[];
   detachmentAbilities: DetachmentAbility[];
+  lastUpdate: string | null;
 }

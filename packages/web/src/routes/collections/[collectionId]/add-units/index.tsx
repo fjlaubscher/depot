@@ -107,10 +107,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     [showLegends, showForgeWorld]
   );
 
-  const rosterStats = useMemo(
-    () => ({
-      points: { current: collection ? calculateCollectionPoints(collection) : 0 }
-    }),
+  const points = useMemo(
+    () => (collection ? calculateCollectionPoints(collection) : 0),
     [collection]
   );
 
@@ -131,7 +129,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     );
   }
 
-  const subtitle = collection.faction?.name || collection.factionSlug || collection.factionId;
+  const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
+  const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
 
   const handleAddSelectedUnits = async () => {
     if (!collection || selectedUnits.length === 0) return;
@@ -182,11 +181,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
         />
       </div>
 
-      <PageHeader
-        title={collection.name}
-        subtitle={subtitle}
-        stats={<RosterHeader roster={rosterStats} showEnhancements={false} showMax={false} />}
-      />
+      <PageHeader title={collection.name} subtitle={subtitle} />
 
       <Alert variant="info" title="Add Units">
         Browse the datasheets below and queue units for your collection. Use the summary drawer to

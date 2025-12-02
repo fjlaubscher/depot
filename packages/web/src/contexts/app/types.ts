@@ -7,6 +7,7 @@ export interface AppState {
   offlineFactions: CachedFaction[];
   loading: boolean;
   error: string | null;
+  dataVersion: string | null;
   settings: depot.Settings | null;
 }
 
@@ -20,6 +21,7 @@ export type AppAction =
   | { type: 'UPDATE_OFFLINE_FACTIONS'; payload: CachedFaction[] }
   | { type: 'LOAD_SETTINGS_SUCCESS'; payload: depot.Settings }
   | { type: 'UPDATE_SETTINGS'; payload: depot.Settings }
+  | { type: 'SET_DATA_VERSION'; payload: string | null }
   | { type: 'CLEAR_ERROR' };
 
 // Context interface

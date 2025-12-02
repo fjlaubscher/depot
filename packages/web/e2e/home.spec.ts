@@ -5,7 +5,6 @@ test.describe('Home', () => {
     await page.goto('/');
 
     await expect(page.getByTestId('welcome-heading')).toBeVisible();
-    await expect(page.getByTestId('collections-wip-indicator')).toBeVisible();
     await expect(page.getByTestId('browse-factions-button')).toBeVisible();
     await expect(page.getByTestId('roster-builder-button')).toBeVisible();
     await expect(page.getByTestId('collections-button')).toBeVisible();

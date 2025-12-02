@@ -55,6 +55,7 @@ const formatRoleLabel = (value: string | null | undefined) => {
 const consolidateFiles = (): wahapedia.Data => {
   const factions = readFileAndParseToJSON<wahapedia.Faction>('factions.json');
   const sources = readFileAndParseToJSON<wahapedia.Source>('source.json');
+  const lastUpdateEntries = readFileAndParseToJSON<wahapedia.LastUpdate>('last-update.json');
 
   const datasheets = readFileAndParseToJSON<wahapedia.Datasheet>('datasheets.json');
   const datasheetAbilities = readFileAndParseToJSON<wahapedia.DatasheetAbility>(
@@ -111,7 +112,8 @@ const consolidateFiles = (): wahapedia.Data => {
     stratagems,
     abilities,
     enhancements,
-    detachmentAbilities
+    detachmentAbilities,
+    lastUpdate: lastUpdateEntries[0]?.lastUpdate ?? null
   };
 };
 
@@ -370,11 +372,13 @@ const buildFactionData = (
 interface GenerateDataResult {
   factions: depot.Faction[];
   coreStratagems: depot.Stratagem[];
+  dataVersion: string | null;
 }
 
 const generateData = (): GenerateDataResult => {
   const data = consolidateFiles();
   const classifySource = buildSourceClassifier(data.sources);
+  const dataVersion = data.lastUpdate ?? null;
 
   const factionSlugGenerator = slugUtils.createSlugGenerator('faction');
   const datasheetSlugGenerator = slugUtils.createSlugGenerator('datasheet');
@@ -394,7 +398,7 @@ const generateData = (): GenerateDataResult => {
   );
   const coreStratagems = buildCoreStratagems(data.stratagems);
 
-  return { factions, coreStratagems };
+  return { factions, coreStratagems, dataVersion };
 };
 
 export default generateData;

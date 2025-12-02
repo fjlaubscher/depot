@@ -71,7 +71,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
       )}
 
       {hasData ? (
-        <div className="h-64 w-full md:h-72">
+        <div className="h-64 w-full md:h-72 no-focus-outline">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
             <BarChart
               data={chartData}

@@ -5,6 +5,7 @@ export const initialState: depot.Roster = {
   name: '',
   factionId: '',
   factionSlug: '',
+  dataVersion: null,
   faction: {
     id: '',
     slug: '',

@@ -11,6 +11,7 @@ export type RosterAction =
         factionId: string;
         factionSlug: string;
         faction: depot.Index;
+        dataVersion?: string | null;
         maxPoints: number;
         name: string;
         detachment: depot.Detachment;
@@ -49,6 +50,7 @@ export interface RosterContextValue {
     factionId: string;
     factionSlug: string;
     faction: depot.Index;
+    dataVersion?: string | null;
     maxPoints: number;
     name: string;
     detachment: depot.Detachment;
@@ -60,6 +62,7 @@ export interface RosterContextValue {
     detachment: depot.Detachment;
     maxPoints: number;
   }) => void;
+  setRoster: (roster: depot.Roster) => void;
   addUnit: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
   duplicateUnit: (unit: depot.RosterUnit) => void;
   removeUnit: (rosterUnitId: string) => void;

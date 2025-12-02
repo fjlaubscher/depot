@@ -1,5 +1,6 @@
 export { DatasheetBrowser } from './datasheet-browser';
 export { DatasheetSelectionCard } from './datasheet-selection-card';
+export { default as DatasheetListItemCard } from './datasheet-list-item-card';
 export { DatasheetComposition } from './datasheet-composition';
 export { DatasheetAbilities } from './datasheet-abilities';
 export { DatasheetSupplementTabs } from './datasheet-supplement-tabs';

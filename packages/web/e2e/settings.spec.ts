@@ -6,8 +6,8 @@ const toggles = [
   { name: 'Unaligned Factions', testId: 'unaligned-factions-toggle', defaultChecked: false },
   { name: 'Show Fluff Text', testId: 'show-fluff-text-toggle', defaultChecked: true },
   {
-    name: 'Include Wargear in Exports',
-    testId: 'include-wargear-in-exports-toggle',
+    name: 'Include Wargear',
+    testId: 'include-wargear-toggle',
     defaultChecked: true
   },
   { name: 'Use Native Sharing', testId: 'use-native-sharing-toggle', defaultChecked: true },

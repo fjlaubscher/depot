@@ -4,12 +4,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useFactions from '@/hooks/use-factions';
 import useFaction from '@/hooks/use-faction';
 import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
+import { PageHeader, Card, Field, SelectField, Button, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 
@@ -17,16 +17,24 @@ const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
-  const { showToast } = useToast();
+  const { state: appState } = useAppContext();
 
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
   const [detachmentSlug, setDetachmentSlug] = useState<string | null>(null);
   const [maxPoints, setMaxPoints] = useState(2000);
   const [prefillUnits, setPrefillUnits] = useState<depot.RosterUnit[]>([]);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    faction?: string;
+    detachment?: string;
+    maxPoints?: string;
+  }>({});
 
   const { factions, loading: factionsLoading } = useFactions();
   const { data: selectedFaction, loading: factionLoading } = useFaction(factionSlug || undefined);
+
+  const collectionId = searchParams.get('fromCollection');
 
   const factionOptions =
     factions
@@ -55,7 +63,6 @@ const CreateRoster: React.FC = () => {
   }, [factionSlug]);
 
   useEffect(() => {
-    const collectionId = searchParams.get('fromCollection');
     if (!collectionId) return;
 
     // Prefer session-stashed selection from collection flow
@@ -99,41 +106,29 @@ const CreateRoster: React.FC = () => {
       setPrefillUnits(units);
     };
     void loadCollection();
-  }, [searchParams]);
+  }, [collectionId]);
+
+  const prefillTotal = useMemo(() => {
+    if (prefillUnits.length === 0) return 0;
+
+    return prefillUnits.reduce((acc, unit) => acc + parseInt(unit.modelCost.cost, 10) || 0, 0);
+  }, [prefillUnits]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const nextErrors: typeof errors = {};
+
     if (!name.trim()) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Please enter a roster name.'
-      });
-      return;
+      nextErrors.name = 'Please enter a roster name.';
     }
     if (!factionSlug) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Please select a faction.'
-      });
-      return;
+      nextErrors.faction = 'Please select a faction.';
     }
     if (!detachmentSlug) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Please select a detachment.'
-      });
-      return;
+      nextErrors.detachment = 'Please select a detachment.';
     }
     if (maxPoints <= 0) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Max points must be greater than 0.'
-      });
-      return;
+      nextErrors.maxPoints = 'Max points must be greater than 0.';
     }
 
     // Build the complete detachment object using lookup
@@ -141,26 +136,27 @@ const CreateRoster: React.FC = () => {
       (detachment) => detachment.slug === detachmentSlug
     );
     if (!selectedDetachment) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Selected detachment not found.'
-      });
-      return;
+      nextErrors.detachment = 'Selected detachment not found.';
     }
 
-    const detachment: depot.Detachment = selectedDetachment;
+    const detachment = selectedDetachment;
 
     // Find the faction Index entry
     const selectedFactionIndex = factions?.find(
       (f) => f.slug === factionSlug || f.id === factionSlug
     );
     if (!selectedFactionIndex) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Selected faction not found.'
-      });
+      nextErrors.faction = 'Selected faction not found.';
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
+    setErrors({});
+
+    if (!selectedFactionIndex || !detachment) {
       return;
     }
 
@@ -169,6 +165,7 @@ const CreateRoster: React.FC = () => {
       factionId: selectedFactionIndex.id,
       factionSlug: selectedFactionIndex.slug,
       faction: selectedFactionIndex,
+      dataVersion: appState.dataVersion ?? null,
       maxPoints,
       detachment,
       units: prefillUnits
@@ -176,16 +173,16 @@ const CreateRoster: React.FC = () => {
     navigate(`/rosters/${newId}/edit`);
   };
 
+  const isFromCollection = !!collectionId && prefillUnits.length > 0;
+
   return (
     <AppLayout title="Create Roster">
       <div className="flex flex-col gap-4">
         <PageHeader title="Create New Roster" />
-        {prefillUnits.length > 0 ? (
-          <Card>
-            <div className="text-sm text-foreground">
-              Prefilling with {prefillUnits.length} units from your collection.
-            </div>
-          </Card>
+        {isFromCollection ? (
+          <Alert title={`Prefilling with ${prefillUnits.length} units from your collection.`}>
+            Total of {prefillTotal} points
+          </Alert>
         ) : null}
         <Card>
           <form data-testid="roster-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -199,9 +196,15 @@ const CreateRoster: React.FC = () => {
                 type="text"
                 className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) {
+                    setErrors((prev) => ({ ...prev, name: undefined }));
+                  }
+                }}
                 required
               />
+              {errors.name ? <p className="text-sm text-danger">{errors.name}</p> : null}
             </Field>
 
             {factionsLoading ? (
@@ -212,9 +215,14 @@ const CreateRoster: React.FC = () => {
                 label="Faction"
                 options={factionOptions}
                 value={factionSlug || ''}
-                onChange={(e) => setFactionSlug(e.target.value || null)}
+                onChange={(e) => {
+                  setFactionSlug(e.target.value || null);
+                  setErrors((prev) => ({ ...prev, faction: undefined, detachment: undefined }));
+                }}
                 placeholder="Select a Faction"
                 required
+                disabled={isFromCollection}
+                error={errors.faction}
               />
             )}
 
@@ -226,9 +234,15 @@ const CreateRoster: React.FC = () => {
                 label="Detachment"
                 options={detachmentOptions}
                 value={detachmentSlug || ''}
-                onChange={(e) => setDetachmentSlug(e.target.value || null)}
+                onChange={(e) => {
+                  setDetachmentSlug(e.target.value || null);
+                  if (errors.detachment) {
+                    setErrors((prev) => ({ ...prev, detachment: undefined }));
+                  }
+                }}
                 placeholder="Select a Detachment"
                 required
+                error={errors.detachment}
               />
             ) : factionSlug ? (
               <Field>
@@ -243,13 +257,20 @@ const CreateRoster: React.FC = () => {
               data-testid="max-points-field"
               value={maxPoints}
               onChange={setMaxPoints}
+              error={errors.maxPoints}
             />
 
             <div className="flex justify-end gap-4">
               <Button
                 data-testid="cancel-button"
                 variant="secondary"
-                onClick={() => navigate('/rosters')}
+                onClick={() => {
+                  if (isFromCollection) {
+                    navigate(`/collections/${collectionId}`);
+                  } else {
+                    navigate('/rosters');
+                  }
+                }}
               >
                 Cancel
               </Button>

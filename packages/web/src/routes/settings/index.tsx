@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type { depot } from '@depot/core';
+import { Users, ClipboardList, Boxes, Database } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -49,8 +50,28 @@ const Settings = () => {
         />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Collection Preferences Card */}
+          <SettingsCard
+            icon={<Boxes size={20} />}
+            title="Collection Preferences"
+            description="Control how collections are displayed"
+          >
+            <div className="flex flex-col gap-4">
+              <SettingToggleItem
+                title="Call It What It Is"
+                description={`Use "Pile of Shame" instead of "Collection" across the app.`}
+                enabled={state.settings?.usePileOfShameLabel ?? true}
+                onChange={(value) => handleSettingsChange('usePileOfShameLabel', value)}
+              />
+            </div>
+          </SettingsCard>
+
           {/* Faction Preferences Card */}
-          <SettingsCard title="Faction Preferences" description="Choose which factions to display">
+          <SettingsCard
+            icon={<Users size={20} />}
+            title="Faction Preferences"
+            description="Customize how factions and datasheets are displayed"
+          >
             <div className="flex flex-col gap-4">
               <SettingToggleItem
                 title="Forge World Units"
@@ -71,32 +92,24 @@ const Settings = () => {
                 onChange={(value) => handleSettingsChange('showUnaligned', value)}
               />
             </div>
-          </SettingsCard>
-
-          {/* Datasheet Preferences Card */}
-          <SettingsCard
-            title="Datasheet Preferences"
-            description="Customize how datasheets are displayed"
-          >
-            <div className="flex flex-col gap-4">
-              <SettingToggleItem
-                title="Show Fluff Text"
-                description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
-                enabled={state.settings?.showFluff ?? true}
-                onChange={(value) => handleSettingsChange('showFluff', value)}
-              />
-            </div>
+            <SettingToggleItem
+              title="Show Fluff Text"
+              description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
+              enabled={state.settings?.showFluff ?? true}
+              onChange={(value) => handleSettingsChange('showFluff', value)}
+            />
           </SettingsCard>
 
           {/* Roster Preferences Card */}
           <SettingsCard
+            icon={<ClipboardList size={20} />}
             title="Roster Preferences"
             description="Control how rosters are exported or shared"
           >
             <div className="flex flex-col gap-4">
               <SettingToggleItem
-                title="Include Wargear in Exports"
-                description="Add selected wargear to exported markdown or shared text"
+                title="Include Wargear"
+                description="Add selected wargear when sharing rosters"
                 enabled={state.settings?.includeWargearOnExport ?? true}
                 onChange={(value) => handleSettingsChange('includeWargearOnExport', value)}
               />
@@ -107,23 +120,8 @@ const Settings = () => {
                 onChange={(value) => handleSettingsChange('useNativeShare', value)}
               />
               <SettingToggleItem
-                title="Call It What It Is"
-                description={`Use "Pile of Shame" instead of "Collection" across the app.`}
-                enabled={state.settings?.usePileOfShameLabel ?? true}
-                onChange={(value) => handleSettingsChange('usePileOfShameLabel', value)}
-              />
-            </div>
-          </SettingsCard>
-
-          {/* Experimental Features Card */}
-          <SettingsCard
-            title="Experimental Features"
-            description="Enable work-in-progress tools (may change or break)"
-          >
-            <div className="flex flex-col gap-4">
-              <SettingToggleItem
-                title="Cogitator"
-                description="Experimental: Enable the roster analysis Cogitator tab powered by GPT."
+                title="Cogitator (Experimental)"
+                description="Enable the roster analysis Cogitator tab powered by GPT."
                 enabled={state.settings?.enableCogitator ?? false}
                 onChange={(value) => handleSettingsChange('enableCogitator', value)}
               />
@@ -132,6 +130,7 @@ const Settings = () => {
 
           {/* Offline Data Card */}
           <SettingsCard
+            icon={<Database size={20} />}
             title="Offline Data"
             description="Manage cached faction data for offline use"
           >
@@ -143,36 +142,20 @@ const Settings = () => {
               <div className="flex flex-col gap-4">
                 {state.offlineFactions && state.offlineFactions.length > 0 ? (
                   <>
-                    <div className="flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-foreground">Cached Factions</span>
-                        <span className="text-xs surface-success-strong text-success-strong px-2 py-1 rounded-full">
-                          {state.offlineFactions.length}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        {state.offlineFactions.slice(0, 4).map((f) => (
-                          <div
-                            key={`faction-${f.id}`}
-                            className="flex items-center gap-2 text-sm text-body surface-soft rounded px-3"
-                          >
-                            <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
-                            <span className="truncate">{f.name}</span>
-                            <span className="text-xs text-subtle ml-auto flex-shrink-0">
-                              {f.cachedDatasheets}{' '}
-                              {f.cachedDatasheets === 1 ? 'datasheet' : 'datasheets'}
-                            </span>
-                          </div>
-                        ))}
-                        {state.offlineFactions.length > 4 && (
-                          <div className="text-center">
-                            <span className="text-xs text-subtle">
-                              +{state.offlineFactions.length - 4} more factions cached
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-1">
+                      {state.offlineFactions.map((f) => (
+                        <div
+                          key={`faction-${f.id}`}
+                          className="flex items-center gap-2 text-sm text-body surface-soft rounded"
+                        >
+                          <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
+                          <span className="truncate">{f.name}</span>
+                          <span className="text-xs text-subtle ml-auto flex-shrink-0">
+                            {f.cachedDatasheets}{' '}
+                            {f.cachedDatasheets === 1 ? 'datasheet' : 'datasheets'}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                     <Button variant="error" onClick={handleReset} size="sm" fullWidth>
                       Clear Cached Factions
