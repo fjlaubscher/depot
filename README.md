@@ -24,9 +24,10 @@ This installs dependencies, downloads Wahapedia data, processes it, and starts t
 
 ## Architecture
 
-Monorepo with three packages:
+Monorepo with four packages:
 - **@depot/cli** - Processes Wahapedia CSV exports into structured JSON
 - **@depot/core** - Shared TypeScript types and utilities
+- **@depot/workers** - Cloudflare Pages/Workers handlers (e.g., Cogitator). Files in `functions/` are thin adapters into this package.
 - **@depot/web** - React PWA with IndexedDB storage
 
 Built with React 19, Vite 6, Tailwind CSS v4, and TypeScript 5.9+.
@@ -44,6 +45,14 @@ When deploying, set the matching environment variables/secrets (`SENTRY_DSN`, `S
 ## Privacy
 
 The published app exposes a privacy policy at `/privacy`. Update the content in `packages/web/src/routes/privacy/index.tsx` if data practices change.
+
+## Legal / IP
+
+depot is a free, open-source fan project intended for personal hobby use via the web. It is not monetised, has no in-app purchases or ads, and is not distributed via any app stores.
+
+depot is not affiliated with, endorsed by, or sponsored by Games Workshop Limited. All related names, logos, imagery, and trademarks remain the property of their respective owners. Please support the official publications and products wherever you can.
+
+Game data is derived from Wahapedia exports. Wahapedia is unaffiliated with Games Workshop and unaffiliated with depot; this project simply transforms its public CSV exports into offline JSON so you can browse and tinker with lists.
 
 ## License
 

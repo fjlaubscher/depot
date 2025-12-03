@@ -25,7 +25,8 @@ const About = () => (
           depot is a free, open-source list companion that treats speed and offline resilience as
           headline features. It mirrors Wahapedia exports, keeps everything cached on your device,
           and wraps it all in a touch-friendly interface meant for busy game tables and late-night
-          list brewing. There are no logins, ads, or social feeds-just useful tools and a bit of
+          list brewing. It ships as a web app only—no app-store builds—and stays free and
+          non-commercial. There are no logins, ads, or social feeds-just useful tools and a bit of
           playful polish for people who love tinkering with armies.
         </p>
       </section>

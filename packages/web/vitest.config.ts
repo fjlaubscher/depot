@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
+/// <reference types="vitest" />
+import { defineConfig } from 'vite';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -15,6 +16,6 @@ export default defineConfig({
       '**/e2e/**',
       '**/test-results/**',
       '**/playwright-report/**'
-    ],
+    ]
   }
-})
+});

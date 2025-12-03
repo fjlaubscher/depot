@@ -11,6 +11,9 @@ importers:
       '@depot/core':
         specifier: workspace:*
         version: link:packages/core
+      '@depot/workers':
+        specifier: workspace:*
+        version: link:packages/workers
       openai:
         specifier: ^6.9.1
         version: 6.9.1(ws@8.18.3)(zod@3.25.76)
@@ -167,6 +170,31 @@ importers:
       vite-tsconfig-paths:
         specifier: ^5.1.4
         version: 5.1.4(typescript@5.9.3)(vite@6.3.6(@types/node@20.19.19)(jiti@2.6.1)(lightningcss@1.30.1)(sass@1.90.0)(terser@5.44.1))
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.19)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.90.0)(terser@5.44.1)
+
+  packages/workers:
+    dependencies:
+      '@depot/core':
+        specifier: workspace:*
+        version: link:../core
+      openai:
+        specifier: ^6.9.1
+        version: 6.9.1(ws@8.18.3)(zod@3.25.76)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.19.19
+        version: 20.19.19
+      prettier:
+        specifier: ^3.4.0
+        version: 3.6.2
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@20.19.19)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(sass@1.90.0)(terser@5.44.1)
