@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/node": "^20.19.19",
     "prettier": "^3.4.0",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.10",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
