@@ -7,7 +7,6 @@ import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
-import { DATA_VERSION } from '@/constants/data-version';
 import { normalizeDatasheetWargear } from '@/utils/wargear';
 
 // Create context
@@ -216,17 +215,18 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
           dataVersion = resolveIndexDataVersion(index);
         }
 
-        const resolvedDataVersion = dataVersion ?? DATA_VERSION;
-
-        try {
-          await offlineStorage.setDataVersion(resolvedDataVersion);
-        } catch (persistError) {
-          console.warn('Failed to persist data version marker.', persistError);
-        }
-
         if (index) {
           dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
-          dispatch({ type: APP_ACTIONS.SET_DATA_VERSION, payload: resolvedDataVersion });
+
+          if (dataVersion) {
+            try {
+              await offlineStorage.setDataVersion(dataVersion);
+            } catch (persistError) {
+              console.warn('Failed to persist data version marker.', persistError);
+            }
+          }
+
+          dispatch({ type: APP_ACTIONS.SET_DATA_VERSION, payload: dataVersion ?? null });
         } else {
           throw new Error('No faction index found');
         }

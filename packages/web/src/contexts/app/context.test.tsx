@@ -5,7 +5,6 @@ import { AppProvider } from './context';
 import { useAppContext } from './use-app-context';
 import type { depot } from '@depot/core';
 import { DEFAULT_SETTINGS } from '@/constants/settings';
-import { DATA_VERSION } from '@/constants/data-version';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -85,27 +84,29 @@ const TestComponent = () => {
   );
 };
 
+const MOCK_DATA_VERSION = '2025-11-29T02:05:23';
+
 const mockFactionIndex: depot.Index[] = [
   {
     id: 'SM',
     slug: 'space-marines',
     name: 'Space Marines',
     path: '/data/factions/space-marines/faction.json',
-    dataVersion: DATA_VERSION
+    dataVersion: MOCK_DATA_VERSION
   },
   {
     id: 'CSM',
     slug: 'chaos-space-marines',
     name: 'Chaos Space Marines',
     path: '/data/factions/chaos-space-marines/faction.json',
-    dataVersion: DATA_VERSION
+    dataVersion: MOCK_DATA_VERSION
   },
   {
     id: 'test-faction',
     slug: 'test-faction',
     name: 'Test Faction',
     path: '/data/factions/test-faction/faction.json',
-    dataVersion: DATA_VERSION
+    dataVersion: MOCK_DATA_VERSION
   }
 ];
 
@@ -215,7 +216,7 @@ describe('AppProvider with IndexedDB Integration', () => {
     mockOfflineStorage.setSettings.mockResolvedValue(undefined);
     mockOfflineStorage.clearFactionData.mockResolvedValue(undefined);
     mockOfflineStorage.clearAllData.mockResolvedValue(undefined);
-    mockOfflineStorage.getDataVersion.mockResolvedValue(DATA_VERSION);
+    mockOfflineStorage.getDataVersion.mockResolvedValue(MOCK_DATA_VERSION);
     mockOfflineStorage.setDataVersion.mockResolvedValue(undefined);
     mockOfflineStorage.destroy.mockResolvedValue(undefined);
 
@@ -284,7 +285,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       await waitFor(() => {
         expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
         expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
-        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
       });
     });
 
@@ -343,7 +344,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       await waitFor(() => {
         expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
         expect(mockOfflineStorage.destroy).not.toHaveBeenCalled();
-        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
       });
     });
 
@@ -362,7 +363,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       await waitFor(() => {
         expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
         expect(mockOfflineStorage.destroy).toHaveBeenCalledTimes(1);
-        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
       });
     });
 
@@ -380,7 +381,7 @@ describe('AppProvider with IndexedDB Integration', () => {
       await waitFor(() => {
         expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
         expect(mockOfflineStorage.destroy).not.toHaveBeenCalled();
-        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(DATA_VERSION);
+        expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
       });
     });
   });
