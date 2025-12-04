@@ -218,15 +218,20 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         if (index) {
           dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
 
-          if (dataVersion) {
+          const effectiveDataVersion = dataVersion ?? storedVersion;
+
+          if (effectiveDataVersion) {
             try {
-              await offlineStorage.setDataVersion(dataVersion);
+              await offlineStorage.setDataVersion(effectiveDataVersion);
             } catch (persistError) {
               console.warn('Failed to persist data version marker.', persistError);
             }
           }
 
-          dispatch({ type: APP_ACTIONS.SET_DATA_VERSION, payload: dataVersion ?? null });
+          dispatch({
+            type: APP_ACTIONS.SET_DATA_VERSION,
+            payload: effectiveDataVersion ?? null
+          });
         } else {
           throw new Error('No faction index found');
         }
