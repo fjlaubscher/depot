@@ -46,7 +46,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with CLI, core, and
 - Before commits: `pnpm format && pnpm lint && pnpm test`.
 
 ## Requirements
-- Node.js >=22.0.0 (CI pins Node 22)
+- Node.js >=24.0.0 (CI pins Node 24)
 - pnpm >=10.0.0 (lockfile generated with pnpm 10.20.x)
 
 ## Naming Conventions

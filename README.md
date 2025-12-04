@@ -6,7 +6,7 @@ A Warhammer 40,000 companion app powered by [Wahapedia](https://wahapedia.ru) da
 
 ## Quick Start
 
-**Requirements**: Node.js >=22.0.0, pnpm >=10.0.0
+**Requirements**: Node.js >=24.0.0, pnpm >=10.0.0
 
 ```bash
 pnpm install
