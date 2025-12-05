@@ -28,7 +28,17 @@ const RosterEdit: FC = () => {
   useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
 
   if (!roster.id) {
-    return <Loader />;
+    return (
+      <div className="flex flex-col gap-4">
+        <BackButton
+          to="/rosters"
+          label="Rosters"
+          ariaLabel="Back to Rosters"
+          className="md:hidden"
+        />
+        <Loader />
+      </div>
+    );
   }
 
   const factionName = getRosterFactionName(roster);
@@ -125,8 +135,13 @@ const RosterEdit: FC = () => {
       ) : (
         <RosterEmptyState
           title="No units in this roster"
-          description="Add units to start building your roster"
           dataTestId="empty-roster-state"
+          action={{
+            label: 'Add units',
+            onClick: handleAddUnits,
+            icon: <Plus size={14} />,
+            testId: 'empty-roster-add-units'
+          }}
         />
       )}
     </div>

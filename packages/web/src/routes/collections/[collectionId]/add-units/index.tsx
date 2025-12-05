@@ -19,7 +19,11 @@ import useFaction from '@/hooks/use-faction';
 import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { calculateCollectionPoints, createCollectionUnitFromDatasheet } from '@/utils/collection';
+import {
+  calculateCollectionPoints,
+  createCollectionUnitFromDatasheet,
+  getCollectionLabels
+} from '@/utils/collection';
 import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 
@@ -27,6 +31,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
   const { collection, loading, error, save } = useCollection(collectionId);
 
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
@@ -113,8 +119,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
   );
 
   const pageTitle = collection
-    ? `${collection.name} - Add Collection Units`
-    : 'Add Collection Units';
+    ? `${collection.name} - Add Units`
+    : `Add Units to ${labels.singularTitle}`;
   useDocumentTitle(pageTitle);
 
   if (loading) {
@@ -123,8 +129,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title="Unable to load collection">
-        {error || 'Collection not found'}
+      <Alert variant="error" title={`Unable to load ${labels.singular}`}>
+        {error || `${labels.singularTitle} not found`}
       </Alert>
     );
   }
@@ -153,11 +159,11 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       });
       navigate(`/collections/${collection.id}`);
     } catch (err) {
-      console.error('Failed to add units to collection', err);
+      console.error('Failed to add units to collection entry', err);
       showToast({
         type: 'error',
         title: 'Error',
-        message: 'Could not add units to collection.'
+        message: `Could not add units to this ${labels.singular}.`
       });
     }
   };
@@ -166,15 +172,15 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
       <BackButton
         to={`/collections/${collection.id}`}
-        label="Back to Collection"
-        ariaLabel="Back to Collection"
+        label={`Back to ${labels.singularTitle}`}
+        ariaLabel={`Back to ${labels.singularTitle}`}
         className="md:hidden"
       />
 
       <div className="hidden md:block">
         <Breadcrumbs
           items={[
-            { label: 'Collections', path: '/collections' },
+            { label: labels.pluralTitle, path: '/collections' },
             { label: collection.name, path: `/collections/${collection.id}` },
             { label: 'Add Units', path: `/collections/${collection.id}/add-units` }
           ]}
@@ -184,8 +190,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       <PageHeader title={collection.name} subtitle={subtitle} />
 
       <Alert variant="info" title="Add Units">
-        Browse the datasheets below and queue units for your collection. Use the summary drawer to
-        review quantities before confirming your additions.
+        Browse the datasheets below and queue units for your {labels.singular}. Use the summary
+        drawer to review quantities before confirming your additions.
       </Alert>
 
       {factionError || datasheetError ? (
@@ -257,9 +263,12 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
 const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
 
   return (
-    <AppLayout title="Add Units to Collection">
+    <AppLayout title={`Add Units to ${labels.singularTitle}`}>
       <AddCollectionUnitsView collectionId={collectionId} />
     </AppLayout>
   );

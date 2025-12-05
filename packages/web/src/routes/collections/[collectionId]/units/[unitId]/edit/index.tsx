@@ -19,9 +19,14 @@ import {
 import { BackButton, DatasheetComposition } from '@/components/shared';
 import { parseLoadoutWargear } from '@/utils/wargear';
 import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
-import { COLLECTION_STATE_META, COLLECTION_UNIT_STATES } from '@/utils/collection';
+import {
+  COLLECTION_STATE_META,
+  COLLECTION_UNIT_STATES,
+  getCollectionLabels
+} from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useAppContext } from '@/contexts/app/use-app-context';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
 import ModelCostSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/model-cost-selection';
 import WargearAbilitiesSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-abilities-selection';
@@ -30,6 +35,9 @@ const CollectionUnitEditView: React.FC = () => {
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
+  const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
 
   const unit = collection?.items.find((item) => item.id === unitId);
 
@@ -83,17 +91,17 @@ const CollectionUnitEditView: React.FC = () => {
   const stateMeta = COLLECTION_STATE_META[state] ?? COLLECTION_STATE_META.sprue;
 
   const pageTitle = collection?.name
-    ? `${collection.name} - Edit Collection Unit`
-    : 'Edit Collection Unit';
+    ? `${collection.name} - Edit ${labels.singularTitle} Unit`
+    : `Edit ${labels.singularTitle} Unit`;
 
   useDocumentTitle(pageTitle);
 
   if (!collectionId) {
     return (
-      <AppLayout title="Edit Collection Unit">
+      <AppLayout title={`Edit ${labels.singularTitle} Unit`}>
         <ErrorState
-          title="Invalid Collection"
-          message="The collection ID provided is invalid."
+          title={`Invalid ${labels.singularTitle}`}
+          message={`The ${labels.singular} ID provided is invalid.`}
           data-testid="invalid-collection-error"
         />
       </AppLayout>
@@ -112,8 +120,8 @@ const CollectionUnitEditView: React.FC = () => {
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title="Unable to load collection">
-        {error || 'Collection not found'}
+      <Alert variant="error" title={`Unable to load ${labels.singular}`}>
+        {error || `${labels.singularTitle} not found`}
       </Alert>
     );
   }
@@ -121,7 +129,7 @@ const CollectionUnitEditView: React.FC = () => {
   if (!unit) {
     return (
       <div className="flex flex-col gap-4" data-testid="edit-collection-unit-not-found">
-        <PageHeader title="Edit Collection Unit" />
+        <PageHeader title={`Edit ${labels.singularTitle} Unit`} />
         <ErrorState
           title="Unit Not Found"
           message="The unit you're trying to edit could not be found."
@@ -164,7 +172,7 @@ const CollectionUnitEditView: React.FC = () => {
     <div className="flex flex-col gap-4" data-testid="edit-collection-unit-form">
       <BackButton
         to={`/collections/${collectionId}`}
-        label="Back to Collection"
+        label={`Back to ${labels.singularTitle}`}
         testId="mobile-back-button"
         className="md:hidden"
       />
@@ -172,7 +180,7 @@ const CollectionUnitEditView: React.FC = () => {
       <div className="hidden md:block">
         <Breadcrumbs
           items={[
-            { label: 'Collections', path: '/collections' },
+            { label: labels.pluralTitle, path: '/collections' },
             { label: collection.name, path: `/collections/${collection.id}` },
             {
               label: unit.datasheet.name,
@@ -184,7 +192,7 @@ const CollectionUnitEditView: React.FC = () => {
       </div>
 
       <PageHeader
-        title="Edit Collection Unit"
+        title={`Edit ${labels.singularTitle} Unit`}
         subtitle={unit.datasheet.name}
         action={{
           icon: <Save size={16} />,
@@ -305,13 +313,16 @@ const CollectionUnitEditView: React.FC = () => {
 
 const CollectionUnitEditPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
 
   if (!collectionId) {
     return (
-      <AppLayout title="Edit Collection Unit">
+      <AppLayout title={`Edit ${labels.singularTitle} Unit`}>
         <ErrorState
-          title="Invalid Collection"
-          message="The collection ID provided is invalid."
+          title={`Invalid ${labels.singularTitle}`}
+          message={`The ${labels.singular} ID provided is invalid.`}
           data-testid="invalid-collection-error"
         />
       </AppLayout>
@@ -319,7 +330,7 @@ const CollectionUnitEditPage: React.FC = () => {
   }
 
   return (
-    <AppLayout title="Edit Collection Unit">
+    <AppLayout title={`Edit ${labels.singularTitle} Unit`}>
       <CollectionUnitEditView />
     </AppLayout>
   );

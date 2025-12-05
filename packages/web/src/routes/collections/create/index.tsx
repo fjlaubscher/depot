@@ -8,11 +8,14 @@ import useFactions from '@/hooks/use-factions';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
+import { getCollectionLabels } from '@/utils/collection';
 
 const CreateCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
 
@@ -24,8 +27,8 @@ const CreateCollectionPage: React.FC = () => {
       .sort((a, b) => a.label.localeCompare(b.label)) || [];
 
   useEffect(() => {
-    setName((prev) => prev || (factionSlug ? `${factionSlug} collection` : ''));
-  }, [factionSlug]);
+    setName((prev) => prev || (factionSlug ? `${factionSlug} ${labels.singular}` : ''));
+  }, [factionSlug, labels.singular]);
 
   const selectedFactionIndex = useMemo(
     () => factions?.find((f) => f.slug === factionSlug || f.id === factionSlug),
@@ -64,9 +67,9 @@ const CreateCollectionPage: React.FC = () => {
   };
 
   return (
-    <AppLayout title="Create Collection Entry">
+    <AppLayout title={`Create ${labels.singularTitle}`}>
       <div className="flex flex-col gap-4">
-        <PageHeader title="Create Collection" />
+        <PageHeader title={`Create ${labels.singularTitle}`} />
         <Card>
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <Field>
@@ -80,7 +83,7 @@ const CreateCollectionPage: React.FC = () => {
                 value={name}
                 data-testid="collection-name-input"
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My Pile of Shame"
+                placeholder={`My ${labels.singularTitle}`}
                 required
               />
             </Field>

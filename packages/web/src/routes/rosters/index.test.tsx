@@ -79,7 +79,7 @@ describe('Rosters', () => {
 
     render(<Rosters />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    expect(screen.getByTestId('empty-rosters')).toBeInTheDocument();
   });
 
   it('displays rosters in grid layout', () => {

@@ -7,6 +7,7 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
+import { getCollectionLabels } from '@/utils/collection';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button, Alert } from '@/components/ui';
@@ -18,6 +19,8 @@ const CreateRoster: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
   const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
 
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
@@ -180,7 +183,9 @@ const CreateRoster: React.FC = () => {
       <div className="flex flex-col gap-4">
         <PageHeader title="Create New Roster" />
         {isFromCollection ? (
-          <Alert title={`Prefilling with ${prefillUnits.length} units from your collection.`}>
+          <Alert
+            title={`Prefilling with ${prefillUnits.length} units from your ${labels.singular}.`}
+          >
             Total of {prefillTotal} points
           </Alert>
         ) : null}

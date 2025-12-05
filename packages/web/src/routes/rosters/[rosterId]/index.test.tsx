@@ -218,9 +218,6 @@ describe('ViewRosterPage', () => {
     render(<ViewRosterPage />, { wrapper: TestWrapper });
 
     expect(screen.getByText('No units in this roster')).toBeInTheDocument();
-    expect(
-      screen.getByText('Use the edit button to start building your roster')
-    ).toBeInTheDocument();
   });
 
   it('renders detachment overview when tab selected', () => {

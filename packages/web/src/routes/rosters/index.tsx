@@ -13,6 +13,7 @@ import { isExportedRoster } from '@/types/export';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, ErrorState } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
+import { ListEmptyState } from '@/components/shared';
 import { RosterCard } from './_components/roster-card';
 
 const Rosters: React.FC = () => {
@@ -123,44 +124,6 @@ const Rosters: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <AppLayout title="Roster Library">
-        <div className="flex flex-col gap-4">
-          <PageHeader
-            title="My Rosters"
-            subtitle="Manage your army rosters"
-            action={{
-              icon: <Plus size={16} />,
-              onClick: handleCreate,
-              ariaLabel: 'Create new roster'
-            }}
-          />
-          <Loader />
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <AppLayout title="Roster Library">
-        <div className="flex flex-col gap-4">
-          <PageHeader
-            title="My Rosters"
-            subtitle="Manage your army rosters"
-            action={{
-              icon: <Plus size={16} />,
-              onClick: handleCreate,
-              ariaLabel: 'Create new roster'
-            }}
-          />
-          <ErrorState title="Failed to load rosters" message={error} />
-        </div>
-      </AppLayout>
-    );
-  }
-
   return (
     <AppLayout title="Roster Library">
       <div className="flex flex-col gap-4">
@@ -181,13 +144,19 @@ const Rosters: React.FC = () => {
             inputTestId="import-roster-input"
           />
         </div>
-        {rosters.length === 0 ? (
-          <div
-            data-testid="empty-state"
-            className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
-          >
-            <p className="text-subtle">You haven't created any rosters yet.</p>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader />
           </div>
+        ) : error ? (
+          <ErrorState title="Failed to load rosters" message={error} />
+        ) : rosters.length === 0 ? (
+          <ListEmptyState
+            title="No rosters yet"
+            actionLabel="Create roster"
+            onAction={handleCreate}
+            testId="empty-rosters"
+          />
         ) : (
           <div
             data-testid="rosters-grid"

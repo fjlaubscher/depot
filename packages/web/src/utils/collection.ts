@@ -3,6 +3,13 @@ import { getDefaultWargearSelection, normalizeDatasheetWargear } from '@/utils/w
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
+export const getCollectionLabels = (usePileLabel: boolean) => ({
+  pluralTitle: usePileLabel ? 'Pile of Shame' : 'Collections',
+  singularTitle: usePileLabel ? 'Pile of Shame' : 'Collection',
+  singular: usePileLabel ? 'pile of shame' : 'collection',
+  short: usePileLabel ? 'pile' : 'collection'
+});
+
 export const COLLECTION_UNIT_STATES: depot.CollectionUnitState[] = [
   'sprue',
   'built',

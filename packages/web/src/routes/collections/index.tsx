@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FolderOpen } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
 import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, Button, Loader, ErrorState } from '@/components/ui';
+import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import { ListEmptyState } from '@/components/shared';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints, getCollectionsSnapshotCopy } from '@/utils/collection';
 import { readJsonFile } from '@/utils/file';
@@ -28,6 +29,7 @@ const CollectionsPage: React.FC = () => {
     () => getCollectionsSnapshotCopy(collections, usePileLabel),
     [collections, usePileLabel]
   );
+  const hasSnapshotData = snapshot.items.length > 0;
 
   const handleCreate = () => navigate('/collections/create');
 
@@ -158,23 +160,21 @@ const CollectionsPage: React.FC = () => {
         ) : error ? (
           <ErrorState title="Failed to load collections" message={error} />
         ) : collections.length === 0 ? (
-          <Card className="flex flex-col items-center gap-3 py-10">
-            <FolderOpen className="h-8 w-8 text-muted" />
-            <div className="text-center">
-              <p className="text-base font-semibold text-foreground">Nothing here yet</p>
-              <p className="text-sm text-subtle">
-                Start your {usePileLabel ? 'pile' : 'collection'} by adding a faction.
-              </p>
-            </div>
-            <Button onClick={() => navigate('/collections/create')}>Create</Button>
-          </Card>
+          <ListEmptyState
+            title="Nothing here yet"
+            actionLabel="Create"
+            onAction={() => navigate('/collections/create')}
+            testId="empty-collections"
+          />
         ) : (
           <div className="flex flex-col gap-4">
-            <CollectionStateChart
-              items={snapshot.items}
-              heading={snapshot.heading}
-              subheading={snapshot.subheading}
-            />
+            {hasSnapshotData ? (
+              <CollectionStateChart
+                items={snapshot.items}
+                heading={snapshot.heading}
+                subheading={snapshot.subheading}
+              />
+            ) : null}
 
             <div
               data-testid="collections-grid"

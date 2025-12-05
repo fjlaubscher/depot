@@ -11,7 +11,7 @@ import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
-import { calculateCollectionPoints } from '@/utils/collection';
+import { calculateCollectionPoints, getCollectionLabels } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
 
 type CollectionDatasheetListItem = depot.Datasheet & {
@@ -25,13 +25,15 @@ const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
   const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
   const pageTitle = collection
     ? `${collection.name} - Build Roster`
-    : 'Build Roster from Collection';
+    : `Build Roster from ${labels.singularTitle}`;
   useDocumentTitle(pageTitle);
 
   useEffect(() => {
@@ -207,8 +209,8 @@ const CollectionNewRoster: React.FC = () => {
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle}>
-        <Alert variant="error" title="Unable to load collection">
-          {error || 'Collection not found'}
+        <Alert variant="error" title={`Unable to load ${labels.singular}`}>
+          {error || `${labels.singularTitle} not found`}
         </Alert>
       </AppLayout>
     );
@@ -217,28 +219,32 @@ const CollectionNewRoster: React.FC = () => {
   return (
     <AppLayout title={pageTitle}>
       <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
-        <BackButton to={`/collections/${collection.id}`} label="Back" className="md:hidden" />
+        <BackButton
+          to={`/collections/${collection.id}`}
+          label={`Back to ${labels.singularTitle}`}
+          className="md:hidden"
+        />
 
         <div className="hidden md:block">
           <Breadcrumbs
             items={[
-              { label: 'Collections', path: '/collections' },
+              { label: labels.pluralTitle, path: '/collections' },
               { label: collection.name, path: `/collections/${collection.id}` },
               { label: 'Select units', path: `/collections/${collection.id}/new-roster` }
             ]}
           />
         </div>
 
-        <PageHeader title="Build roster from collection" subtitle={subtitle} />
+        <PageHeader title={`Build roster from ${labels.singular}`} subtitle={subtitle} />
 
         <Alert variant="info" title="Prefill a new roster">
-          Select units from your collection to prefill a roster. Use the summary drawer to review
-          points before creating the roster.
+          Select units from your {labels.singular} to prefill a roster. Use the summary drawer to
+          review points before creating the roster.
         </Alert>
 
         {collection.items.length === 0 ? (
           <Card>
-            <p className="text-sm text-subtle">No units in this collection yet.</p>
+            <p className="text-sm text-subtle">No units in this {labels.singular} yet.</p>
           </Card>
         ) : (
           <div className="flex flex-col gap-4">
@@ -247,7 +253,7 @@ const CollectionNewRoster: React.FC = () => {
             ) : (
               <DatasheetBrowser<CollectionDatasheetListItem>
                 datasheets={collectionDatasheets}
-                searchPlaceholder="Search collection units..."
+                searchPlaceholder={`Search ${labels.singular} units...`}
                 emptyStateMessage="No units match your filters."
                 filters={datasheetFilters}
                 showItemCount={false}

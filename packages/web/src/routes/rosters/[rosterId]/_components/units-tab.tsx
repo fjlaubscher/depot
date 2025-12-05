@@ -14,13 +14,7 @@ const UnitsTab: React.FC<UnitsTabProps> = ({ units }) => {
   const roleKeys = useMemo(() => Object.keys(groupedUnits).sort(), [groupedUnits]);
 
   if (units.length === 0) {
-    return (
-      <RosterEmptyState
-        title="No units in this roster"
-        description="Use the edit button to start building your roster"
-        dataTestId="empty-roster-message"
-      />
-    );
+    return <RosterEmptyState title="No units in this roster" dataTestId="empty-roster-message" />;
   }
 
   return (

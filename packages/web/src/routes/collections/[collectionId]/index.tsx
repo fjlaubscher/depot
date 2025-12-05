@@ -22,6 +22,7 @@ import { refreshCollectionData } from '@/utils/refresh-user-data';
 import {
   COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
+  getCollectionLabels,
   calculateCollectionPoints,
   getCollectionStateCounts,
   getCollectionChartCopy
@@ -35,6 +36,8 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const { collection, loading, error, save } = useCollection(collectionId);
   const { state: appState, getDatasheet } = useAppContext();
   const { showToast } = useToast();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
   const downloadFile = useDownloadFile();
   const [refreshing, setRefreshing] = useState(false);
   const {
@@ -144,7 +147,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       await save(updatedCollection);
       showToast({
         type: 'success',
-        title: 'Collection updated',
+        title: `${labels.singularTitle} updated`,
         message: 'Refreshed with the latest Wahapedia data.'
       });
     } catch (err) {
@@ -218,11 +221,14 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       `collection-${safeSlug(collection.name)}-${collection.id}.json`,
       JSON.stringify(payload, null, 2)
     );
-    showToast({ type: 'success', title: 'Collection exported' });
+    showToast({ type: 'success', title: `${labels.singularTitle} exported` });
   };
 
   const totalUnits = collection?.items.length ?? 0;
-  const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
+  const hasUnits = totalUnits > 0;
+  const pageTitle = collection
+    ? `${collection.name} - ${labels.singularTitle} Tracker`
+    : `${labels.singularTitle} Overview`;
   useDocumentTitle(pageTitle);
   const { heading: collectionHeading, subheading: collectionSubheading } = collection
     ? getCollectionChartCopy(collection, points)
@@ -231,6 +237,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   if (loading) {
     return (
       <div className="flex flex-col gap-4">
+        <BackButton
+          to="/collections"
+          label={labels.pluralTitle}
+          ariaLabel={`Back to ${labels.pluralTitle}`}
+          className="md:hidden"
+        />
         <Loader />
       </div>
     );
@@ -238,9 +250,17 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title="Unable to load collection">
-        {error || 'Collection not found'}
-      </Alert>
+      <div className="flex flex-col gap-4">
+        <BackButton
+          to="/collections"
+          label={labels.pluralTitle}
+          ariaLabel={`Back to ${labels.pluralTitle}`}
+          className="md:hidden"
+        />
+        <Alert variant="error" title={`Unable to load ${labels.singular}`}>
+          {error || `${labels.singularTitle} not found`}
+        </Alert>
+      </div>
     );
   }
 
@@ -251,15 +271,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     <div className="flex flex-col gap-4">
       <BackButton
         to="/collections"
-        label="Collections"
-        ariaLabel="Back to Collections"
+        label={labels.pluralTitle}
+        ariaLabel={`Back to ${labels.pluralTitle}`}
         className="md:hidden"
       />
 
       <div className="hidden md:block">
         <Breadcrumbs
           items={[
-            { label: 'Collections', path: '/collections' },
+            { label: labels.pluralTitle, path: '/collections' },
             { label: collection.name, path: `/collections/${collection.id}` }
           ]}
         />
@@ -276,21 +296,23 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         }}
       />
 
-      <div className="flex flex-wrap gap-2">
-        <Button
-          onClick={handleCreateRoster}
-          variant="secondary"
-          className="flex items-center gap-2"
-          data-testid="create-roster-from-collection-button"
-        >
-          <ClipboardPlus size={16} />
-          Create Roster
-        </Button>
-        <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
-      </div>
+      {hasUnits ? (
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={handleCreateRoster}
+            variant="secondary"
+            className="flex items-center gap-2"
+            data-testid="create-roster-from-collection-button"
+          >
+            <ClipboardPlus size={16} />
+            Create Roster
+          </Button>
+          <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
+        </div>
+      ) : null}
 
       {isStale ? (
-        <Alert variant="warning" title="Collection uses older data">
+        <Alert variant="warning" title={`${labels.singularTitle} uses older data`}>
           <div className="flex flex-col gap-2">
             <span className="text-sm text-secondary">
               Refresh to pull the latest Wahapedia data for these units.
@@ -311,11 +333,13 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         </Alert>
       ) : null}
 
-      <CollectionStateChart
-        items={collection.items}
-        heading={collectionHeading}
-        subheading={collectionSubheading}
-      />
+      {hasUnits ? (
+        <CollectionStateChart
+          items={collection.items}
+          heading={collectionHeading}
+          subheading={collectionSubheading}
+        />
+      ) : null}
 
       <RosterSection
         title={`Units (${totalUnits})`}
@@ -374,9 +398,14 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           />
         ) : (
           <RosterEmptyState
-            title="No units in this collection"
-            description="Add units to start tracking your pile"
+            title={`No units in this ${labels.singular}`}
             dataTestId="empty-collection-state"
+            action={{
+              label: 'Add units',
+              onClick: handleAddUnits,
+              icon: <Plus size={14} />,
+              testId: 'empty-collection-add-units'
+            }}
           />
         )}
       </RosterSection>
@@ -386,9 +415,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const { state: appState } = useAppContext();
+  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const labels = getCollectionLabels(usePileLabel);
 
   return (
-    <AppLayout title="Collection Overview">
+    <AppLayout title={`${labels.singularTitle} Overview`}>
       <CollectionPageContent collectionId={collectionId} />
     </AppLayout>
   );

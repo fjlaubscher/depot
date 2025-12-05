@@ -1,20 +1,39 @@
-import type { FC } from 'react';
+import React, { type FC, type ReactNode } from 'react';
+
+import { Button } from '@/components/ui';
 
 interface RosterEmptyStateProps {
   title: string;
-  description: string;
+  description?: string;
   dataTestId?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+    icon?: ReactNode;
+    testId?: string;
+  };
 }
 
-const RosterEmptyState: FC<RosterEmptyStateProps> = ({ title, description, dataTestId }) => (
+const RosterEmptyState: FC<RosterEmptyStateProps> = ({
+  title,
+  description,
+  dataTestId,
+  action
+}) => (
   <div
-    className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg"
+    className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-gray-300 py-12 text-center dark:border-gray-700"
     data-testid={dataTestId}
   >
     <div className="flex flex-col gap-2">
-      <p className="text-subtle text-lg">{title}</p>
-      <p className="text-hint text-sm">{description}</p>
+      <p className="text-lg text-subtle">{title}</p>
+      {description ? <p className="text-sm text-hint">{description}</p> : null}
     </div>
+    {action ? (
+      <Button onClick={action.onClick} data-testid={action.testId} className="inline-flex gap-2">
+        {action.icon}
+        {action.label}
+      </Button>
+    ) : null}
   </div>
 );
 
