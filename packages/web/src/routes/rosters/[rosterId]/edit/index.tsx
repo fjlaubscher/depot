@@ -5,6 +5,7 @@ import { Eye, Plus, Pencil } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
@@ -26,6 +27,7 @@ const RosterEdit: FC = () => {
   const roleKeys = Object.keys(groupedUnits).sort();
 
   useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
+  useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
     return (

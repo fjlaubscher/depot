@@ -32,4 +32,5 @@ export interface AppContextType {
   getDatasheet: (factionSlug: string, datasheetIdOrSlug: string) => Promise<depot.Datasheet | null>;
   clearOfflineData: () => Promise<void>;
   updateSettings: (settings: depot.Settings) => Promise<void>;
+  checkForDataUpdates: () => Promise<{ updated: boolean; dataVersion: string | null }>;
 }

@@ -7,6 +7,7 @@ import { formatWargearDisplayName } from '@/utils/wargear';
 import { formatAbilityName } from '@/utils/abilities';
 
 interface RosterUnitCardCompactProps {
+  id?: string;
   unit: depot.RosterUnit;
   actions?: ReactNode;
   children?: ReactNode;
@@ -18,6 +19,7 @@ interface RosterUnitCardCompactProps {
 }
 
 const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
+  id,
   unit,
   actions,
   children,
@@ -37,6 +39,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
 
   return (
     <Card
+      id={id}
       padding="sm"
       className={classNames(
         'relative flex h-full flex-col gap-2',

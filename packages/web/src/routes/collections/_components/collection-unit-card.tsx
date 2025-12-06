@@ -77,6 +77,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
 
   return (
     <RosterUnitCardCompact
+      id={`collection-unit-${unit.id}`}
       unit={unit}
       actions={actions}
       onClick={handleCardClick}

@@ -10,6 +10,7 @@ import { BackButton } from '@/components/shared';
 // Hooks
 import useFaction from '@/hooks/use-faction';
 import { useAppContext } from '@/contexts/app/use-app-context';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 // Utils
 import { getFactionAlliance } from '@/utils/faction';
@@ -50,6 +51,8 @@ const Faction: React.FC = () => {
     copySuccessMessage: 'Faction link copied to clipboard.',
     shareSuccessMessage: 'Faction link shared.'
   });
+
+  useScrollToHash({ enabled: !loading && Boolean(faction) });
 
   // Error State Component
   if (error) {

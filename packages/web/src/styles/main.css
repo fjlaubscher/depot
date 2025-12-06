@@ -42,6 +42,21 @@ span.hi_custom {
   @apply text-orange-500 dark:text-orange-400 font-semibold;
 }
 
+@keyframes scroll-highlight {
+  0% {
+    box-shadow: 0 0 0 6px rgba(251, 146, 60, 0.28);
+    background-color: rgba(251, 146, 60, 0.14);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0);
+    background-color: transparent;
+  }
+}
+
+[data-scroll-highlight='true'] {
+  animation: scroll-highlight 1.2s ease-out;
+}
+
 /* Shared utility classes */
 @utility text-foreground {
   @apply text-gray-900 dark:text-white;

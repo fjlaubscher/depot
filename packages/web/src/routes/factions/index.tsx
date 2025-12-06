@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 // Context hooks
 import { useAppContext } from '@/contexts/app/use-app-context';
@@ -23,10 +23,14 @@ import {
 import useDebounce from '@/hooks/use-debounce';
 
 const Factions: React.FC = () => {
-  const { state } = useAppContext();
+  const { state, checkForDataUpdates } = useAppContext();
 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
+
+  useEffect(() => {
+    void checkForDataUpdates();
+  }, [checkForDataUpdates]);
 
   const filteredFactions = useMemo(() => {
     const queryFiltered = filterFactionsByQuery(state.factionIndex, debouncedQuery);

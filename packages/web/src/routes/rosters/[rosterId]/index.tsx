@@ -26,6 +26,7 @@ import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
 import CogitatorTab from './_components/cogitator-tab';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 const RosterView: FC = () => {
   const { state: roster, setRoster } = useRoster();
@@ -142,6 +143,7 @@ const RosterView: FC = () => {
 
   const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
   useDocumentTitle(pageTitle);
+  useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
     return <Loader />;

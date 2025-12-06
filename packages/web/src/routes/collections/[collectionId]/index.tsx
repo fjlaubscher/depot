@@ -11,6 +11,7 @@ import { RosterSection, RosterEmptyState, RosterUnitList } from '@/components/sh
 import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import useDownloadFile from '@/hooks/use-download-file';
 import { useToast } from '@/contexts/toast/use-toast-context';
@@ -230,6 +231,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     ? `${collection.name} - ${labels.singularTitle} Tracker`
     : `${labels.singularTitle} Overview`;
   useDocumentTitle(pageTitle);
+  useScrollToHash({ enabled: Boolean(collection) });
   const { heading: collectionHeading, subheading: collectionSubheading } = collection
     ? getCollectionChartCopy(collection, points)
     : { heading: undefined, subheading: undefined };

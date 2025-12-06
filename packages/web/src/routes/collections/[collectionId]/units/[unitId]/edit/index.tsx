@@ -140,6 +140,8 @@ const CollectionUnitEditView: React.FC = () => {
     );
   }
 
+  const unitHash = unit ? `#collection-unit-${unit.id}` : '';
+
   const handleSave = async () => {
     if (!collection || !unitId) return;
 
@@ -160,7 +162,7 @@ const CollectionUnitEditView: React.FC = () => {
       items: updatedItems
     });
 
-    navigate(`/collections/${collection.id}`);
+    navigate(`/collections/${collection.id}${unitHash}`);
   };
 
   const stateOptions = COLLECTION_UNIT_STATES.map((value) => ({
@@ -171,7 +173,7 @@ const CollectionUnitEditView: React.FC = () => {
   return (
     <div className="flex flex-col gap-4" data-testid="edit-collection-unit-form">
       <BackButton
-        to={`/collections/${collectionId}`}
+        to={`/collections/${collectionId}${unitHash}`}
         label={`Back to ${labels.singularTitle}`}
         testId="mobile-back-button"
         className="md:hidden"
@@ -181,7 +183,7 @@ const CollectionUnitEditView: React.FC = () => {
         <Breadcrumbs
           items={[
             { label: labels.pluralTitle, path: '/collections' },
-            { label: collection.name, path: `/collections/${collection.id}` },
+            { label: collection.name, path: `/collections/${collection.id}${unitHash}` },
             {
               label: unit.datasheet.name,
               path: `/collections/${collection.id}/units/${unit.id}/edit`
@@ -298,7 +300,7 @@ const CollectionUnitEditView: React.FC = () => {
       <div className="flex justify-end gap-4" data-testid="action-buttons">
         <Button
           variant="secondary"
-          onClick={() => navigate(`/collections/${collection.id}`)}
+          onClick={() => navigate(`/collections/${collection.id}${unitHash}`)}
           data-testid="cancel-button"
         >
           Cancel

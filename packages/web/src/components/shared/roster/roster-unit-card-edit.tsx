@@ -60,6 +60,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
 
   return (
     <RosterUnitCardCompact
+      id={`unit-${unit.id}`}
       unit={unit}
       actions={actions}
       onClick={handleCardClick}
