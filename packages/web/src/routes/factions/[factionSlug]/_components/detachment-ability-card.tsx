@@ -2,15 +2,15 @@ import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from '@/hooks/use-settings';
 
 interface DetachmentAbilityCardProps {
   ability: depot.DetachmentAbility;
 }
 
 const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }) => {
-  const { state } = useAppContext();
-  const showFluff = state.settings?.showFluff ?? true;
+  const { settings } = useSettings();
+  const showFluff = settings.showFluff ?? true;
 
   return (
     <Card className="p-4 space-y-2 h-full">

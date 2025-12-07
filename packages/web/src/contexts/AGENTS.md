@@ -10,10 +10,11 @@ React contexts follow a consistent modular pattern (actions, reducer, provider, 
 - `use-<name>-context.ts` — consumer hook that throws if used outside provider
 
 ## Active Contexts
-- **App** — global data, faction loading/caching, settings, IndexedDB invalidation
-- **Layout** — sidebar + responsive UI state
-- **Toast** — notification system with auto-dismiss and reduced-motion respect
-- **Roster** — roster building state, unit selection, points calculations
+- **Factions** - faction index, data versioning, offline cache + data helpers
+- **Settings** - user preferences with IndexedDB persistence
+- **Layout** - sidebar + responsive UI state
+- **Toast** - notification system with auto-dismiss and reduced-motion respect
+- **Roster** - roster building state, unit selection, points calculations
 
 ## Usage
 ```tsx
@@ -27,7 +28,8 @@ React contexts follow a consistent modular pattern (actions, reducer, provider, 
   </LayoutProvider>
 </AppProvider>
 
-const { state, getFactionManifest, getDatasheet } = useAppContext();
+const { getFactionManifest, getDatasheet } = useFactionData();
+const { settings } = useSettings();
 const { showToast } = useToastContext();
 const { state: roster, addUnit } = useRoster();
 ```

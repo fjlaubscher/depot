@@ -2,7 +2,6 @@ import { Fragment, useMemo, useState } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Pencil, Share2, RefreshCw } from 'lucide-react';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
@@ -11,6 +10,9 @@ import useDownloadFile from '@/hooks/use-download-file';
 import { safeSlug } from '@/utils/strings';
 import type { ExportedRoster } from '@/types/export';
 import { refreshRosterData } from '@/utils/refresh-user-data';
+import useSettings from '@/hooks/use-settings';
+import useFactionIndex from '@/hooks/use-faction-index';
+import useFactionData from '@/hooks/use-faction-data';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
@@ -26,14 +28,17 @@ import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
 import CogitatorTab from './_components/cogitator-tab';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 const RosterView: FC = () => {
   const { state: roster, setRoster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { state: appState, getDatasheet, getFactionManifest } = useAppContext();
+  const { settings } = useSettings();
+  const { dataVersion: catalogueDataVersion } = useFactionIndex();
+  const { getDatasheet, getFactionManifest } = useFactionData();
   const downloadFile = useDownloadFile();
-  const isCogitatorEnabled = appState.settings?.enableCogitator ?? false;
+  const isCogitatorEnabled = settings.enableCogitator ?? false;
   const {
     stratagems: coreStratagems,
     loading: loadingCoreStratagems,
@@ -42,13 +47,13 @@ const RosterView: FC = () => {
   const [refreshingRoster, setRefreshingRoster] = useState(false);
 
   const factionName = getRosterFactionName(roster);
-  const includeWargearOnExport = appState.settings?.includeWargearOnExport ?? true;
-  const useNativeShare = appState.settings?.useNativeShare ?? true;
+  const includeWargearOnExport = settings.includeWargearOnExport ?? true;
+  const useNativeShare = settings.useNativeShare ?? true;
   const canUseNativeShare =
     useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   const handleExportJson = async () => {
-    const dataVersion = roster.dataVersion ?? appState.dataVersion ?? null;
+    const dataVersion = roster.dataVersion ?? catalogueDataVersion ?? null;
     const payload: ExportedRoster = {
       kind: 'roster',
       version: 1,
@@ -73,7 +78,7 @@ const RosterView: FC = () => {
   );
 
   const rosterVersion = roster.dataVersion ?? null;
-  const currentDataVersion = appState.dataVersion ?? null;
+  const currentDataVersion = catalogueDataVersion ?? null;
   const isRosterStale = Boolean(currentDataVersion && rosterVersion !== currentDataVersion);
 
   const handleRefreshRosterData = async () => {
@@ -142,6 +147,7 @@ const RosterView: FC = () => {
 
   const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
   useDocumentTitle(pageTitle);
+  useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
     return <Loader />;

@@ -45,6 +45,7 @@ const EditRosterUnitView: React.FC = () => {
 
   // Find the unit we're editing
   const unit = roster.units.find((u) => u.id === unitId);
+  const unitHash = unit ? `#unit-${unit.id}` : '';
 
   // Track which unit we've initialized to avoid resetting user selections
   const initializedUnitRef = useRef<string | null>(null);
@@ -184,7 +185,7 @@ const EditRosterUnitView: React.FC = () => {
         message: 'Unit configuration has been saved successfully.'
       });
 
-      navigate(`/rosters/${rosterId}/edit`);
+      navigate(`/rosters/${rosterId}/edit${unitHash}`);
     } catch (error) {
       console.error('Failed to save unit changes:', error);
       showToast({
@@ -200,7 +201,7 @@ const EditRosterUnitView: React.FC = () => {
   return (
     <div className="flex flex-col gap-4" data-testid="edit-unit-form">
       <BackButton
-        to={`/rosters/${rosterId}/edit`}
+        to={`/rosters/${rosterId}/edit${unitHash}`}
         label="Back to Roster"
         testId="mobile-back-button"
         className="md:hidden"
@@ -211,8 +212,8 @@ const EditRosterUnitView: React.FC = () => {
         <Breadcrumbs
           items={[
             { label: 'Rosters', path: '/rosters' },
-            { label: roster.name, path: `/rosters/${roster.id}` },
-            { label: 'Edit', path: `/rosters/${roster.id}/edit` },
+            { label: roster.name, path: `/rosters/${roster.id}/edit${unitHash}` },
+            { label: 'Edit', path: `/rosters/${roster.id}/edit${unitHash}` },
             { label: unit.datasheet.name, path: `/rosters/${roster.id}/units/${unit.id}/edit` }
           ]}
           data-testid="edit-unit-breadcrumbs"
@@ -342,7 +343,7 @@ const EditRosterUnitView: React.FC = () => {
       <div className="flex justify-end gap-4" data-testid="action-buttons">
         <Button
           variant="secondary"
-          onClick={() => navigate(`/rosters/${rosterId}/edit`)}
+          onClick={() => navigate(`/rosters/${rosterId}/edit${unitHash}`)}
           data-testid="cancel-button"
         >
           Cancel

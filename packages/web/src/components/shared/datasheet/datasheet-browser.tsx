@@ -159,7 +159,9 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       {hasResults ? (
         <DatasheetResultsGrid>
           {visibleDatasheets.map((datasheet) => (
-            <div key={datasheet.slug}>{renderItem(datasheet)}</div>
+            <div key={datasheet.slug} id={datasheet.id}>
+              {renderItem(datasheet)}
+            </div>
           ))}
         </DatasheetResultsGrid>
       ) : (

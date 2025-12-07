@@ -5,16 +5,18 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import useFactions from '@/hooks/use-factions';
+import useFactionIndex from '@/hooks/use-faction-index';
+import useSettings from '@/hooks/use-settings';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { getCollectionLabels } from '@/utils/collection';
 
 const CreateCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const { dataVersion } = useFactionIndex();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
@@ -52,7 +54,7 @@ const CreateCollectionPage: React.FC = () => {
       factionId: selectedFactionIndex.id,
       factionSlug: selectedFactionIndex.slug,
       faction: selectedFactionIndex,
-      dataVersion: appState.dataVersion ?? null,
+      dataVersion: dataVersion ?? null,
       items: [],
       points: { current: 0 }
     };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { depot } from '@depot/core';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionData from './use-faction-data';
 
 interface UseDatasheetReturn {
   data: depot.Datasheet | undefined;
@@ -9,7 +9,7 @@ interface UseDatasheetReturn {
 }
 
 const useDatasheet = (factionSlug?: string, datasheetIdOrSlug?: string): UseDatasheetReturn => {
-  const { getDatasheet } = useAppContext();
+  const { getDatasheet } = useFactionData();
   const shouldStartLoading = Boolean(factionSlug && datasheetIdOrSlug);
   const [data, setData] = useState<depot.Datasheet | undefined>(undefined);
   const [loading, setLoading] = useState(shouldStartLoading);

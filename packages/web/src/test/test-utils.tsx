@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { LayoutProvider } from '@/contexts/layout/context';
 import { ToastProvider } from '@/contexts/toast/context';
-import { AppProvider } from '@/contexts/app/context';
+import { AppProvider } from '@/contexts/app-provider';
 
 /**
  * Test utilities for consistent testing setup

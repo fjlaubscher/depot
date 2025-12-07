@@ -12,7 +12,6 @@ import {
   DatasheetBrowserSkeleton,
   RosterHeader
 } from '@/components/shared';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useCollection from '@/hooks/use-collection';
 import useFaction from '@/hooks/use-faction';
@@ -26,12 +25,13 @@ import {
 } from '@/utils/collection';
 import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
+import useSettings from '@/hooks/use-settings';
 
 const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const { collection, loading, error, save } = useCollection(collectionId);
 
@@ -94,8 +94,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     [removeLatestUnit]
   );
 
-  const showLegends = appState.settings?.showLegends ?? false;
-  const showForgeWorld = appState.settings?.showForgeWorld ?? false;
+  const showLegends = settings.showLegends ?? false;
+  const showForgeWorld = settings.showForgeWorld ?? false;
 
   const hasSelections = selectedUnits.length > 0;
 
@@ -263,8 +263,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
 const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   return (

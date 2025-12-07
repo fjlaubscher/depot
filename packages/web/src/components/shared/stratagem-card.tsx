@@ -1,7 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from '@/hooks/use-settings';
 
 interface StratagemCardProps {
   stratagem: depot.Stratagem;
@@ -9,8 +9,8 @@ interface StratagemCardProps {
 }
 
 const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = [] }) => {
-  const { state } = useAppContext();
-  const showFluff = state.settings?.showFluff ?? true;
+  const { settings } = useSettings();
+  const showFluff = settings.showFluff ?? true;
 
   return (
     <Card className="flex h-full flex-col gap-3" padding="md">

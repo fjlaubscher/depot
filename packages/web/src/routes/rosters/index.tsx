@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionIndex from '@/hooks/use-faction-index';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { readJsonFile } from '@/utils/file';
@@ -20,7 +20,7 @@ const Rosters: React.FC = () => {
   const navigate = useNavigate();
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
-  const { state: appState } = useAppContext();
+  const { dataVersion } = useFactionIndex();
 
   const handleCreate = () => {
     navigate('/rosters/create');
@@ -46,7 +46,7 @@ const Rosters: React.FC = () => {
 
   const handleDuplicateRoster = async (roster: depot.Roster) => {
     try {
-      const duplicated = await duplicateRoster(roster, appState.dataVersion ?? roster.dataVersion);
+      const duplicated = await duplicateRoster(roster, dataVersion ?? roster.dataVersion);
       showToast({
         type: 'success',
         title: 'Roster Duplicated',

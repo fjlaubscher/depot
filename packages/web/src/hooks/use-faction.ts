@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { depot } from '@depot/core';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionData from './use-faction-data';
 
 interface UseFactionReturn {
   data: depot.FactionManifest | undefined;
@@ -9,7 +9,7 @@ interface UseFactionReturn {
 }
 
 const useFaction = (factionSlug?: string): UseFactionReturn => {
-  const { getFactionManifest } = useAppContext();
+  const { getFactionManifest } = useFactionData();
   const shouldStartLoading = Boolean(factionSlug);
   const [data, setData] = useState<depot.FactionManifest | undefined>(undefined);
   const [loading, setLoading] = useState(shouldStartLoading);

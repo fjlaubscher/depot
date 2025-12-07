@@ -26,17 +26,17 @@ import {
 } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
 import ModelCostSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/model-cost-selection';
 import WargearAbilitiesSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-abilities-selection';
+import useSettings from '@/hooks/use-settings';
 
 const CollectionUnitEditView: React.FC = () => {
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   const unit = collection?.items.find((item) => item.id === unitId);
@@ -140,6 +140,8 @@ const CollectionUnitEditView: React.FC = () => {
     );
   }
 
+  const unitHash = unit ? `#collection-unit-${unit.id}` : '';
+
   const handleSave = async () => {
     if (!collection || !unitId) return;
 
@@ -160,7 +162,7 @@ const CollectionUnitEditView: React.FC = () => {
       items: updatedItems
     });
 
-    navigate(`/collections/${collection.id}`);
+    navigate(`/collections/${collection.id}${unitHash}`);
   };
 
   const stateOptions = COLLECTION_UNIT_STATES.map((value) => ({
@@ -171,7 +173,7 @@ const CollectionUnitEditView: React.FC = () => {
   return (
     <div className="flex flex-col gap-4" data-testid="edit-collection-unit-form">
       <BackButton
-        to={`/collections/${collectionId}`}
+        to={`/collections/${collectionId}${unitHash}`}
         label={`Back to ${labels.singularTitle}`}
         testId="mobile-back-button"
         className="md:hidden"
@@ -181,7 +183,7 @@ const CollectionUnitEditView: React.FC = () => {
         <Breadcrumbs
           items={[
             { label: labels.pluralTitle, path: '/collections' },
-            { label: collection.name, path: `/collections/${collection.id}` },
+            { label: collection.name, path: `/collections/${collection.id}${unitHash}` },
             {
               label: unit.datasheet.name,
               path: `/collections/${collection.id}/units/${unit.id}/edit`
@@ -298,7 +300,7 @@ const CollectionUnitEditView: React.FC = () => {
       <div className="flex justify-end gap-4" data-testid="action-buttons">
         <Button
           variant="secondary"
-          onClick={() => navigate(`/collections/${collection.id}`)}
+          onClick={() => navigate(`/collections/${collection.id}${unitHash}`)}
           data-testid="cancel-button"
         >
           Cancel
@@ -313,8 +315,8 @@ const CollectionUnitEditView: React.FC = () => {
 
 const CollectionUnitEditPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   if (!collectionId) {

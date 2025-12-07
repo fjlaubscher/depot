@@ -10,7 +10,8 @@ import AppLayout from '@/components/layout';
 import { Card, Grid } from '@/components/ui';
 
 // Custom hooks
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionIndex from '@/hooks/use-faction-index';
+import useSettings from '@/hooks/use-settings';
 
 const highlights: Array<{
   icon: LucideIcon;
@@ -45,13 +46,13 @@ const highlights: Array<{
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { state } = useAppContext();
-
+  const { settings } = useSettings();
+  const { dataVersion } = useFactionIndex();
   const collectionLabel = useMemo(
-    () => ((state.settings?.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections'),
-    [state.settings?.usePileOfShameLabel]
+    () => ((settings.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections'),
+    [settings.usePileOfShameLabel]
   );
-  const dataVersionLabel = state.dataVersion ?? 'Unknown';
+  const dataVersionLabel = dataVersion ?? 'Unknown';
 
   const actionTiles: Array<{
     key: 'collections' | 'factions' | 'rosters' | 'settings';

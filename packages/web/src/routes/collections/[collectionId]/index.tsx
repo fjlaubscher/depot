@@ -11,13 +11,16 @@ import { RosterSection, RosterEmptyState, RosterUnitList } from '@/components/sh
 import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import useDownloadFile from '@/hooks/use-download-file';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import type { ExportedCollection } from '@/types/export';
 import { safeSlug } from '@/utils/strings';
 import ExportButton from '@/components/shared/export-button';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionData from '@/hooks/use-faction-data';
+import useSettings from '@/hooks/use-settings';
+import useFactionIndex from '@/hooks/use-faction-index';
 import { refreshCollectionData } from '@/utils/refresh-user-data';
 import {
   COLLECTION_STATE_META,
@@ -34,9 +37,11 @@ const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { state: appState, getDatasheet } = useAppContext();
+  const { getDatasheet } = useFactionData();
+  const { settings } = useSettings();
+  const { dataVersion } = useFactionIndex();
   const { showToast } = useToast();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const downloadFile = useDownloadFile();
   const [refreshing, setRefreshing] = useState(false);
@@ -95,7 +100,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     () => (collection ? calculateCollectionPoints(collection) : 0),
     [collection]
   );
-  const currentDataVersion = appState.dataVersion ?? null;
+  const currentDataVersion = dataVersion ?? null;
   const isStale =
     !!currentDataVersion && collection ? collection.dataVersion !== currentDataVersion : false;
 
@@ -208,12 +213,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const handleExportCollection = async () => {
     if (!collection) return;
 
-    const dataVersion = collection.dataVersion ?? appState.dataVersion ?? null;
-
     const payload: ExportedCollection = {
       kind: 'collection',
       version: 1,
-      dataVersion,
+      dataVersion: collection.dataVersion ?? currentDataVersion ?? null,
       collection
     };
 
@@ -230,6 +233,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     ? `${collection.name} - ${labels.singularTitle} Tracker`
     : `${labels.singularTitle} Overview`;
   useDocumentTitle(pageTitle);
+  useScrollToHash({ enabled: Boolean(collection) });
   const { heading: collectionHeading, subheading: collectionSubheading } = collection
     ? getCollectionChartCopy(collection, points)
     : { heading: undefined, subheading: undefined };
@@ -415,8 +419,8 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   return (

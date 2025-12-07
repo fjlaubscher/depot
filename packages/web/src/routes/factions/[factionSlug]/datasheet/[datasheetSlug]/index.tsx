@@ -9,7 +9,7 @@ import { BackButton } from '@/components/shared';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import useDatasheet from '@/hooks/use-datasheet';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from '@/hooks/use-settings';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
 
@@ -28,8 +28,7 @@ const DatasheetPage: FC = () => {
     loading: datasheetLoading,
     error: datasheetError
   } = useDatasheet(factionSlug, datasheetSlug);
-  const { state } = useAppContext();
-  const settings = state.settings;
+  const { settings } = useSettings();
   const shareAction = useShareAction({
     title: datasheet?.name,
     url:
@@ -76,12 +75,13 @@ const DatasheetPage: FC = () => {
   }
 
   const pageTitle = `${datasheet.name} - ${faction.name}`;
+  const backPath = `/faction/${faction.slug}#${datasheet.id}`;
 
   return (
     <AppLayout title={pageTitle}>
       <div className="flex flex-col gap-4">
         <BackButton
-          to={`/faction/${faction.slug}`}
+          to={backPath}
           label={faction.name}
           ariaLabel={`Back to ${faction.name}`}
           className="md:hidden"
@@ -92,7 +92,7 @@ const DatasheetPage: FC = () => {
           <Breadcrumbs
             items={[
               { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: `/faction/${faction.slug}` },
+              { label: faction.name, path: backPath },
               {
                 label: datasheet.name,
                 path: `/faction/${faction.slug}/datasheet/${datasheet.slug}`

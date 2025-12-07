@@ -32,3 +32,4 @@ playwright/.cache/
 playwright/.auth/
 test-results/
 .dev.vars
+docs

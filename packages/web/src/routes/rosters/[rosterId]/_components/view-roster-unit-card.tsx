@@ -19,6 +19,7 @@ const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
 
   return (
     <RosterUnitCardCompact
+      id={`unit-${unit.id}`}
       unit={unit}
       actions={actions}
       onClick={() => setIsExpanded((prev) => !prev)}

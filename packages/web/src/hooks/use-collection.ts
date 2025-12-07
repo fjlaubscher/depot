@@ -5,11 +5,15 @@ import { calculateCollectionPoints } from '@/utils/collection';
 
 export const useCollection = (collectionId?: string) => {
   const [collection, setCollection] = useState<depot.Collection | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(Boolean(collectionId));
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!collectionId) return;
+    if (!collectionId) {
+      setCollection(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -31,6 +35,7 @@ export const useCollection = (collectionId?: string) => {
     };
     await offlineStorage.saveCollection(withPoints);
     setCollection(withPoints);
+    setLoading(false);
   }, []);
 
   const remove = useCallback(async () => {
