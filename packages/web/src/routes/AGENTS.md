@@ -30,7 +30,7 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
  - For roster + collections unit views, prefer composing shared roster components (`RosterUnitCardCompact`, `RosterUnitProfilePanel`, `RosterUnitList`) rather than duplicating layout/expansion logic in route-level `_components`.
 
 ## State & Data Patterns
-- Context integration: `useAppContext`, `useToastContext`, `useRoster`.
+- Context integration: `useSettings`, `useFactionIndex`/`useFactionData`, `useToastContext`, `useRoster`.
 - Loading states use skeletons mirroring the final layout; errors provide recovery actions; empty states should be meaningful.
 - Memoize heavy filtering/grouping and debounce search inputs (300ms search, ~100ms filters) to keep routes responsive.
 

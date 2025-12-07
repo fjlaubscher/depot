@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-import { AppProvider } from './contexts/app/context';
+import { AppProvider } from './contexts/app-provider';
 import { LayoutProvider } from './contexts/layout/context';
 import { RosterProvider } from './contexts/roster/context';
 import { ToastProvider } from './contexts/toast/context';

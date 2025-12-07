@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import { Share2 } from 'lucide-react';
 import type { Action } from '@/components/ui/action-group';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from './use-settings';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 
@@ -30,9 +30,9 @@ export const useShareAction = ({
   shareSuccessMessage = 'Link shared.',
   unavailableMessage = 'Sharing is not available on this device.'
 }: ShareActionOptions): Action => {
-  const { state } = useAppContext();
+  const { settings } = useSettings();
   const { showToast } = useToast();
-  const useNativeShare = state.settings?.useNativeShare ?? true;
+  const useNativeShare = settings.useNativeShare ?? true;
 
   const currentPath =
     typeof window !== 'undefined' && typeof window.location !== 'undefined'

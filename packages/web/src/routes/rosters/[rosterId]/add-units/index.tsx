@@ -5,11 +5,11 @@ import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import useFaction from '@/hooks/use-faction';
 import useFactionDatasheets from '@/hooks/use-faction-datasheets';
+import useSettings from '@/hooks/use-settings';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Alert } from '@/components/ui';
@@ -26,7 +26,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
-  const { state: appState } = useAppContext();
+  const { settings } = useSettings();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
@@ -88,8 +88,8 @@ const AddRosterUnitsView: FC = () => {
     [removeLatestUnit]
   );
 
-  const showLegends = appState.settings?.showLegends ?? false;
-  const showForgeWorld = appState.settings?.showForgeWorld ?? false;
+  const showLegends = settings.showLegends ?? false;
+  const showForgeWorld = settings.showForgeWorld ?? false;
 
   const hasSelections = selectedUnits.length > 0;
 

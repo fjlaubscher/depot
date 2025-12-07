@@ -1,24 +1,21 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useReducer, useEffect, useCallback } from 'react';
+import { createContext, useCallback, useEffect, useReducer } from 'react';
 import type { depot } from '@depot/core';
-import type { AppContextType } from './types';
-import { appReducer, initialState } from './reducer';
-import { APP_ACTIONS } from './constants';
 import { offlineStorage } from '@/data/offline-storage';
-import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
 import { normalizeDatasheetWargear } from '@/utils/wargear';
+import { FACTIONS_ACTIONS } from './constants';
+import { factionsReducer, initialFactionsState } from './reducer';
+import type { FactionsContextType } from './types';
 
-// Create context
-const AppContext = createContext<AppContextType | undefined>(undefined);
+const FactionsContext = createContext<FactionsContextType | undefined>(undefined);
 
-// Provider component
-interface AppProviderProps {
+interface FactionsProviderProps {
   children: ReactNode;
 }
 
-export const AppProvider: FC<AppProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(factionsReducer, initialFactionsState);
 
   const resolveIndexDataVersion = useCallback(
     (index?: depot.Index[] | null): string | null =>
@@ -60,13 +57,12 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const refreshOfflineFactions = useCallback(async () => {
     try {
       const offlineFactions = await offlineStorage.getAllCachedFactions();
-      dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+      dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
     } catch (error) {
       console.warn('Failed to load offline factions list:', error);
     }
   }, []);
 
-  // Get faction manifest with network fallback
   const getFactionManifest = useCallback(
     async (key: string): Promise<depot.FactionManifest | null> => {
       try {
@@ -100,7 +96,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         try {
           await offlineStorage.setFactionManifest(slug, manifest);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
-          dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+          dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache faction manifest in IndexedDB:', cacheError);
         }
@@ -110,7 +106,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Failed to load faction ${key}:`, error);
         dispatch({
-          type: APP_ACTIONS.LOAD_FACTION_ERROR,
+          type: FACTIONS_ACTIONS.LOAD_FACTION_ERROR,
           payload: { slug: key, error: message }
         });
         return null;
@@ -152,7 +148,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         try {
           await offlineStorage.setDatasheet(normalized);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
-          dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+          dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache datasheet in IndexedDB:', cacheError);
         }
@@ -169,26 +165,12 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     [getFactionManifest]
   );
 
-  // Clear cached faction data
   const clearOfflineData = async () => {
     try {
       await resetOfflineData();
-      dispatch({ type: APP_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
+      dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
     } catch (error) {
       throw error;
-    }
-  };
-
-  // Update settings with offline storage
-  const updateSettings = async (settings: depot.Settings) => {
-    try {
-      const mergedSettings = mergeSettingsWithDefaults(settings);
-      await offlineStorage.setSettings(mergedSettings);
-      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: mergedSettings });
-    } catch (error) {
-      console.error('Failed to save settings to IndexedDB:', error);
-      // Still update in-memory state even if offline save fails
-      dispatch({ type: APP_ACTIONS.UPDATE_SETTINGS, payload: mergeSettingsWithDefaults(settings) });
     }
   };
 
@@ -216,7 +198,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         const latestIndex = await fetchAndCacheIndex();
         const latestDataVersion = resolveIndexDataVersion(latestIndex);
 
-        dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: latestIndex });
+        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: latestIndex });
 
         const effectiveVersion = latestDataVersion ?? null;
         if (effectiveVersion) {
@@ -228,7 +210,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         }
 
         dispatch({
-          type: APP_ACTIONS.SET_DATA_VERSION,
+          type: FACTIONS_ACTIONS.SET_DATA_VERSION,
           payload: effectiveVersion
         });
 
@@ -238,7 +220,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       }
 
       if (!state.factionIndex) {
-        dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: refreshedIndex });
+        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: refreshedIndex });
       }
 
       if (!state.dataVersion && refreshedDataVersion) {
@@ -247,7 +229,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         } catch (persistError) {
           console.warn('Failed to persist data version marker.', persistError);
         }
-        dispatch({ type: APP_ACTIONS.SET_DATA_VERSION, payload: refreshedDataVersion });
+        dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: refreshedDataVersion });
       }
 
       return { updated: false, dataVersion: refreshedDataVersion ?? currentVersion };
@@ -264,11 +246,9 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     state.factionIndex
   ]);
 
-  // Initialize app data on mount
   useEffect(() => {
-    const initializeApp = async () => {
-      // Load faction index
-      dispatch({ type: APP_ACTIONS.LOAD_INDEX_START });
+    const initializeData = async () => {
+      dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_START });
 
       try {
         let storedVersion: string | null = null;
@@ -311,7 +291,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         }
 
         if (index) {
-          dispatch({ type: APP_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
+          dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
 
           const effectiveDataVersion = dataVersion ?? storedVersion ?? null;
 
@@ -324,7 +304,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
           }
 
           dispatch({
-            type: APP_ACTIONS.SET_DATA_VERSION,
+            type: FACTIONS_ACTIONS.SET_DATA_VERSION,
             payload: effectiveDataVersion
           });
         } else {
@@ -332,42 +312,26 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
         }
       } catch (error) {
         dispatch({
-          type: APP_ACTIONS.LOAD_INDEX_ERROR,
+          type: FACTIONS_ACTIONS.LOAD_INDEX_ERROR,
           payload: error instanceof Error ? error.message : 'Unknown error'
         });
-      }
-
-      // Load settings from IndexedDB
-      try {
-        const settings = await offlineStorage.getSettings();
-        if (settings) {
-          const resolvedSettings = mergeSettingsWithDefaults(settings);
-          dispatch({
-            type: APP_ACTIONS.LOAD_SETTINGS_SUCCESS,
-            payload: resolvedSettings
-          });
-        }
-      } catch (error) {
-        console.warn('Failed to load settings from IndexedDB:', error);
       }
 
       await refreshOfflineFactions();
     };
 
-    void initializeApp();
+    void initializeData();
   }, [fetchAndCacheIndex, refreshOfflineFactions, resetOfflineData, resolveIndexDataVersion]);
 
-  const contextValue: AppContextType = {
+  const value: FactionsContextType = {
     state,
-    dispatch,
     getFactionManifest,
     getDatasheet,
     clearOfflineData,
-    updateSettings,
     checkForDataUpdates
   };
 
-  return <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>;
+  return <FactionsContext.Provider value={value}>{children}</FactionsContext.Provider>;
 };
 
-export default AppContext;
+export default FactionsContext;

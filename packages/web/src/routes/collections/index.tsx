@@ -4,7 +4,8 @@ import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from '@/hooks/use-settings';
+import useFactionIndex from '@/hooks/use-faction-index';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, ErrorState } from '@/components/ui';
@@ -20,9 +21,10 @@ import CollectionStateChart from './_components/collection-state-chart';
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { collections, loading, error, refresh } = useCollections();
-  const { state } = useAppContext();
+  const { settings } = useSettings();
+  const { dataVersion } = useFactionIndex();
   const { showToast } = useToast();
-  const usePileLabel = state.settings?.usePileOfShameLabel ?? true;
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const label = usePileLabel ? 'Pile of Shame' : 'Collections';
   const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
   const snapshot = useMemo(
@@ -54,7 +56,7 @@ const CollectionsPage: React.FC = () => {
 
   const handleDuplicate = async (collection: depot.Collection) => {
     try {
-      const currentDataVersion = state.dataVersion ?? null;
+      const currentDataVersion = dataVersion ?? null;
       const duplicated: depot.Collection = {
         ...collection,
         id: crypto.randomUUID(),
@@ -83,7 +85,7 @@ const CollectionsPage: React.FC = () => {
   };
 
   const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
-    const currentDataVersion = state.dataVersion ?? null;
+    const currentDataVersion = dataVersion ?? null;
     const items = collection.items.map((item) => ({
       ...item,
       id: crypto.randomUUID()

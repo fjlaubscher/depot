@@ -26,17 +26,17 @@ import {
 } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import WargearSelectionContainer from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-selection-container';
 import ModelCostSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/model-cost-selection';
 import WargearAbilitiesSelection from '@/routes/rosters/[rosterId]/units/[unitId]/edit/_components/wargear-abilities-selection';
+import useSettings from '@/hooks/use-settings';
 
 const CollectionUnitEditView: React.FC = () => {
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   const unit = collection?.items.find((item) => item.id === unitId);
@@ -315,8 +315,8 @@ const CollectionUnitEditView: React.FC = () => {
 
 const CollectionUnitEditPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
   if (!collectionId) {

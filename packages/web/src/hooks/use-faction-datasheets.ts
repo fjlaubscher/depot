@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionData from './use-faction-data';
 import type { DatasheetListItem } from '@/types/datasheets';
 
 const CONCURRENCY_LIMIT = 6;
@@ -19,7 +19,7 @@ const useFactionDatasheets = (
   factionSlug?: string,
   datasheetRefs?: DatasheetListItem[]
 ): UseFactionDatasheetsResult => {
-  const { getDatasheet } = useAppContext();
+  const { getDatasheet } = useFactionData();
   const [datasheets, setDatasheets] = useState<depot.Datasheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

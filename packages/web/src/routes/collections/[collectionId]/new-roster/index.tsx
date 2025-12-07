@@ -6,13 +6,13 @@ import type { depot } from '@depot/core';
 import AppLayout from '@/components/layout';
 import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/components/shared';
 import { Alert, Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
-import { useAppContext } from '@/contexts/app/use-app-context';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
 import { calculateCollectionPoints, getCollectionLabels } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
+import useSettings from '@/hooks/use-settings';
 
 type CollectionDatasheetListItem = depot.Datasheet & {
   collectionUnitId: string;
@@ -24,8 +24,8 @@ const SESSION_KEY = 'collection-roster-prefill';
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
-  const { state: appState } = useAppContext();
-  const usePileLabel = appState.settings?.usePileOfShameLabel ?? true;
+  const { settings } = useSettings();
+  const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -107,10 +107,10 @@ const CollectionNewRoster: React.FC = () => {
 
   const datasheetFilters = useMemo(
     () => ({
-      showLegends: appState.settings?.showLegends ?? false,
-      showForgeWorld: appState.settings?.showForgeWorld ?? false
+      showLegends: settings.showLegends ?? false,
+      showForgeWorld: settings.showForgeWorld ?? false
     }),
-    [appState.settings?.showLegends, appState.settings?.showForgeWorld]
+    [settings.showLegends, settings.showForgeWorld]
   );
 
   const toggleSelect = useCallback((id: string) => {

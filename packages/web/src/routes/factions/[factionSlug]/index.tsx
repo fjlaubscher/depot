@@ -9,7 +9,7 @@ import { BackButton } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useSettings from '@/hooks/use-settings';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 // Utils
@@ -28,11 +28,11 @@ import type { depot } from '@depot/core';
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
-  const { state } = useAppContext();
+  const { settings } = useSettings();
   const [activeTab, setActiveTab] = useState(0);
 
-  const showLegends = state.settings?.showLegends ?? false;
-  const showForgeWorld = state.settings?.showForgeWorld ?? false;
+  const showLegends = settings.showLegends ?? false;
+  const showForgeWorld = settings.showForgeWorld ?? false;
 
   const datasheetFilters = useMemo(
     () => ({

@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 // Context hooks
-import { useAppContext } from '@/contexts/app/use-app-context';
+import useFactionIndex from '@/hooks/use-faction-index';
+import useSettings from '@/hooks/use-settings';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -23,7 +24,8 @@ import {
 import useDebounce from '@/hooks/use-debounce';
 
 const Factions: React.FC = () => {
-  const { state, checkForDataUpdates } = useAppContext();
+  const { factionIndex, loading, error, checkForDataUpdates } = useFactionIndex();
+  const { settings } = useSettings();
 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
@@ -33,9 +35,9 @@ const Factions: React.FC = () => {
   }, [checkForDataUpdates]);
 
   const filteredFactions = useMemo(() => {
-    const queryFiltered = filterFactionsByQuery(state.factionIndex, debouncedQuery);
-    return filterFactionsBySettings(queryFiltered, state.settings);
-  }, [state.factionIndex, debouncedQuery, state.settings]);
+    const queryFiltered = filterFactionsByQuery(factionIndex, debouncedQuery);
+    return filterFactionsBySettings(queryFiltered, settings);
+  }, [factionIndex, debouncedQuery, settings]);
 
   const groupedFactions = useMemo(
     () => groupFactionsByAlliance(filteredFactions),
@@ -46,17 +48,17 @@ const Factions: React.FC = () => {
   const totalFactions = filteredFactions.length;
   const totalAlliances = Object.keys(groupedFactions).length;
 
-  if (state.loading) {
+  if (loading) {
     return <Skeleton />;
   }
 
-  if (state.error) {
+  if (error) {
     return (
       <AppLayout title="Error">
         <ErrorState
           title="Failed to Load Factions"
           message="We encountered an error while trying to load the factions data. This could be due to network issues or server problems."
-          stackTrace={state.error}
+          stackTrace={error}
         />
       </AppLayout>
     );

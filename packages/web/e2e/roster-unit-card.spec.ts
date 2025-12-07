@@ -58,9 +58,9 @@ test.describe('Roster unit card view', () => {
 
     // Select some wargear pills (up to two) so we have explicit selections
     const wargearPills = page.locator('[data-testid^="wargear-pill-"]');
-    const wargearCount = await wargearPills.count();
-    const selectCount = Math.min(wargearCount, 2);
-    const selectedWargearNames: string[] = [];
+  const wargearCount = await wargearPills.count();
+  const selectCount = Math.min(wargearCount, 2);
+  const selectedWargearNames: string[] = [];
 
     for (let index = 0; index < selectCount; index += 1) {
       const pill = wargearPills.nth(index);
@@ -73,13 +73,15 @@ test.describe('Roster unit card view', () => {
     }
 
     // Select the first available wargear ability
-    const abilityPill = page.locator('[data-testid^="wargear-ability-pill-"]').first();
-    await expect(abilityPill).toBeVisible();
-    await abilityPill.click();
+  const abilityPill = page.locator('[data-testid^="wargear-ability-pill-"]').first();
+  await expect(abilityPill).toBeVisible();
+  await abilityPill.click();
 
-    // Save changes and return to roster edit
-    await page.getByTestId('save-button').click();
-    await expect(page).toHaveURL(/\/rosters\/[a-z0-9-]+\/edit$/i);
+  // Save changes and return to roster edit
+  await page.getByTestId('save-button').click();
+  const editUrl = await page.url();
+  expect(editUrl).toMatch(/\/rosters\/[a-z0-9-]+\/edit(#unit-[a-z0-9-]+)?$/i);
+  expect(editUrl.includes('#unit-')).toBe(true);
 
     // Navigate to roster view
     await page.getByTestId('view-roster-button').click();
