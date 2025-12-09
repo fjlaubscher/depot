@@ -3,8 +3,8 @@ import {
   getDefaultWargearSelection,
   normalizeDatasheetWargear,
   normalizeSelectedWargear
-} from '@/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
+} from '@depot/core/utils/wargear';
+import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
 import { calculateTotalPoints } from './utils';

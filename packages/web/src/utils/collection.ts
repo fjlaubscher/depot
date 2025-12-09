@@ -1,5 +1,5 @@
 import type { depot } from '@depot/core';
-import { getDefaultWargearSelection, normalizeDatasheetWargear } from '@/utils/wargear';
+import { getDefaultWargearSelection, normalizeDatasheetWargear } from '@depot/core/utils/wargear';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 

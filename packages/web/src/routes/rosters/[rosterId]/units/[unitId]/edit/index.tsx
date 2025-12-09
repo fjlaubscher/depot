@@ -25,8 +25,11 @@ import EnhancementSelection from './_components/enhancement-selection';
 import WarlordSelection from './_components/warlord-selection';
 import WargearAbilitiesSelection from './_components/wargear-abilities-selection';
 import { BackButton, DatasheetComposition } from '@/components/shared';
-import { parseLoadoutWargear } from '@/utils/wargear';
-import { getWargearAbilities, normalizeSelectedWargearAbilities } from '@/utils/abilities';
+import { parseLoadoutWargear } from '@depot/core/utils/wargear';
+import {
+  getWargearAbilities,
+  normalizeSelectedWargearAbilities
+} from '@depot/core/utils/abilities';
 import { getRosterFactionName } from '@/utils/roster';
 
 const EditRosterUnitView: React.FC = () => {

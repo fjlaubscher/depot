@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import type { depot } from '@depot/core';
 import { Card, PointsTag, Tag, TagGroup } from '@/components/ui';
 import { COLLECTION_STATE_META } from '@/utils/collection';
-import { formatWargearDisplayName } from '@/utils/wargear';
-import { formatAbilityName } from '@/utils/abilities';
+import { formatWargearDisplayName } from '@depot/core/utils/wargear';
+import { formatAbilityName } from '@depot/core/utils/abilities';
 
 interface RosterUnitCardCompactProps {
   id?: string;

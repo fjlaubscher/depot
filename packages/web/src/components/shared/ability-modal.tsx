@@ -4,7 +4,8 @@ import { X } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { IconButton, Tag } from '@/components/ui';
-import { formatAbilityName, getAbilityTagVariant, getAbilityTypeBadge } from '@/utils/abilities';
+import { formatAbilityName } from '@depot/core/utils/abilities';
+import { getAbilityTagVariant, getAbilityTypeBadge } from '@/utils/abilities';
 
 interface AbilityModalProps {
   ability: depot.Ability | null;

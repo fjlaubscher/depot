@@ -7,6 +7,9 @@ export * as slug from './utils/slug.js';
 // Export wargear helpers
 export * as wargear from './utils/wargear.js';
 
+// Export ability helpers
+export * as abilities from './utils/abilities.js';
+
 // Export roster share helpers
 export * as rosterShare from './utils/roster-share.js';
 

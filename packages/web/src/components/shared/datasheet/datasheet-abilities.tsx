@@ -5,7 +5,8 @@ import classNames from 'classnames';
 
 import { Tag, TagSection } from '@/components/ui';
 import AbilityModal from '@/components/shared/ability-modal';
-import { formatAbilityName, getAbilityTagVariant, sortAbilitiesByType } from '@/utils/abilities';
+import { formatAbilityName, sortAbilitiesByType } from '@depot/core/utils/abilities';
+import { getAbilityTagVariant } from '@/utils/abilities';
 
 interface DatasheetAbilitiesProps {
   title: string;

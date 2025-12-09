@@ -7,7 +7,7 @@ import {
   mockDatasheet,
   mockEnhancement
 } from '@/test/mock-data';
-import { formatWargearDisplayName } from '@/utils/wargear';
+import { formatWargearDisplayName } from '@depot/core/utils/wargear';
 
 describe('generateRosterShareText', () => {
   const wargearSelection = mockDatasheet.wargear.slice(0, 1);

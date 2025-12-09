@@ -1,5 +1,12 @@
 packages:
   - packages/*
 
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
+  - sharp
+  - workerd
+
 onlyBuiltDependencies:
   - '@sentry/cli'
+  - esbuild

@@ -1,6 +1,6 @@
 import type { depot } from '@depot/core';
-import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
+import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@depot/core/utils/wargear';
+import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
 import { calculateTotalPoints } from '@/contexts/roster/utils';
 import { calculateCollectionPoints } from '@/utils/collection';
 

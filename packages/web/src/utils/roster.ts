@@ -1,7 +1,7 @@
 import type { depot } from '@depot/core';
 import { calculateTotalPoints } from '@/contexts/roster/utils';
-import { formatWargearDisplayName } from '@/utils/wargear';
-import { formatAbilityName } from '@/utils/abilities';
+import { formatWargearDisplayName } from '@depot/core/utils/wargear';
+import { formatAbilityName } from '@depot/core/utils/abilities';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { rosterShare } from '@depot/core';
 

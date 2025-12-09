@@ -25,6 +25,16 @@
       "types": "./dist/utils/slug.d.ts",
       "import": "./dist/utils/slug.js",
       "default": "./dist/utils/slug.js"
+    },
+    "./utils/wargear": {
+      "types": "./dist/utils/wargear.d.ts",
+      "import": "./dist/utils/wargear.js",
+      "default": "./dist/utils/wargear.js"
+    },
+    "./utils/abilities": {
+      "types": "./dist/utils/abilities.d.ts",
+      "import": "./dist/utils/abilities.js",
+      "default": "./dist/utils/abilities.js"
     }
   },
   "files": [
@@ -34,6 +44,7 @@
     "build": "tsc -b",
     "clean": "rimraf dist",
     "dev": "tsc -b --watch",
+    "test": "vitest run",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -42,7 +53,8 @@
   "devDependencies": {
     "prettier": "^3.4.0",
     "rimraf": "^5.0.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "author": "Francois Laubscher",
   "license": "MIT"
