@@ -30,8 +30,9 @@ The web package never fetches Wahapedia directly. Run the CLI (or root `pnpm sta
 ## Type System
 - Uses `@depot/core` as the source of truth (`wahapedia.*` raw, `depot.*` processed).
 - Transformations in `generate-data.ts` must adhere to these interfaces.
+- Shared helpers (slugging, datasheet normalization, enhancement grouping, etc.) now live in `@depot/core/src/utils`. Prefer `@depot/core/utils/{common,datasheets,wargear,...}` instead of duplicating logic locally.
 
 ## Import Rules (NodeNext)
 - Relative imports inside `src/` must include `.js` extensions in source files.
 - Use `import type` for type-only pulls from `@depot/core` to keep emitted JS lean.
-- Keep runtime helpers in `src/utils/` to avoid circular dependencies between main pipeline steps.
+- Keep runtime helpers specific to CLI behavior under `src/utils/`; generic routines that could benefit other packages should be promoted to `@depot/core`.
