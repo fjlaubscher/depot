@@ -10,6 +10,12 @@ export * as wargear from './utils/wargear.js';
 // Export ability helpers
 export * as abilities from './utils/abilities.js';
 
+// Export roster helpers
+export * as roster from './utils/roster.js';
+
+// Export collection helpers
+export * as collection from './utils/collection.js';
+
 // Export roster share helpers
 export * as rosterShare from './utils/roster-share.js';
 

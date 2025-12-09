@@ -1,1 +1,1 @@
-export * from './points';
+export { calculateTotalPoints } from '@depot/core/utils/roster';

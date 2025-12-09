@@ -35,6 +35,16 @@
       "types": "./dist/utils/abilities.d.ts",
       "import": "./dist/utils/abilities.js",
       "default": "./dist/utils/abilities.js"
+    },
+    "./utils/roster": {
+      "types": "./dist/utils/roster.d.ts",
+      "import": "./dist/utils/roster.js",
+      "default": "./dist/utils/roster.js"
+    },
+    "./utils/collection": {
+      "types": "./dist/utils/collection.d.ts",
+      "import": "./dist/utils/collection.js",
+      "default": "./dist/utils/collection.js"
     }
   },
   "files": [
