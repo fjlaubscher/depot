@@ -73,15 +73,15 @@ test.describe('Roster unit card view', () => {
     }
 
     // Select the first available wargear ability
-  const abilityPill = page.locator('[data-testid^="wargear-ability-pill-"]').first();
-  await expect(abilityPill).toBeVisible();
-  await abilityPill.click();
+    const abilityPill = page.locator('[data-testid^="wargear-ability-pill-"]').first();
+    await expect(abilityPill).toBeVisible();
+    await abilityPill.click();
 
-  // Save changes and return to roster edit
-  await page.getByTestId('save-button').click();
-  const editUrl = await page.url();
-  expect(editUrl).toMatch(/\/rosters\/[a-z0-9-]+\/edit(#unit-[a-z0-9-]+)?$/i);
-  expect(editUrl.includes('#unit-')).toBe(true);
+    // Save changes and return to roster edit
+    await page.getByTestId('save-button').click();
+    const editUrl = await page.url();
+    expect(editUrl).toMatch(/\/rosters\/[a-z0-9-]+\/edit(#unit-[a-z0-9-]+)?$/i);
+    expect(editUrl.includes('#unit-')).toBe(true);
 
     // Navigate to roster view
     await page.getByTestId('view-roster-button').click();
