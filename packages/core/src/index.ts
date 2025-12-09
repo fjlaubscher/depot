@@ -19,5 +19,8 @@ export * as collection from './utils/collection.js';
 // Export roster share helpers
 export * as rosterShare from './utils/roster-share.js';
 
+// Export datasheet helpers
+export * as datasheets from './utils/datasheets.js';
+
 // Export all wahapedia types
 export * as wahapedia from './types/wahapedia.js';

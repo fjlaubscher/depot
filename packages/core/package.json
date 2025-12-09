@@ -45,6 +45,11 @@
       "types": "./dist/utils/collection.d.ts",
       "import": "./dist/utils/collection.js",
       "default": "./dist/utils/collection.js"
+    },
+    "./utils/datasheets": {
+      "types": "./dist/utils/datasheets.d.ts",
+      "import": "./dist/utils/datasheets.js",
+      "default": "./dist/utils/datasheets.js"
     }
   },
   "files": [

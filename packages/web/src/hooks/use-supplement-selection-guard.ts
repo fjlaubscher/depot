@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 import type { DatasheetFilters } from './use-datasheet-browser';
 import type { DatasheetListItem } from '@/types/datasheets';
-import type { SupplementMetadata } from '@/utils/datasheet-supplements';
-import { shouldResetSupplementSelection } from '@/utils/datasheet-supplements';
+import {
+  shouldResetSupplementSelection,
+  type SupplementMetadata
+} from '@depot/core/utils/datasheets';
 
 interface UseSupplementSelectionGuardArgs<T extends DatasheetListItem> {
   filters?: DatasheetFilters;

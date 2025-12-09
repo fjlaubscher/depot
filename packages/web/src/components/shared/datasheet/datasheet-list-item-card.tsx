@@ -7,7 +7,7 @@ import {
   buildSupplementLabel,
   getSupplementKey,
   isSupplementEntry
-} from '@/utils/datasheet-supplements';
+} from '@depot/core/utils/datasheets';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetListItemCardProps {

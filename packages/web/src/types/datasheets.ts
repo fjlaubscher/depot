@@ -1,3 +1,3 @@
-import type { depot } from '@depot/core';
+import type { DatasheetListItem as CoreDatasheetListItem } from '@depot/core/utils/datasheets';
 
-export type DatasheetListItem = depot.Datasheet | depot.DatasheetSummary;
+export type DatasheetListItem = CoreDatasheetListItem;
