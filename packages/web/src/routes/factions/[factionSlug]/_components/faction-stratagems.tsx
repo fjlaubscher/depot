@@ -13,7 +13,7 @@ import useDebounce from '@/hooks/use-debounce';
 import useSelect from '@/hooks/use-select';
 
 // Utils
-import { sortByName } from '@/utils/array';
+import { sortByName } from '@depot/core/utils/common';
 
 interface FactionStratagemProps {
   stratagems: depot.Stratagem[];

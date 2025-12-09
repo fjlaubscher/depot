@@ -8,9 +8,7 @@ import DatasheetWargear from './datasheet-wargear';
 import DatasheetLeaderRules from './datasheet-leader-rules';
 import { ModelStatsRow } from '@/components/shared';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
-
-// utils
-import { categorizeAbilities } from '@/utils/abilities';
+import { categorizeAbilities } from '@depot/core/utils/abilities';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;

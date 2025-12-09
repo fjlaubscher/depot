@@ -18,7 +18,7 @@ import {
   filterEnhancements,
   getUniqueEnhancementDetachmentTypes,
   isEnhancementGroupedDataEmpty
-} from '@/utils/enhancement';
+} from '@depot/core/utils/common';
 
 interface FactionEnhancementsProps {
   enhancements: depot.Enhancement[];

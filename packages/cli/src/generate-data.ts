@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { slug as slugUtils, wargear as wargearUtils } from '@depot/core';
+import { sortByName } from '@depot/core/utils/common';
 import type { wahapedia, depot } from '@depot/core';
 import { buildSourceClassifier } from './utils/source-classification.js';
 import type { SourceClassifier } from './utils/source-classification.js';
@@ -266,9 +267,6 @@ const buildDatasheet = (
     isLegends
   };
 };
-
-const sortByName = <T extends { name: string }>(items: T[]) =>
-  items.sort((a, b) => a.name.localeCompare(b.name));
 
 const buildDetachments = (
   detachmentAbilities: wahapedia.DetachmentAbility[],

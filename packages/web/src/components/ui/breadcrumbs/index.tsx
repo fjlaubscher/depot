@@ -2,8 +2,8 @@ import type { FC } from 'react';
 import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
-import type { BreadcrumbItem } from '@/utils/breadcrumbs';
-import { generateBreadcrumbs } from '@/utils/breadcrumbs';
+import type { BreadcrumbItem } from '@depot/core/utils/common';
+import { generateBreadcrumbs } from '@depot/core/utils/common';
 
 interface BreadcrumbsProps {
   items?: BreadcrumbItem[];

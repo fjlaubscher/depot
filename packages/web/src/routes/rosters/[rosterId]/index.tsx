@@ -7,7 +7,7 @@ import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
 import useDownloadFile from '@/hooks/use-download-file';
-import { safeSlug } from '@/utils/strings';
+import { safeSlug } from '@depot/core/utils/common';
 import type { ExportedRoster } from '@/types/export';
 import { refreshRosterData } from '@/utils/refresh-user-data';
 import useSettings from '@/hooks/use-settings';

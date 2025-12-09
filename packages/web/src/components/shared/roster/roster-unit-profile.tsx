@@ -5,7 +5,7 @@ import type { depot } from '@depot/core';
 import { ModelStatsRow } from '@/components/shared';
 import DatasheetHero from '@/components/shared/datasheet/datasheet-hero';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
-import { categorizeAbilities } from '@/utils/abilities';
+import { categorizeAbilities } from '@depot/core/utils/abilities';
 import WargearTable from '@/components/shared/wargear-table';
 
 interface RosterUnitProfileProps {

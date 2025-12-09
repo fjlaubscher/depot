@@ -1,5 +1,5 @@
 import type { depot } from '@depot/core';
-import { getFactionAlliance } from '@/utils/faction';
+import { getFactionAlliance } from '@depot/core/utils/common';
 
 export interface GroupedFactions {
   [key: string]: depot.Index[];

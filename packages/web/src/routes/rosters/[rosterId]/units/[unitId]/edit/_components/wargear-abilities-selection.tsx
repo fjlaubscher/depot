@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { slugify } from '@depot/core/utils/slug';
 import type { depot } from '@depot/core';
 
-import { formatAbilityName } from '@/utils/abilities';
+import { formatAbilityName } from '@depot/core/utils/abilities';
 
 interface WargearAbilitiesSelectionProps {
   abilities: depot.Ability[];

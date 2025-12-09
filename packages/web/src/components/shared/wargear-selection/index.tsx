@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import WargearSection from './wargear-section';
-import { separateWargearByType } from '@/utils/wargear';
+import { separateWargearByType } from '@depot/core/utils/wargear';
 
 interface WargearSelectionProps {
   wargear: depot.Wargear[];

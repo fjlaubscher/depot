@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 
 import { ContentCard, PointsTag, Tag, SelectField, Button } from '@/components/ui';
-import { groupKeywords } from '@/utils/keywords';
+import { groupKeywords } from '@depot/core/utils/common';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetSelectionCardProps {

@@ -1,5 +1,10 @@
 import type { depot } from '@depot/core';
-import { getDefaultWargearSelection, normalizeDatasheetWargear } from '@/utils/wargear';
+import {
+  COLLECTION_UNIT_STATES as CORE_COLLECTION_UNIT_STATES,
+  calculateCollectionPoints as calculateCollectionPointsCore,
+  createCollectionUnitFromDatasheet as createCollectionUnitFromDatasheetCore,
+  getCollectionStateCounts as getCollectionStateCountsCore
+} from '@depot/core/utils/collection';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
@@ -10,12 +15,7 @@ export const getCollectionLabels = (usePileLabel: boolean) => ({
   short: usePileLabel ? 'pile' : 'collection'
 });
 
-export const COLLECTION_UNIT_STATES: depot.CollectionUnitState[] = [
-  'sprue',
-  'built',
-  'battle-ready',
-  'parade-ready'
-];
+export const COLLECTION_UNIT_STATES = CORE_COLLECTION_UNIT_STATES;
 
 export const COLLECTION_STATE_META: Record<
   depot.CollectionUnitState,
@@ -34,44 +34,11 @@ export const COLLECTION_STATE_BLURBS: Record<depot.CollectionUnitState, string> 
   'parade-ready': 'Mostly "Parade Ready" — showtime (or start a new box).'
 };
 
-const createEmptyStateCounts = (): Record<depot.CollectionUnitState, number> => ({
-  sprue: 0,
-  built: 0,
-  'battle-ready': 0,
-  'parade-ready': 0
-});
+export const getCollectionStateCounts = getCollectionStateCountsCore;
 
-export const getCollectionStateCounts = (
-  items: depot.CollectionUnit[]
-): Record<depot.CollectionUnitState, number> => {
-  return items.reduce<Record<depot.CollectionUnitState, number>>((acc, item) => {
-    acc[item.state] = (acc[item.state] ?? 0) + 1;
-    return acc;
-  }, createEmptyStateCounts());
-};
+export const calculateCollectionPoints = calculateCollectionPointsCore;
 
-export const calculateCollectionPoints = (collection: depot.Collection): number => {
-  return collection.items.reduce(
-    (total, item) => total + (parseInt(item.modelCost.cost, 10) || 0),
-    0
-  );
-};
-
-export const createCollectionUnitFromDatasheet = (
-  datasheet: depot.Datasheet,
-  modelCost: depot.ModelCost
-): depot.CollectionUnit => {
-  const normalized = normalizeDatasheetWargear(datasheet);
-  return {
-    id: crypto.randomUUID(),
-    datasheet: normalized,
-    modelCost,
-    selectedWargear: getDefaultWargearSelection(normalized),
-    selectedWargearAbilities: [],
-    state: 'sprue',
-    datasheetSlug: normalized.slug
-  };
-};
+export const createCollectionUnitFromDatasheet = createCollectionUnitFromDatasheetCore;
 
 export const getCollectionChartCopy = (
   collection: depot.Collection,

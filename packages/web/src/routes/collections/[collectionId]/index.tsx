@@ -16,7 +16,7 @@ import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import useDownloadFile from '@/hooks/use-download-file';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import type { ExportedCollection } from '@/types/export';
-import { safeSlug } from '@/utils/strings';
+import { safeSlug } from '@depot/core/utils/common';
 import ExportButton from '@/components/shared/export-button';
 import useFactionData from '@/hooks/use-faction-data';
 import useSettings from '@/hooks/use-settings';

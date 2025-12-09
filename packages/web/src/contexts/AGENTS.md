@@ -19,13 +19,13 @@ React contexts follow a consistent modular pattern (actions, reducer, provider, 
 ## Usage
 ```tsx
 <AppProvider>
-  <LayoutProvider>
-    <RosterProvider>
-      <ToastProvider>
+  <ToastProvider>
+    <LayoutProvider>
+      <RosterProvider>
         <App />
-      </ToastProvider>
-    </RosterProvider>
-  </LayoutProvider>
+      </RosterProvider>
+    </LayoutProvider>
+  </ToastProvider>
 </AppProvider>
 
 const { getFactionManifest, getDatasheet } = useFactionData();
@@ -35,5 +35,5 @@ const { state: roster, addUnit } = useRoster();
 ```
 
 ## Testing
-- Always wrap renders with `TestWrapper` (`src/test/test-utils.tsx`) so Router + all providers are present.
+- Always wrap general UI tests with `TestWrapper` (`src/test/test-utils.tsx`) to get Router + App, Layout, and Toast providers; add `RosterProvider` explicitly when testing roster-specific flows or reducers that expect it.
 - Reducer unit tests should import from the specific folder and cover edge cases with table-driven Vitest tests.

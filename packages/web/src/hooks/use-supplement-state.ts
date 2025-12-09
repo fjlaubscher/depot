@@ -1,24 +1,23 @@
 import { useMemo } from 'react';
 import type { DatasheetFilters } from './use-datasheet-browser';
 import type { DatasheetListItem } from '@/types/datasheets';
-import { filterDatasheetsBySettings } from '@/utils/datasheet-filters';
 import {
   CODEX_SLUG,
   buildSupplementLabel,
   deriveSupplementMetadata,
+  filterDatasheetsBySettings,
   filterDatasheetsBySupplement,
   getSupplementKey,
   isSupplementEntry,
-  normalizeSupplementValue
-} from '@/utils/datasheet-supplements';
+  normalizeSupplementValue,
+  type SupplementMetadata
+} from '@depot/core/utils/datasheets';
 
 interface UseSupplementStateArgs<T extends DatasheetListItem> {
   datasheets: T[];
   filters?: DatasheetFilters;
   selectedSupplement: string;
 }
-
-type SupplementMetadata = ReturnType<typeof deriveSupplementMetadata>;
 
 const getSelectedSupplementLabel = (
   supplementMetadata: SupplementMetadata,

@@ -1,7 +1,7 @@
 import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
-import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@/utils/abilities';
+import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@depot/core/utils/wargear';
+import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
 import type { CachedFaction } from '@/types/offline';
 
 // Database configuration constants

@@ -1,4 +1,12 @@
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { Datasheet, DatasheetSummary } from '../types/depot.js';
+import { sortByName } from './common/index.js';
+
+export type DatasheetListItem = Datasheet | DatasheetSummary;
+
+export interface DatasheetVisibilityFilters {
+  showLegends?: boolean;
+  showForgeWorld?: boolean;
+}
 
 export interface SupplementOption {
   label: string;
@@ -12,6 +20,47 @@ export interface SupplementMetadata {
   options: SupplementOption[];
 }
 
+export const groupDatasheetsByRole = <T extends DatasheetListItem>(datasheets: T[]) => {
+  const dictionary: Record<string, T[]> = {};
+
+  datasheets.forEach((datasheet) => {
+    const role = datasheet.role;
+    const existing = dictionary[role];
+    if (existing) {
+      existing.push(datasheet);
+    } else {
+      dictionary[role] = [datasheet];
+    }
+  });
+
+  Object.keys(dictionary).forEach((key) => {
+    dictionary[key] = sortByName(dictionary[key]) as T[];
+  });
+
+  return dictionary;
+};
+
+export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
+  datasheets: T[],
+  filters?: DatasheetVisibilityFilters
+): T[] => {
+  if (!filters) {
+    return datasheets;
+  }
+
+  return datasheets.filter((sheet) => {
+    if (filters.showLegends === false && sheet.isLegends) {
+      return false;
+    }
+
+    if (filters.showForgeWorld === false && sheet.isForgeWorld) {
+      return false;
+    }
+
+    return true;
+  });
+};
+
 export const CODEX_SLUG = 'codex';
 
 export const toTitleCase = (slug: string) =>
@@ -20,10 +69,13 @@ export const toTitleCase = (slug: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 
-export const normalizeSupplementValue = (value: string) => value.toLowerCase();
+export const normalizeSupplementValue = (value: string | undefined | null) => {
+  const normalized = (value ?? '').trim().toLowerCase();
+  return normalized || CODEX_SLUG;
+};
 
 export const getSupplementKey = (sheet: DatasheetListItem) =>
-  sheet.supplementKey ?? normalizeSupplementValue(sheet.supplementSlug ?? CODEX_SLUG);
+  sheet.supplementKey ?? normalizeSupplementValue(sheet.supplementSlug);
 
 export const isSupplementEntry = (sheet: DatasheetListItem) => {
   if (typeof sheet.isSupplement === 'boolean') {
@@ -34,7 +86,7 @@ export const isSupplementEntry = (sheet: DatasheetListItem) => {
   return key !== CODEX_SLUG;
 };
 
-export const isCodexEntry = (slug?: string, isSupplement?: boolean) => {
+export const isCodexEntry = (slug?: string | null, isSupplement?: boolean) => {
   if (typeof isSupplement === 'boolean') {
     return !isSupplement;
   }
@@ -129,9 +181,8 @@ export const filterDatasheetsBySupplement = <T extends DatasheetListItem>(
   datasheets.forEach((sheet) => {
     const key = getSupplementKey(sheet);
     const isSupplement = isSupplementEntry(sheet);
-    const isCodex = !isSupplement;
 
-    if (isCodex) {
+    if (!isSupplement) {
       if (normalizedSelection === CODEX_SLUG) {
         supplementDatasheets.push(sheet);
       } else {

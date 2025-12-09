@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { CollapsibleSection, Card } from '@/components/ui';
 import WargearTable from '@/components/shared/wargear-table';
-import { separateWargearByType } from '@/utils/wargear';
+import { separateWargearByType } from '@depot/core/utils/wargear';
 
 interface DatasheetWargearProps {
   datasheet: depot.Datasheet;

@@ -3,7 +3,7 @@ import { createContext, useCallback, useEffect, useReducer } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
-import { normalizeDatasheetWargear } from '@/utils/wargear';
+import { normalizeDatasheetWargear } from '@depot/core/utils/wargear';
 import { FACTIONS_ACTIONS } from './constants';
 import { factionsReducer, initialFactionsState } from './reducer';
 import type { FactionsContextType } from './types';

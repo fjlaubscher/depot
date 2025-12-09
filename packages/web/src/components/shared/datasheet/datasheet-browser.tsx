@@ -10,7 +10,7 @@ import DatasheetRoleTabs from './datasheet-role-tabs';
 import DatasheetFilterBar from './datasheet-filter-bar';
 import DatasheetResultsGrid from './datasheet-results-grid';
 import DatasheetEmptyState from './datasheet-empty-state';
-import { sortDatasheetsBySupplementPreference } from '@/utils/datasheet-supplements';
+import { sortDatasheetsBySupplementPreference } from '@depot/core/utils/datasheets';
 import DatasheetListItemCard from './datasheet-list-item-card';
 
 interface DatasheetBrowserProps<T extends DatasheetListItem> {

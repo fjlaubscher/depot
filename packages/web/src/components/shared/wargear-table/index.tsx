@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import classNames from 'classnames';
 import type { depot } from '@depot/core';
 import { Tag, TagGroup } from '@/components/ui';
-import { parseWargearKeywords } from '@/utils/wargear';
+import { parseWargearKeywords } from '@depot/core/utils/wargear';
 
 interface WargearTableProps {
   wargear: depot.Wargear[];

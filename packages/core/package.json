@@ -25,6 +25,41 @@
       "types": "./dist/utils/slug.d.ts",
       "import": "./dist/utils/slug.js",
       "default": "./dist/utils/slug.js"
+    },
+    "./utils/wargear": {
+      "types": "./dist/utils/wargear.d.ts",
+      "import": "./dist/utils/wargear.js",
+      "default": "./dist/utils/wargear.js"
+    },
+    "./utils/abilities": {
+      "types": "./dist/utils/abilities.d.ts",
+      "import": "./dist/utils/abilities.js",
+      "default": "./dist/utils/abilities.js"
+    },
+    "./utils/roster": {
+      "types": "./dist/utils/roster.d.ts",
+      "import": "./dist/utils/roster.js",
+      "default": "./dist/utils/roster.js"
+    },
+    "./utils/collection": {
+      "types": "./dist/utils/collection.d.ts",
+      "import": "./dist/utils/collection.js",
+      "default": "./dist/utils/collection.js"
+    },
+    "./utils/common": {
+      "types": "./dist/utils/common/index.d.ts",
+      "import": "./dist/utils/common/index.js",
+      "default": "./dist/utils/common/index.js"
+    },
+    "./utils/paths": {
+      "types": "./dist/utils/paths.d.ts",
+      "import": "./dist/utils/paths.js",
+      "default": "./dist/utils/paths.js"
+    },
+    "./utils/datasheets": {
+      "types": "./dist/utils/datasheets.d.ts",
+      "import": "./dist/utils/datasheets.js",
+      "default": "./dist/utils/datasheets.js"
     }
   },
   "files": [
@@ -34,6 +69,7 @@
     "build": "tsc -b",
     "clean": "rimraf dist",
     "dev": "tsc -b --watch",
+    "test": "vitest run",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "tsc --noEmit && prettier --check \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -42,7 +78,8 @@
   "devDependencies": {
     "prettier": "^3.4.0",
     "rimraf": "^5.0.10",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
   },
   "author": "Francois Laubscher",
   "license": "MIT"

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import type { DatasheetListItem } from '@/types/datasheets';
-import { groupDatasheetsByRole } from '@/utils/datasheet';
 import {
   type DatasheetVisibilityFilters,
-  filterDatasheetsBySettings
-} from '@/utils/datasheet-filters';
-import { sortByName } from '@/utils/array';
+  filterDatasheetsBySettings,
+  groupDatasheetsByRole
+} from '@depot/core/utils/datasheets';
+import { sortByName } from '@depot/core/utils/common';
 import useDebounce from './use-debounce';
 import usePersistedTagSelection from './use-persisted-tag-selection';
 

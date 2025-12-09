@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import classNames from 'classnames';
-import { CODEX_SLUG } from '@/utils/datasheet-supplements';
+import { CODEX_SLUG } from '@depot/core/utils/datasheets';
 import {
   DEFAULT_TAB_ACTIVE_CLASS,
   DEFAULT_TAB_INACTIVE_CLASS,

@@ -3,11 +3,11 @@
 Centralized testing utilities for consistent, reliable tests. Vitest runs in jsdom with React 19 + Router 7 future flags enabled via `TestWrapper`.
 
 ## Files
-- `mock-data.ts` — factory-backed mock data (factions, datasheets, rosters, stratagems, enhancements, etc.)
-- `test-utils.tsx` — `TestWrapper`, router helpers, mock providers
+- `mock-data.ts` - factory-backed mock data (factions, datasheets, rosters, stratagems, enhancements, etc.)
+- `test-utils.tsx` - `TestWrapper`, router helpers, mock providers
 
 ## Rules
-- Always render with `TestWrapper`: `render(<Component />, { wrapper: TestWrapper });`
+- Prefer rendering with `TestWrapper`: `render(<Component />, { wrapper: TestWrapper });` (MemoryRouter + AppProvider + Layout/Toast providers). For flows that depend on `RosterProvider`, wrap with an additional provider in the test.
 - Prefer factory mocks (`mockDatasheet`, `createMockFaction`, etc.) over ad-hoc inline objects.
 - Use `data-testid` for stable selectors instead of text matching.
 
