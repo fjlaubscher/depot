@@ -7,7 +7,7 @@ import { Tag, TagSection, TagGroup } from '@/components/ui';
 import { DatasheetComposition } from '@/components/shared';
 
 // utils
-import { groupKeywords } from '@/utils/keywords';
+import { groupKeywords } from '@depot/core/utils/common';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;

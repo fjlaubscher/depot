@@ -1,70 +1,14 @@
-const normalizeBasePath = (value?: string | null): string => {
-  if (!value) {
-    return '';
-  }
-
-  const trimmed = value.trim();
-  if (!trimmed.length) {
-    return '';
-  }
-
-  const withoutTrailingSlashes = trimmed.replace(/\/+$/, '');
-  const withoutLeadingSlashes = withoutTrailingSlashes.replace(/^\/+/, '');
-
-  return withoutLeadingSlashes ? `/${withoutLeadingSlashes}` : '';
-};
-
-const DATA_ROOT = '/data';
-const IMAGE_ROOT = '/images';
-
-const normalizeDataSuffix = (value: string): string => value.replace(/^\/+/, '');
-
-export const getDataPath = (path: string): string => {
-  const trimmed = path.trim();
-  if (!trimmed) {
-    return DATA_ROOT;
-  }
-
-  const normalized = trimmed.replace(/\\/g, '/');
-  const normalizedLower = normalized.toLowerCase();
-
-  // Respect an explicit /data prefix, but ignore partial matches (e.g. "/datasheets")
-  if (normalizedLower === DATA_ROOT || normalizedLower.startsWith(`${DATA_ROOT}/`)) {
-    const suffix = normalized.slice(DATA_ROOT.length);
-    const sanitizedSuffix = normalizeDataSuffix(suffix);
-    return sanitizedSuffix ? `${DATA_ROOT}/${sanitizedSuffix}` : DATA_ROOT;
-  }
-
-  // If the path already contains a leading base path (e.g. "/depot/data/foo"), strip any leading
-  // segments before the data root and rebuild.
-  const dataIndex = normalizedLower.indexOf('/data/');
-  if (dataIndex > 0) {
-    const suffix = normalized.slice(dataIndex + DATA_ROOT.length);
-    const sanitizedSuffix = normalizeDataSuffix(suffix);
-    return sanitizedSuffix ? `${DATA_ROOT}/${sanitizedSuffix}` : DATA_ROOT;
-  }
-
-  let remainder = normalizeDataSuffix(normalized);
-
-  if (remainder.toLowerCase().startsWith('data/')) {
-    remainder = remainder.slice('data/'.length);
-  } else if (remainder.toLowerCase() === 'data') {
-    remainder = '';
-  }
-
-  const sanitizedRemainder = normalizeDataSuffix(remainder);
-  return sanitizedRemainder ? `${DATA_ROOT}/${sanitizedRemainder}` : DATA_ROOT;
-};
-
-export const getImagePath = (path: string): string => {
-  const trimmed = path.trim();
-  if (!trimmed) {
-    return IMAGE_ROOT;
-  }
-
-  const normalizedPath = trimmed.replace(/\\/g, '/');
-  return `${IMAGE_ROOT}/${normalizedPath}`;
-};
+import {
+  getAppBasePath as getAppBasePathCore,
+  getRouterBasePath as getRouterBasePathCore,
+  getViteBasePath as getViteBasePathCore,
+  getDataPath,
+  getImagePath,
+  getDataUrl as getDataUrlCore,
+  getImageUrl as getImageUrlCore,
+  getFactionManifestPath,
+  getDatasheetPath
+} from '@depot/core/utils/paths';
 
 const readConfiguredBasePath = (): string => {
   const fromImportMeta =
@@ -74,51 +18,26 @@ const readConfiguredBasePath = (): string => {
 
   const fromProcess = typeof process !== 'undefined' ? process.env?.VITE_APP_BASE_PATH : undefined;
 
-  return normalizeBasePath(fromImportMeta ?? fromProcess ?? '');
+  return fromImportMeta ?? fromProcess ?? '';
 };
 
-/**
- * Returns the application base path without a trailing slash.
- */
 export const getAppBasePath = (basePath?: string): string =>
-  normalizeBasePath(basePath ?? readConfiguredBasePath());
+  getAppBasePathCore(basePath ?? readConfiguredBasePath());
 
-/**
- * Returns the BrowserRouter base path (undefined in development for defaults).
- */
-export const getRouterBasePath = (basePath?: string): string | undefined => {
-  const normalizedBasePath = getAppBasePath(basePath);
-  return normalizedBasePath || undefined;
-};
+export const getRouterBasePath = (basePath?: string): string | undefined =>
+  getRouterBasePathCore(basePath ?? readConfiguredBasePath());
 
-/**
- * Returns the Vite base path, ensuring a trailing slash when the app is bundled.
- */
-export const getViteBasePath = (basePath?: string): string => {
-  const normalizedBasePath = getAppBasePath(basePath);
-  return normalizedBasePath ? `${normalizedBasePath}/` : '/';
-};
+export const getViteBasePath = (basePath?: string): string =>
+  getViteBasePathCore(basePath ?? readConfiguredBasePath());
 
-/**
- * Constructs a data URL with the correct base path.
- */
-export const getDataUrl = (path: string, basePath?: string): string => {
-  const normalizedBasePath = getAppBasePath(basePath);
-  const normalizedPath = getDataPath(path);
+export const getDataUrl = (path: string, basePath?: string): string =>
+  getDataUrlCore(path, basePath ?? readConfiguredBasePath());
 
-  return `${normalizedBasePath}${normalizedPath}`;
-};
+export const getImageUrl = (path: string, basePath?: string): string =>
+  getImageUrlCore(path, basePath ?? readConfiguredBasePath());
 
-export const getImageUrl = (path: string, basePath?: string): string => {
-  const normalizedBasePath = getAppBasePath(basePath);
-  const normalizedPath = getImagePath(path);
+export { getDataPath, getImagePath, getFactionManifestPath, getDatasheetPath };
 
-  return `${normalizedBasePath}${normalizedPath}`;
-};
-
-/**
- * Builds an absolute URL for the app, respecting any configured base path.
- */
 export const buildAbsoluteUrl = (path: string = '/'): string => {
   const normalizedBasePath = getAppBasePath();
   const sanitizedPath = path.startsWith('/') ? path : `/${path}`;
@@ -131,9 +50,3 @@ export const buildAbsoluteUrl = (path: string = '/'): string => {
 
   return origin ? `${origin}${relativePath}` : relativePath;
 };
-
-export const getFactionManifestPath = (slug: string): string =>
-  getDataPath(`factions/${slug}/faction.json`);
-
-export const getDatasheetPath = (factionSlug: string, datasheetId: string): string =>
-  getDataPath(`factions/${factionSlug}/datasheets/${datasheetId}.json`);

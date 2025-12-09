@@ -1,22 +1,16 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { buildAbsoluteUrl } from './paths';
 
-import {
-  getAppBasePath,
-  getDataPath,
-  getDataUrl,
-  getDatasheetPath,
-  getFactionManifestPath,
-  getRouterBasePath,
-  getViteBasePath
-} from './paths';
+const originalWindow = globalThis.window;
+const originalProcessBasePath = process.env.VITE_APP_BASE_PATH;
+const originalImportMetaBasePath = import.meta.env.VITE_APP_BASE_PATH;
 
 const setBasePath = (value?: string) => {
   if (typeof value === 'string') {
+    process.env.VITE_APP_BASE_PATH = value;
     if (!import.meta.env) {
       (import.meta as { env: Record<string, string> }).env = {} as Record<string, string>;
     }
-
-    process.env.VITE_APP_BASE_PATH = value;
     (import.meta.env as Record<string, string>).VITE_APP_BASE_PATH = value;
     return;
   }
@@ -27,11 +21,9 @@ const setBasePath = (value?: string) => {
   }
 };
 
-describe('paths helpers', () => {
-  const originalProcessBasePath = process.env.VITE_APP_BASE_PATH;
-  const originalImportMetaBasePath = import.meta.env.VITE_APP_BASE_PATH;
-
+describe('buildAbsoluteUrl', () => {
   afterEach(() => {
+    globalThis.window = originalWindow;
     setBasePath(undefined);
 
     if (typeof originalProcessBasePath === 'string') {
@@ -43,41 +35,29 @@ describe('paths helpers', () => {
     }
   });
 
-  it('returns defaults when no base path is configured', () => {
-    setBasePath();
+  it('builds URLs using window origin', () => {
+    globalThis.window = {
+      location: {
+        origin: 'https://depothub.app'
+      }
+    } as Window & typeof globalThis;
 
-    expect(getAppBasePath()).toBe('');
-    expect(getDataPath('index.json')).toBe('/data/index.json');
-    expect(getDataPath('/data/index.json')).toBe('/data/index.json');
-    expect(getRouterBasePath()).toBeUndefined();
-    expect(getViteBasePath()).toBe('/');
-    expect(getDataUrl('units.json')).toBe('/data/units.json');
+    expect(buildAbsoluteUrl('/faction')).toBe('https://depothub.app/faction');
   });
 
-  it('normalises the configured base path', () => {
-    setBasePath('/depot/');
+  it('respects configured base path', () => {
+    setBasePath('/depot');
+    globalThis.window = {
+      location: {
+        origin: 'https://depothub.app'
+      }
+    } as Window & typeof globalThis;
 
-    expect(getAppBasePath()).toBe('/depot');
-    expect(getDataPath('/depot/data/units.json')).toBe('/data/units.json');
-    expect(getRouterBasePath()).toBe('/depot');
-    expect(getViteBasePath()).toBe('/depot/');
-    expect(getDataUrl('units.json')).toBe('/depot/data/units.json');
+    expect(buildAbsoluteUrl('/faction')).toBe('https://depothub.app/depot/faction');
   });
 
-  it('handles leading slashes when building data URLs', () => {
-    setBasePath('/depot/');
-
-    expect(getDataPath('//units.json')).toBe('/data/units.json');
-    expect(getDataUrl('/data/units.json')).toBe('/depot/data/units.json');
-    expect(getDataUrl('//units.json')).toBe('/depot/data/units.json');
-  });
-
-  it('builds nested faction and datasheet paths', () => {
-    expect(getFactionManifestPath('space-marines')).toBe(
-      '/data/factions/space-marines/faction.json'
-    );
-    expect(getDatasheetPath('space-marines', '123')).toBe(
-      '/data/factions/space-marines/datasheets/123.json'
-    );
+  it('returns relative path when window is unavailable', () => {
+    globalThis.window = undefined as unknown as Window & typeof globalThis;
+    expect(buildAbsoluteUrl('/faction')).toBe('/faction');
   });
 });

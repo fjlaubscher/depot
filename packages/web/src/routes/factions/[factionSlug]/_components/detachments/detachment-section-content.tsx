@@ -4,7 +4,7 @@ import StratagemCard from '@/components/shared/stratagem-card';
 import EnhancementCard from '../enhancement-card';
 import DetachmentAbilityCard from '../detachment-ability-card';
 import type { DetachmentSectionKey } from './types';
-import { sortByName } from '@/utils/array';
+import { sortByName } from '@depot/core/utils/common';
 
 interface DetachmentSectionContentProps {
   abilities: depot.DetachmentAbility[];

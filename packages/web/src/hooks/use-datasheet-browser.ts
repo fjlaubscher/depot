@@ -5,7 +5,7 @@ import {
   filterDatasheetsBySettings,
   groupDatasheetsByRole
 } from '@depot/core/utils/datasheets';
-import { sortByName } from '@/utils/array';
+import { sortByName } from '@depot/core/utils/common';
 import useDebounce from './use-debounce';
 import usePersistedTagSelection from './use-persisted-tag-selection';
 

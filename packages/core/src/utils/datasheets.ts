@@ -1,4 +1,5 @@
 import type { Datasheet, DatasheetSummary } from '../types/depot.js';
+import { sortByName } from './common/index.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
 
@@ -18,24 +19,6 @@ export interface SupplementMetadata {
   hasCodexDatasheets: boolean;
   options: SupplementOption[];
 }
-
-const normalizeName = (value: string | undefined) => (value ?? '').toLowerCase();
-
-const sortByName = <T extends { name: string }>(items: T[]): T[] =>
-  items
-    .filter((item): item is T => Boolean(item))
-    .slice()
-    .sort((a, b) => {
-      const nameA = normalizeName(a.name);
-      const nameB = normalizeName(b.name);
-      if (nameA < nameB) {
-        return -1;
-      }
-      if (nameA > nameB) {
-        return 1;
-      }
-      return 0;
-    });
 
 export const groupDatasheetsByRole = <T extends DatasheetListItem>(datasheets: T[]) => {
   const dictionary: Record<string, T[]> = {};

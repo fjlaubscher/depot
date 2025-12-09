@@ -3,7 +3,7 @@ import type { depot } from '@depot/core';
 import DetachmentAbilityCard from '@/routes/factions/[factionSlug]/_components/detachment-ability-card';
 import EnhancementCard from '@/routes/factions/[factionSlug]/_components/enhancement-card';
 import StratagemCard from '@/components/shared/stratagem-card';
-import { sortByName } from '@/utils/array';
+import { sortByName } from '@depot/core/utils/common';
 
 interface DetachmentTabProps {
   detachment: depot.Detachment;

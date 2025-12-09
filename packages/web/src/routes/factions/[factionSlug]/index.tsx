@@ -13,7 +13,7 @@ import useSettings from '@/hooks/use-settings';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 // Utils
-import { getFactionAlliance } from '@/utils/faction';
+import { getFactionAlliance } from '@depot/core/utils/common';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
 
