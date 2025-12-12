@@ -193,7 +193,8 @@ describe('FactionsProvider', () => {
     });
 
     expect(mockOfflineStorage.getFactionIndex).toHaveBeenCalled();
-    expect(global.fetch).not.toHaveBeenCalledWith('/data/index.json');
+    // Boot-time update check still refreshes the index in the background.
+    expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
   });
 
   it('falls back to network when IndexedDB is empty', async () => {
@@ -213,7 +214,7 @@ describe('FactionsProvider', () => {
     expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
   });
 
-  it('clears cached faction data when data version changes', async () => {
+  it('refreshes index and updates data version when version changes', async () => {
     mockOfflineStorage.getDataVersion.mockResolvedValue('legacy-version');
     mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
 
@@ -224,9 +225,11 @@ describe('FactionsProvider', () => {
     );
 
     await waitFor(() => {
-      expect(mockOfflineStorage.clearFactionData).toHaveBeenCalledTimes(1);
+      expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
       expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
     });
+
+    expect(mockOfflineStorage.clearFactionData).not.toHaveBeenCalled();
   });
 
   it('loads offline factions list on initialization', async () => {
@@ -255,10 +258,16 @@ describe('FactionsProvider', () => {
     mockOfflineStorage.getFactionManifest.mockResolvedValue(null);
     mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
     (global.fetch as unknown as Mock).mockReset();
-    (global.fetch as unknown as Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockManifest
-    });
+    // Boot-time update check refreshes the index first.
+    (global.fetch as unknown as Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockFactionIndex
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockManifest
+      });
 
     render(
       <FactionsProvider>
@@ -284,14 +293,20 @@ describe('FactionsProvider', () => {
     (global.fetch as any).mockReset();
     mockOfflineStorage.getFactionManifest.mockResolvedValue(mockManifest);
     mockOfflineStorage.getDatasheet.mockResolvedValue(null);
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockFactionIndex
-    });
-    (global.fetch as any).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockDatasheet
-    });
+    // Initial provider mount triggers two index fetches (init + boot update check).
+    (global.fetch as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockFactionIndex
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockFactionIndex
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockDatasheet
+      });
 
     render(
       <FactionsProvider>

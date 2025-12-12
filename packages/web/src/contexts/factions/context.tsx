@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useCallback, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useEffect, useReducer, useRef } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
@@ -16,6 +16,7 @@ interface FactionsProviderProps {
 
 export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(factionsReducer, initialFactionsState);
+  const hasBootCheckedUpdatesRef = useRef(false);
 
   const resolveIndexDataVersion = useCallback(
     (index?: depot.Index[] | null): string | null =>
@@ -194,13 +195,10 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         Boolean(refreshedDataVersion) && refreshedDataVersion !== currentVersion;
 
       if (versionChanged) {
-        await resetOfflineData();
-        const latestIndex = await fetchAndCacheIndex();
-        const latestDataVersion = resolveIndexDataVersion(latestIndex);
+        // Index and version changed; refresh the index but keep cached manifests/datasheets.
+        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: refreshedIndex });
 
-        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: latestIndex });
-
-        const effectiveVersion = latestDataVersion ?? null;
+        const effectiveVersion = refreshedDataVersion ?? null;
         if (effectiveVersion) {
           try {
             await offlineStorage.setDataVersion(effectiveVersion);
@@ -281,13 +279,9 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         }
 
         if (dataVersion && storedVersion !== dataVersion) {
-          console.info('Resetting offline cache due to data version change', {
-            storedVersion,
-            dataVersion
-          });
-          await resetOfflineData();
-          index = await fetchAndCacheIndex();
-          dataVersion = resolveIndexDataVersion(index);
+          // Cached index is from a different version; don't clear cached faction data.
+          // We'll fetch the latest index on boot to patch IndexedDB.
+          storedVersion = dataVersion;
         }
 
         if (index) {
@@ -322,6 +316,15 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
 
     void initializeData();
   }, [fetchAndCacheIndex, refreshOfflineFactions, resetOfflineData, resolveIndexDataVersion]);
+
+  useEffect(() => {
+    if (hasBootCheckedUpdatesRef.current) {
+      return;
+    }
+
+    hasBootCheckedUpdatesRef.current = true;
+    void checkForDataUpdates();
+  }, [checkForDataUpdates]);
 
   const value: FactionsContextType = {
     state,
