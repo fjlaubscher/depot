@@ -1,11 +1,13 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useCallback, useEffect, useReducer, useRef } from 'react';
+import { createContext, useCallback, useEffect, useReducer } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
 import { normalizeDatasheetWargear } from '@depot/core/utils/wargear';
 import { FACTIONS_ACTIONS } from './constants';
 import { factionsReducer, initialFactionsState } from './reducer';
+import { syncFactionIndex } from './index-sync';
+import { appendSearchParam } from './url';
 import type { FactionsContextType } from './types';
 
 const FactionsContext = createContext<FactionsContextType | undefined>(undefined);
@@ -16,30 +18,16 @@ interface FactionsProviderProps {
 
 export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(factionsReducer, initialFactionsState);
-  const hasBootCheckedUpdatesRef = useRef(false);
 
-  const resolveIndexDataVersion = useCallback(
-    (index?: depot.Index[] | null): string | null =>
-      index?.find((entry) => Boolean(entry.dataVersion))?.dataVersion ?? null,
-    []
-  );
-
-  const fetchAndCacheIndex = useCallback(async (): Promise<depot.Index[]> => {
+  const fetchIndex = useCallback(async (): Promise<depot.Index[]> => {
     const indexPath = getDataPath('index.json');
-    const response = await fetch(getDataUrl(indexPath));
+    const url = appendSearchParam(getDataUrl(indexPath), 't', Date.now().toString());
+    const response = await fetch(url, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error('Failed to load faction index');
     }
 
-    const fetchedIndex = (await response.json()) as depot.Index[];
-
-    try {
-      await offlineStorage.setFactionIndex(fetchedIndex);
-    } catch (cacheError) {
-      console.warn('Failed to cache faction index:', cacheError);
-    }
-
-    return fetchedIndex;
+    return (await response.json()) as depot.Index[];
   }, []);
 
   const resetOfflineData = useCallback(async () => {
@@ -77,8 +65,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         const shouldUseCached =
           cachedManifest &&
           (!currentVersion ||
-            !cachedManifest.dataVersion ||
-            cachedManifest.dataVersion === currentVersion);
+            (Boolean(cachedManifest.dataVersion) && cachedManifest.dataVersion === currentVersion));
 
         if (shouldUseCached) {
           return cachedManifest;
@@ -87,22 +74,30 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         const path = getFactionManifestPath(slug);
         const resolvedPath = indexEntry?.path ? getDataPath(indexEntry.path) : path;
 
-        const response = await fetch(getDataUrl(resolvedPath));
+        const manifestUrlBase = getDataUrl(resolvedPath);
+        const manifestUrl = state.dataVersion
+          ? appendSearchParam(manifestUrlBase, 'v', state.dataVersion)
+          : manifestUrlBase;
+        const response = await fetch(manifestUrl, { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Failed to load faction ${slug}`);
         }
 
         const manifest = (await response.json()) as depot.FactionManifest;
+        const manifestWithVersion =
+          !manifest.dataVersion && state.dataVersion
+            ? { ...manifest, dataVersion: state.dataVersion }
+            : manifest;
 
         try {
-          await offlineStorage.setFactionManifest(slug, manifest);
+          await offlineStorage.setFactionManifest(slug, manifestWithVersion);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
           dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache faction manifest in IndexedDB:', cacheError);
         }
 
-        return manifest;
+        return manifestWithVersion;
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Failed to load faction ${key}:`, error);
@@ -138,7 +133,11 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         }
 
         const path = getDataPath(reference.path || getDatasheetPath(manifest.slug, reference.id));
-        const response = await fetch(getDataUrl(path));
+        const datasheetUrlBase = getDataUrl(path);
+        const datasheetUrl = state.dataVersion
+          ? appendSearchParam(datasheetUrlBase, 'v', state.dataVersion)
+          : datasheetUrlBase;
+        const response = await fetch(datasheetUrl, { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Failed to load datasheet ${reference.id}`);
         }
@@ -167,143 +166,42 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   );
 
   const clearOfflineData = async () => {
-    try {
-      await resetOfflineData();
-      dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
-    } catch (error) {
-      throw error;
-    }
+    await resetOfflineData();
+    dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
   };
 
-  const checkForDataUpdates = useCallback(async (): Promise<{
-    updated: boolean;
-    dataVersion: string | null;
-  }> => {
+  const checkForDataUpdates = useCallback(async () => {
     try {
-      const refreshedIndex = await fetchAndCacheIndex();
-      const refreshedDataVersion = resolveIndexDataVersion(refreshedIndex);
+      const result = await syncFactionIndex({
+        fetchIndex,
+        storage: offlineStorage,
+        resetOfflineData
+      });
 
-      let storedVersion: string | null = null;
-      try {
-        storedVersion = await offlineStorage.getDataVersion();
-      } catch (error) {
-        console.warn('Failed to read stored data version while checking for updates.', error);
-      }
+      dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: result.index });
+      dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: result.dataVersion });
 
-      const currentVersion = state.dataVersion ?? storedVersion ?? null;
-      const versionChanged =
-        Boolean(refreshedDataVersion) && refreshedDataVersion !== currentVersion;
-
-      if (versionChanged) {
-        // Index and version changed; refresh the index but keep cached manifests/datasheets.
-        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: refreshedIndex });
-
-        const effectiveVersion = refreshedDataVersion ?? null;
-        if (effectiveVersion) {
-          try {
-            await offlineStorage.setDataVersion(effectiveVersion);
-          } catch (persistError) {
-            console.warn('Failed to persist data version marker.', persistError);
-          }
-        }
-
-        dispatch({
-          type: FACTIONS_ACTIONS.SET_DATA_VERSION,
-          payload: effectiveVersion
-        });
-
-        await refreshOfflineFactions();
-
-        return { updated: true, dataVersion: effectiveVersion };
-      }
-
-      if (!state.factionIndex) {
-        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: refreshedIndex });
-      }
-
-      if (!state.dataVersion && refreshedDataVersion) {
-        try {
-          await offlineStorage.setDataVersion(refreshedDataVersion);
-        } catch (persistError) {
-          console.warn('Failed to persist data version marker.', persistError);
-        }
-        dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: refreshedDataVersion });
-      }
-
-      return { updated: false, dataVersion: refreshedDataVersion ?? currentVersion };
+      await refreshOfflineFactions();
+      return { updated: result.updated, dataVersion: result.dataVersion };
     } catch (error) {
       console.error('Failed to check for data updates:', error);
       return { updated: false, dataVersion: state.dataVersion };
     }
-  }, [
-    fetchAndCacheIndex,
-    refreshOfflineFactions,
-    resetOfflineData,
-    resolveIndexDataVersion,
-    state.dataVersion,
-    state.factionIndex
-  ]);
+  }, [fetchIndex, refreshOfflineFactions, resetOfflineData, state.dataVersion]);
 
   useEffect(() => {
     const initializeData = async () => {
       dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_START });
 
       try {
-        let storedVersion: string | null = null;
-        let versionReadError: unknown = null;
+        const { index, dataVersion } = await syncFactionIndex({
+          fetchIndex,
+          storage: offlineStorage,
+          resetOfflineData
+        });
 
-        try {
-          storedVersion = await offlineStorage.getDataVersion();
-        } catch (versionError) {
-          versionReadError = versionError;
-          console.warn('Failed to verify cached data version, forcing reset.', versionError);
-        }
-
-        const loadIndexFromCache = async (): Promise<depot.Index[]> => {
-          const cachedIndex = await offlineStorage.getFactionIndex();
-          if (cachedIndex && cachedIndex.length > 0) {
-            return cachedIndex;
-          }
-          return fetchAndCacheIndex();
-        };
-
-        let index = await loadIndexFromCache();
-
-        let dataVersion = resolveIndexDataVersion(index);
-
-        if (versionReadError) {
-          await resetOfflineData();
-          index = await fetchAndCacheIndex();
-          dataVersion = resolveIndexDataVersion(index);
-          storedVersion = dataVersion ?? storedVersion;
-        }
-
-        if (dataVersion && storedVersion !== dataVersion) {
-          // Cached index is from a different version; don't clear cached faction data.
-          // We'll fetch the latest index on boot to patch IndexedDB.
-          storedVersion = dataVersion;
-        }
-
-        if (index) {
-          dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
-
-          const effectiveDataVersion = dataVersion ?? storedVersion ?? null;
-
-          if (effectiveDataVersion) {
-            try {
-              await offlineStorage.setDataVersion(effectiveDataVersion);
-            } catch (persistError) {
-              console.warn('Failed to persist data version marker.', persistError);
-            }
-          }
-
-          dispatch({
-            type: FACTIONS_ACTIONS.SET_DATA_VERSION,
-            payload: effectiveDataVersion
-          });
-        } else {
-          throw new Error('No faction index found');
-        }
+        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
+        dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: dataVersion });
       } catch (error) {
         dispatch({
           type: FACTIONS_ACTIONS.LOAD_INDEX_ERROR,
@@ -315,15 +213,22 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
     };
 
     void initializeData();
-  }, [fetchAndCacheIndex, refreshOfflineFactions, resetOfflineData, resolveIndexDataVersion]);
+  }, [fetchIndex, refreshOfflineFactions, resetOfflineData]);
 
   useEffect(() => {
-    if (hasBootCheckedUpdatesRef.current) {
-      return;
-    }
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void checkForDataUpdates();
+      }
+    };
 
-    hasBootCheckedUpdatesRef.current = true;
-    void checkForDataUpdates();
+    window.addEventListener('online', checkForDataUpdates);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('online', checkForDataUpdates);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [checkForDataUpdates]);
 
   const value: FactionsContextType = {

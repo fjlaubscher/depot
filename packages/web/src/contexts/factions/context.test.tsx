@@ -179,8 +179,9 @@ describe('FactionsProvider', () => {
     vi.restoreAllMocks();
   });
 
-  it('loads faction index from IndexedDB first', async () => {
+  it('falls back to IndexedDB when the network request fails', async () => {
     mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+    (global.fetch as any).mockRejectedValueOnce(new Error('network down'));
 
     render(
       <FactionsProvider>
@@ -193,8 +194,11 @@ describe('FactionsProvider', () => {
     });
 
     expect(mockOfflineStorage.getFactionIndex).toHaveBeenCalled();
-    // Boot-time update check still refreshes the index in the background.
-    expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/data\/index\.json\?t=\d+$/),
+      expect.anything()
+    );
+    expect(mockOfflineStorage.setFactionIndex).not.toHaveBeenCalled();
   });
 
   it('falls back to network when IndexedDB is empty', async () => {
@@ -210,7 +214,10 @@ describe('FactionsProvider', () => {
       expect(screen.getByTestId('faction-count')).toHaveTextContent('2');
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/data/index.json');
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringMatching(/^\/data\/index\.json\?t=\d+$/),
+      expect.anything()
+    );
     expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
   });
 
@@ -229,7 +236,7 @@ describe('FactionsProvider', () => {
       expect(mockOfflineStorage.setDataVersion).toHaveBeenCalledWith(MOCK_DATA_VERSION);
     });
 
-    expect(mockOfflineStorage.clearFactionData).not.toHaveBeenCalled();
+    expect(mockOfflineStorage.clearFactionData).toHaveBeenCalled();
   });
 
   it('loads offline factions list on initialization', async () => {
@@ -258,7 +265,6 @@ describe('FactionsProvider', () => {
     mockOfflineStorage.getFactionManifest.mockResolvedValue(null);
     mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
     (global.fetch as unknown as Mock).mockReset();
-    // Boot-time update check refreshes the index first.
     (global.fetch as unknown as Mock)
       .mockResolvedValueOnce({
         ok: true,
@@ -275,6 +281,10 @@ describe('FactionsProvider', () => {
       </FactionsProvider>
     );
 
+    await waitFor(() => {
+      expect(screen.getByTestId('faction-count')).toHaveTextContent('2');
+    });
+
     const loadButton = screen.getByTestId('load-manifest');
     await act(async () => {
       loadButton.click();
@@ -289,16 +299,55 @@ describe('FactionsProvider', () => {
     });
   });
 
-  it('fetches datasheet from network and caches when not in IndexedDB', async () => {
-    (global.fetch as any).mockReset();
+  it('refetches cached manifest without a version when current version is known', async () => {
     mockOfflineStorage.getFactionManifest.mockResolvedValue(mockManifest);
-    mockOfflineStorage.getDatasheet.mockResolvedValue(null);
-    // Initial provider mount triggers two index fetches (init + boot update check).
-    (global.fetch as any)
+    mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
+
+    (global.fetch as unknown as Mock).mockReset();
+    (global.fetch as unknown as Mock)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockFactionIndex
       })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockManifest
+      });
+
+    render(
+      <FactionsProvider>
+        <TestComponent />
+      </FactionsProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('data-version')).toHaveTextContent(MOCK_DATA_VERSION);
+    });
+
+    const loadButton = screen.getByTestId('load-manifest');
+    await act(async () => {
+      loadButton.click();
+    });
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /^\/data\/factions\/test-faction\/faction\.json\?v=2025-11-29T02%3A05%3A23$/
+        ),
+        expect.anything()
+      );
+      expect(mockOfflineStorage.setFactionManifest).toHaveBeenCalledWith(
+        'test-faction',
+        expect.objectContaining({ dataVersion: MOCK_DATA_VERSION })
+      );
+    });
+  });
+
+  it('fetches datasheet from network and caches when not in IndexedDB', async () => {
+    (global.fetch as any).mockReset();
+    mockOfflineStorage.getFactionManifest.mockResolvedValue(mockManifest);
+    mockOfflineStorage.getDatasheet.mockResolvedValue(null);
+    (global.fetch as any)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockFactionIndex
