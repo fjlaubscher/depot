@@ -187,4 +187,7 @@ const init = async () => {
 
 init()
   .then(() => log('Done!'))
-  .catch((e) => logError('CLI failed', e));
+  .catch((e) => {
+    logError('CLI failed', e);
+    process.exit(1);
+  });

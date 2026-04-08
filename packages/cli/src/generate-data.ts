@@ -165,9 +165,6 @@ const buildDatasheet = (
   const supplementLabel = buildSupplementLabel(supplementInfo?.slug, supplementInfo?.name);
   const isSupplement = supplementKey !== CODEX_SLUG;
   const source = data.sources.find((entry) => entry.id === datasheet.sourceId);
-  if (!source) {
-    throw new Error(`Missing source for datasheet ${datasheet.id} (${datasheet.name})`);
-  }
 
   const keywords = data.datasheetKeywords.filter(
     (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
@@ -262,7 +259,7 @@ const buildDatasheet = (
     supplementLabel,
     isSupplement,
     roleLabel: formatRoleLabel(datasheet.role) ?? datasheet.role,
-    sourceName: `${source.type}: ${source.name}`,
+    sourceName: source ? `${source.type}: ${source.name}` : undefined,
     isForgeWorld,
     isLegends
   };

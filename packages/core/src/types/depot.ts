@@ -127,7 +127,7 @@ export interface Datasheet {
   factionId: string;
   factionSlug: string;
   sourceId: string;
-  sourceName: string;
+  sourceName?: string;
   /**
    * Normalized supplement identifier (lowercase). Defaults to 'codex' when absent.
    */
