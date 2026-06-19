@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import Card from '../card';
 
-interface LinkCardProps
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'children' | 'className'> {
+interface LinkCardProps extends Omit<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
+  'href' | 'children' | 'className'
+> {
   to: string;
   children: ReactNode;
   className?: string;

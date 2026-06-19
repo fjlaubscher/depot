@@ -114,7 +114,11 @@ export default defineConfig(({ mode }) => {
         org: env.VITE_SENTRY_ORG,
         project: env.VITE_SENTRY_PROJECT,
         authToken: env.VITE_SENTRY_AUTH_TOKEN,
-        release: { name: env.VITE_SENTRY_RELEASE, create: true },
+        release: {
+          name: env.VITE_SENTRY_RELEASE,
+          create: true,
+          deploy: { env: env.VITE_SENTRY_ENVIRONMENT || 'production' }
+        },
         sourcemaps: {
           assets: [`${distPath}/**`],
           rewriteSources: (source) => `${urlPrefix}${source}`
