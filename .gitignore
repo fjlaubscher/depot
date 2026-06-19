@@ -33,3 +33,13 @@ playwright/.auth/
 test-results/
 .dev.vars
 docs
+
+# design-sync (claude.ai/design) — staged scripts, build output, machine state
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+# generated build inputs (reproduced by .design-sync/prepare-build.mjs)
+packages/web/.ds-entry.tsx
+packages/web/.ds-providers.tsx
