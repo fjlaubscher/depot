@@ -2,7 +2,7 @@ import { type ReactNode, useMemo, useState } from 'react';
 import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datasheet-browser';
 import { useSupplementSelectionGuard } from '@/hooks/use-supplement-selection-guard';
 import { useSupplementState } from '@/hooks/use-supplement-state';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import DatasheetSupplementTabs, {
   type SupplementTab as SupplementTabsOption
 } from './datasheet-supplement-tabs';

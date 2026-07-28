@@ -17,7 +17,7 @@ Fetches Wahapedia CSV exports and converts them into the JSON payloads the PWA c
 1. **Fetch** (`src/index.ts`): Downloads CSVs from URLs in `src/config/supplements.ts`.
 2. **Convert** (`src/convert-to-json.ts`): Transforms CSV -> JSON with cleaning/normalization.
 3. **Generate** (`src/generate-data.ts`): Builds faction-level payloads and navigation index consumed by the web app.
-   - Forge World / Legends flags flow through `buildSourceClassifier` (`src/utils/source-classification.ts`); extend this helper instead of adding ad-hoc string matching.
+   - Forge World / Legends flags are derived from source names inline in `buildDatasheet` (`src/generate-data.ts`).
 
 ## Output
 - `dist/json/` — individual converted CSV files

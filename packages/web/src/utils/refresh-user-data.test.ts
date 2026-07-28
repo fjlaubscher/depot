@@ -69,8 +69,7 @@ describe('refresh-user-data utilities', () => {
         datasheetSlug: 'unit-one'
       }
     ],
-    enhancements: [],
-    cogitatorAnalysis: null
+    enhancements: []
   };
 
   const baseCollection: depot.Collection = {

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, web, and workers packages).
+Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and web packages).
 
 ## Workspace Layout
 | Package | Path | Purpose |
@@ -8,7 +8,6 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, web
 | `@depot/core` | `packages/core` | Type definitions + shared utilities (single source of truth) |
 | `@depot/cli` | `packages/cli` | Fetches Wahapedia CSV exports and emits cleaned JSON |
 | `@depot/web` | `packages/web` | React PWA that ships the experience + offline cache |
-| `@depot/workers` | `packages/workers` | Cloudflare Workers handlers + shared server-side logic (e.g. roster analysis) |
 | Scripts | `scripts/*.mjs` | Supporting utilities (e.g., data copy helper) |
 
 ## Common Commands
@@ -31,10 +30,10 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, web
 ### Scripts
 - `scripts/copy-data.mjs` deletes the existing `packages/web/public/data` directory, then copies `packages/cli/dist/data` into it. It runs automatically in `pnpm start` and `pnpm build`; manual runs are rarely needed.
 
-## Workers + API
-- Cloudflare Pages/Workers entrypoints live under the root `functions/` directory; files there should be thin adapters that forward to handlers in `@depot/workers`.
-- `@depot/workers` is pure ESM (NodeNext); avoid Node-only APIs (`fs`, `net`, etc.) and rely on Web-standard APIs supported by Cloudflare Workers.
-- Local iteration: `pnpm --filter @depot/workers build`, `dev`, `test` — see `packages/workers/AGENTS.md` for details.
+## Functions
+- Cloudflare Pages Functions live under the root `functions/` directory (currently just `[[path]].ts`, which injects og/meta tags for faction and datasheet routes).
+- Code there runs on the Pages runtime: rely on Web-standard APIs only (no Node built-ins).
+- Local iteration: `pnpm dev:wrangler` serves the built web app through the Pages runtime.
 
 ## Type System
 - Canonical types live in `@depot/core/src/types/depot.ts` and `@depot/core/src/types/wahapedia.ts`.

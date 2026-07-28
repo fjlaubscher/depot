@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 
 import { TestWrapper } from '@/test/test-utils';
-import usePersistedTagSelection, { persistTagSelection } from './use-persisted-tag-selection';
+import usePersistedTagSelection from './use-persisted-tag-selection';
 
 describe('usePersistedTagSelection', () => {
   const storageKey = 'test-tag-selection';
@@ -20,7 +20,7 @@ describe('usePersistedTagSelection', () => {
   });
 
   it('restores a stored value', () => {
-    persistTagSelection(storageKey, 'stored');
+    localStorage.setItem(`depot:tag-selection:${storageKey}`, 'stored');
 
     const { result } = renderHook(() => usePersistedTagSelection<string>(storageKey, 'all'), {
       wrapper: TestWrapper

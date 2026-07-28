@@ -6,11 +6,8 @@ import {
   deriveSupplementMetadata,
   filterDatasheetsBySettings,
   filterDatasheetsBySupplement,
-  formatDetachmentOptionLabel,
-  formatDetachmentSupplementLabel,
   getSupplementKey,
   groupDatasheetsByRole,
-  isCodexEntry,
   isSupplementEntry,
   normalizeSupplementValue,
   shouldResetSupplementSelection,
@@ -95,12 +92,14 @@ describe('datasheet utils', () => {
       makeDatasheet({ slug: 'intercessors', supplementSlug: 'codex', supplementName: 'Codex' }),
       makeDatasheet({
         slug: 'death-company',
-        supplementSlug: 'blood-angels',
-        supplementName: 'Blood Angels'
+        supplementKey: 'blood-angels',
+        supplementName: 'Blood Angels',
+        isSupplement: true
       }),
       makeDatasheet({
         slug: 'ravenwing-black-knights',
-        supplementSlug: 'dark-angels'
+        supplementKey: 'dark-angels',
+        isSupplement: true
       })
     ];
 
@@ -166,22 +165,13 @@ describe('datasheet utils', () => {
     it('determines supplement identity helpers consistently', () => {
       const sheet = makeDatasheet({
         slug: 'supplement-unit',
-        supplementSlug: 'blood-angels'
+        supplementKey: 'blood-angels',
+        isSupplement: true
       });
       expect(normalizeSupplementValue(' Blood-Angels ')).toBe('blood-angels');
       expect(getSupplementKey(sheet)).toBe('blood-angels');
       expect(isSupplementEntry(sheet)).toBe(true);
-      expect(isCodexEntry(sheet.supplementSlug)).toBe(false);
-      expect(buildSupplementLabel(sheet.supplementSlug ?? '')).toBe('Blood Angels');
-    });
-
-    it('formats detachment labels for supplements', () => {
-      expect(formatDetachmentSupplementLabel('blood-angels-legends', 'Blood Angels Legends')).toBe(
-        'Blood Angels'
-      );
-      expect(formatDetachmentOptionLabel('Strike Force', 'blood-angels')).toBe(
-        'Strike Force [Blood Angels]'
-      );
+      expect(buildSupplementLabel(sheet.supplementKey ?? '')).toBe('Blood Angels');
     });
 
     it('sorts datasheets by supplement preference', () => {
@@ -190,12 +180,14 @@ describe('datasheet utils', () => {
         makeDatasheet({
           slug: 'blood-angels-unit',
           name: 'BA Unit',
-          supplementSlug: 'blood-angels'
+          supplementKey: 'blood-angels',
+          isSupplement: true
         }),
         makeDatasheet({
           slug: 'dark-angels-unit',
           name: 'DA Unit',
-          supplementSlug: 'dark-angels'
+          supplementKey: 'dark-angels',
+          isSupplement: true
         })
       ];
 

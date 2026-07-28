@@ -1,76 +1,23 @@
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
-/**
- * Maps ability type to pill badge styles used across the app.
- */
-export const getAbilityTypeBadge = (type: string): { text: string; color: string } => {
-  switch (type) {
-    case 'Core':
-      return {
-        text: 'Core',
-        color: 'surface-info-strong text-info-strong'
-      };
-    case 'Faction':
-      return {
-        text: 'Faction',
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
-      };
-    case 'Datasheet':
-      return {
-        text: 'Unit',
-        color: 'surface-success-strong text-success-strong'
-      };
-    case 'Wargear':
-      return {
-        text: 'Wargear',
-        color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
-      };
-    case 'Special (правая колонка)':
-    case 'Special':
-      return {
-        text: 'Special',
-        color: 'surface-danger-strong text-danger-strong'
-      };
-    case 'Fortification (левая колонка)':
-    case 'Fortification':
-      return {
-        text: 'Fortification',
-        color: 'surface-warning-strong text-warning-strong'
-      };
-    default:
-      return { text: type, color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' };
-  }
+interface AbilityTypeMeta {
+  label: string;
+  variant: TagVariant;
+}
+
+const ABILITY_TYPE_META: Record<string, AbilityTypeMeta> = {
+  Core: { label: 'Core', variant: 'primary' },
+  Faction: { label: 'Faction', variant: 'secondary' },
+  Datasheet: { label: 'Unit', variant: 'success' },
+  Wargear: { label: 'Wargear', variant: 'warning' },
+  Special: { label: 'Special', variant: 'danger' },
+  'Special (правая колонка)': { label: 'Special', variant: 'danger' },
+  Fortification: { label: 'Fortification', variant: 'warning' },
+  'Fortification (левая колонка)': { label: 'Fortification', variant: 'warning' }
 };
 
 /**
- * Converts ability type to a Tag variant for consistent styling.
+ * Maps ability type to the display label and Tag variant used across the app.
  */
-export const getAbilityTagVariant = (type: string): TagVariant => {
-  const normalized = type.toLowerCase();
-
-  if (normalized.includes('core')) {
-    return 'primary';
-  }
-
-  if (normalized.includes('faction')) {
-    return 'secondary';
-  }
-
-  if (normalized.includes('datasheet')) {
-    return 'success';
-  }
-
-  if (normalized.includes('wargear')) {
-    return 'warning';
-  }
-
-  if (normalized.includes('special')) {
-    return 'danger';
-  }
-
-  if (normalized.includes('fortification')) {
-    return 'warning';
-  }
-
-  return 'default';
-};
+export const getAbilityTypeMeta = (type: string): AbilityTypeMeta =>
+  ABILITY_TYPE_META[type] ?? { label: type, variant: 'default' };

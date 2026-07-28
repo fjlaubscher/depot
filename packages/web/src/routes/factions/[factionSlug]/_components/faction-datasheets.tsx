@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 
 // Components
 import { DatasheetBrowser } from '@/components/shared/datasheet';

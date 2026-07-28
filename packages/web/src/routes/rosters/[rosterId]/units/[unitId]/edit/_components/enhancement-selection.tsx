@@ -1,7 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface EnhancementSelectionProps {
   unit: depot.RosterUnit;
@@ -16,7 +16,7 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
   selectedEnhancements,
   onEnhancementChange
 }) => {
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const availableEnhancements = roster.detachment?.enhancements || [];
   const showFluff = settings.showFluff ?? true;
 

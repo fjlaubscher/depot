@@ -47,17 +47,10 @@ export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
     dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
   }, []);
 
-  // Clear all toasts
-  const clearAllToasts = useCallback(() => {
-    dispatch({ type: TOAST_ACTIONS.CLEAR_ALL_TOASTS });
-  }, []);
-
   const contextValue: ToastContextType = {
     state,
-    dispatch,
     showToast,
-    removeToast,
-    clearAllToasts
+    removeToast
   };
 
   return <ToastContext.Provider value={contextValue}>{children}</ToastContext.Provider>;

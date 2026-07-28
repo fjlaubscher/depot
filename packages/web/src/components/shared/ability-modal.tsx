@@ -5,7 +5,7 @@ import type { depot } from '@depot/core';
 
 import { IconButton, Tag } from '@/components/ui';
 import { formatAbilityName } from '@depot/core/utils/abilities';
-import { getAbilityTagVariant, getAbilityTypeBadge } from '@/utils/abilities';
+import { getAbilityTypeMeta } from '@/utils/abilities';
 
 interface AbilityModalProps {
   ability: depot.Ability | null;
@@ -38,8 +38,7 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
     return null;
   }
 
-  const badge = getAbilityTypeBadge(ability.type);
-  const tagVariant = getAbilityTagVariant(ability.type);
+  const { label: badgeLabel, variant: tagVariant } = getAbilityTypeMeta(ability.type);
   const abilityName = formatAbilityName(ability);
 
   return createPortal(
@@ -71,7 +70,7 @@ const AbilityModal: React.FC<AbilityModalProps> = ({ ability, open, onClose }) =
               {abilityName}
             </h2>
             <Tag variant={tagVariant} size="sm" className="self-start cursor-default">
-              {badge.text}
+              {badgeLabel}
             </Tag>
           </div>
           <IconButton

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  getAppBasePath,
+  normalizeBasePath,
   getDataPath,
   getDataUrl,
   getDatasheetPath,
@@ -11,7 +11,7 @@ import {
 
 describe('paths helpers', () => {
   it('returns defaults when no base path is configured', () => {
-    expect(getAppBasePath()).toBe('');
+    expect(normalizeBasePath()).toBe('');
     expect(getDataPath('index.json')).toBe('/data/index.json');
     expect(getDataPath('/data/index.json')).toBe('/data/index.json');
     expect(getRouterBasePath()).toBeUndefined();
@@ -20,7 +20,7 @@ describe('paths helpers', () => {
   });
 
   it('normalizes the provided base path', () => {
-    expect(getAppBasePath('/depot/')).toBe('/depot');
+    expect(normalizeBasePath('/depot/')).toBe('/depot');
     expect(getRouterBasePath('/depot/')).toBe('/depot');
     expect(getViteBasePath('/depot/')).toBe('/depot/');
     expect(getDataUrl('units.json', '/depot/')).toBe('/depot/data/units.json');

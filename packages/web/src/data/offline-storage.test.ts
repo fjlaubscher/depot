@@ -226,22 +226,6 @@ describe('OfflineStorage', () => {
       expect(mockObjectStore.getAll).toHaveBeenCalled();
     });
 
-    it('should normalize legacy single-entry array shape', async () => {
-      mockObjectStore.getAll.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          request.result = [mockFactionIndex];
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      const result = await offlineStorage.getFactionIndex();
-
-      expect(result).toEqual(mockFactionIndex);
-      expect(mockObjectStore.getAll).toHaveBeenCalled();
-    });
-
     it('should return null when no index exists', async () => {
       mockObjectStore.getAll.mockImplementation(() => {
         const request = { ...mockRequest };
@@ -494,22 +478,6 @@ describe('OfflineStorage', () => {
         'readwrite'
       );
       expect(mockObjectStore.clear).toHaveBeenCalledTimes(3);
-    });
-  });
-
-  describe('clearAllData', () => {
-    it('should clear all data from all stores', async () => {
-      mockObjectStore.clear.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      await expect(offlineStorage.clearAllData()).resolves.toBeUndefined();
-
-      expect(mockObjectStore.clear).toHaveBeenCalledTimes(7);
     });
   });
 
@@ -772,57 +740,6 @@ describe('OfflineStorage', () => {
       expect(saved.items[0].datasheet.unitComposition).toEqual([]);
       expect(saved.items[0].datasheet.options).toEqual([]);
       expect(saved.items[0].datasheet.modelCosts).toEqual([]);
-    });
-
-    it('should normalize datasheet fields when loading collections', async () => {
-      mockObjectStore.get.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          const stored = JSON.parse(JSON.stringify(mockCollection));
-          delete (stored.items[0].datasheet as any).unitComposition;
-          (stored.items[0].datasheet as any).options = undefined;
-          request.result = stored;
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      const result = await offlineStorage.getCollection('collection-1');
-
-      expect(result?.items[0].datasheet.unitComposition).toEqual([]);
-      expect(result?.items[0].datasheet.options).toEqual([]);
-    });
-  });
-
-  describe('isDataStale', () => {
-    it('should return true when no index exists', async () => {
-      mockObjectStore.getAll.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          request.result = [];
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      const result = await offlineStorage.isDataStale();
-
-      expect(result).toBe(true);
-    });
-
-    it('should return false when index exists', async () => {
-      mockObjectStore.getAll.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          request.result = mockFactionIndex;
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      const result = await offlineStorage.isDataStale();
-
-      expect(result).toBe(false);
     });
   });
 });

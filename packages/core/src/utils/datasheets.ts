@@ -1,5 +1,5 @@
 import type { Datasheet, DatasheetSummary } from '../types/depot.js';
-import { sortByName } from './common/index.js';
+import { groupBy, sortByName } from './common.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
 
@@ -21,23 +21,11 @@ export interface SupplementMetadata {
 }
 
 export const groupDatasheetsByRole = <T extends DatasheetListItem>(datasheets: T[]) => {
-  const dictionary: Record<string, T[]> = {};
-
-  datasheets.forEach((datasheet) => {
-    const role = datasheet.role;
-    const existing = dictionary[role];
-    if (existing) {
-      existing.push(datasheet);
-    } else {
-      dictionary[role] = [datasheet];
-    }
+  const grouped = groupBy(datasheets, (datasheet) => datasheet.role);
+  Object.keys(grouped).forEach((key) => {
+    grouped[key] = sortByName(grouped[key]);
   });
-
-  Object.keys(dictionary).forEach((key) => {
-    dictionary[key] = sortByName(dictionary[key]) as T[];
-  });
-
-  return dictionary;
+  return grouped;
 };
 
 export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
@@ -74,29 +62,9 @@ export const normalizeSupplementValue = (value: string | undefined | null) => {
   return normalized || CODEX_SLUG;
 };
 
-export const getSupplementKey = (sheet: DatasheetListItem) =>
-  sheet.supplementKey ?? normalizeSupplementValue(sheet.supplementSlug);
+export const getSupplementKey = (sheet: DatasheetListItem) => sheet.supplementKey ?? CODEX_SLUG;
 
-export const isSupplementEntry = (sheet: DatasheetListItem) => {
-  if (typeof sheet.isSupplement === 'boolean') {
-    return sheet.isSupplement;
-  }
-
-  const key = getSupplementKey(sheet);
-  return key !== CODEX_SLUG;
-};
-
-export const isCodexEntry = (slug?: string | null, isSupplement?: boolean) => {
-  if (typeof isSupplement === 'boolean') {
-    return !isSupplement;
-  }
-
-  if (!slug) {
-    return true;
-  }
-
-  return normalizeSupplementValue(slug) === CODEX_SLUG;
-};
+export const isSupplementEntry = (sheet: DatasheetListItem) => sheet.isSupplement === true;
 
 export const buildSupplementLabel = (slug: string, name?: string) => {
   const normalizedSlug = normalizeSupplementValue(slug);
@@ -175,72 +143,21 @@ export const filterDatasheetsBySupplement = <T extends DatasheetListItem>(
     return datasheets;
   }
 
-  const codexDatasheets: T[] = [];
-  const supplementDatasheets: T[] = [];
+  const matches = datasheets.filter((sheet) =>
+    isSupplementEntry(sheet)
+      ? getSupplementKey(sheet) === normalizedSelection
+      : normalizedSelection === CODEX_SLUG
+  );
 
-  datasheets.forEach((sheet) => {
-    const key = getSupplementKey(sheet);
-    const isSupplement = isSupplementEntry(sheet);
-
-    if (!isSupplement) {
-      if (normalizedSelection === CODEX_SLUG) {
-        supplementDatasheets.push(sheet);
-      } else {
-        codexDatasheets.push(sheet);
-      }
-      return;
-    }
-
-    if (key === normalizedSelection) {
-      supplementDatasheets.push(sheet);
-    }
-  });
-
-  if (normalizedSelection === CODEX_SLUG) {
-    return supplementDatasheets;
-  }
-
-  return [...supplementDatasheets, ...codexDatasheets];
+  return normalizedSelection === CODEX_SLUG
+    ? matches
+    : matches.concat(datasheets.filter((sheet) => !isSupplementEntry(sheet)));
 };
 
 export const shouldResetSupplementSelection = (
   supplementaryDatasheets: DatasheetListItem[],
   filtersAppliedDatasheets: DatasheetListItem[]
 ) => supplementaryDatasheets.length > 0 && filtersAppliedDatasheets.length === 0;
-
-export const formatDetachmentSupplementLabel = (
-  supplementKey?: string | null,
-  supplementLabel?: string | null
-): string | null => {
-  const normalizedKey = supplementKey ? normalizeSupplementValue(supplementKey) : null;
-
-  if (!normalizedKey || normalizedKey === CODEX_SLUG) {
-    return null;
-  }
-
-  if (supplementLabel && supplementLabel !== 'None') {
-    return supplementLabel.replace(/\s*\(?Legends\)?$/i, '');
-  }
-
-  const baseKey = normalizedKey.endsWith('-legends')
-    ? normalizedKey.replace(/-legends$/, '')
-    : normalizedKey;
-
-  return toTitleCase(baseKey);
-};
-
-export const formatDetachmentOptionLabel = (
-  name: string,
-  supplementKey?: string | null,
-  supplementLabel?: string | null
-): string => {
-  const formatted = formatDetachmentSupplementLabel(supplementKey, supplementLabel);
-  if (!formatted) {
-    return name;
-  }
-
-  return `${name} [${formatted}]`;
-};
 
 export const sortDatasheetsBySupplementPreference = <T extends DatasheetListItem>(
   datasheets: T[],

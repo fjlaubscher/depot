@@ -1,7 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface StratagemCardProps {
   stratagem: depot.Stratagem;
@@ -9,7 +9,7 @@ interface StratagemCardProps {
 }
 
 const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = [] }) => {
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const showFluff = settings.showFluff ?? true;
 
   return (

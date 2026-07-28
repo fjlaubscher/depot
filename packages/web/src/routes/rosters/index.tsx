@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import useFactionIndex from '@/hooks/use-faction-index';
+import { useFactionsContext } from '@/contexts/factions/context';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { readJsonFile } from '@/utils/file';
@@ -20,7 +20,7 @@ const Rosters: React.FC = () => {
   const navigate = useNavigate();
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
-  const { dataVersion } = useFactionIndex();
+  const { dataVersion } = useFactionsContext();
 
   const handleCreate = () => {
     navigate('/rosters/create');

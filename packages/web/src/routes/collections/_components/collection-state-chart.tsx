@@ -1,13 +1,8 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import { Bar, BarChart, Cell, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import classNames from 'classnames';
 
-import {
-  COLLECTION_STATE_META,
-  COLLECTION_UNIT_STATES,
-  getCollectionStateCounts
-} from '@/utils/collection';
+import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/utils/collection';
+import { COLLECTION_STATE_META } from '@/utils/collection';
 
 type CollectionStateChartProps = {
   items: depot.CollectionUnit[];
@@ -58,10 +53,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
 
   return (
     <div
-      className={classNames(
-        'flex flex-col gap-4 rounded-xl border border-subtle bg-white/5 p-4 shadow-sm dark:bg-gray-800/80 md:p-6 md:gap-6',
-        className
-      )}
+      className={`flex flex-col gap-4 rounded-xl border border-subtle bg-white/5 p-4 shadow-sm dark:bg-gray-800/80 md:p-6 md:gap-6 ${className ?? ''}`}
     >
       {(heading || subheading) && (
         <div className="flex flex-col items-center gap-1 text-center">
@@ -71,34 +63,29 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
       )}
 
       {hasData ? (
-        <div className="h-64 w-full md:h-72 no-focus-outline">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-              barGap={4}
-              barSize={32}
-            >
-              <XAxis
-                type="number"
-                domain={[0, 100]}
-                tickFormatter={(v) => `${v}%`}
-                tick={{ fill: 'var(--color-gray-300)', fontSize: 12 }}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                width={70}
-                tick={{ fill: 'var(--color-gray-300)', fontSize: 12 }}
-              />
-              <Bar dataKey="percent" radius={[0, 8, 8, 0]} isAnimationActive={false}>
-                {chartData.map((entry) => (
-                  <Cell key={`bar-${entry.key}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="flex h-64 w-full flex-col justify-around md:h-72">
+          {chartData.map((entry) => (
+            <div key={`bar-${entry.key}`} className="flex items-center gap-2">
+              <span
+                className="w-[70px] shrink-0 text-xs"
+                style={{ color: 'var(--color-gray-300)' }}
+              >
+                {entry.label}
+              </span>
+              <div className="h-8 flex-1">
+                <div
+                  className="h-full rounded-r-lg"
+                  style={{ width: `${entry.percent}%`, backgroundColor: entry.color }}
+                />
+              </div>
+              <span
+                className="w-10 shrink-0 text-right text-xs"
+                style={{ color: 'var(--color-gray-300)' }}
+              >
+                {entry.percent}%
+              </span>
+            </div>
+          ))}
         </div>
       ) : (
         <div className="flex h-48 items-center justify-center text-sm text-subtle">

@@ -17,13 +17,10 @@ const SOURCE_DATA_DIR = join(DIST_DIR, 'source_data');
 const LOG_PREFIX = '[@depot/cli]';
 
 const log = (message: string) => console.log(`${LOG_PREFIX} ${message}`);
-const logError = (message: string, error?: unknown) =>
-  console.error(`${LOG_PREFIX} ${message}`, error);
-
-const getFileName = (input: string) =>
-  input.toLowerCase().replace(/_/g, '-').replace('.csv', '.json');
 
 const getCSVFileName = (input: string) => input.toLowerCase().replace(/_/g, '-');
+
+const getFileName = (input: string) => getCSVFileName(input).replace('.csv', '.json');
 
 const WAHAPEDIA_CSV_FILES = [
   'Factions.csv',
@@ -52,13 +49,8 @@ const fetchCSV = (url: string) => fetch(url).then((response) => response.text())
 const forceDownload = process.argv.includes('--force-download');
 
 const init = async () => {
-  if (existsSync(JSON_DIR)) {
-    rmSync(JSON_DIR, { recursive: true, force: true });
-  }
-
-  if (existsSync(DATA_DIR)) {
-    rmSync(DATA_DIR, { recursive: true, force: true });
-  }
+  rmSync(JSON_DIR, { recursive: true, force: true });
+  rmSync(DATA_DIR, { recursive: true, force: true });
 
   const sourceDataExists = existsSync(SOURCE_DATA_DIR);
   const shouldDownload = forceDownload || !sourceDataExists;
@@ -69,10 +61,8 @@ const init = async () => {
   }
 
   log('Creating directories');
-  mkdirSync(JSON_DIR);
-  if (!existsSync(SOURCE_DATA_DIR)) {
-    mkdirSync(SOURCE_DATA_DIR);
-  }
+  mkdirSync(JSON_DIR, { recursive: true });
+  mkdirSync(SOURCE_DATA_DIR, { recursive: true });
 
   const fileNames = WAHAPEDIA_CSV_FILES.map(getFileName);
   const csvFileNames = WAHAPEDIA_CSV_FILES.map(getCSVFileName);
@@ -188,6 +178,6 @@ const init = async () => {
 init()
   .then(() => log('Done!'))
   .catch((e) => {
-    logError('CLI failed', e);
+    console.error(`${LOG_PREFIX} CLI failed`, e);
     process.exit(1);
   });

@@ -17,7 +17,7 @@ import {
   RosterEmptyState,
   RosterUnitGrid
 } from '@/components/shared/roster';
-import { getRosterFactionName, groupRosterUnitsByRole } from '@/utils/roster';
+import { getRosterFactionName, groupRosterUnitsByRole } from '@depot/core/utils/roster';
 
 const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();

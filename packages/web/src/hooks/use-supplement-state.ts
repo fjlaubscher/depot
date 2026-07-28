@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { DatasheetFilters } from './use-datasheet-browser';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import {
   CODEX_SLUG,
   buildSupplementLabel,

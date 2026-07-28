@@ -9,7 +9,7 @@ import { BackButton } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 // Utils
@@ -28,7 +28,7 @@ import type { depot } from '@depot/core';
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const [activeTab, setActiveTab] = useState(0);
 
   const showLegends = settings.showLegends ?? false;

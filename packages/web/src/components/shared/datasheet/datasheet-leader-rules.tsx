@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 
 import { CollapsibleSection } from '@/components/ui';
 

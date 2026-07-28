@@ -38,11 +38,7 @@ export type RosterAction =
   | { type: 'APPLY_ENHANCEMENT'; payload: { enhancement: depot.Enhancement; targetUnitId: string } }
   | { type: 'REMOVE_ENHANCEMENT'; payload: { enhancementId: string } }
   | { type: 'SET_WARLORD'; payload: { unitId: string | null } }
-  | { type: 'RECALCULATE_POINTS' }
-  | {
-      type: 'SET_COGITATOR_ANALYSIS';
-      payload: depot.RosterCogitatorAnalysis | null;
-    };
+  | { type: 'RECALCULATE_POINTS' };
 
 export interface RosterContextValue {
   state: RosterState;
@@ -73,5 +69,4 @@ export interface RosterContextValue {
   removeEnhancement: (enhancementId: string) => void;
   setWarlord: (unitId: string | null) => void;
   recalculatePoints: () => void;
-  setCogitatorAnalysis: (analysis: depot.RosterCogitatorAnalysis | null) => void;
 }

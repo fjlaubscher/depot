@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { RosterEmptyState, RosterSection } from '@/components/shared';
 import { RosterUnitList } from '@/components/shared/roster';
-import { groupRosterUnitsByRole } from '@/utils/roster';
+import { groupRosterUnitsByRole } from '@depot/core/utils/roster';
 import ViewRosterUnitCard from './view-roster-unit-card';
 
 interface UnitsTabProps {

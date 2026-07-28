@@ -11,16 +11,6 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./types/depot": {
-      "types": "./dist/types/depot.d.ts",
-      "import": "./dist/types/depot.js",
-      "default": "./dist/types/depot.js"
-    },
-    "./types/wahapedia": {
-      "types": "./dist/types/wahapedia.d.ts",
-      "import": "./dist/types/wahapedia.js",
-      "default": "./dist/types/wahapedia.js"
-    },
     "./utils/slug": {
       "types": "./dist/utils/slug.d.ts",
       "import": "./dist/utils/slug.js",
@@ -47,9 +37,9 @@
       "default": "./dist/utils/collection.js"
     },
     "./utils/common": {
-      "types": "./dist/utils/common/index.d.ts",
-      "import": "./dist/utils/common/index.js",
-      "default": "./dist/utils/common/index.js"
+      "types": "./dist/utils/common.d.ts",
+      "import": "./dist/utils/common.js",
+      "default": "./dist/utils/common.js"
     },
     "./utils/paths": {
       "types": "./dist/utils/paths.d.ts",

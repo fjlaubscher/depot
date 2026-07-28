@@ -21,19 +21,16 @@ pnpm install
 
 ## Monorepo Overview
 
-This is a pnpm workspace with four main packages:
+This is a pnpm workspace with three main packages:
 
 - **`@depot/core`** (`packages/core`)  
-  Shared TypeScript types and pure utilities. This is the canonical source of truth for data structures flowing between CLI, web, and workers.
+  Shared TypeScript types and pure utilities. This is the canonical source of truth for data structures flowing between CLI and web.
 
 - **`@depot/cli`** (`packages/cli`)  
   Fetches Wahapedia CSV exports, converts them into typed JSON, and emits the data consumed by the PWA.
 
 - **`@depot/web`** (`packages/web`)  
   React PWA (Vite + Tailwind) with IndexedDB offline storage for factions, datasheets, rosters, and collections.
-
-- **`@depot/workers`** (`packages/workers`)  
-  Cloudflare Pages/Workers handlers (for example, the Cogitator API). Root `functions/` files are thin adapters into this package.
 
 Core stack:
 
@@ -149,20 +146,6 @@ pnpm --filter @depot/web typecheck
 pnpm --filter @depot/web clean
 pnpm --filter @depot/web generate-pwa-assets
 ```
-
-### `@depot/workers`
-
-```bash
-pnpm --filter @depot/workers build
-pnpm --filter @depot/workers dev
-pnpm --filter @depot/workers test
-pnpm --filter @depot/workers format
-pnpm --filter @depot/workers lint
-pnpm --filter @depot/workers typecheck
-pnpm --filter @depot/workers clean
-```
-
-Cloudflare Pages/Workers entrypoints live under `functions/` and should be thin adapters that delegate to compiled handlers from `@depot/workers`.
 
 ---
 

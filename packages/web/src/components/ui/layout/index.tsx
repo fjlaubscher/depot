@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import type { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { useLayoutContext } from '@/contexts/layout/use-layout-context';
-import { BREAKPOINTS } from '@/constants/breakpoints';
+import { useLayoutContext } from '@/contexts/layout/context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import IconButton from '../icon-button';
 import Logo from '@/components/logo';
@@ -15,8 +14,7 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
-  const { state, closeSidebar, toggleSidebar } = useLayoutContext();
-  const { sidebarOpen } = state;
+  const { sidebarOpen, closeSidebar, toggleSidebar } = useLayoutContext();
 
   // Set document title
   useDocumentTitle(title);
@@ -24,7 +22,8 @@ const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
   // Close sidebar when resizing to desktop on mobile
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= BREAKPOINTS.LG && sidebarOpen) {
+      // Tailwind lg breakpoint
+      if (window.innerWidth >= 1024 && sidebarOpen) {
         closeSidebar();
       }
     };

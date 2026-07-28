@@ -2,30 +2,27 @@ const CANONICAL_ORIGIN = 'https://godepot.dev';
 const HERO_IMAGE_URL = `${CANONICAL_ORIGIN}/maskable-icon-512x512.png`;
 const HERO_IMAGE_ALT = 'depot app icon';
 
-type AssetBinding = {
-  fetch: (request: Request) => Promise<Response>;
+// Minimal Pages-runtime types; HTMLRewriter is a runtime global on Cloudflare Pages.
+type Env = { ASSETS: { fetch: (request: Request) => Promise<Response> } };
+type PagesContext = { request: Request; env: Env };
+
+type RewriterElement = {
+  setAttribute(name: string, value: string): void;
+  setInnerContent(content: string): void;
 };
 
-type Env = {
-  ASSETS: AssetBinding;
-};
+declare class HTMLRewriter {
+  on(selector: string, handlers: { element?(element: RewriterElement): void }): this;
+  transform(response: Response): Response;
+}
 
 type RouteMatch =
   | { type: 'faction'; factionSlug: string }
   | { type: 'datasheet'; factionSlug: string; datasheetSlug: string };
 
-type PagesContext = {
-  request: Request;
-  env: Env;
-};
+type Metadata = { title: string; description: string; url: string };
 
-type Metadata = {
-  title: string;
-  description: string;
-  url: string;
-  image: string;
-  imageAlt: string;
-};
+type DatasheetSummary = { id: string; slug?: string; name: string; role?: string; path: string };
 
 type FactionManifest = {
   name: string;
@@ -36,24 +33,13 @@ type FactionManifest = {
   detachments?: unknown[];
 };
 
-type DatasheetSummary = {
-  id: string;
-  slug?: string;
-  name: string;
-  role?: string;
-  path: string;
-};
-
-type DatasheetDetail = {
-  legend?: string;
-};
-
 export const onRequest = async ({ request, env }: PagesContext): Promise<Response> => {
   if (request.method !== 'GET') {
     return env.ASSETS.fetch(request);
   }
 
-  const routeMatch = matchRoute(request);
+  const url = new URL(request.url);
+  const routeMatch = matchRoute(url.pathname);
   const assetResponse = await env.ASSETS.fetch(request);
   if (!routeMatch) {
     return assetResponse;
@@ -64,9 +50,7 @@ export const onRequest = async ({ request, env }: PagesContext): Promise<Respons
     return assetResponse;
   }
 
-  const url = new URL(request.url);
   let metadata: Metadata | null = null;
-
   try {
     metadata = await buildMetadata(routeMatch, env, url);
   } catch (error) {
@@ -77,32 +61,42 @@ export const onRequest = async ({ request, env }: PagesContext): Promise<Respons
     return assetResponse;
   }
 
-  const originalHtml = await assetResponse.text();
-  const rewrittenHtml = applyMetadata(originalHtml, metadata);
-  const encoder = new TextEncoder();
-  const bodyBuffer = encoder.encode(rewrittenHtml);
-  const headers = new Headers(assetResponse.headers);
+  const { title, description, url: canonicalUrl } = metadata;
+  const metaContent: Record<string, string> = {
+    description,
+    'og:title': title,
+    'og:description': description,
+    'og:url': canonicalUrl,
+    'og:image': HERO_IMAGE_URL,
+    'og:image:secure_url': HERO_IMAGE_URL,
+    'og:image:alt': HERO_IMAGE_ALT,
+    'twitter:title': title,
+    'twitter:description': description,
+    'twitter:image': HERO_IMAGE_URL,
+    'twitter:image:alt': HERO_IMAGE_ALT
+  };
 
-  headers.delete('content-encoding');
-  headers.delete('etag');
-  headers.set('content-length', bodyBuffer.length.toString());
-
-  return new Response(bodyBuffer, {
-    status: assetResponse.status,
-    statusText: assetResponse.statusText,
-    headers
+  // ponytail: rewrites tags in place only; every tag is guaranteed present in
+  // packages/web/index.html. Re-add an upsert path if tags are removed there.
+  const rewriter = new HTMLRewriter().on('title', {
+    element: (element) => element.setInnerContent(title)
   });
-};
-
-const matchRoute = (request: Request): RouteMatch | null => {
-  const url = new URL(request.url);
-  const normalizedPath = normalizePathname(url.pathname);
-
-  if (normalizedPath === '/' || normalizedPath.startsWith('/assets/')) {
-    return null;
+  for (const [key, value] of Object.entries(metaContent)) {
+    rewriter.on(`meta[name="${key}"], meta[property="${key}"]`, {
+      element: (element) => element.setAttribute('content', value)
+    });
   }
 
-  const datasheetMatch = normalizedPath.match(/^\/faction\/([^/]+)\/datasheet\/([^/]+)$/i);
+  // Streamed body: copy the response so headers are mutable, drop the stale etag.
+  const transformed = rewriter.transform(assetResponse);
+  const response = new Response(transformed.body, transformed);
+  response.headers.delete('content-encoding');
+  response.headers.delete('etag');
+  return response;
+};
+
+const matchRoute = (pathname: string): RouteMatch | null => {
+  const datasheetMatch = pathname.match(/^\/faction\/([^/]+)\/datasheet\/([^/]+)\/?$/i);
   if (datasheetMatch) {
     return {
       type: 'datasheet',
@@ -111,7 +105,7 @@ const matchRoute = (request: Request): RouteMatch | null => {
     };
   }
 
-  const factionMatch = normalizedPath.match(/^\/faction\/([^/]+)$/i);
+  const factionMatch = pathname.match(/^\/faction\/([^/]+)\/?$/i);
   if (factionMatch) {
     return {
       type: 'faction',
@@ -127,17 +121,19 @@ const buildMetadata = async (
   env: Env,
   requestUrl: URL
 ): Promise<Metadata | null> => {
-  const manifest = await fetchFactionManifest(env, requestUrl, match.factionSlug);
+  const manifest = await fetchJson<FactionManifest>(
+    env,
+    requestUrl,
+    `/data/factions/${match.factionSlug}/faction.json`
+  );
   if (!manifest) {
     return null;
   }
 
   const canonicalUrl = `${CANONICAL_ORIGIN}${requestUrl.pathname}${requestUrl.search}`;
-  const imageAlt = HERO_IMAGE_ALT;
 
   if (match.type === 'faction') {
-    const datasheetTotal =
-      manifest.datasheetCount ?? (manifest.datasheets ? manifest.datasheets.length : 0);
+    const datasheetTotal = manifest.datasheetCount ?? manifest.datasheets?.length ?? 0;
     const detachmentTotal =
       manifest.detachmentCount ?? (Array.isArray(manifest.detachments) ? manifest.detachments.length : 0);
 
@@ -147,9 +143,7 @@ const buildMetadata = async (
         detachmentTotal,
         'detachment'
       )} for ${manifest.name} in Warhammer 40,000.`,
-      url: canonicalUrl,
-      image: HERO_IMAGE_URL,
-      imageAlt
+      url: canonicalUrl
     };
   }
 
@@ -158,7 +152,7 @@ const buildMetadata = async (
     return null;
   }
 
-  const datasheetDetails = await fetchDatasheet(env, requestUrl, datasheetEntry.path);
+  const datasheetDetails = await fetchJson<{ legend?: string }>(env, requestUrl, datasheetEntry.path);
   const legend = datasheetDetails?.legend ? truncateText(stripHtml(datasheetDetails.legend)) : '';
   const description =
     legend ||
@@ -169,30 +163,11 @@ const buildMetadata = async (
   return {
     title: `${datasheetEntry.name} - ${manifest.name} | depot`,
     description,
-    url: canonicalUrl,
-    image: HERO_IMAGE_URL,
-    imageAlt
+    url: canonicalUrl
   };
 };
 
-const fetchFactionManifest = async (
-  env: Env,
-  requestUrl: URL,
-  factionSlug: string
-): Promise<FactionManifest | null> =>
-  fetchJson<FactionManifest>(env, requestUrl, `/data/factions/${factionSlug}/faction.json`);
-
-const fetchDatasheet = async (
-  env: Env,
-  requestUrl: URL,
-  datasheetPath: string
-): Promise<DatasheetDetail | null> => fetchJson<DatasheetDetail>(env, requestUrl, datasheetPath);
-
-const fetchJson = async <T>(
-  env: Env,
-  requestUrl: URL,
-  assetPath: string
-): Promise<T | null> => {
+const fetchJson = async <T>(env: Env, requestUrl: URL, assetPath: string): Promise<T | null> => {
   try {
     const assetUrl = new URL(assetPath, requestUrl.origin);
     const response = await env.ASSETS.fetch(new Request(assetUrl.toString(), { method: 'GET' }));
@@ -218,98 +193,11 @@ const findDatasheet = (manifest: FactionManifest, slugOrId: string): DatasheetSu
   );
 };
 
-const normalizePathname = (pathname: string): string => {
-  if (!pathname) {
-    return '/';
-  }
+const stripHtml = (value: string): string =>
+  value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
-  const collapsed = pathname.replace(/\/{2,}/g, '/');
-  if (collapsed.length > 1 && collapsed.endsWith('/')) {
-    return collapsed.slice(0, -1);
-  }
+const truncateText = (value: string, maxLength = 200): string =>
+  value.length <= maxLength ? value : `${value.slice(0, maxLength - 3).trimEnd()}...`;
 
-  return collapsed || '/';
-};
-
-const stripHtml = (value: string): string => value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-
-const truncateText = (value: string, maxLength = 200): string => {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
-};
-
-const formatCount = (count: number, singular: string): string => {
-  const safeCount = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
-  const label = safeCount === 1 ? singular : `${singular}s`;
-  return `${safeCount} ${label}`;
-};
-
-const applyMetadata = (html: string, metadata: Metadata): string => {
-  if (!html.includes('</head>')) {
-    return html;
-  }
-
-  let output = replaceTitle(html, metadata.title);
-
-  const replacements: Array<{ attribute: 'name' | 'property'; key: string; value: string }> = [
-    { attribute: 'name', key: 'description', value: metadata.description },
-    { attribute: 'property', key: 'og:title', value: metadata.title },
-    { attribute: 'property', key: 'og:description', value: metadata.description },
-    { attribute: 'property', key: 'og:url', value: metadata.url },
-    { attribute: 'property', key: 'og:image', value: metadata.image },
-    { attribute: 'property', key: 'og:image:secure_url', value: metadata.image },
-    { attribute: 'property', key: 'og:image:alt', value: metadata.imageAlt },
-    { attribute: 'name', key: 'twitter:title', value: metadata.title },
-    { attribute: 'name', key: 'twitter:description', value: metadata.description },
-    { attribute: 'name', key: 'twitter:image', value: metadata.image },
-    { attribute: 'name', key: 'twitter:image:alt', value: metadata.imageAlt }
-  ];
-
-  for (const replacement of replacements) {
-    output = upsertMetaTag(output, replacement.attribute, replacement.key, replacement.value);
-  }
-
-  return output;
-};
-
-const replaceTitle = (html: string, value: string): string => {
-  const escaped = escapeHtml(value);
-  if (/<title>.*<\/title>/is.test(html)) {
-    return html.replace(/<title>.*<\/title>/is, `<title>${escaped}</title>`);
-  }
-
-  return html.replace('</head>', `<title>${escaped}</title></head>`);
-};
-
-const upsertMetaTag = (
-  html: string,
-  attribute: 'name' | 'property',
-  key: string,
-  value: string
-): string => {
-  const escapedValue = escapeHtml(value);
-  const metaTag = `<meta ${attribute}="${key}" content="${escapedValue}" />`;
-  const regex = new RegExp(
-    `<meta[^>]*${attribute}\\s*=\\s*["']${escapeRegExp(key)}["'][^>]*>`,
-    'i'
-  );
-
-  if (regex.test(html)) {
-    return html.replace(regex, metaTag);
-  }
-
-  return html.replace('</head>', `${metaTag}</head>`);
-};
-
-const escapeHtml = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const formatCount = (count: number, singular: string): string =>
+  `${count} ${count === 1 ? singular : `${singular}s`}`;

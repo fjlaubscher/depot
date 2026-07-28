@@ -1,14 +1,25 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useCallback, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useReducer } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { getDataPath, getDataUrl, getDatasheetPath, getFactionManifestPath } from '@/utils/paths';
 import { normalizeDatasheetWargear } from '@depot/core/utils/wargear';
-import { FACTIONS_ACTIONS } from './constants';
 import { factionsReducer, initialFactionsState } from './reducer';
+import type { FactionsState } from './reducer';
 import { syncFactionIndex } from './index-sync';
-import { appendSearchParam } from './url';
-import type { FactionsContextType } from './types';
+
+export interface FactionsContextType extends FactionsState {
+  getFactionManifest: (slug: string) => Promise<depot.FactionManifest | null>;
+  getDatasheet: (factionSlug: string, datasheetIdOrSlug: string) => Promise<depot.Datasheet | null>;
+  clearOfflineData: () => Promise<void>;
+  checkForDataUpdates: () => Promise<{ updated: boolean; dataVersion: string | null }>;
+}
+
+const appendSearchParam = (url: string, key: string, value: string): string => {
+  const resolved = new URL(url, window.location.origin);
+  resolved.searchParams.set(key, value);
+  return `${resolved.pathname}${resolved.search}`;
+};
 
 const FactionsContext = createContext<FactionsContextType | undefined>(undefined);
 
@@ -46,7 +57,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   const refreshOfflineFactions = useCallback(async () => {
     try {
       const offlineFactions = await offlineStorage.getAllCachedFactions();
-      dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+      dispatch({ type: 'UPDATE_OFFLINE_FACTIONS', payload: offlineFactions });
     } catch (error) {
       console.warn('Failed to load offline factions list:', error);
     }
@@ -92,7 +103,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         try {
           await offlineStorage.setFactionManifest(slug, manifestWithVersion);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
-          dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+          dispatch({ type: 'UPDATE_OFFLINE_FACTIONS', payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache faction manifest in IndexedDB:', cacheError);
         }
@@ -102,7 +113,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Failed to load faction ${key}:`, error);
         dispatch({
-          type: FACTIONS_ACTIONS.LOAD_FACTION_ERROR,
+          type: 'LOAD_FACTION_ERROR',
           payload: { slug: key, error: message }
         });
         return null;
@@ -148,7 +159,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         try {
           await offlineStorage.setDatasheet(normalized);
           const offlineFactions = await offlineStorage.getAllCachedFactions();
-          dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: offlineFactions });
+          dispatch({ type: 'UPDATE_OFFLINE_FACTIONS', payload: offlineFactions });
         } catch (cacheError) {
           console.warn('Failed to cache datasheet in IndexedDB:', cacheError);
         }
@@ -167,7 +178,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
 
   const clearOfflineData = async () => {
     await resetOfflineData();
-    dispatch({ type: FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS, payload: [] });
+    dispatch({ type: 'UPDATE_OFFLINE_FACTIONS', payload: [] });
   };
 
   const checkForDataUpdates = useCallback(async () => {
@@ -178,8 +189,8 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         resetOfflineData
       });
 
-      dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: result.index });
-      dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: result.dataVersion });
+      dispatch({ type: 'LOAD_INDEX_SUCCESS', payload: result.index });
+      dispatch({ type: 'SET_DATA_VERSION', payload: result.dataVersion });
 
       await refreshOfflineFactions();
       return { updated: result.updated, dataVersion: result.dataVersion };
@@ -191,7 +202,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializeData = async () => {
-      dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_START });
+      dispatch({ type: 'LOAD_INDEX_START' });
 
       try {
         const { index, dataVersion } = await syncFactionIndex({
@@ -200,11 +211,11 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
           resetOfflineData
         });
 
-        dispatch({ type: FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS, payload: index });
-        dispatch({ type: FACTIONS_ACTIONS.SET_DATA_VERSION, payload: dataVersion });
+        dispatch({ type: 'LOAD_INDEX_SUCCESS', payload: index });
+        dispatch({ type: 'SET_DATA_VERSION', payload: dataVersion });
       } catch (error) {
         dispatch({
-          type: FACTIONS_ACTIONS.LOAD_INDEX_ERROR,
+          type: 'LOAD_INDEX_ERROR',
           payload: error instanceof Error ? error.message : 'Unknown error'
         });
       }
@@ -232,7 +243,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   }, [checkForDataUpdates]);
 
   const value: FactionsContextType = {
-    state,
+    ...state,
     getFactionManifest,
     getDatasheet,
     clearOfflineData,
@@ -240,6 +251,14 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   };
 
   return <FactionsContext.Provider value={value}>{children}</FactionsContext.Provider>;
+};
+
+export const useFactionsContext = (): FactionsContextType => {
+  const context = useContext(FactionsContext);
+  if (!context) {
+    throw new Error('useFactionsContext must be used within a FactionsProvider');
+  }
+  return context;
 };
 
 export default FactionsContext;

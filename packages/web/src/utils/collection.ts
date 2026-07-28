@@ -1,10 +1,5 @@
 import type { depot } from '@depot/core';
-import {
-  COLLECTION_UNIT_STATES as CORE_COLLECTION_UNIT_STATES,
-  calculateCollectionPoints as calculateCollectionPointsCore,
-  createCollectionUnitFromDatasheet as createCollectionUnitFromDatasheetCore,
-  getCollectionStateCounts as getCollectionStateCountsCore
-} from '@depot/core/utils/collection';
+import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/utils/collection';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
@@ -14,8 +9,6 @@ export const getCollectionLabels = (usePileLabel: boolean) => ({
   singular: usePileLabel ? 'pile of shame' : 'collection',
   short: usePileLabel ? 'pile' : 'collection'
 });
-
-export const COLLECTION_UNIT_STATES = CORE_COLLECTION_UNIT_STATES;
 
 export const COLLECTION_STATE_META: Record<
   depot.CollectionUnitState,
@@ -33,12 +26,6 @@ export const COLLECTION_STATE_BLURBS: Record<depot.CollectionUnitState, string> 
   'battle-ready': 'Mostly "Battle Ready" — add tufts and decals.',
   'parade-ready': 'Mostly "Parade Ready" — showtime (or start a new box).'
 };
-
-export const getCollectionStateCounts = getCollectionStateCountsCore;
-
-export const calculateCollectionPoints = calculateCollectionPointsCore;
-
-export const createCollectionUnitFromDatasheet = createCollectionUnitFromDatasheetCore;
 
 export const getCollectionChartCopy = (
   collection: depot.Collection,

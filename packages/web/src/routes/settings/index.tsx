@@ -11,16 +11,14 @@ import SettingsCard from './_components/settings-card';
 import SettingToggleItem from './_components/setting-toggle-item';
 
 // Hooks and Context
-import useSettings from '@/hooks/use-settings';
-import useOfflineFactions from '@/hooks/use-offline-factions';
-import useFactionIndex from '@/hooks/use-faction-index';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 
 const Settings = () => {
   const { showToast } = useToast();
-  const { settings, updateSettings } = useSettings();
-  const { offlineFactions, clearOfflineData } = useOfflineFactions();
-  const { loading } = useFactionIndex();
+  const { settings, updateSettings } = useSettingsContext();
+  const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
 
   const handleSettingsChange = useCallback(
     async (field: keyof depot.Settings, value: boolean) => {
@@ -122,12 +120,6 @@ const Settings = () => {
                 description="Attempt to use the device share sheet when available; otherwise copy to clipboard"
                 enabled={settings.useNativeShare ?? true}
                 onChange={(value) => handleSettingsChange('useNativeShare', value)}
-              />
-              <SettingToggleItem
-                title="Cogitator (Experimental)"
-                description="Enable the roster analysis Cogitator tab powered by GPT."
-                enabled={settings.enableCogitator ?? false}
-                onChange={(value) => handleSettingsChange('enableCogitator', value)}
               />
             </div>
           </SettingsCard>

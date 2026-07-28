@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import { Trash2, Pencil, Copy } from 'lucide-react';
-import { Card, ActionGroup, PointsTag, Tag } from '@/components/ui';
+import { Card, ActionGroup, Tag } from '@/components/ui';
 
 interface RosterCardProps {
   roster: depot.Roster;
@@ -72,11 +72,9 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
             {roster.faction?.name}
           </Card.Subtitle>
         </div>
-        <PointsTag
-          points={roster.points.current}
-          maxPoints={roster.points.max}
-          className="whitespace-nowrap"
-        />
+        <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
+          {roster.points.current} / {roster.points.max} pts
+        </Tag>
       </Card.Header>
 
       {roster.detachment?.name ? (

@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import useFactions from '@/hooks/use-factions';
 import useFaction from '@/hooks/use-faction';
-import useSettings from '@/hooks/use-settings';
-import useFactionIndex from '@/hooks/use-faction-index';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useFactionsContext } from '@/contexts/factions/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
@@ -19,8 +18,8 @@ const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
-  const { settings } = useSettings();
-  const { dataVersion } = useFactionIndex();
+  const { settings } = useSettingsContext();
+  const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
   const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 
@@ -36,7 +35,6 @@ const CreateRoster: React.FC = () => {
     maxPoints?: string;
   }>({});
 
-  const { factions, loading: factionsLoading } = useFactions();
   const { data: selectedFaction, loading: factionLoading } = useFaction(factionSlug || undefined);
 
   const collectionId = searchParams.get('fromCollection');

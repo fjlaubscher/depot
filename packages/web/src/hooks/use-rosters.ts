@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
-import { createRosterDuplicate } from '@/utils/roster';
+import { createRosterDuplicate } from '@depot/core/utils/roster';
+import useAsync from './use-async';
 
 interface UseRosters {
   rosters: depot.Roster[];
@@ -16,42 +16,21 @@ interface UseRosters {
 }
 
 function useRosters(): UseRosters {
-  const [rosters, setRosters] = useState<depot.Roster[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadRosters = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const allRosters = await offlineStorage.getAllRosters();
-      setRosters(allRosters);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error loading rosters';
-      setError(errorMessage);
-      console.error('Failed to load rosters:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadRosters();
-  }, [loadRosters]);
+  const { data, loading, error, refresh } = useAsync(() => offlineStorage.getAllRosters(), []);
 
   const addRoster = async (roster: depot.Roster) => {
     await offlineStorage.saveRoster(roster);
-    await loadRosters(); // Refresh the list
+    await refresh(); // Refresh the list
   };
 
   const updateRoster = async (roster: depot.Roster) => {
     await offlineStorage.saveRoster(roster); // `put` in IndexedDB handles both create and update
-    await loadRosters();
+    await refresh();
   };
 
   const deleteRoster = async (rosterId: string) => {
     await offlineStorage.deleteRoster(rosterId);
-    await loadRosters();
+    await refresh();
   };
 
   const getRoster = async (rosterId: string) => {
@@ -61,12 +40,12 @@ function useRosters(): UseRosters {
   const duplicateRoster = async (roster: depot.Roster, dataVersion?: string | null) => {
     const duplicatedRoster = createRosterDuplicate(roster, { dataVersion });
     await offlineStorage.saveRoster(duplicatedRoster);
-    await loadRosters();
+    await refresh();
     return duplicatedRoster;
   };
 
   return {
-    rosters,
+    rosters: data ?? [],
     loading,
     error,
     addRoster,
@@ -74,7 +53,7 @@ function useRosters(): UseRosters {
     deleteRoster,
     getRoster,
     duplicateRoster,
-    refresh: loadRosters
+    refresh
   };
 }
 

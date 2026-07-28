@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 
 // components
 import DatasheetHero from './datasheet-hero';

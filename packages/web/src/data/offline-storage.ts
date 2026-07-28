@@ -7,7 +7,7 @@ import type { CachedFaction } from '@/types/offline';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 9 // Force cache destroy/rebuild after offline schema changes
+  VERSION: 10 // Force cache destroy/rebuild after offline schema changes
 } as const;
 
 const STORES = {
@@ -24,6 +24,12 @@ const KEYS = {
   SETTINGS: 'settings',
   DATA_VERSION: 'data-version'
 } as const;
+
+const req = <T>(r: IDBRequest<T>): Promise<T> =>
+  new Promise<T>((res, rej) => {
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
 
 const ensureArray = <T>(value: T[] | undefined): T[] => (Array.isArray(value) ? value : []);
 const ensureString = (value: string | undefined): string => value ?? '';
@@ -192,65 +198,20 @@ class OfflineStorage {
     return this.dbPromise;
   }
 
-  /**
-   * Ensures the requested object store exists; if not, reset the DB and recreate.
-   * Limits retries to avoid infinite recursion if the store cannot be created.
-   */
-  private async getDBWithStore(
+  private async store(
     storeName: (typeof STORES)[keyof typeof STORES],
-    retryCount = 0
-  ): Promise<IDBDatabase> {
-    const MAX_RETRIES = 2;
+    mode: IDBTransactionMode = 'readonly'
+  ): Promise<IDBObjectStore> {
     const db = await this.getDB();
-    if (db.objectStoreNames.contains(storeName)) {
-      return db;
-    }
-
-    if (retryCount >= MAX_RETRIES) {
-      throw new Error(
-        `IndexedDB store "${storeName}" missing after ${MAX_RETRIES} retries. Database may be in an invalid state.`
-      );
-    }
-
-    console.warn(
-      `IndexedDB missing store ${storeName}, resetting database (attempt ${retryCount + 1}).`
-    );
-    await this.destroy();
-    const newDb = await this.getDB();
-    if (newDb.objectStoreNames.contains(storeName)) {
-      return newDb;
-    }
-
-    return this.getDBWithStore(storeName, retryCount + 1);
+    return db.transaction([storeName], mode).objectStore(storeName);
   }
 
   // Faction Index Operations
   async getFactionIndex(): Promise<depot.Index[] | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_INDEX], 'readonly');
-      const store = transaction.objectStore(STORES.FACTION_INDEX);
-
-      return new Promise((resolve, reject) => {
-        const request = store.getAll();
-        request.onsuccess = () => {
-          const result = request.result as (depot.Index | depot.Index[] | undefined)[] | undefined;
-          if (!result || result.length === 0) {
-            resolve(null);
-            return;
-          }
-
-          // Handle legacy single-entry array shape
-          const [first] = result;
-          if (Array.isArray(first)) {
-            resolve(first);
-            return;
-          }
-
-          resolve(result.filter((entry): entry is depot.Index => !Array.isArray(entry)));
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.FACTION_INDEX);
+      const result = (await req(store.getAll())) as depot.Index[] | undefined;
+      return result && result.length > 0 ? result : null;
     } catch (error) {
       console.error('Failed to get faction index from IndexedDB:', error);
       return null;
@@ -259,28 +220,9 @@ class OfflineStorage {
 
   async setFactionIndex(index: depot.Index[]): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_INDEX], 'readwrite');
-      const store = transaction.objectStore(STORES.FACTION_INDEX);
-
-      return new Promise((resolve, reject) => {
-        const clearRequest = store.clear();
-        clearRequest.onerror = () => reject(clearRequest.error);
-        clearRequest.onsuccess = () => {
-          Promise.all(
-            index.map(
-              (faction) =>
-                new Promise<void>((putResolve, putReject) => {
-                  const request = store.put(faction);
-                  request.onsuccess = () => putResolve();
-                  request.onerror = () => putReject(request.error);
-                })
-            )
-          )
-            .then(() => resolve())
-            .catch(reject);
-        };
-      });
+      const store = await this.store(STORES.FACTION_INDEX, 'readwrite');
+      await req(store.clear());
+      await Promise.all(index.map((faction) => req(store.put(faction))));
     } catch (error) {
       console.error('Failed to set faction index in IndexedDB:', error);
       throw error;
@@ -290,15 +232,8 @@ class OfflineStorage {
   // Faction Data Operations
   async getFactionManifest(factionSlug: string): Promise<depot.FactionManifest | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
-      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(factionSlug);
-        request.onsuccess = () => resolve((request.result as depot.FactionManifest) ?? null);
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.FACTION_MANIFESTS);
+      return ((await req(store.get(factionSlug))) as depot.FactionManifest | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get manifest for ${factionSlug} from IndexedDB:`, error);
       return null;
@@ -307,15 +242,8 @@ class OfflineStorage {
 
   async setFactionManifest(factionSlug: string, manifest: depot.FactionManifest): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readwrite');
-      const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(manifest, factionSlug);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.FACTION_MANIFESTS, 'readwrite');
+      await req(store.put(manifest, factionSlug));
     } catch (error) {
       console.error(`Failed to set manifest for ${factionSlug} in IndexedDB:`, error);
       throw error;
@@ -324,18 +252,8 @@ class OfflineStorage {
 
   async getDatasheet(datasheetId: string): Promise<depot.Datasheet | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.DATASHEETS], 'readonly');
-      const store = transaction.objectStore(STORES.DATASHEETS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(datasheetId);
-        request.onsuccess = () => {
-          const result = request.result as depot.Datasheet | undefined;
-          resolve(result ? normalizeDatasheetStructure(result) : null);
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.DATASHEETS);
+      return ((await req(store.get(datasheetId))) as depot.Datasheet | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get datasheet ${datasheetId} from IndexedDB:`, error);
       return null;
@@ -344,15 +262,8 @@ class OfflineStorage {
 
   async setDatasheet(datasheet: depot.Datasheet): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.DATASHEETS], 'readwrite');
-      const store = transaction.objectStore(STORES.DATASHEETS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(normalizeDatasheetStructure(datasheet), datasheet.id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.DATASHEETS, 'readwrite');
+      await req(store.put(normalizeDatasheetStructure(datasheet), datasheet.id));
     } catch (error) {
       console.error(`Failed to set datasheet ${datasheet.id} in IndexedDB:`, error);
       throw error;
@@ -362,18 +273,8 @@ class OfflineStorage {
   // Collections
   async getCollections(): Promise<depot.Collection[]> {
     try {
-      const db = await this.getDBWithStore(STORES.COLLECTIONS);
-      const transaction = db.transaction([STORES.COLLECTIONS], 'readonly');
-      const store = transaction.objectStore(STORES.COLLECTIONS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.getAll();
-        request.onsuccess = () => {
-          const result = (request.result as depot.Collection[] | undefined) ?? [];
-          resolve(result.map((collection) => normalizeCollection(collection)));
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.COLLECTIONS);
+      return ((await req(store.getAll())) as depot.Collection[] | undefined) ?? [];
     } catch (error) {
       console.error('Failed to get collections from IndexedDB:', error);
       return [];
@@ -382,18 +283,8 @@ class OfflineStorage {
 
   async getCollection(id: string): Promise<depot.Collection | null> {
     try {
-      const db = await this.getDBWithStore(STORES.COLLECTIONS);
-      const transaction = db.transaction([STORES.COLLECTIONS], 'readonly');
-      const store = transaction.objectStore(STORES.COLLECTIONS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(id);
-        request.onsuccess = () => {
-          const result = request.result as depot.Collection | undefined;
-          resolve(result ? normalizeCollection(result) : null);
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.COLLECTIONS);
+      return ((await req(store.get(id))) as depot.Collection | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get collection ${id} from IndexedDB:`, error);
       return null;
@@ -402,15 +293,8 @@ class OfflineStorage {
 
   async saveCollection(collection: depot.Collection): Promise<void> {
     try {
-      const db = await this.getDBWithStore(STORES.COLLECTIONS);
-      const transaction = db.transaction([STORES.COLLECTIONS], 'readwrite');
-      const store = transaction.objectStore(STORES.COLLECTIONS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(normalizeCollection(collection));
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.COLLECTIONS, 'readwrite');
+      await req(store.put(normalizeCollection(collection)));
     } catch (error) {
       console.error(`Failed to save collection ${collection.id} in IndexedDB:`, error);
       throw error;
@@ -419,15 +303,8 @@ class OfflineStorage {
 
   async deleteCollection(id: string): Promise<void> {
     try {
-      const db = await this.getDBWithStore(STORES.COLLECTIONS);
-      const transaction = db.transaction([STORES.COLLECTIONS], 'readwrite');
-      const store = transaction.objectStore(STORES.COLLECTIONS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.delete(id);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.COLLECTIONS, 'readwrite');
+      await req(store.delete(id));
     } catch (error) {
       console.error(`Failed to delete collection ${id} from IndexedDB:`, error);
       throw error;
@@ -436,42 +313,33 @@ class OfflineStorage {
 
   async getAllCachedFactions(): Promise<CachedFaction[]> {
     try {
-      const db = await this.getDB();
-      const manifestsPromise = new Promise<depot.FactionManifest[]>((resolve, reject) => {
-        const transaction = db.transaction([STORES.FACTION_MANIFESTS], 'readonly');
-        const store = transaction.objectStore(STORES.FACTION_MANIFESTS);
-        const request = store.getAll();
-        request.onsuccess = () =>
-          resolve((request.result as depot.FactionManifest[] | undefined) ?? []);
-        request.onerror = () => reject(request.error);
-      });
+      const [manifests, datasheets] = await Promise.all([
+        this.store(STORES.FACTION_MANIFESTS).then(
+          (store) => req(store.getAll()) as Promise<depot.FactionManifest[]>
+        ),
+        this.store(STORES.DATASHEETS).then(
+          (store) => req(store.getAll()) as Promise<depot.Datasheet[]>
+        )
+      ]);
 
-      const datasheetsPromise = new Promise<depot.Datasheet[]>((resolve, reject) => {
-        const transaction = db.transaction([STORES.DATASHEETS], 'readonly');
-        const store = transaction.objectStore(STORES.DATASHEETS);
-        const request = store.getAll();
-        request.onsuccess = () => resolve((request.result as depot.Datasheet[] | undefined) ?? []);
-        request.onerror = () => reject(request.error);
-      });
-
-      const [manifests, datasheets] = await Promise.all([manifestsPromise, datasheetsPromise]);
-      const datasheetCountByFaction = datasheets.reduce<Record<string, number>>((acc, sheet) => {
-        const factionSlug = sheet.factionSlug || sheet.factionId;
-        if (!factionSlug) {
+      const datasheetCountByFaction = (datasheets ?? []).reduce<Record<string, number>>(
+        (acc, sheet) => {
+          const factionSlug = sheet.factionSlug || sheet.factionId;
+          if (!factionSlug) {
+            return acc;
+          }
+          acc[factionSlug] = (acc[factionSlug] ?? 0) + 1;
           return acc;
-        }
-        acc[factionSlug] = (acc[factionSlug] ?? 0) + 1;
-        return acc;
-      }, {});
+        },
+        {}
+      );
 
-      const factions: CachedFaction[] = manifests.map((manifest) => ({
+      return (manifests ?? []).map((manifest) => ({
         id: manifest.id,
         slug: manifest.slug,
         name: manifest.name,
         cachedDatasheets: datasheetCountByFaction[manifest.slug] ?? 0
       }));
-
-      return factions;
     } catch (error) {
       console.error('Failed to get all cached factions:', error);
       return [];
@@ -481,22 +349,9 @@ class OfflineStorage {
   // Settings Operations
   async getSettings(): Promise<depot.Settings | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.SETTINGS], 'readonly');
-      const store = transaction.objectStore(STORES.SETTINGS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(KEYS.SETTINGS);
-        request.onsuccess = () => {
-          const storedSettings = request.result as depot.Settings | undefined;
-          if (!storedSettings) {
-            resolve(null);
-            return;
-          }
-          resolve(mergeSettingsWithDefaults(storedSettings));
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.SETTINGS);
+      const storedSettings = (await req(store.get(KEYS.SETTINGS))) as depot.Settings | undefined;
+      return storedSettings ? mergeSettingsWithDefaults(storedSettings) : null;
     } catch (error) {
       console.error('Failed to get settings from IndexedDB:', error);
       return null;
@@ -505,15 +360,8 @@ class OfflineStorage {
 
   async setSettings(settings: depot.Settings): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.SETTINGS], 'readwrite');
-      const store = transaction.objectStore(STORES.SETTINGS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(mergeSettingsWithDefaults(settings), KEYS.SETTINGS);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.SETTINGS, 'readwrite');
+      await req(store.put(mergeSettingsWithDefaults(settings), KEYS.SETTINGS));
     } catch (error) {
       console.error('Failed to set settings in IndexedDB:', error);
       throw error;
@@ -522,15 +370,8 @@ class OfflineStorage {
 
   async getDataVersion(): Promise<string | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.USER_DATA], 'readonly');
-      const store = transaction.objectStore(STORES.USER_DATA);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(KEYS.DATA_VERSION);
-        request.onsuccess = () => resolve((request.result as string | undefined) ?? null);
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.USER_DATA);
+      return ((await req(store.get(KEYS.DATA_VERSION))) as string | undefined) ?? null;
     } catch (error) {
       console.error('Failed to get data version from IndexedDB:', error);
       return null;
@@ -539,15 +380,8 @@ class OfflineStorage {
 
   async setDataVersion(version: string): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.USER_DATA], 'readwrite');
-      const store = transaction.objectStore(STORES.USER_DATA);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(version, KEYS.DATA_VERSION);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.USER_DATA, 'readwrite');
+      await req(store.put(version, KEYS.DATA_VERSION));
     } catch (error) {
       console.error('Failed to set data version in IndexedDB:', error);
       throw error;
@@ -557,15 +391,8 @@ class OfflineStorage {
   // Roster Operations
   async saveRoster(roster: depot.Roster): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.ROSTERS], 'readwrite');
-      const store = transaction.objectStore(STORES.ROSTERS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.put(normalizeRoster(roster));
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.ROSTERS, 'readwrite');
+      await req(store.put(normalizeRoster(roster)));
     } catch (error) {
       console.error(`Failed to save roster ${roster.id} in IndexedDB:`, error);
       throw error;
@@ -574,18 +401,8 @@ class OfflineStorage {
 
   async getRoster(rosterId: string): Promise<depot.Roster | null> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.ROSTERS], 'readonly');
-      const store = transaction.objectStore(STORES.ROSTERS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.get(rosterId);
-        request.onsuccess = () => {
-          const result = request.result as depot.Roster | undefined;
-          resolve(result ? normalizeRoster(result) : null);
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.ROSTERS);
+      return ((await req(store.get(rosterId))) as depot.Roster | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get roster ${rosterId} from IndexedDB:`, error);
       return null;
@@ -594,18 +411,8 @@ class OfflineStorage {
 
   async getAllRosters(): Promise<depot.Roster[]> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.ROSTERS], 'readonly');
-      const store = transaction.objectStore(STORES.ROSTERS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.getAll();
-        request.onsuccess = () => {
-          const result = (request.result as depot.Roster[] | undefined)?.map(normalizeRoster) || [];
-          resolve(result);
-        };
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.ROSTERS);
+      return ((await req(store.getAll())) as depot.Roster[] | undefined) ?? [];
     } catch (error) {
       console.error('Failed to get all rosters from IndexedDB:', error);
       return [];
@@ -614,15 +421,8 @@ class OfflineStorage {
 
   async deleteRoster(rosterId: string): Promise<void> {
     try {
-      const db = await this.getDB();
-      const transaction = db.transaction([STORES.ROSTERS], 'readwrite');
-      const store = transaction.objectStore(STORES.ROSTERS);
-
-      return new Promise((resolve, reject) => {
-        const request = store.delete(rosterId);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      const store = await this.store(STORES.ROSTERS, 'readwrite');
+      await req(store.delete(rosterId));
     } catch (error) {
       console.error(`Failed to delete roster ${rosterId} from IndexedDB:`, error);
       throw error;
@@ -638,81 +438,13 @@ class OfflineStorage {
         'readwrite'
       );
 
-      const clearStore = (storeName: (typeof STORES)[keyof typeof STORES]) =>
-        new Promise<void>((resolve, reject) => {
-          const store = transaction.objectStore(storeName);
-          const request = store.clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        });
-
-      await Promise.all([
-        clearStore(STORES.FACTION_INDEX),
-        clearStore(STORES.FACTION_MANIFESTS),
-        clearStore(STORES.DATASHEETS)
-      ]);
+      await Promise.all(
+        [STORES.FACTION_INDEX, STORES.FACTION_MANIFESTS, STORES.DATASHEETS].map((storeName) =>
+          req(transaction.objectStore(storeName).clear())
+        )
+      );
     } catch (error) {
       console.error('Failed to clear faction cache from IndexedDB:', error);
-      throw error;
-    }
-  }
-
-  async clearAllData(): Promise<void> {
-    try {
-      const db = await this.getDB();
-      const storesToClear = [
-        STORES.FACTION_INDEX,
-        STORES.FACTION_MANIFESTS,
-        STORES.DATASHEETS,
-        STORES.SETTINGS,
-        STORES.USER_DATA,
-        STORES.ROSTERS,
-        STORES.COLLECTIONS
-      ];
-
-      const transaction = db.transaction(storesToClear, 'readwrite');
-
-      const promises = [
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.FACTION_INDEX).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.FACTION_MANIFESTS).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.DATASHEETS).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.SETTINGS).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.USER_DATA).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.ROSTERS).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        }),
-        new Promise<void>((resolve, reject) => {
-          const request = transaction.objectStore(STORES.COLLECTIONS).clear();
-          request.onsuccess = () => resolve();
-          request.onerror = () => reject(request.error);
-        })
-      ];
-
-      await Promise.all(promises);
-    } catch (error) {
-      console.error('Failed to clear all data from IndexedDB:', error);
       throw error;
     }
   }
@@ -727,30 +459,18 @@ class OfflineStorage {
       }
 
       // Delete the database
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.deleteDatabase(DB_CONFIG.NAME);
+      const request = indexedDB.deleteDatabase(DB_CONFIG.NAME);
 
-        // Some mocks may not return a real request; guard accordingly
-        if (!request) {
-          resolve();
-          return;
-        }
+      // Some mocks may not return a real request; guard accordingly
+      if (!request) {
+        return;
+      }
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
+      await req(request);
     } catch (error) {
       console.error('Failed to destroy IndexedDB:', error);
       throw error;
     }
-  }
-
-  // Utility method to check if data is stale (could be extended with timestamps)
-  async isDataStale(): Promise<boolean> {
-    // For now, just check if we have any data
-    // In the future, this could check timestamps to determine staleness
-    const index = await this.getFactionIndex();
-    return !index || index.length === 0;
   }
 }
 

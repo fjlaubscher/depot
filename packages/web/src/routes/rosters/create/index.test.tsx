@@ -24,16 +24,21 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock useFactions hook
-const mockUseFactions = vi.hoisted(() => ({
-  factions: [] as depot.Index[],
+// Mock the factions context consumer hook (keep the real provider for TestWrapper)
+const mockFactionsContext = vi.hoisted(() => ({
+  factionIndex: [] as depot.Index[],
   loading: false,
-  error: null
+  error: null as string | null,
+  dataVersion: null as string | null
 }));
 
-vi.mock('@/hooks/use-factions', () => ({
-  default: () => mockUseFactions
-}));
+vi.mock('@/contexts/factions/context', async () => {
+  const actual = await vi.importActual('@/contexts/factions/context');
+  return {
+    ...(actual as object),
+    useFactionsContext: () => mockFactionsContext
+  };
+});
 
 // Mock useFaction hook
 const mockUseFaction = vi.hoisted(() => ({
@@ -58,9 +63,9 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
 describe('CreateRoster', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseFactions.factions = mockFactionIndexes;
-    mockUseFactions.loading = false;
-    mockUseFactions.error = null;
+    mockFactionsContext.factionIndex = mockFactionIndexes;
+    mockFactionsContext.loading = false;
+    mockFactionsContext.error = null;
     mockUseFaction.data = {
       id: mockFaction.id,
       slug: mockFaction.slug,
@@ -102,7 +107,7 @@ describe('CreateRoster', () => {
   });
 
   it('shows loading skeleton while factions are loading', () => {
-    mockUseFactions.loading = true;
+    mockFactionsContext.loading = true;
 
     render(<CreateRoster />, { wrapper: TestWrapper });
 
@@ -120,7 +125,7 @@ describe('CreateRoster', () => {
   });
 
   it('disables submit button when factions are loading', () => {
-    mockUseFactions.loading = true;
+    mockFactionsContext.loading = true;
 
     render(<CreateRoster />, { wrapper: TestWrapper });
 
@@ -137,7 +142,7 @@ describe('CreateRoster', () => {
   });
 
   it('handles empty faction list gracefully', () => {
-    mockUseFactions.factions = [];
+    mockFactionsContext.factionIndex = [];
 
     render(<CreateRoster />, { wrapper: TestWrapper });
 

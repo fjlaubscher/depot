@@ -8,11 +8,12 @@ import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/compon
 import { Alert, Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import SelectionSummary from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
-import type { SelectionGroup } from '@/routes/rosters/[rosterId]/add-units/_components/selection-summary';
-import { calculateCollectionPoints, getCollectionLabels } from '@/utils/collection';
+import SelectionSummary from '@/components/shared/selection-summary';
+import type { SelectionGroup } from '@/components/shared/selection-summary';
+import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import { getCollectionLabels } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 type CollectionDatasheetListItem = depot.Datasheet & {
   collectionUnitId: string;
@@ -24,7 +25,7 @@ const SESSION_KEY = 'collection-roster-prefill';
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const { collection, loading, error } = useCollection(collectionId);

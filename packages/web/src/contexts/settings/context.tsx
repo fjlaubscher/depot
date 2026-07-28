@@ -1,11 +1,13 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useCallback, useEffect, useReducer } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
-import { mergeSettingsWithDefaults } from '@/constants/settings';
-import type { SettingsContextType } from './types';
-import { initialSettingsState, settingsReducer } from './reducer';
-import { SETTINGS_ACTIONS } from './constants';
+import { DEFAULT_SETTINGS, mergeSettingsWithDefaults } from '@/constants/settings';
+
+export interface SettingsContextType {
+  settings: depot.Settings;
+  updateSettings: (settings: depot.Settings) => Promise<void>;
+}
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
@@ -14,53 +16,34 @@ interface SettingsProviderProps {
 }
 
 export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(settingsReducer, initialSettingsState);
-
-  const loadSettings = useCallback(async () => {
-    dispatch({ type: SETTINGS_ACTIONS.LOAD_SETTINGS_START });
-
-    try {
-      const stored = await offlineStorage.getSettings();
-      if (stored) {
-        const resolved = mergeSettingsWithDefaults(stored);
-        dispatch({ type: SETTINGS_ACTIONS.LOAD_SETTINGS_SUCCESS, payload: resolved });
-        return;
-      }
-
-      dispatch({ type: SETTINGS_ACTIONS.LOAD_SETTINGS_SUCCESS, payload: state.settings });
-    } catch (error) {
-      console.warn('Failed to load settings from IndexedDB:', error);
-      dispatch({
-        type: SETTINGS_ACTIONS.LOAD_SETTINGS_ERROR,
-        payload: error instanceof Error ? error.message : 'Failed to load settings'
-      });
-    }
-  }, [state.settings]);
-
-  const updateSettings = useCallback(async (settings: depot.Settings) => {
-    try {
-      const merged = mergeSettingsWithDefaults(settings);
-      await offlineStorage.setSettings(merged);
-      dispatch({ type: SETTINGS_ACTIONS.UPDATE_SETTINGS, payload: merged });
-    } catch (error) {
-      console.error('Failed to save settings to IndexedDB:', error);
-      dispatch({
-        type: SETTINGS_ACTIONS.UPDATE_SETTINGS,
-        payload: mergeSettingsWithDefaults(settings)
-      });
-    }
-  }, []);
+  const [settings, setSettings] = useState<depot.Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    void loadSettings();
-  }, [loadSettings]);
+    offlineStorage
+      .getSettings()
+      .then((stored) => {
+        if (stored) {
+          setSettings(mergeSettingsWithDefaults(stored));
+        }
+      })
+      .catch((error) => console.warn('Failed to load settings from IndexedDB:', error));
+  }, []);
 
-  const value: SettingsContextType = {
-    state,
-    updateSettings
-  };
+  const updateSettings = useCallback(async (next: depot.Settings) => {
+    const merged = mergeSettingsWithDefaults(next);
+    try {
+      await offlineStorage.setSettings(merged);
+    } catch (error) {
+      console.error('Failed to save settings to IndexedDB:', error);
+    }
+    setSettings(merged);
+  }, []);
 
-  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={{ settings, updateSettings }}>
+      {children}
+    </SettingsContext.Provider>
+  );
 };
 
 export default SettingsContext;

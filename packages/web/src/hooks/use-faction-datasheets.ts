@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
-import useFactionData from './use-faction-data';
-import type { DatasheetListItem } from '@/types/datasheets';
-
-const CONCURRENCY_LIMIT = 6;
+import { useFactionsContext } from '@/contexts/factions/context';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
+import useAsync from './use-async';
 
 interface UseFactionDatasheetsResult {
   datasheets: depot.Datasheet[];
@@ -19,10 +18,7 @@ const useFactionDatasheets = (
   factionSlug?: string,
   datasheetRefs?: DatasheetListItem[]
 ): UseFactionDatasheetsResult => {
-  const { getDatasheet } = useFactionData();
-  const [datasheets, setDatasheets] = useState<depot.Datasheet[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { getDatasheet } = useFactionsContext();
   const [loadedCount, setLoadedCount] = useState(0);
 
   const targets = useMemo(() => {
@@ -40,71 +36,28 @@ const useFactionDatasheets = (
     });
   }, [datasheetRefs]);
 
-  useEffect(() => {
+  // ponytail: unbounded fan-out; datasheets are cached in IndexedDB after first
+  // load, so reintroduce a pool only if cold loads measurably choke the network.
+  const { data, loading, error } = useAsync(async () => {
+    setLoadedCount(0);
     if (!factionSlug || targets.length === 0) {
-      setDatasheets([]);
-      setLoading(false);
-      setError(null);
-      setLoadedCount(0);
-      return;
+      return [];
     }
 
-    let isCancelled = false;
-
-    const loadDatasheets = async () => {
-      setLoading(true);
-      setError(null);
-      setLoadedCount(0);
-
-      try {
-        const results: depot.Datasheet[] = [];
-        let cursor = 0;
-
-        const runNext = async (): Promise<void> => {
-          if (isCancelled || cursor >= targets.length) {
-            return;
-          }
-
-          const target = targets[cursor++];
-          const sheet = await getDatasheet(factionSlug, target.id);
-          if (!sheet) {
-            throw new Error(`Failed to load datasheet ${target.id}`);
-          }
-          results.push(sheet);
-          setLoadedCount((count) => count + 1);
-          await runNext();
-        };
-
-        const workers = Array.from({ length: Math.min(CONCURRENCY_LIMIT, targets.length) }, () =>
-          runNext()
-        );
-
-        await Promise.all(workers);
-
-        if (!isCancelled) {
-          setDatasheets(results);
+    return Promise.all(
+      targets.map(async (target) => {
+        const sheet = await getDatasheet(factionSlug, target.id);
+        if (!sheet) {
+          throw new Error(`Failed to load datasheet ${target.id}`);
         }
-      } catch (err) {
-        if (!isCancelled) {
-          setDatasheets([]);
-          setError(err instanceof Error ? err.message : 'Unknown error');
-        }
-      } finally {
-        if (!isCancelled) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadDatasheets();
-
-    return () => {
-      isCancelled = true;
-    };
+        setLoadedCount((count) => count + 1);
+        return sheet;
+      })
+    );
   }, [factionSlug, getDatasheet, targets]);
 
   return {
-    datasheets,
+    datasheets: error ? [] : (data ?? []),
     loading,
     error,
     progress: {

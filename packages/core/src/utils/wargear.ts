@@ -2,14 +2,12 @@ import { createSlugGenerator } from './slug.js';
 import type { Datasheet, Wargear, WargearProfile } from '../types/depot.js';
 import type { DatasheetWargear } from '../types/wahapedia.js';
 
-const PROFILE_SEPARATORS = [' - ', ' - ', ' - '];
+const PROFILE_SEPARATOR = ' - ';
 
 interface SplitNameResult {
   baseName: string;
   profileName?: string;
 }
-
-type LegacyWargearProfile = DatasheetWargear;
 
 const splitWargearName = (name: string): SplitNameResult => {
   const trimmed = name?.trim() ?? '';
@@ -18,27 +16,21 @@ const splitWargearName = (name: string): SplitNameResult => {
     return { baseName: '' };
   }
 
-  for (const separator of PROFILE_SEPARATORS) {
-    const index = trimmed.indexOf(separator);
-    if (index > -1) {
-      const base = trimmed.slice(0, index).trim();
-      const profile = trimmed.slice(index + separator.length).trim();
+  const index = trimmed.indexOf(PROFILE_SEPARATOR);
+  if (index > -1) {
+    const base = trimmed.slice(0, index).trim();
+    const profile = trimmed.slice(index + PROFILE_SEPARATOR.length).trim();
 
-      if (base && profile) {
-        return {
-          baseName: base,
-          profileName: profile
-        };
-      }
+    if (base && profile) {
+      return {
+        baseName: base,
+        profileName: profile
+      };
     }
   }
 
   return { baseName: trimmed };
 };
-
-export interface GroupWargearProfilesOptions {
-  createId?: (context: { baseName: string; groupIndex: number; entry: DatasheetWargear }) => string;
-}
 
 const getLineValue = (value: string | undefined, fallback: number) => {
   if (value && value.trim().length > 0) {
@@ -52,14 +44,12 @@ const getLineValue = (value: string | undefined, fallback: number) => {
  * Groups Wahapedia wargear profiles (which are often flattened) into structured weapons with profiles.
  * This enables downstream consumers (CLI + Web) to treat multi-profile weapons as a single selectable item.
  */
-export const groupWargearProfiles = (
-  entries: DatasheetWargear[],
-  options: GroupWargearProfilesOptions = {}
-): Wargear[] => {
+export const groupWargearProfiles = (entries: DatasheetWargear[]): Wargear[] => {
   if (!entries || entries.length === 0) {
     return [];
   }
 
+  const wargearSlug = createSlugGenerator('wargear');
   const grouped: Wargear[] = [];
   let groupIndex = -1;
   let currentGroup: Wargear | null = null;
@@ -78,12 +68,7 @@ export const groupWargearProfiles = (
     if (!shouldContinueCurrentGroup || !currentGroup) {
       groupIndex += 1;
       const fallbackLine = getLineValue(entry.line, groupIndex + 1);
-      const id =
-        options.createId?.({
-          baseName: normalizedBaseName,
-          groupIndex,
-          entry
-        }) ?? `${entry.datasheetId}:${fallbackLine}`;
+      const id = `${entry.datasheetId}:${wargearSlug(normalizedBaseName)}`;
 
       currentGroup = {
         id,
@@ -146,9 +131,6 @@ const normaliseLoadoutItem = (text: string) =>
     .replace(/^(a |an |the |and )/i, '')
     .trim()
     .toLowerCase();
-
-const isGroupedWargearArray = (wargear: Wargear[]): boolean =>
-  wargear.every((weapon) => Array.isArray((weapon as Wargear).profiles));
 
 /**
  * Splits a comma-separated string of weapon keywords and trims whitespace.
@@ -281,28 +263,10 @@ export function formatWargearDisplayName(weapon: Wargear): string {
   return labels.length > 0 ? `${weapon.name} (${labels.join(' / ')})` : weapon.name;
 }
 
+// ponytail: legacy (ungrouped) wargear migration removed; stale offline caches are rebuilt via the
+// IndexedDB version bump, so datasheets always arrive with grouped wargear.
 export function normalizeDatasheetWargear(datasheet: Datasheet): Datasheet {
-  if (!datasheet.wargear || datasheet.wargear.length === 0) {
-    return datasheet;
-  }
-
-  if (isGroupedWargearArray(datasheet.wargear)) {
-    return datasheet;
-  }
-
-  const legacyWargear = datasheet.wargear as unknown as LegacyWargearProfile[];
-  const wargearSlug = createSlugGenerator(`${datasheet.slug ?? datasheet.id}-wargear`);
-  const grouped = groupWargearProfiles(legacyWargear, {
-    createId: ({ baseName, groupIndex }) => {
-      const label = baseName || `wargear-${groupIndex + 1}`;
-      return `${datasheet.id}:${wargearSlug(label)}`;
-    }
-  });
-
-  return {
-    ...datasheet,
-    wargear: grouped
-  };
+  return datasheet;
 }
 
 export function normalizeSelectedWargear(
@@ -313,31 +277,8 @@ export function normalizeSelectedWargear(
     return [];
   }
 
-  if (isGroupedWargearArray(selection)) {
-    const availableMap = new Map(availableWargear.map((weapon) => [weapon.id, weapon]));
-    return selection
-      .map((weapon) => availableMap.get(weapon.id) ?? weapon)
-      .filter((weapon, index, array) => array.findIndex((w) => w.id === weapon.id) === index);
-  }
-
-  const legacySelection = selection as unknown as LegacyWargearProfile[];
-  const matched = new Map<string, Wargear>();
-
-  legacySelection.forEach((legacy) => {
-    const weapon = availableWargear.find((candidate) =>
-      candidate.profiles.some(
-        (profile) =>
-          (!!legacy.line && profile.line === legacy.line) ||
-          (!!legacy.lineInWargear && profile.lineInWargear === legacy.lineInWargear) ||
-          profile.name === legacy.name ||
-          candidate.name === legacy.name
-      )
-    );
-
-    if (weapon) {
-      matched.set(weapon.id, weapon);
-    }
-  });
-
-  return Array.from(matched.values());
+  const availableMap = new Map(availableWargear.map((weapon) => [weapon.id, weapon]));
+  return selection
+    .map((weapon) => availableMap.get(weapon.id) ?? weapon)
+    .filter((weapon, index, array) => array.findIndex((w) => w.id === weapon.id) === index);
 }

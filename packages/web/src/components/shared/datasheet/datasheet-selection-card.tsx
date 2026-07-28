@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 
-import { ContentCard, PointsTag, Tag, SelectField, Button } from '@/components/ui';
+import { Card, Tag, SelectField, Button } from '@/components/ui';
 import { groupKeywords } from '@depot/core/utils/common';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
@@ -72,72 +72,84 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
   };
 
   return (
-    <ContentCard
-      title={datasheet.name}
-      actions={selectedModelCost ? <PointsTag points={selectedModelCost.cost} /> : undefined}
+    <Card
+      className="flex h-full flex-col"
       padding="sm"
-      contentGap="sm"
-      titleClassName="text-base"
       data-testid={`datasheet-card-${datasheet.slug}`}
     >
-      <div className="flex h-full flex-col gap-2 text-sm md:text-base">
-        <div className="flex min-w-0 flex-col gap-1">
-          {(datasheet.isLegends || datasheet.isForgeWorld) && (
-            <div className="flex w-fit flex-wrap gap-2 self-start">
-              {datasheet.isLegends ? (
-                <Tag size="sm" variant="warning">
-                  Warhammer Legends
-                </Tag>
-              ) : null}
-              {datasheet.isForgeWorld ? (
-                <Tag size="sm" variant="secondary">
-                  Forge World
-                </Tag>
-              ) : null}
-            </div>
-          )}
-
-          {factionKeywords.length > 1 ? (
-            <div className="flex flex-wrap gap-2" data-testid="faction-keywords">
-              {factionKeywords.map((keyword) => (
-                <Tag
-                  key={keyword}
-                  size="sm"
-                  variant="default"
-                  className={isSupplementKeyword(keyword) ? supplementStyles.tagClass : undefined}
-                >
-                  {keyword}
-                </Tag>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="mt-auto flex flex-wrap items-center gap-2">
-          {datasheet.modelCosts.length > 1 ? (
-            <SelectField
-              fullWidth={false}
-              className="max-w-[14rem] md:max-w-[18rem]"
-              options={modelCostOptions}
-              value={selectedModelCost?.line ?? ''}
-              onChange={(event) => setSelectedCostLine(event.target.value)}
-              aria-label={`Select ${datasheet.name} loadout`}
-            />
-          ) : null}
-
-          <div className="ml-auto">
-            <Button
-              size="sm"
-              variant="accent"
-              onClick={handleAdd}
-              disabled={!selectedModelCost}
-              data-testid={`add-datasheet-${datasheet.slug}`}
-            >
-              Add
-            </Button>
+      <div className="flex flex-1 flex-col gap-2">
+        <Card.Header className="gap-4">
+          <div className="min-w-0 flex-1">
+            <Card.Title className="truncate text-base">{datasheet.name}</Card.Title>
           </div>
-        </div>
+          {selectedModelCost ? (
+            <div className="flex items-start gap-3">
+              <Tag variant="primary" size="sm" className="rounded-md py-1">
+                {selectedModelCost.cost} pts
+              </Tag>
+            </div>
+          ) : null}
+        </Card.Header>
+
+        <Card.Content className="flex flex-1 h-full flex-col gap-2 text-sm md:text-base">
+          <div className="flex min-w-0 flex-col gap-1">
+            {(datasheet.isLegends || datasheet.isForgeWorld) && (
+              <div className="flex w-fit flex-wrap gap-2 self-start">
+                {datasheet.isLegends ? (
+                  <Tag size="sm" variant="warning">
+                    Warhammer Legends
+                  </Tag>
+                ) : null}
+                {datasheet.isForgeWorld ? (
+                  <Tag size="sm" variant="secondary">
+                    Forge World
+                  </Tag>
+                ) : null}
+              </div>
+            )}
+
+            {factionKeywords.length > 1 ? (
+              <div className="flex flex-wrap gap-2" data-testid="faction-keywords">
+                {factionKeywords.map((keyword) => (
+                  <Tag
+                    key={keyword}
+                    size="sm"
+                    variant="default"
+                    className={isSupplementKeyword(keyword) ? supplementStyles.tagClass : undefined}
+                  >
+                    {keyword}
+                  </Tag>
+                ))}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-auto flex flex-wrap items-center gap-2">
+            {datasheet.modelCosts.length > 1 ? (
+              <SelectField
+                fullWidth={false}
+                className="max-w-[14rem] md:max-w-[18rem]"
+                options={modelCostOptions}
+                value={selectedModelCost?.line ?? ''}
+                onChange={(event) => setSelectedCostLine(event.target.value)}
+                aria-label={`Select ${datasheet.name} loadout`}
+              />
+            ) : null}
+
+            <div className="ml-auto">
+              <Button
+                size="sm"
+                variant="accent"
+                onClick={handleAdd}
+                disabled={!selectedModelCost}
+                data-testid={`add-datasheet-${datasheet.slug}`}
+              >
+                Add
+              </Button>
+            </div>
+          </div>
+        </Card.Content>
       </div>
-    </ContentCard>
+    </Card>
   );
 };

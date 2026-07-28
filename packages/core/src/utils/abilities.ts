@@ -29,35 +29,19 @@ export const sortAbilitiesByType = (abilities: Ability[]): Ability[] => {
   });
 };
 
-export const categorizeAbilities = (abilities: Ability[]): CategorizedAbilities => {
-  const inline: Ability[] = [];
-  const referenced: Ability[] = [];
+const isReferencedAbility = (ability: Ability): boolean =>
+  ability.type === 'Core' ||
+  ability.type === 'Faction' ||
+  (ability.type !== 'Datasheet' &&
+    ability.type !== 'Wargear' &&
+    !ability.type.includes('Special') &&
+    !ability.type.includes('Fortification') &&
+    Boolean(ability.id));
 
-  abilities.forEach((ability) => {
-    if (ability.type === 'Datasheet' || ability.type === 'Wargear') {
-      inline.push(ability);
-      return;
-    }
-
-    if (ability.type === 'Core' || ability.type === 'Faction') {
-      referenced.push(ability);
-      return;
-    }
-
-    if (ability.type.includes('Special') || ability.type.includes('Fortification')) {
-      inline.push(ability);
-      return;
-    }
-
-    if (ability.id) {
-      referenced.push(ability);
-    } else {
-      inline.push(ability);
-    }
-  });
-
-  return { inline, referenced };
-};
+export const categorizeAbilities = (abilities: Ability[]): CategorizedAbilities => ({
+  inline: abilities.filter((ability) => !isReferencedAbility(ability)),
+  referenced: abilities.filter(isReferencedAbility)
+});
 
 export const formatAbilityName = (ability: Ability): string => {
   const name = ability.name?.trim() ?? '';
@@ -78,49 +62,27 @@ export const normalizeSelectedWargearAbilities = (
   selectedAbilities: Ability[] | undefined,
   datasheetAbilities: Ability[]
 ): Ability[] => {
-  if (!selectedAbilities || selectedAbilities.length === 0) {
+  if (!selectedAbilities?.length) {
     return [];
   }
 
-  const wargearAbilities = getWargearAbilities(datasheetAbilities);
-  const availableIds = new Set(wargearAbilities.map((ability) => ability.id).filter(Boolean));
-  const availableBySlug = new Map(
-    wargearAbilities
-      .map(
-        (ability) => [slugify(formatAbilityName(ability) || ability.name || ''), ability] as const
-      )
-      .filter(([slug]) => Boolean(slug))
+  const slugOf = (ability: Ability) => slugify(formatAbilityName(ability) || ability.name || '');
+  const available = new Map(
+    getWargearAbilities(datasheetAbilities).flatMap((ability) =>
+      [ability.id, slugOf(ability)].filter(Boolean).map((key) => [key, ability] as const)
+    )
   );
-  const uniqueAbilities: Ability[] = [];
+  const normalized = new Map<string, Ability>();
 
   selectedAbilities.forEach((ability) => {
     if (!ability) return;
-    const abilityId = ability.id;
-    const abilitySlug = slugify(formatAbilityName(ability) || ability.name || '');
-
-    let normalized: Ability | null = null;
-
-    if (abilityId && availableIds.has(abilityId)) {
-      if (uniqueAbilities.some((existing) => existing.id === abilityId)) return;
-      normalized = wargearAbilities.find((available) => available.id === abilityId) ?? ability;
-    } else if (abilitySlug && availableBySlug.has(abilitySlug)) {
-      if (
-        uniqueAbilities.some(
-          (existing) => slugify(formatAbilityName(existing) || existing.name || '') === abilitySlug
-        )
-      ) {
-        return;
-      }
-      normalized = availableBySlug.get(abilitySlug) ?? ability;
-    }
-
-    if (normalized) {
-      if (!normalized.id && abilitySlug) {
-        normalized = { ...normalized, id: abilitySlug };
-      }
-      uniqueAbilities.push(normalized);
+    const match = available.get(ability.id ?? '') ?? available.get(slugOf(ability));
+    if (!match) return;
+    const key = match.id || slugOf(match);
+    if (key && !normalized.has(key)) {
+      normalized.set(key, match.id ? match : { ...match, id: key });
     }
   });
 
-  return uniqueAbilities;
+  return [...normalized.values()];
 };

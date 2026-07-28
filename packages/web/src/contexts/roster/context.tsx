@@ -148,13 +148,6 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     dispatch({ type: 'RECALCULATE_POINTS' });
   }, []);
 
-  const setCogitatorAnalysis = useCallback(
-    (analysis: depot.RosterCogitatorAnalysis | null): void => {
-      dispatch({ type: 'SET_COGITATOR_ANALYSIS', payload: analysis });
-    },
-    []
-  );
-
   const setRoster = useCallback((roster: depot.Roster) => {
     dispatch({ type: 'SET_ROSTER', payload: roster });
   }, []);
@@ -176,7 +169,6 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
         removeEnhancement,
         setWarlord,
         recalculatePoints,
-        setCogitatorAnalysis,
         setRoster
       }}
     >

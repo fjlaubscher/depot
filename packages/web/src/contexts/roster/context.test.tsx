@@ -12,10 +12,8 @@ const mockOfflineStorage = vi.hoisted(() => ({
 }));
 
 const mockToastContext = vi.hoisted(() => ({
-  dispatch: vi.fn(),
   showToast: vi.fn(),
-  removeToast: vi.fn(),
-  clearAllToasts: vi.fn()
+  removeToast: vi.fn()
 }));
 
 vi.mock('../../data/offline-storage', () => ({
@@ -25,10 +23,8 @@ vi.mock('../../data/offline-storage', () => ({
 vi.mock('@/contexts/toast/use-toast-context', () => ({
   useToast: () => ({
     state: { toasts: [] },
-    dispatch: mockToastContext.dispatch,
     showToast: mockToastContext.showToast,
-    removeToast: mockToastContext.removeToast,
-    clearAllToasts: mockToastContext.clearAllToasts
+    removeToast: mockToastContext.removeToast
   })
 }));
 
