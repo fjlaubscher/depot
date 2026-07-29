@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Home, Users, Settings, ClipboardList, Boxes } from 'lucide-react';
 
-import useSettings from '@/hooks/use-settings';
-import { useLayoutContext } from '@/contexts/layout/use-layout-context';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useLayoutContext } from '@/contexts/layout/context';
 
 import { Layout } from '../ui';
 
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const AppLayout = ({ children, title }: Props) => {
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const { closeSidebar } = useLayoutContext();
   const appVersion = import.meta.env.VITE_APP_VERSION?.trim() || 'dev';
   const collectionLabel = (settings.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections';

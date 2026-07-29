@@ -7,8 +7,7 @@ export const DEFAULT_SETTINGS: Required<depot.Settings> = {
   showFluff: true,
   includeWargearOnExport: true,
   useNativeShare: true,
-  usePileOfShameLabel: true,
-  enableCogitator: false
+  usePileOfShameLabel: true
 };
 
 export const mergeSettingsWithDefaults = (

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Plus, ClipboardPlus, RefreshCw } from 'lucide-react';
+import { Plus, ClipboardPlus, Download, RefreshCw } from 'lucide-react';
 import type { depot } from '@depot/core';
 import classNames from 'classnames';
 
@@ -13,21 +13,21 @@ import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
-import useDownloadFile from '@/hooks/use-download-file';
+import { downloadFile } from '@/utils/file';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import type { ExportedCollection } from '@/types/export';
 import { safeSlug } from '@depot/core/utils/common';
-import ExportButton from '@/components/shared/export-button';
-import useFactionData from '@/hooks/use-faction-data';
-import useSettings from '@/hooks/use-settings';
-import useFactionIndex from '@/hooks/use-faction-index';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { refreshCollectionData } from '@/utils/refresh-user-data';
 import {
-  COLLECTION_STATE_META,
   COLLECTION_UNIT_STATES,
-  getCollectionLabels,
   calculateCollectionPoints,
-  getCollectionStateCounts,
+  getCollectionStateCounts
+} from '@depot/core/utils/collection';
+import {
+  COLLECTION_STATE_META,
+  getCollectionLabels,
   getCollectionChartCopy
 } from '@/utils/collection';
 import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
@@ -37,13 +37,11 @@ const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { getDatasheet } = useFactionData();
-  const { settings } = useSettings();
-  const { dataVersion } = useFactionIndex();
+  const { getDatasheet, dataVersion } = useFactionsContext();
+  const { settings } = useSettingsContext();
   const { showToast } = useToast();
   const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
-  const downloadFile = useDownloadFile();
   const [refreshing, setRefreshing] = useState(false);
   const {
     selection: persistedStateFilter,
@@ -311,7 +309,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
             <ClipboardPlus size={16} />
             Create Roster
           </Button>
-          <ExportButton onClick={handleExportCollection} testId="export-collection-button" />
+          <Button
+            variant="secondary"
+            onClick={handleExportCollection}
+            className="flex items-center gap-2"
+            data-testid="export-collection-button"
+          >
+            <Download size={16} />
+            Export
+          </Button>
         </div>
       ) : null}
 
@@ -419,7 +425,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
 

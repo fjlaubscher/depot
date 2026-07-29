@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import Tag from '@/components/ui/tag';
 import { LinkCard } from '@/components/ui';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import {
   CODEX_SLUG,
   buildSupplementLabel,

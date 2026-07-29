@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { DatasheetFilters } from './use-datasheet-browser';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import {
   shouldResetSupplementSelection,
   type SupplementMetadata

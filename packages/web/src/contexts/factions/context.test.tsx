@@ -2,8 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vite
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { useState } from 'react';
 import type { depot } from '@depot/core';
-import { FactionsProvider } from './context';
-import { useFactionsContext } from './use-factions-context';
+import { FactionsProvider, useFactionsContext } from './context';
 
 const mockOfflineStorage = vi.hoisted(() => ({
   getFactionIndex: vi.fn(),
@@ -26,17 +25,26 @@ vi.mock('../../data/offline-storage', () => ({
 global.fetch = vi.fn();
 
 const TestComponent = () => {
-  const { state, getFactionManifest, getDatasheet, clearOfflineData } = useFactionsContext();
+  const {
+    loading,
+    error,
+    factionIndex,
+    offlineFactions,
+    dataVersion,
+    getFactionManifest,
+    getDatasheet,
+    clearOfflineData
+  } = useFactionsContext();
   const [manifestName, setManifestName] = useState<string | null>(null);
   const [datasheetName, setDatasheetName] = useState<string | null>(null);
 
   return (
     <div>
-      <div data-testid="loading">{state.loading.toString()}</div>
-      <div data-testid="error">{state.error || 'null'}</div>
-      <div data-testid="faction-count">{state.factionIndex?.length || 0}</div>
-      <div data-testid="offline-count">{state.offlineFactions.length}</div>
-      <div data-testid="data-version">{state.dataVersion ?? 'null'}</div>
+      <div data-testid="loading">{loading.toString()}</div>
+      <div data-testid="error">{error || 'null'}</div>
+      <div data-testid="faction-count">{factionIndex?.length || 0}</div>
+      <div data-testid="offline-count">{offlineFactions.length}</div>
+      <div data-testid="data-version">{dataVersion ?? 'null'}</div>
       <div data-testid="manifest-name">{manifestName ?? 'null'}</div>
       <div data-testid="datasheet-name">{datasheetName ?? 'null'}</div>
       <button

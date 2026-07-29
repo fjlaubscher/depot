@@ -1,8 +1,8 @@
 import type { depot } from '@depot/core';
 import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@depot/core/utils/wargear';
 import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
-import { calculateTotalPoints } from '@/contexts/roster/utils';
-import { calculateCollectionPoints } from '@/utils/collection';
+import { calculateTotalPoints } from '@depot/core/utils/roster';
+import { calculateCollectionPoints } from '@depot/core/utils/collection';
 
 type GetDatasheet = (
   factionSlug: string,

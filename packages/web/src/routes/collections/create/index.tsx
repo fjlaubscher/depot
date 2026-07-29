@@ -4,9 +4,8 @@ import type { depot } from '@depot/core';
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
-import useFactions from '@/hooks/use-factions';
-import useFactionIndex from '@/hooks/use-faction-index';
-import useSettings from '@/hooks/use-settings';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import { getCollectionLabels } from '@/utils/collection';
@@ -14,14 +13,12 @@ import { getCollectionLabels } from '@/utils/collection';
 const CreateCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { settings } = useSettings();
-  const { dataVersion } = useFactionIndex();
+  const { settings } = useSettingsContext();
+  const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
   const usePileLabel = settings.usePileOfShameLabel ?? true;
   const labels = getCollectionLabels(usePileLabel);
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
-
-  const { factions, loading: factionsLoading } = useFactions();
 
   const factionOptions =
     factions

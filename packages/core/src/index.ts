@@ -5,7 +5,7 @@ export * as depot from './types/depot.js';
 export * as slug from './utils/slug.js';
 
 // Export shared common helpers
-export * as common from './utils/common/index.js';
+export * as common from './utils/common.js';
 
 // Export wargear helpers
 export * as wargear from './utils/wargear.js';
@@ -18,9 +18,6 @@ export * as roster from './utils/roster.js';
 
 // Export collection helpers
 export * as collection from './utils/collection.js';
-
-// Export roster share helpers
-export * as rosterShare from './utils/roster-share.js';
 
 // Export path helpers
 export * as paths from './utils/paths.js';

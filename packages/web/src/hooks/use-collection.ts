@@ -1,53 +1,42 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
-import { calculateCollectionPoints } from '@/utils/collection';
+import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import useAsync from './use-async';
 
 export const useCollection = (collectionId?: string) => {
-  const [collection, setCollection] = useState<depot.Collection | null>(null);
-  const [loading, setLoading] = useState<boolean>(Boolean(collectionId));
-  const [error, setError] = useState<string | null>(null);
+  const { data, setData, loading, error, refresh } = useAsync(
+    async () => (collectionId ? offlineStorage.getCollection(collectionId) : null),
+    [collectionId]
+  );
 
-  const load = useCallback(async () => {
-    if (!collectionId) {
-      setCollection(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await offlineStorage.getCollection(collectionId);
-      setCollection(data);
-    } catch (err) {
-      console.error(`Failed to load collection ${collectionId}`, err);
-      setError(err instanceof Error ? err.message : 'Failed to load collection');
-    } finally {
-      setLoading(false);
-    }
-  }, [collectionId]);
-
-  const save = useCallback(async (updated: depot.Collection) => {
-    const withPoints = {
-      ...updated,
-      dataVersion: updated.dataVersion ?? null,
-      points: { current: calculateCollectionPoints(updated) }
-    };
-    await offlineStorage.saveCollection(withPoints);
-    setCollection(withPoints);
-    setLoading(false);
-  }, []);
+  const save = useCallback(
+    async (updated: depot.Collection) => {
+      const withPoints = {
+        ...updated,
+        dataVersion: updated.dataVersion ?? null,
+        points: { current: calculateCollectionPoints(updated) }
+      };
+      await offlineStorage.saveCollection(withPoints);
+      setData(withPoints);
+    },
+    [setData]
+  );
 
   const remove = useCallback(async () => {
     if (!collectionId) return;
     await offlineStorage.deleteCollection(collectionId);
   }, [collectionId]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  return { collection, setCollection, loading, error, refresh: load, save, remove };
+  return {
+    collection: data ?? null,
+    setCollection: setData,
+    loading,
+    error,
+    refresh,
+    save,
+    remove
+  };
 };
 
 export default useCollection;

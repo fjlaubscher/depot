@@ -32,7 +32,6 @@
     }
   },
   "dependencies": {
-    "@depot/core": "workspace:*",
-    "@depot/workers": "workspace:*"
+    "@depot/core": "workspace:*"
   }
 }

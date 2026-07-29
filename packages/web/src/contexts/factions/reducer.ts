@@ -1,5 +1,21 @@
-import { FACTIONS_ACTIONS } from './constants';
-import type { FactionsAction, FactionsState } from './types';
+import type { depot } from '@depot/core';
+import type { CachedFaction } from '@/types/offline';
+
+export interface FactionsState {
+  factionIndex: depot.Index[] | null;
+  offlineFactions: CachedFaction[];
+  loading: boolean;
+  error: string | null;
+  dataVersion: string | null;
+}
+
+export type FactionsAction =
+  | { type: 'LOAD_INDEX_START' }
+  | { type: 'LOAD_INDEX_SUCCESS'; payload: depot.Index[] }
+  | { type: 'LOAD_INDEX_ERROR'; payload: string }
+  | { type: 'LOAD_FACTION_ERROR'; payload: { slug: string; error: string } }
+  | { type: 'UPDATE_OFFLINE_FACTIONS'; payload: CachedFaction[] }
+  | { type: 'SET_DATA_VERSION'; payload: string | null };
 
 export const initialFactionsState: FactionsState = {
   factionIndex: null,
@@ -11,22 +27,18 @@ export const initialFactionsState: FactionsState = {
 
 export const factionsReducer = (state: FactionsState, action: FactionsAction): FactionsState => {
   switch (action.type) {
-    case FACTIONS_ACTIONS.LOAD_INDEX_START:
+    case 'LOAD_INDEX_START':
       return { ...state, loading: true, error: null };
-    case FACTIONS_ACTIONS.LOAD_INDEX_SUCCESS:
+    case 'LOAD_INDEX_SUCCESS':
       return { ...state, loading: false, factionIndex: action.payload };
-    case FACTIONS_ACTIONS.LOAD_INDEX_ERROR:
+    case 'LOAD_INDEX_ERROR':
       return { ...state, loading: false, error: action.payload };
-    case FACTIONS_ACTIONS.LOAD_FACTION_START:
-      return { ...state, loading: true };
-    case FACTIONS_ACTIONS.LOAD_FACTION_ERROR:
+    case 'LOAD_FACTION_ERROR':
       return { ...state, loading: false, error: action.payload.error };
-    case FACTIONS_ACTIONS.UPDATE_OFFLINE_FACTIONS:
+    case 'UPDATE_OFFLINE_FACTIONS':
       return { ...state, offlineFactions: action.payload };
-    case FACTIONS_ACTIONS.SET_DATA_VERSION:
+    case 'SET_DATA_VERSION':
       return { ...state, dataVersion: action.payload };
-    case FACTIONS_ACTIONS.CLEAR_ERROR:
-      return { ...state, error: null };
     default:
       return state;
   }

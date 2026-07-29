@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import { Trash2, Pencil, Copy } from 'lucide-react';
 
-import { Card, ActionGroup, PointsTag, Tag } from '@/components/ui';
-import {
-  COLLECTION_STATE_META,
-  COLLECTION_UNIT_STATES,
-  calculateCollectionPoints
-} from '@/utils/collection';
+import { Card, ActionGroup, Tag } from '@/components/ui';
+import { COLLECTION_UNIT_STATES, calculateCollectionPoints } from '@depot/core/utils/collection';
+import { COLLECTION_STATE_META } from '@/utils/collection';
 
 interface CollectionCardProps {
   collection: depot.Collection;
@@ -91,7 +88,9 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ collection, onDelete, o
             {collection.faction?.name || collection.factionSlug || collection.factionId}
           </Card.Subtitle>
         </div>
-        <PointsTag points={points} className="whitespace-nowrap" />
+        <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
+          {points} pts
+        </Tag>
       </Card.Header>
 
       {Object.entries(stateSummary).length > 0 ? (

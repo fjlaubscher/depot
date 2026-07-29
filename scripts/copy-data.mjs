@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { cpSync, existsSync, mkdirSync, rmSync, statSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, rmSync } from 'fs';
 import { dirname } from 'path';
 
 const sourceDir = 'packages/cli/dist/data';
@@ -14,12 +14,6 @@ try {
   if (!existsSync(sourceDir)) {
     console.error(`Source directory not found: ${sourceDir}`);
     console.error('Run "pnpm run data:generate" first to create the data files.');
-    process.exit(1);
-  }
-
-  const stats = statSync(sourceDir);
-  if (!stats.isDirectory()) {
-    console.error(`Source path is not a directory: ${sourceDir}`);
     process.exit(1);
   }
 

@@ -1,9 +1,8 @@
 import {
-  getAppBasePath as getAppBasePathCore,
+  normalizeBasePath as getAppBasePathCore,
   getRouterBasePath as getRouterBasePathCore,
   getViteBasePath as getViteBasePathCore,
   getDataPath,
-  getImagePath,
   getDataUrl as getDataUrlCore,
   getImageUrl as getImageUrlCore,
   getFactionManifestPath,
@@ -36,7 +35,7 @@ export const getDataUrl = (path: string, basePath?: string): string =>
 export const getImageUrl = (path: string, basePath?: string): string =>
   getImageUrlCore(path, basePath ?? readConfiguredBasePath());
 
-export { getDataPath, getImagePath, getFactionManifestPath, getDatasheetPath };
+export { getDataPath, getFactionManifestPath, getDatasheetPath };
 
 export const buildAbsoluteUrl = (path: string = '/'): string => {
   const normalizedBasePath = getAppBasePath();

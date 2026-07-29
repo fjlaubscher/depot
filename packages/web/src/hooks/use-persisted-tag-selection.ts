@@ -2,60 +2,43 @@ import { useEffect, useState } from 'react';
 
 const STORAGE_PREFIX = 'depot:tag-selection:';
 
-const isStorageAvailable = () => typeof window !== 'undefined' && !!window.localStorage;
-
-const buildStorageKey = (key: string) => `${STORAGE_PREFIX}${key}`;
-
-export const persistTagSelection = <T extends string>(key: string, value: T) => {
-  if (!isStorageAvailable()) {
-    return;
-  }
-
-  window.localStorage.setItem(buildStorageKey(key), value);
-};
-
-export const readTagSelection = <T extends string>(key: string): T | null => {
-  if (!isStorageAvailable()) {
-    return null;
-  }
-
-  return window.localStorage.getItem(buildStorageKey(key)) as T | null;
-};
-
-export const clearTagSelection = (key: string) => {
-  if (!isStorageAvailable()) {
-    return;
-  }
-
-  window.localStorage.removeItem(buildStorageKey(key));
-};
-
 export const usePersistedTagSelection = <T extends string>(
   key: string,
   defaultValue: T,
   isValid?: (value: T) => boolean
 ) => {
+  const storageKey = `${STORAGE_PREFIX}${key}`;
+
   const [selection, setSelection] = useState<T>(() => {
-    const stored = readTagSelection<T>(key);
-
-    if (stored && (!isValid || isValid(stored))) {
-      return stored;
+    try {
+      const stored = window.localStorage.getItem(storageKey) as T | null;
+      if (stored && (!isValid || isValid(stored))) {
+        return stored;
+      }
+    } catch {
+      // localStorage unavailable; fall through to default
     }
-
     return defaultValue;
   });
 
   useEffect(() => {
-    if (isValid && !isValid(selection)) {
-      setSelection(defaultValue);
-      return;
+    try {
+      if (isValid && !isValid(selection)) {
+        setSelection(defaultValue);
+        return;
+      }
+      window.localStorage.setItem(storageKey, selection);
+    } catch {
+      // localStorage unavailable; selection stays in-memory only
     }
-
-    persistTagSelection(key, selection);
-  }, [defaultValue, isValid, key, selection]);
+  }, [defaultValue, isValid, storageKey, selection]);
 
   const clearSelection = () => {
-    clearTagSelection(key);
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // localStorage unavailable
+    }
     setSelection(defaultValue);
   };
 

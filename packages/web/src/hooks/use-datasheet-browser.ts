@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { DatasheetListItem } from '@/types/datasheets';
+import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import {
   type DatasheetVisibilityFilters,
   filterDatasheetsBySettings,

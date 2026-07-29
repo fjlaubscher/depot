@@ -3,7 +3,7 @@ import type { Ability, ModelCost, Roster, RosterUnit, Wargear } from '../types/d
 import {
   calculateTotalPoints,
   createRosterDuplicate,
-  generateRosterMarkdown,
+  generateRosterShareText,
   groupRosterUnitsByRole
 } from './roster.js';
 
@@ -133,7 +133,6 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
   dataVersion: overrides.dataVersion ?? null,
   notes: overrides.notes ?? '',
   factionKeyword: overrides.factionKeyword ?? 'ADEPTUS ASTARTES',
-  cogitatorAnalysis: overrides.cogitatorAnalysis ?? null,
   shareCode: overrides.shareCode ?? null
 });
 
@@ -183,42 +182,69 @@ describe('roster utils', () => {
     expect(grouped.Battleline[1].datasheet.name).toBe('B');
   });
 
-  it('generates markdown including wargear and abilities', () => {
+  it('generates share text containing wargear when requested', () => {
     const roster = createRoster({
-      name: 'Strike Force Echo',
       units: [
         createRosterUnit({
-          id: 'unit-1',
-          datasheet: { ...createRosterUnit().datasheet, role: 'Leader', name: 'Captain' },
-          selectedWargear: [createWargear({ name: 'Combi-weapon' })],
-          selectedWargearAbilities: [createAbility({ name: 'Combi-aim' })]
+          modelCost: createModelCost({ description: 'Captain', cost: '80' }),
+          selectedWargear: [createWargear({ name: 'Power sword' })],
+          selectedWargearAbilities: [createAbility({ name: 'Duellist Strike' })]
         })
-      ],
-      enhancements: []
+      ]
     });
 
-    const markdown = generateRosterMarkdown(roster, 'Space Marines');
+    const text = generateRosterShareText(roster, 'Space Marines', {
+      includeWargear: true,
+      includeWargearAbilities: true
+    });
 
-    expect(markdown).toContain('# Strike Force Echo');
-    expect(markdown).toContain('**Faction:** Space Marines');
-    expect(markdown).toContain('## Leader');
-    expect(markdown).toContain('- **[Warlord] Captain**');
-    expect(markdown).toContain('Combi-weapon');
-    expect(markdown).toContain('[Wargear Ability] Combi-aim');
+    expect(text).toContain('*Faction:* Space Marines');
+    expect(text).toContain('- [Warlord] Captain - Captain (80 pts)');
+    expect(text).toContain('Power sword');
+    expect(text).toContain('[Wargear Ability] Duellist Strike');
+  });
+
+  it('marks the warlord and enhancements in the share text', () => {
+    const roster = createRoster({
+      units: [
+        createRosterUnit({ modelCost: createModelCost({ description: 'Captain', cost: '80' }) })
+      ],
+      warlordUnitId: 'unit-1',
+      enhancements: [
+        {
+          unitId: 'unit-1',
+          enhancement: {
+            id: 'enh-1',
+            factionId: 'test',
+            name: 'The Honour Veil',
+            legend: '',
+            description: '',
+            cost: '15',
+            detachment: 'gladius'
+          }
+        }
+      ]
+    });
+
+    const text = generateRosterShareText(roster, 'Space Marines');
+
+    expect(text).toContain('- [Warlord] Captain - Captain (80 pts)');
+    expect(text).toContain('[Enhancement] The Honour Veil (15 pts)');
   });
 
   it('duplicates rosters with new ids while preserving selections', () => {
     const roster = createRoster({
+      name: 'Strike Force',
       units: [createRosterUnit({ id: 'unit-abc' })],
       warlordUnitId: 'unit-abc'
     });
 
-    const duplicated = createRosterDuplicate(roster, { name: 'Copy' });
+    const duplicated = createRosterDuplicate(roster);
 
     expect(duplicated.id).not.toBe(roster.id);
     expect(duplicated.units).toHaveLength(1);
     expect(duplicated.units[0].id).not.toBe('unit-abc');
     expect(duplicated.warlordUnitId).toBe(duplicated.units[0].id);
-    expect(duplicated.name).toBe('Copy');
+    expect(duplicated.name).toBe('Strike Force (Copy)');
   });
 });

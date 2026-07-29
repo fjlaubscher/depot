@@ -7,7 +7,7 @@ import {
 import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
-import { calculateTotalPoints } from './utils';
+import { calculateTotalPoints } from '@depot/core/utils/roster';
 
 export const rosterReducer = (state: RosterState, action: RosterAction): RosterState => {
   switch (action.type) {
@@ -38,8 +38,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
             ),
             datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
           };
-        }),
-        cogitatorAnalysis: action.payload.cogitatorAnalysis ?? null
+        })
       };
 
       return {
@@ -85,8 +84,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         },
         warlordUnitId: null,
         units: initialUnits,
-        enhancements: [],
-        cogitatorAnalysis: null
+        enhancements: []
       };
 
       return {
@@ -105,8 +103,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: {
           ...state.points,
           max: action.payload.maxPoints
-        },
-        cogitatorAnalysis: null
+        }
       };
 
       return {
@@ -121,8 +118,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
     case 'SET_DETACHMENT':
       return {
         ...state,
-        detachment: action.payload,
-        cogitatorAnalysis: null
+        detachment: action.payload
       };
 
     case 'ADD_UNIT': {
@@ -139,8 +135,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       const updatedState = {
         ...state,
-        units: [...state.units, newUnit],
-        cogitatorAnalysis: null
+        units: [...state.units, newUnit]
       };
 
       return {
@@ -160,8 +155,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       const updatedState = {
         ...state,
-        units: [...state.units, duplicatedUnit],
-        cogitatorAnalysis: null
+        units: [...state.units, duplicatedUnit]
       };
 
       return {
@@ -181,8 +175,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           (enhancement) => enhancement.unitId !== action.payload.rosterUnitId
         ),
         warlordUnitId:
-          state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId,
-        cogitatorAnalysis: null
+          state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId
       };
 
       return {
@@ -201,8 +194,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargear: action.payload.wargear }
             : unit
-        ),
-        cogitatorAnalysis: null
+        )
       };
 
       return {
@@ -221,8 +213,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargearAbilities: action.payload.abilities }
             : unit
-        ),
-        cogitatorAnalysis: null
+        )
       };
 
       return {
@@ -241,8 +232,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
           unit.id === action.payload.rosterUnitId
             ? { ...unit, modelCost: action.payload.modelCost }
             : unit
-        ),
-        cogitatorAnalysis: null
+        )
       };
 
       return {
@@ -263,8 +253,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
             enhancement: action.payload.enhancement,
             unitId: action.payload.targetUnitId
           }
-        ],
-        cogitatorAnalysis: null
+        ]
       };
 
       return {
@@ -281,8 +270,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         ...state,
         enhancements: state.enhancements.filter(
           ({ enhancement }) => enhancement.id !== action.payload.enhancementId
-        ),
-        cogitatorAnalysis: null
+        )
       };
 
       return {
@@ -301,8 +289,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
 
       return {
         ...state,
-        warlordUnitId: nextWarlordId,
-        cogitatorAnalysis: null
+        warlordUnitId: nextWarlordId
       };
     }
 
@@ -312,14 +299,7 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: {
           ...state.points,
           current: calculateTotalPoints(state)
-        },
-        cogitatorAnalysis: null
-      };
-
-    case 'SET_COGITATOR_ANALYSIS':
-      return {
-        ...state,
-        cogitatorAnalysis: action.payload
+        }
       };
 
     default:

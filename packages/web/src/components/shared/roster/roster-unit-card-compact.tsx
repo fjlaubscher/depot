@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import classNames from 'classnames';
 import type { depot } from '@depot/core';
-import { Card, PointsTag, Tag, TagGroup } from '@/components/ui';
+import { Card, Tag, TagGroup } from '@/components/ui';
 import { COLLECTION_STATE_META } from '@/utils/collection';
 import { formatWargearDisplayName } from '@depot/core/utils/wargear';
 import { formatAbilityName } from '@depot/core/utils/abilities';
@@ -62,7 +62,9 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
           ) : null}
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
-          <PointsTag points={unitPoints} className="whitespace-nowrap" />
+          <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
+            {unitPoints} pts
+          </Tag>
         </div>
       </Card.Header>
 

@@ -4,7 +4,6 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/cli" },
-    { "path": "./packages/web" },
-    { "path": "./packages/workers" }
+    { "path": "./packages/web" }
   ]
 }

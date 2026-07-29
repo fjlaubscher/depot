@@ -1,42 +1,40 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useReducer } from 'react';
-import type { LayoutContextType } from './types';
-import { layoutReducer, initialLayoutState } from './reducer';
-import { LAYOUT_ACTIONS } from './constants';
+import { createContext, useContext, useState } from 'react';
 
-// Create context
+export interface LayoutContextType {
+  sidebarOpen: boolean;
+  toggleSidebar: () => void;
+  closeSidebar: () => void;
+}
+
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
-// Provider component
 interface LayoutProviderProps {
   children: ReactNode;
 }
 
 export const LayoutProvider: FC<LayoutProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(layoutReducer, initialLayoutState);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Action creators
-  const toggleSidebar = () => {
-    dispatch({ type: LAYOUT_ACTIONS.TOGGLE_SIDEBAR });
-  };
+  return (
+    <LayoutContext.Provider
+      value={{
+        sidebarOpen,
+        toggleSidebar: () => setSidebarOpen((open) => !open),
+        closeSidebar: () => setSidebarOpen(false)
+      }}
+    >
+      {children}
+    </LayoutContext.Provider>
+  );
+};
 
-  const openSidebar = () => {
-    dispatch({ type: LAYOUT_ACTIONS.OPEN_SIDEBAR });
-  };
-
-  const closeSidebar = () => {
-    dispatch({ type: LAYOUT_ACTIONS.CLOSE_SIDEBAR });
-  };
-
-  const contextValue: LayoutContextType = {
-    state,
-    dispatch,
-    toggleSidebar,
-    openSidebar,
-    closeSidebar
-  };
-
-  return <LayoutContext.Provider value={contextValue}>{children}</LayoutContext.Provider>;
+export const useLayoutContext = (): LayoutContextType => {
+  const context = useContext(LayoutContext);
+  if (context === undefined) {
+    throw new Error('useLayoutContext must be used within a LayoutProvider');
+  }
+  return context;
 };
 
 export default LayoutContext;

@@ -51,9 +51,7 @@ export const setupCommonMocks = async (mocks: ReturnType<typeof createMockFuncti
   mockUseToastContext.mockReturnValue({
     showToast: mockShowToast,
     removeToast: vi.fn(),
-    clearAllToasts: vi.fn(),
-    state: { toasts: [] },
-    dispatch: vi.fn()
+    state: { toasts: [] }
   });
 
   // Apply mocks

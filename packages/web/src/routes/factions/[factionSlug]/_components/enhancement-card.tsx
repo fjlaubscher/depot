@@ -2,14 +2,14 @@ import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface EnhancementCardProps {
   enhancement: depot.Enhancement;
 }
 
 const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const showFluff = settings.showFluff ?? true;
 
   return (

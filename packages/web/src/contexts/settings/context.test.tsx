@@ -16,19 +16,18 @@ vi.mock('../../data/offline-storage', () => ({
 }));
 
 const TestComponent = () => {
-  const { state, updateSettings } = useSettingsContext();
+  const { settings, updateSettings } = useSettingsContext();
   const [status, setStatus] = useState<'idle' | 'saving' | 'done'>('idle');
 
   const handleUpdate = async () => {
     setStatus('saving');
-    await updateSettings({ ...state.settings, showForgeWorld: true });
+    await updateSettings({ ...settings, showForgeWorld: true });
     setStatus('done');
   };
 
   return (
     <div>
-      <div data-testid="settings">{JSON.stringify(state.settings)}</div>
-      <div data-testid="status">{state.status}</div>
+      <div data-testid="settings">{JSON.stringify(settings)}</div>
       <div data-testid="local-status">{status}</div>
       <button onClick={() => void handleUpdate()} data-testid="update-settings">
         Update

@@ -68,7 +68,7 @@ describe('useRosters', () => {
 
     expect(result.current.rosters).toEqual([]);
     expect(result.current.error).toBe('Storage error');
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load rosters:', error);
+    expect(consoleSpy).toHaveBeenCalledWith(error);
 
     consoleSpy.mockRestore();
   });
@@ -82,7 +82,7 @@ describe('useRosters', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.error).toBe('Unknown error loading rosters');
+    expect(result.current.error).toBe('Unknown error');
   });
 
   it('should add roster and reload list', async () => {

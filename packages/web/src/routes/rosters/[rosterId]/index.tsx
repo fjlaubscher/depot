@@ -1,32 +1,26 @@
 import { Fragment, useMemo, useState } from 'react';
 import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Copy, Pencil, Share2, RefreshCw } from 'lucide-react';
+import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
-import useDownloadFile from '@/hooks/use-download-file';
+import { downloadFile } from '@/utils/file';
 import { safeSlug } from '@depot/core/utils/common';
 import type { ExportedRoster } from '@/types/export';
 import { refreshRosterData } from '@/utils/refresh-user-data';
-import useSettings from '@/hooks/use-settings';
-import useFactionIndex from '@/hooks/use-faction-index';
-import useFactionData from '@/hooks/use-faction-data';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useFactionsContext } from '@/contexts/factions/context';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
-import ExportButton from '@/components/shared/export-button';
-import {
-  generateRosterMarkdown,
-  generateRosterShareText,
-  getRosterFactionName
-} from '@/utils/roster';
+import { generateRosterShareText } from '@/utils/roster';
+import { getRosterFactionName } from '@depot/core/utils/roster';
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
-import CogitatorTab from './_components/cogitator-tab';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
@@ -34,11 +28,12 @@ const RosterView: FC = () => {
   const { state: roster, setRoster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { settings } = useSettings();
-  const { dataVersion: catalogueDataVersion } = useFactionIndex();
-  const { getDatasheet, getFactionManifest } = useFactionData();
-  const downloadFile = useDownloadFile();
-  const isCogitatorEnabled = settings.enableCogitator ?? false;
+  const { settings } = useSettingsContext();
+  const {
+    dataVersion: catalogueDataVersion,
+    getDatasheet,
+    getFactionManifest
+  } = useFactionsContext();
   const {
     stratagems: coreStratagems,
     loading: loadingCoreStratagems,
@@ -185,11 +180,6 @@ const RosterView: FC = () => {
     />
   );
 
-  if (isCogitatorEnabled) {
-    tabLabels.push('Cogitator');
-    tabPanels.push(<CogitatorTab key="cogitator" roster={roster} />);
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <BackButton to="/rosters" label="Rosters" className="md:hidden" />
@@ -229,7 +219,15 @@ const RosterView: FC = () => {
             <Pencil size={16} />
             Edit
           </Button>
-          <ExportButton onClick={handleExportJson} />
+          <Button
+            variant="secondary"
+            onClick={handleExportJson}
+            className="flex items-center gap-2"
+            data-testid="export-button"
+          >
+            <Download size={16} />
+            Export
+          </Button>
         </div>
         <p className="text-xs text-subtle">
           Export downloads a JSON you can import on another device. Sharing still follows your

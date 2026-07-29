@@ -1,9 +1,3 @@
-export interface Option {
-  id: string;
-  slug: string;
-  name: string;
-}
-
 export interface Ability {
   id: string;
   name: string;
@@ -230,7 +224,6 @@ export interface Settings {
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
   usePileOfShameLabel?: boolean;
-  enableCogitator?: boolean;
 }
 
 // Detachment, composed from other types
@@ -256,11 +249,6 @@ export interface RosterUnit {
   datasheetSlug?: string;
 }
 
-export interface RosterCogitatorAnalysis {
-  output: string;
-  updatedAt: string;
-}
-
 // The main roster object that represents a user's army list.
 export interface Roster {
   id: string; // A unique ID for this roster
@@ -277,11 +265,6 @@ export interface Roster {
   warlordUnitId?: string | null;
   units: RosterUnit[];
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
-  /**
-   * Cached output from the Cogitator roster analysis.
-   * Optional for backward compatibility with existing saved rosters.
-   */
-  cogitatorAnalysis?: RosterCogitatorAnalysis | null;
 }
 
 export type CollectionUnitState = 'sprue' | 'built' | 'battle-ready' | 'parade-ready';

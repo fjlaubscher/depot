@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
 // Context hooks
-import useFactionIndex from '@/hooks/use-faction-index';
-import useSettings from '@/hooks/use-settings';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -24,8 +24,8 @@ import {
 import useDebounce from '@/hooks/use-debounce';
 
 const Factions: React.FC = () => {
-  const { factionIndex, loading, error, checkForDataUpdates } = useFactionIndex();
-  const { settings } = useSettings();
+  const { factionIndex, loading, error, checkForDataUpdates } = useFactionsContext();
+  const { settings } = useSettingsContext();
 
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);

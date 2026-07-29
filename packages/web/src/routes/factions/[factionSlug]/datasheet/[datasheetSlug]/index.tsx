@@ -9,7 +9,7 @@ import { BackButton } from '@/components/shared';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import useDatasheet from '@/hooks/use-datasheet';
-import useSettings from '@/hooks/use-settings';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
 
@@ -28,7 +28,7 @@ const DatasheetPage: FC = () => {
     loading: datasheetLoading,
     error: datasheetError
   } = useDatasheet(factionSlug, datasheetSlug);
-  const { settings } = useSettings();
+  const { settings } = useSettingsContext();
   const shareAction = useShareAction({
     title: datasheet?.name,
     url:

@@ -1,6 +1,6 @@
 import React from 'react';
 import AppLayout from '@/components/layout';
-import { Skeleton as UISkeleton, TabsSkeleton } from '@/components/ui';
+import { Skeleton as UISkeleton } from '@/components/ui';
 
 const PillRow: React.FC = () => (
   <div className="flex flex-wrap gap-2">
@@ -17,7 +17,15 @@ const DatasheetSkeleton: React.FC = () => {
         <UISkeleton width="70%" height={28} className="rounded-md" />
         <UISkeleton width="45%" height={14} className="rounded-md" />
 
-        <TabsSkeleton tabCount={2} />
+        <div className="border-b border-subtle">
+          <nav className="-mb-px flex gap-4">
+            {[0, 1].map((index) => (
+              <div key={index} className="py-4 px-1 border-b-2 border-transparent">
+                <UISkeleton height={20} width={80} />
+              </div>
+            ))}
+          </nav>
+        </div>
 
         <div className="surface-card p-4 rounded-md flex flex-col gap-2">
           <UISkeleton width="100%" height={12} className="rounded-md" />

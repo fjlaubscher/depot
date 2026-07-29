@@ -1,5 +1,7 @@
 import type { depot } from '@depot/core';
-import { resolveIndexDataVersion } from './index-version';
+
+const resolveIndexDataVersion = (index?: depot.Index[] | null): string | null =>
+  index?.find((entry) => Boolean(entry.dataVersion))?.dataVersion ?? null;
 
 export interface FactionIndexStorage {
   getFactionIndex: () => Promise<depot.Index[] | null>;
