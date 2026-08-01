@@ -48,6 +48,9 @@ const AppLayout = ({ children, title }: Props) => {
           <span className="font-semibold text-muted">depot </span>
           <span>v{appVersion}</span>
         </span>
+        <Link to="/about" onClick={closeSidebar} className="link-subtle">
+          About
+        </Link>
         <Link to="/privacy" onClick={closeSidebar} className="link-subtle">
           Privacy Policy
         </Link>

@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { getAppBasePath, getViteBasePath } from './src/utils/paths';
+import { getAppBasePath, getViteBasePath } from './src/utils/paths.js';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {

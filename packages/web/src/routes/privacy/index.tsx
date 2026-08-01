@@ -13,8 +13,7 @@ const PrivacyPolicy = () => (
         <h2 className="text-lg font-semibold text-foreground">Overview</h2>
         <p className="text-sm text-body">
           depot is a privacy-first, open-source Warhammer 40,000 companion. You can browse factions,
-          datasheets, and rosters anonymously: the app never asks for a login, and there are no ad
-          networks or third-party beacons watching what you do.
+          datasheets, and rosters anonymously—the app never asks for a login.
         </p>
         <p className="text-sm text-body">
           Only the minimum technical data required to serve the site or fix crashes is processed,
@@ -27,8 +26,7 @@ const PrivacyPolicy = () => (
         <p className="text-sm text-body">
           Rosters, preferences, cached faction data, and any offline assets live inside your
           browser's IndexedDB and local storage. None of this content is uploaded back to depot or
-          shared with third parties. Clearing your browser storage for godepot.dev removes that
-          information permanently from your device.
+          shared with third parties.
         </p>
       </section>
 
@@ -62,8 +60,7 @@ const PrivacyPolicy = () => (
         </p>
         <p className="text-sm text-body">
           Sentry is used strictly to debug crashes. No roster data, PII, or gameplay content is
-          intentionally included in those payloads. If you'd rather block telemetry completely, use
-          an ad blocker or network rule to deny requests to <code>*.ingest.sentry.io</code>.
+          intentionally included in those payloads.
         </p>
       </section>
 

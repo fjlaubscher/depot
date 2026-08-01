@@ -7,7 +7,7 @@ import { getImageUrl } from '@/utils/paths';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Card, Grid } from '@/components/ui';
+import { Alert, Card, Grid } from '@/components/ui';
 
 // Custom hooks
 import { useFactionsContext } from '@/contexts/factions/context';
@@ -99,6 +99,22 @@ const Home: React.FC = () => {
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">
       <div className="flex flex-col gap-12">
+        <Alert variant="warning" title="11th edition isn't here yet" data-testid="edition-notice">
+          <p className="text-sm">
+            Wahapedia has updated their site, but their data exports are still 10th edition. depot
+            will follow once they do. Track it on{' '}
+            <a
+              href="https://github.com/fjlaubscher/depot/issues/46"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold underline"
+            >
+              issue #46
+            </a>
+            .
+          </p>
+        </Alert>
+
         <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
           <img
             src={getImageUrl('depot-hero.jpg')}

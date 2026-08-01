@@ -22,27 +22,11 @@ const About = () => (
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold text-foreground">What depot is</h2>
         <p className="text-sm text-body">
-          depot is a free, open-source list companion that treats speed and offline resilience as
-          headline features. It mirrors Wahapedia exports, keeps everything cached on your device,
-          and wraps it all in a touch-friendly interface meant for busy game tables and late-night
-          list brewing. It ships as a web app only—no app-store builds—and stays free and
-          non-commercial. There are no logins, ads, or social feeds-just useful tools and a bit of
-          playful polish for people who love tinkering with armies.
+          A free, open-source list companion built around fast datasheet browsing, lightweight
+          roster sketching, and typography tuned for phones. It mirrors Wahapedia exports and caches
+          everything on your device, so it keeps working on trains, planes, or spotty Wi-Fi. Web app
+          only—no app-store builds, no logins, no ads.
         </p>
-      </section>
-
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold text-foreground">What depot focuses on</h2>
-        <ul className="list-disc list-inside text-sm text-body">
-          <li>Fast datasheet browsing with sensible filters and typography tuned for phones.</li>
-          <li>Lightweight roster sketching so you can tweak points and detachments on the fly.</li>
-          <li>
-            Offline-first caching that keeps your data available on trains, planes, or spotty Wi-Fi.
-          </li>
-          <li>
-            Transparency: open-source code, Wahapedia-powered data, and no extractive telemetry.
-          </li>
-        </ul>
       </section>
 
       <section className="flex flex-col gap-2">
@@ -70,7 +54,19 @@ const About = () => (
           >
             View the GitHub repository
           </a>
+          <a
+            href="https://x.com/fjlaubscher"
+            target="_blank"
+            rel="noreferrer"
+            className="text-primary-600 dark:text-primary-400 underline"
+          >
+            Say hi on X (@fjlaubscher)
+          </a>
         </div>
+        <p className="text-sm text-body">
+          GitHub issues are the best place for bugs and requests. For anything else, X is the way to
+          reach me.
+        </p>
       </section>
 
       <section className="flex flex-col gap-2">
