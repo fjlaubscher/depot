@@ -21,7 +21,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - `pnpm clean` - clean all package outputs
 
 ## Data + Build Flow
-1. CLI fetches CSV from Wahapedia URLs.
+1. CLI fetches CSV from Wahapedia URLs. Edition path defaults to `wh40k10ed`; override with `WAHAPEDIA_EDITION=wh40k11ed`.
 2. CSV is converted to JSON using `@depot/core` types.
 3. Output lands in `packages/cli/dist/json/` and `packages/cli/dist/data/`.
 4. `scripts/copy-data.mjs` copies `dist/data/` into `packages/web/public/data/`.

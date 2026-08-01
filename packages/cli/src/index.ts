@@ -44,6 +44,10 @@ const WAHAPEDIA_CSV_FILES = [
   'Last_update.csv'
 ];
 
+// Wahapedia serves each edition under its own path. 11ed exports exist but are still a stale copy
+// of 10ed (older last_update), so keep 10ed as the default until that flips.
+const EDITION = process.env.WAHAPEDIA_EDITION ?? 'wh40k10ed';
+
 const fetchCSV = (url: string) => fetch(url).then((response) => response.text());
 
 const forceDownload = process.argv.includes('--force-download');
@@ -69,9 +73,9 @@ const init = async () => {
   let results: string[];
 
   if (shouldDownload) {
-    log('Fetching CSV data from Wahapedia');
+    log(`Fetching CSV data from Wahapedia (${EDITION})`);
     const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
-      fetchCSV(`http://wahapedia.ru/wh40k10ed/${fileName}`)
+      fetchCSV(`https://wahapedia.ru/${EDITION}/${fileName}`)
     );
     results = await Promise.all(requests);
 
