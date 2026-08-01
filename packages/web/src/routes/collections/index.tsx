@@ -4,7 +4,6 @@ import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
@@ -13,8 +12,10 @@ import { ListEmptyState } from '@/components/shared';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { getCollectionsSnapshotCopy } from '@/utils/collection';
-import { readJsonFile } from '@/utils/file';
-import { isExportedCollection } from '@/types/export';
+import {
+  formatCollectionImportToast,
+  importCollectionsFromFiles
+} from '@/utils/import-collections';
 import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
 import CollectionStateChart from './_components/collection-state-chart';
@@ -22,16 +23,9 @@ import CollectionStateChart from './_components/collection-state-chart';
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { collections, loading, error, refresh } = useCollections();
-  const { settings } = useSettingsContext();
   const { dataVersion } = useFactionsContext();
   const { showToast } = useToast();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const label = usePileLabel ? 'Pile of Shame' : 'Collections';
-  const pageTitle = usePileLabel ? 'Pile of Shame Tracker' : 'Collection Tracker';
-  const snapshot = useMemo(
-    () => getCollectionsSnapshotCopy(collections, usePileLabel),
-    [collections, usePileLabel]
-  );
+  const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections]);
   const hasSnapshotData = snapshot.items.length > 0;
 
   const handleCreate = () => navigate('/collections/create');
@@ -42,7 +36,7 @@ const CollectionsPage: React.FC = () => {
       await refresh();
       showToast({
         type: 'success',
-        title: usePileLabel ? 'Pile entry removed' : 'Collection deleted',
+        title: 'Collection deleted',
         message: 'Entry deleted successfully.'
       });
     } catch (err) {
@@ -85,60 +79,33 @@ const CollectionsPage: React.FC = () => {
     }
   };
 
-  const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
-    const currentDataVersion = dataVersion ?? null;
-    const items = collection.items.map((item) => ({
-      ...item,
-      id: crypto.randomUUID()
-    }));
-
-    const imported: depot.Collection = {
-      ...collection,
-      id: crypto.randomUUID(),
-      items,
-      dataVersion: currentDataVersion ?? collection.dataVersion ?? null,
-      points: { current: calculateCollectionPoints({ ...collection, items }) }
-    };
-
-    return imported;
-  };
-
-  const handleImportCollectionFile = async (file: File) => {
+  const handleImportCollectionFiles = async (files: File[]) => {
     try {
-      const parsed = await readJsonFile<unknown>(file);
-      if (!isExportedCollection(parsed) || parsed.version !== 1) {
-        showToast({
-          type: 'error',
-          title: 'Import failed',
-          message: 'This file does not look like a depot collection export.'
-        });
-        return;
+      const result = await importCollectionsFromFiles(files, {
+        dataVersion: dataVersion ?? null,
+        saveCollection: (collection) => offlineStorage.saveCollection(collection)
+      });
+
+      if (result.imported.length > 0) {
+        await refresh();
       }
 
-      const imported = remapCollectionIds(parsed.collection);
-      await offlineStorage.saveCollection(imported);
-      await refresh();
-
-      showToast({
-        type: 'success',
-        title: usePileLabel ? 'Pile entry imported' : 'Collection imported',
-        message: `Imported "${imported.name}".`
-      });
+      showToast(formatCollectionImportToast(result));
     } catch (err) {
-      console.error('Failed to import collection', err);
+      console.error('Failed to import collections', err);
       showToast({
         type: 'error',
         title: 'Import failed',
-        message: 'Could not import this collection. Please check the file and try again.'
+        message: 'Could not import the selected files. Please try again.'
       });
     }
   };
 
   return (
-    <AppLayout title={pageTitle}>
+    <AppLayout title="Collection Tracker">
       <div className="flex flex-col gap-4">
         <PageHeader
-          title={label}
+          title="Collections"
           subtitle="Track your kits, set their state, and prep them for roster building."
           action={{
             icon: <Plus size={16} />,
@@ -149,8 +116,8 @@ const CollectionsPage: React.FC = () => {
         />
         <div className="flex flex-wrap gap-3">
           <ImportButton
-            label="Import collection"
-            onFileSelected={handleImportCollectionFile}
+            multiple
+            onFilesSelected={handleImportCollectionFiles}
             buttonTestId="import-collection-button"
             inputTestId="import-collection-input"
           />

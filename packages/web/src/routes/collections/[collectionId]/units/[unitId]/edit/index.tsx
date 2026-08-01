@@ -16,18 +16,15 @@ import {
 import UnitEditShell from '@/components/shared/unit-edit/unit-edit-shell';
 import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-shell';
 import { COLLECTION_UNIT_STATES } from '@depot/core/utils/collection';
-import { COLLECTION_STATE_META, getCollectionLabels } from '@/utils/collection';
+import { COLLECTION_STATE_META, COLLECTION_LABELS } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 const CollectionUnitEditView: React.FC = () => {
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
 
   const unit = collection?.items.find((item) => item.id === unitId);
 
@@ -167,9 +164,7 @@ const CollectionUnitEditView: React.FC = () => {
 
 const CollectionUnitEditPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
 
   if (!collectionId) {
     return (

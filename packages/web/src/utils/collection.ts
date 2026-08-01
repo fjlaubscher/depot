@@ -3,12 +3,12 @@ import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/ut
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
-export const getCollectionLabels = (usePileLabel: boolean) => ({
-  pluralTitle: usePileLabel ? 'Pile of Shame' : 'Collections',
-  singularTitle: usePileLabel ? 'Pile of Shame' : 'Collection',
-  singular: usePileLabel ? 'pile of shame' : 'collection',
-  short: usePileLabel ? 'pile' : 'collection'
-});
+export const COLLECTION_LABELS = {
+  pluralTitle: 'Collections',
+  singularTitle: 'Collection',
+  singular: 'collection',
+  short: 'collection'
+} as const;
 
 export const COLLECTION_STATE_META: Record<
   depot.CollectionUnitState,
@@ -56,8 +56,7 @@ export const getCollectionChartCopy = (
 };
 
 export const getCollectionsSnapshotCopy = (
-  collections: depot.Collection[],
-  usePileLabel: boolean
+  collections: depot.Collection[]
 ): {
   heading: string;
   subheading: string;
@@ -81,9 +80,7 @@ export const getCollectionsSnapshotCopy = (
       ? `${totalUnits} unit${totalUnits === 1 ? '' : 's'} across ${collections.length} collection${
           collections.length === 1 ? '' : 's'
         }`
-      : usePileLabel
-        ? 'Start your pile of shame'
-        : 'Start your collection';
+      : 'Start your collection';
 
   const subheading =
     totalUnits > 0 && dominantState

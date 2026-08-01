@@ -50,6 +50,11 @@
       "types": "./dist/utils/datasheets.d.ts",
       "import": "./dist/utils/datasheets.js",
       "default": "./dist/utils/datasheets.js"
+    },
+    "./utils/rebind": {
+      "types": "./dist/utils/rebind.d.ts",
+      "import": "./dist/utils/rebind.js",
+      "default": "./dist/utils/rebind.js"
     }
   },
   "files": [

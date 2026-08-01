@@ -8,8 +8,11 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
 import { downloadFile } from '@/utils/file';
 import { safeSlug } from '@depot/core/utils/common';
-import type { ExportedRoster } from '@/types/export';
-import { refreshRosterData } from '@/utils/refresh-user-data';
+import { CURRENT_GAME_EDITION, type ExportedRoster } from '@/types/export';
+import {
+  formatRebindSummaryMessage,
+  refreshRosterDataWithReport
+} from '@/utils/refresh-user-data';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useFactionsContext } from '@/contexts/factions/context';
 
@@ -53,6 +56,7 @@ const RosterView: FC = () => {
       kind: 'roster',
       version: 1,
       dataVersion,
+      edition: CURRENT_GAME_EDITION,
       roster
     };
 
@@ -89,18 +93,21 @@ const RosterView: FC = () => {
 
     setRefreshingRoster(true);
     try {
-      const refreshed = await refreshRosterData({
+      const result = await refreshRosterDataWithReport({
         roster,
         currentDataVersion,
         getDatasheet,
         getFactionManifest
       });
 
-      setRoster(refreshed);
+      setRoster(result.roster);
+      const rebindNote = formatRebindSummaryMessage(result.summary);
       showToast({
         title: 'Roster updated',
-        message: 'Refreshed with the latest Wahapedia data.',
-        type: 'success'
+        message: rebindNote
+          ? `Refreshed with the latest data. ${rebindNote}`
+          : 'Refreshed with the latest Wahapedia data.',
+        type: rebindNote ? 'warning' : 'success'
       });
     } catch (error) {
       console.error('Failed to refresh roster data', error);

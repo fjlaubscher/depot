@@ -12,15 +12,12 @@ import {
   calculateCollectionPoints,
   createCollectionUnitFromDatasheet
 } from '@depot/core/utils/collection';
-import { getCollectionLabels } from '@/utils/collection';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { COLLECTION_LABELS } from '@/utils/collection';
 
 const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
   const { collection, loading, error, save } = useCollection(collectionId);
 
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
@@ -99,9 +96,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
 const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
 
   return (
     <AppLayout title={`Add Units to ${labels.singularTitle}`}>

@@ -7,7 +7,8 @@ import { Button } from '@/components/ui';
 type ImportButtonProps = {
   label?: string;
   accept?: string;
-  onFileSelected: (file: File) => void;
+  multiple?: boolean;
+  onFilesSelected: (files: File[]) => void;
   buttonTestId?: string;
   inputTestId?: string;
 };
@@ -15,17 +16,18 @@ type ImportButtonProps = {
 const ImportButton: FC<ImportButtonProps> = ({
   label = 'Import',
   accept = 'application/json,.json',
-  onFileSelected,
+  multiple = false,
+  onFilesSelected,
   buttonTestId = 'import-button',
   inputTestId = 'import-input'
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const [file] = event.target.files ?? [];
+    const files = Array.from(event.target.files ?? []);
     event.target.value = '';
-    if (file) {
-      onFileSelected(file);
+    if (files.length > 0) {
+      onFilesSelected(files);
     }
   };
 
@@ -46,6 +48,7 @@ const ImportButton: FC<ImportButtonProps> = ({
         className="hidden"
         type="file"
         accept={accept}
+        multiple={multiple}
         onChange={handleChange}
         data-testid={inputTestId}
       />

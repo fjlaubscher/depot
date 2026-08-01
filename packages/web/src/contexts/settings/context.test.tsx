@@ -43,8 +43,7 @@ describe('SettingsProvider', () => {
     showUnaligned: false,
     showFluff: true,
     includeWargearOnExport: true,
-    useNativeShare: true,
-    usePileOfShameLabel: false
+    useNativeShare: true
   };
 
   beforeEach(() => {

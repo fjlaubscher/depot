@@ -5,18 +5,15 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import { getCollectionLabels } from '@/utils/collection';
+import { COLLECTION_LABELS } from '@/utils/collection';
 
 const CreateCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { settings } = useSettingsContext();
   const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);
 

@@ -25,5 +25,8 @@ export * as paths from './utils/paths.js';
 // Export datasheet helpers
 export * as datasheets from './utils/datasheets.js';
 
+// Export rebind / edition-migration helpers
+export * as rebind from './utils/rebind.js';
+
 // Export all wahapedia types
 export * as wahapedia from './types/wahapedia.js';

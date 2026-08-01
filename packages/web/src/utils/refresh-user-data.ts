@@ -1,8 +1,14 @@
 import type { depot } from '@depot/core';
-import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@depot/core/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
+import {
+  applyCollectionRebind,
+  matchDatasheetSummary,
+  rebindCollectionUnit,
+  rebindRosterUnit,
+  unitDatasheetIdentity,
+  type RebindCollectionResult,
+  type RebindStatus
+} from '@depot/core/utils/rebind';
 import { calculateTotalPoints } from '@depot/core/utils/roster';
-import { calculateCollectionPoints } from '@depot/core/utils/collection';
 
 type GetDatasheet = (
   factionSlug: string,
@@ -18,12 +24,90 @@ export interface RefreshRosterParams {
   getFactionManifest: GetFactionManifest;
 }
 
+export type RefreshRosterResult = {
+  roster: depot.Roster;
+  summary: { ok: number; partial: number; missing: number };
+};
+
+export interface RefreshCollectionParams {
+  collection: depot.Collection;
+  currentDataVersion: string | null;
+  getDatasheet: GetDatasheet;
+  getFactionManifest?: GetFactionManifest;
+}
+
+const emptySummary = () => ({ ok: 0, partial: 0, missing: 0 });
+
+const addStatus = (
+  summary: { ok: number; partial: number; missing: number },
+  status: RebindStatus
+) => {
+  summary[status] += 1;
+};
+
+/**
+ * Resolve a datasheet for a stored unit: id → slug → name (via faction manifest).
+ */
+export const resolveDatasheetForUnit = async (
+  unit: { datasheet: depot.Datasheet; datasheetSlug?: string },
+  factionSlug: string | undefined,
+  getDatasheet: GetDatasheet,
+  getFactionManifest?: GetFactionManifest,
+  manifestCache?: Map<string, depot.FactionManifest | null>
+): Promise<depot.Datasheet | null> => {
+  const identity = unitDatasheetIdentity(unit);
+  const slug = unit.datasheet.factionSlug || factionSlug;
+  if (!slug) return null;
+
+  const keys = [identity.id, identity.slug].filter((value): value is string => Boolean(value));
+  for (const key of keys) {
+    const fetched = await getDatasheet(slug, key);
+    if (fetched) return fetched;
+  }
+
+  if (!getFactionManifest || !identity.name) {
+    return null;
+  }
+
+  let manifest: depot.FactionManifest | null | undefined;
+  if (manifestCache?.has(slug)) {
+    manifest = manifestCache.get(slug);
+  } else {
+    manifest = await getFactionManifest(slug);
+    manifestCache?.set(slug, manifest);
+  }
+
+  if (!manifest?.datasheets?.length) {
+    return null;
+  }
+
+  const summary = matchDatasheetSummary(identity, manifest.datasheets);
+  if (!summary) return null;
+
+  return getDatasheet(slug, summary.id || summary.slug);
+};
+
 export const refreshRosterData = async ({
   roster,
   currentDataVersion,
   getDatasheet,
   getFactionManifest
 }: RefreshRosterParams): Promise<depot.Roster> => {
+  const result = await refreshRosterDataWithReport({
+    roster,
+    currentDataVersion,
+    getDatasheet,
+    getFactionManifest
+  });
+  return result.roster;
+};
+
+export const refreshRosterDataWithReport = async ({
+  roster,
+  currentDataVersion,
+  getDatasheet,
+  getFactionManifest
+}: RefreshRosterParams): Promise<RefreshRosterResult> => {
   if (!currentDataVersion) {
     throw new Error('currentDataVersion is required to refresh roster data');
   }
@@ -34,31 +118,24 @@ export const refreshRosterData = async ({
     manifest?.detachments.find((entry) => entry.slug === roster.detachment?.slug) ??
     roster.detachment;
 
+  const manifestCache = new Map<string, depot.FactionManifest | null>();
+  if (factionSlug && manifest) {
+    manifestCache.set(factionSlug, manifest);
+  }
+
+  const summary = emptySummary();
   const updatedUnits = await Promise.all(
     roster.units.map(async (unit) => {
-      const slug = unit.datasheet.factionSlug || factionSlug;
-      const datasheetKey = unit.datasheet.id || unit.datasheet.slug;
-
-      if (!slug || !datasheetKey) {
-        return unit;
-      }
-
-      const fetched = await getDatasheet(slug, datasheetKey);
-      if (!fetched) {
-        return unit;
-      }
-
-      const normalized = normalizeDatasheetWargear(fetched);
-      return {
-        ...unit,
-        datasheet: normalized,
-        datasheetSlug: normalized.slug,
-        selectedWargear: normalizeSelectedWargear(unit.selectedWargear, normalized.wargear),
-        selectedWargearAbilities: normalizeSelectedWargearAbilities(
-          unit.selectedWargearAbilities,
-          normalized.abilities
-        )
-      };
+      const datasheet = await resolveDatasheetForUnit(
+        unit,
+        factionSlug,
+        getDatasheet,
+        getFactionManifest,
+        manifestCache
+      );
+      const rebound = rebindRosterUnit(unit, datasheet);
+      addStatus(summary, rebound.status);
+      return rebound.unit;
     })
   );
 
@@ -70,60 +147,72 @@ export const refreshRosterData = async ({
   };
 
   return {
-    ...updatedRoster,
-    points: { ...updatedRoster.points, current: calculateTotalPoints(updatedRoster) }
+    roster: {
+      ...updatedRoster,
+      points: { ...updatedRoster.points, current: calculateTotalPoints(updatedRoster) }
+    },
+    summary
   };
 };
-
-export interface RefreshCollectionParams {
-  collection: depot.Collection;
-  currentDataVersion: string | null;
-  getDatasheet: GetDatasheet;
-}
 
 export const refreshCollectionData = async ({
   collection,
   currentDataVersion,
-  getDatasheet
+  getDatasheet,
+  getFactionManifest
 }: RefreshCollectionParams): Promise<depot.Collection> => {
+  const result = await refreshCollectionDataWithReport({
+    collection,
+    currentDataVersion,
+    getDatasheet,
+    getFactionManifest
+  });
+  return result.collection;
+};
+
+export const refreshCollectionDataWithReport = async ({
+  collection,
+  currentDataVersion,
+  getDatasheet,
+  getFactionManifest
+}: RefreshCollectionParams): Promise<RebindCollectionResult> => {
   if (!currentDataVersion) {
     throw new Error('currentDataVersion is required to refresh collection data');
   }
 
   const factionSlug = collection.factionSlug || collection.faction?.slug || collection.factionId;
+  const manifestCache = new Map<string, depot.FactionManifest | null>();
 
-  const updatedItems = await Promise.all(
+  const itemResults = await Promise.all(
     collection.items.map(async (item) => {
-      const slug = item.datasheet.factionSlug || factionSlug;
-      const datasheetKey = item.datasheet.id || item.datasheet.slug;
-
-      if (!slug || !datasheetKey) {
-        return item;
-      }
-
-      const fetched = await getDatasheet(slug, datasheetKey);
-      if (!fetched) {
-        return item;
-      }
-
-      const normalized = normalizeDatasheetWargear(fetched);
-      return {
-        ...item,
-        datasheet: normalized,
-        datasheetSlug: normalized.slug,
-        selectedWargear: normalizeSelectedWargear(item.selectedWargear, normalized.wargear),
-        selectedWargearAbilities: normalizeSelectedWargearAbilities(
-          item.selectedWargearAbilities,
-          normalized.abilities
-        )
-      };
+      const datasheet = await resolveDatasheetForUnit(
+        item,
+        factionSlug,
+        getDatasheet,
+        getFactionManifest,
+        manifestCache
+      );
+      return rebindCollectionUnit(item, datasheet);
     })
   );
 
-  return {
-    ...collection,
-    dataVersion: currentDataVersion,
-    items: updatedItems,
-    points: { current: calculateCollectionPoints({ ...collection, items: updatedItems }) }
-  };
+  return applyCollectionRebind(collection, itemResults, currentDataVersion);
+};
+
+export const formatRebindSummaryMessage = (summary: {
+  ok: number;
+  partial: number;
+  missing: number;
+}): string | null => {
+  const { partial, missing } = summary;
+  if (partial === 0 && missing === 0) return null;
+
+  const parts: string[] = [];
+  if (partial > 0) {
+    parts.push(`${partial} unit${partial === 1 ? '' : 's'} partially matched (loadout changes)`);
+  }
+  if (missing > 0) {
+    parts.push(`${missing} unit${missing === 1 ? '' : 's'} not found in the current catalog`);
+  }
+  return parts.join('. ') + '.';
 };

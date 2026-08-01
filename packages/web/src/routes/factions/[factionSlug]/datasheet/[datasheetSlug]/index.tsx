@@ -1,5 +1,7 @@
 import type { FC } from 'react';
+import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
@@ -9,9 +11,12 @@ import { BackButton } from '@/components/shared';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import useDatasheet from '@/hooks/use-datasheet';
+import useBookmarks from '@/hooks/use-bookmarks';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useToast } from '@/contexts/toast/use-toast-context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
+import { createDatasheetBookmark, datasheetBookmarkId } from '@/utils/bookmarks';
 
 // page components
 import { DatasheetProfile } from '@/components/shared/datasheet';
@@ -29,6 +34,35 @@ const DatasheetPage: FC = () => {
     error: datasheetError
   } = useDatasheet(factionSlug, datasheetSlug);
   const { settings } = useSettingsContext();
+  const { showToast } = useToast();
+  const { isBookmarked, toggleBookmark } = useBookmarks();
+
+  const bookmarked =
+    faction && datasheet
+      ? isBookmarked(datasheetBookmarkId(faction.slug, datasheet.slug))
+      : false;
+
+  const handleToggleBookmark = useCallback(async () => {
+    if (!faction || !datasheet) return;
+    try {
+      const next = await toggleBookmark(createDatasheetBookmark(faction, datasheet));
+      showToast({
+        type: 'success',
+        title: next ? 'Bookmarked' : 'Bookmark removed',
+        message: next
+          ? `${datasheet.name} pinned to your desk.`
+          : `${datasheet.name} removed from bookmarks.`
+      });
+    } catch (err) {
+      console.error('Failed to toggle datasheet bookmark', err);
+      showToast({
+        type: 'error',
+        title: 'Bookmark failed',
+        message: 'Could not update bookmarks.'
+      });
+    }
+  }, [datasheet, faction, showToast, toggleBookmark]);
+
   const shareAction = useShareAction({
     title: datasheet?.name,
     url:
@@ -105,12 +139,23 @@ const DatasheetPage: FC = () => {
         <PageHeader
           title={datasheet.name}
           subtitle={datasheet.sourceName}
-          action={{
-            icon: shareAction.icon,
-            onClick: () => shareAction.onClick(),
-            ariaLabel: shareAction.ariaLabel,
-            testId: shareAction['data-testid']
-          }}
+          actions={[
+            {
+              icon: bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />,
+              onClick: () => {
+                void handleToggleBookmark();
+              },
+              ariaLabel: bookmarked ? 'Remove bookmark' : 'Bookmark datasheet',
+              variant: bookmarked ? 'primary' : 'ghost',
+              'data-testid': 'bookmark-datasheet-button'
+            },
+            {
+              icon: shareAction.icon,
+              onClick: () => shareAction.onClick(),
+              ariaLabel: shareAction.ariaLabel ?? 'Share datasheet',
+              'data-testid': shareAction['data-testid']
+            }
+          ]}
           data-testid="datasheet-header"
         />
 

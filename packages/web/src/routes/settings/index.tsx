@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import type { depot } from '@depot/core';
-import { Users, ClipboardList, Boxes, Database } from 'lucide-react';
+import { Users, ClipboardList, Database } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -36,10 +36,18 @@ const Settings = () => {
   const handleReset = useCallback(async () => {
     try {
       await clearOfflineData();
-      showToast({ type: 'success', title: 'Success', message: 'Cached faction data deleted.' });
+      showToast({
+        type: 'success',
+        title: 'Offline cache cleared',
+        message: 'Cached faction packs and datasheets were removed.'
+      });
     } catch (error) {
       console.error('Failed to delete offline data:', error);
-      showToast({ type: 'error', title: 'Error', message: 'Failed to delete cached factions.' });
+      showToast({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to clear the offline cache.'
+      });
     }
   }, [clearOfflineData, showToast]);
 
@@ -52,22 +60,6 @@ const Settings = () => {
         />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Collection Preferences Card */}
-          <SettingsCard
-            icon={<Boxes size={20} />}
-            title="Collection Preferences"
-            description="Control how collections are displayed"
-          >
-            <div className="flex flex-col gap-4">
-              <SettingToggleItem
-                title="Call It What It Is"
-                description={`Use "Pile of Shame" instead of "Collection" across the app.`}
-                enabled={settings.usePileOfShameLabel ?? true}
-                onChange={(value) => handleSettingsChange('usePileOfShameLabel', value)}
-              />
-            </div>
-          </SettingsCard>
-
           {/* Faction Preferences Card */}
           <SettingsCard
             icon={<Users size={20} />}
@@ -128,7 +120,7 @@ const Settings = () => {
           <SettingsCard
             icon={<Database size={20} />}
             title="Offline Data"
-            description="Manage cached faction data for offline use"
+            description="Faction packs and datasheets cached for offline use (rosters and collections are separate)"
           >
             {loading ? (
               <div className="flex justify-center py-8">
@@ -147,15 +139,24 @@ const Settings = () => {
                           <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
                           <span className="truncate">{f.name}</span>
                           <span className="text-xs text-subtle ml-auto flex-shrink-0">
-                            {f.cachedDatasheets}{' '}
-                            {f.cachedDatasheets === 1 ? 'datasheet' : 'datasheets'}
+                            {f.cachedDatasheets === 0
+                              ? 'Faction data only · no datasheets'
+                              : f.cachedDatasheets === 1
+                                ? '1 datasheet'
+                                : `${f.cachedDatasheets} datasheets`}
                           </span>
                         </div>
                       ))}
                     </div>
-                    <Button variant="error" onClick={handleReset} size="sm" fullWidth>
-                      Clear Cached Factions
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                      <Button variant="error" onClick={handleReset} size="sm" fullWidth>
+                        Clear offline cache
+                      </Button>
+                      <p className="text-xs text-subtle text-center">
+                        Removes cached faction packs and datasheets. Rosters, collections, and
+                        bookmarks stay.
+                      </p>
+                    </div>
                   </>
                 ) : (
                   <div className="text-center py-6">

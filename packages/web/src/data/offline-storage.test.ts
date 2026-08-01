@@ -146,8 +146,7 @@ const mockSettings: depot.Settings = {
   showUnaligned: false,
   showFluff: true,
   includeWargearOnExport: true,
-  useNativeShare: true,
-  usePileOfShameLabel: true
+  useNativeShare: true
 };
 
 const mockCollection: depot.Collection = {

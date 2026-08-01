@@ -94,7 +94,10 @@ const Rosters: React.FC = () => {
     };
   };
 
-  const handleImportRosterFile = async (file: File) => {
+  const handleImportRosterFiles = async (files: File[]) => {
+    const file = files[0];
+    if (!file) return;
+
     try {
       const parsed = await readJsonFile<unknown>(file);
       if (!isExportedRoster(parsed) || parsed.version !== 1) {
@@ -139,7 +142,7 @@ const Rosters: React.FC = () => {
         <div className="flex flex-wrap gap-3">
           <ImportButton
             label="Import roster"
-            onFileSelected={handleImportRosterFile}
+            onFilesSelected={handleImportRosterFiles}
             buttonTestId="import-roster-button"
             inputTestId="import-roster-input"
           />

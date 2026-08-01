@@ -2,10 +2,15 @@ import type { depot } from '@depot/core';
 
 type UnknownRecord = Record<string, unknown>;
 
+/** Wahapedia edition path the export was built against (e.g. wh40k10ed). */
+export type GameEdition = string;
+
 export interface ExportedRoster {
   kind: 'roster';
   version: 1;
   dataVersion: string | null;
+  /** Optional; missing means legacy 10th-era export. */
+  edition?: GameEdition;
   roster: depot.Roster;
 }
 
@@ -13,8 +18,13 @@ export interface ExportedCollection {
   kind: 'collection';
   version: 1;
   dataVersion: string | null;
+  /** Optional; missing means legacy 10th-era export. */
+  edition?: GameEdition;
   collection: depot.Collection;
 }
+
+/** Current catalog edition shipped by depot (mirrors CLI WAHAPEDIA_EDITION default). */
+export const CURRENT_GAME_EDITION = 'wh40k10ed';
 
 const isObject = (value: unknown): value is UnknownRecord =>
   typeof value === 'object' && value !== null;

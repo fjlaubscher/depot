@@ -223,7 +223,6 @@ export interface Settings {
   showFluff?: boolean;
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
-  usePileOfShameLabel?: boolean;
 }
 
 // Detachment, composed from other types
@@ -265,6 +264,10 @@ export interface Roster {
   warlordUnitId?: string | null;
   units: RosterUnit[];
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
+  /** ISO timestamp when the roster was first created (optional for legacy saves). */
+  createdAt?: string;
+  /** ISO timestamp of the last local save (used for recent sorting). */
+  updatedAt?: string;
 }
 
 export type CollectionUnitState = 'sprue' | 'built' | 'battle-ready' | 'parade-ready';
@@ -290,4 +293,27 @@ export interface Collection {
   points: {
     current: number;
   };
+  /** ISO timestamp when the collection was first created (optional for legacy saves). */
+  createdAt?: string;
+  /** ISO timestamp of the last local save (used for recent sorting). */
+  updatedAt?: string;
 }
+
+/** User-pinned faction or datasheet for the home dashboard. */
+export type Bookmark =
+  | {
+      id: string;
+      kind: 'faction';
+      factionSlug: string;
+      name: string;
+      createdAt: string;
+    }
+  | {
+      id: string;
+      kind: 'datasheet';
+      factionSlug: string;
+      datasheetSlug: string;
+      name: string;
+      factionName?: string;
+      createdAt: string;
+    };

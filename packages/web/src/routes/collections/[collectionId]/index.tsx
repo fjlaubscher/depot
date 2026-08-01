@@ -15,11 +15,13 @@ import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import { downloadFile } from '@/utils/file';
 import { useToast } from '@/contexts/toast/use-toast-context';
-import type { ExportedCollection } from '@/types/export';
+import { CURRENT_GAME_EDITION, type ExportedCollection } from '@/types/export';
 import { safeSlug } from '@depot/core/utils/common';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
-import { refreshCollectionData } from '@/utils/refresh-user-data';
+import {
+  formatRebindSummaryMessage,
+  refreshCollectionDataWithReport
+} from '@/utils/refresh-user-data';
 import {
   COLLECTION_UNIT_STATES,
   calculateCollectionPoints,
@@ -27,7 +29,7 @@ import {
 } from '@depot/core/utils/collection';
 import {
   COLLECTION_STATE_META,
-  getCollectionLabels,
+  COLLECTION_LABELS,
   getCollectionChartCopy
 } from '@/utils/collection';
 import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
@@ -37,11 +39,9 @@ const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { getDatasheet, dataVersion } = useFactionsContext();
-  const { settings } = useSettingsContext();
+  const { getDatasheet, getFactionManifest, dataVersion } = useFactionsContext();
   const { showToast } = useToast();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
   const [refreshing, setRefreshing] = useState(false);
   const {
     selection: persistedStateFilter,
@@ -141,17 +141,21 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
     setRefreshing(true);
     try {
-      const updatedCollection = await refreshCollectionData({
+      const result = await refreshCollectionDataWithReport({
         collection,
         currentDataVersion,
-        getDatasheet
+        getDatasheet,
+        getFactionManifest
       });
 
-      await save(updatedCollection);
+      await save(result.collection);
+      const rebindNote = formatRebindSummaryMessage(result.summary);
       showToast({
-        type: 'success',
+        type: rebindNote ? 'warning' : 'success',
         title: `${labels.singularTitle} updated`,
-        message: 'Refreshed with the latest Wahapedia data.'
+        message: rebindNote
+          ? `Refreshed with the latest data. ${rebindNote}`
+          : 'Refreshed with the latest Wahapedia data.'
       });
     } catch (err) {
       console.error('Failed to refresh collection data', err);
@@ -215,6 +219,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       kind: 'collection',
       version: 1,
       dataVersion: collection.dataVersion ?? currentDataVersion ?? null,
+      edition: CURRENT_GAME_EDITION,
       collection
     };
 
@@ -425,9 +430,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
 
   return (
     <AppLayout title={`${labels.singularTitle} Overview`}>

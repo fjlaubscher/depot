@@ -1,104 +1,41 @@
 import React, { useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import type { LucideIcon } from 'lucide-react';
-import { Search, Star, Settings, List, Users, ClipboardList, Boxes } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-import { getImageUrl } from '@/utils/paths';
-
-// UI Components
 import AppLayout from '@/components/layout';
-import { Alert, Card, Grid } from '@/components/ui';
-
-// Custom hooks
+import { Alert, Loader } from '@/components/ui';
+import { ListEmptyState } from '@/components/shared';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import useRosters from '@/hooks/use-rosters';
+import useCollections from '@/hooks/use-collections';
+import useBookmarks from '@/hooks/use-bookmarks';
+import { takeRecent } from '@/utils/recent';
 
-const highlights: Array<{
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  link?: string;
-  linkLabel?: string;
-}> = [
-  {
-    icon: Search,
-    title: 'Thanks, Wahapedia',
-    description: 'Reads the official exports so you have trusted rules on hand.'
-  },
-  {
-    icon: List,
-    title: 'Offline cache',
-    description: 'Keep factions and lists stored locally for trains, basements, or spotty Wi-Fi.'
-  },
-  {
-    icon: Settings,
-    title: 'Local privacy',
-    description: 'Nothing syncs anywhere unless you export it yourself—no accounts, no tracking.'
-  },
-  {
-    icon: Star,
-    title: 'Open code',
-    description: 'Skim the commits, follow along, or fork your own take.',
-    link: 'https://github.com/fjlaubscher/depot',
-    linkLabel: 'GitHub: fjlaubscher/depot'
-  }
-];
+import SectionHeader from './_components/section-header';
+import RosterPreviewCard from './_components/roster-preview-card';
+import CollectionPreviewCard from './_components/collection-preview-card';
+import BookmarkCard from './_components/bookmark-card';
+import BookmarksPanel from './_components/bookmarks-panel';
+
+const PREVIEW_LIMIT = 4;
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { settings } = useSettingsContext();
   const { dataVersion } = useFactionsContext();
-  const collectionLabel = useMemo(
-    () => ((settings.usePileOfShameLabel ?? true) ? 'Pile of Shame' : 'Collections'),
-    [settings.usePileOfShameLabel]
-  );
+  const { rosters, loading: rostersLoading } = useRosters();
+  const { collections, loading: collectionsLoading } = useCollections();
+  const { bookmarks, loading: bookmarksLoading } = useBookmarks();
+
   const dataVersionLabel = dataVersion ?? 'Unknown';
 
-  const actionTiles: Array<{
-    key: 'collections' | 'factions' | 'rosters' | 'settings';
-    icon: LucideIcon;
-    title: string;
-    description: string;
-    path: string;
-    testId: string;
-  }> = [
-    {
-      key: 'collections',
-      icon: Boxes,
-      title: collectionLabel,
-      description: 'Track your pile of shame and prep future lists.',
-      path: '/collections',
-      testId: 'collections-button'
-    },
-    {
-      key: 'factions',
-      icon: Users,
-      title: 'Factions',
-      description: 'Browse every detachment, rule, and enhancement.',
-      path: '/factions',
-      testId: 'browse-factions-button'
-    },
-    {
-      key: 'rosters',
-      icon: ClipboardList,
-      title: 'Rosters',
-      description: 'Build, tweak, and store lists offline.',
-      path: '/rosters',
-      testId: 'roster-builder-button'
-    },
-    {
-      key: 'settings',
-      icon: Settings,
-      title: 'Settings',
-      description: 'Tweak the app to your liking.',
-      path: '/settings',
-      testId: 'settings-button'
-    }
-  ];
+  const recentRosters = useMemo(() => takeRecent(rosters, PREVIEW_LIMIT), [rosters]);
+  const recentCollections = useMemo(
+    () => takeRecent(collections, PREVIEW_LIMIT),
+    [collections]
+  );
 
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-6">
         <Alert variant="warning" title="11th edition isn't here yet" data-testid="edition-notice">
           <p className="text-sm">
             Wahapedia has updated their site, but their data exports are still 10th edition. depot
@@ -115,125 +52,114 @@ const Home: React.FC = () => {
           </p>
         </Alert>
 
-        <section className="relative overflow-hidden rounded-3xl border border-gray-200 bg-gray-950 text-white shadow-xl dark:border-gray-800">
-          <img
-            src={getImageUrl('depot-hero.jpg')}
-            alt="Servitors preparing a cogitator in the depths of a forge world"
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-950/70 via-gray-900/55 to-primary-900/35" />
-          <div className="relative z-10 grid gap-10 px-6 py-12 sm:px-12 lg:grid-cols-[3fr_2fr] lg:items-center lg:gap-16 lg:py-16">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-3">
-                <span className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-200">
-                  Hobby-built Warhammer 40,000 companion
-                </span>
-                <h1
-                  className="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
-                  data-testid="welcome-heading"
-                >
-                  Keep your rosters close and your games moving
-                </h1>
-                <p className="text-base text-white/80">
-                  Mirror Wahapedia exports, prep your armies, and take everything offline so game
-                  night stays about rolling dice, not wrangling tabs.
-                </p>
-              </div>
-              <p className="text-sm text-white/70">
-                Curious about the backstory?{' '}
-                <Link to="/about" className="font-semibold text-white hover:text-primary-200">
-                  Learn how depot works
-                </Link>
+        <BookmarksPanel
+          header={
+            bookmarks.length > 0 ? (
+              <SectionHeader title="Bookmarks" count={bookmarks.length} tone="on-media" />
+            ) : null
+          }
+        >
+          {bookmarksLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader color="white" />
+            </div>
+          ) : bookmarks.length === 0 ? (
+            <div
+              className="flex flex-col items-center gap-2 px-4 py-10 text-center sm:py-14"
+              data-testid="empty-bookmarks-home"
+            >
+              <p className="text-lg font-semibold text-white">Your bookmarks will show up here</p>
+              <p className="max-w-md text-sm text-white/75">
+                Bookmark a faction or datasheet from its page to pin it to the home screen.
               </p>
             </div>
-            <div className="grid grid-cols-2 grid-rows-2 gap-4">
-              {actionTiles.map(({ icon: Icon, title, description, path, testId }) => {
-                return (
-                  <button
-                    key={title}
-                    type="button"
-                    onClick={() => navigate(path)}
-                    data-testid={testId}
-                    className={`
-                    group relative flex h-full min-h-[120px] cursor-pointer flex-col justify-between rounded-xl
-                    border border-white/15 bg-white/10 p-4 text-left text-white shadow-lg shadow-primary-900/20 transition
-                    hover:-translate-y-0.5 hover:bg-white/20 focus-visible:outline
-                    focus-visible:outline-offset-2 focus-visible:outline-white dark:border-gray-700
-                    dark:bg-gray-900/60 dark:hover:bg-gray-900/50
-                  `}
-                  >
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-white transition group-hover:bg-white/25">
-                      <Icon className="h-6 w-6" />
-                    </span>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-base font-semibold">{title}</span>
-                      <span className="text-sm text-white/80 leading-snug">{description}</span>
-                    </div>
-                  </button>
-                );
-              })}
+          ) : (
+            <div
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              data-testid="bookmark-previews"
+            >
+              {bookmarks.map((bookmark) => (
+                <BookmarkCard key={bookmark.id} bookmark={bookmark} />
+              ))}
             </div>
-          </div>
+          )}
+        </BookmarksPanel>
+
+        <section className="flex flex-col gap-4" data-testid="rosters-section">
+          <SectionHeader
+            title="Recent rosters"
+            count={rosters.length}
+            viewAllTo={rosters.length > 0 ? '/rosters' : undefined}
+            viewAllTestId="view-all-rosters"
+          />
+
+          {rostersLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader />
+            </div>
+          ) : rosters.length === 0 ? (
+            <ListEmptyState
+              title="No rosters yet"
+              actionLabel="Create roster"
+              onAction={() => navigate('/rosters/create')}
+              testId="empty-rosters-home"
+            />
+          ) : (
+            <div
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              data-testid="roster-previews"
+            >
+              {recentRosters.map((roster) => (
+                <RosterPreviewCard key={roster.id} roster={roster} />
+              ))}
+            </div>
+          )}
         </section>
 
-        <section className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-400">
-              What depot actually does
-            </span>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              A few notes from the workbench
-            </h2>
-          </div>
-          <Grid cols={4} gap="lg" className="gap-4">
-            {highlights.map(({ icon: Icon, title, description, link, linkLabel }) => (
-              <Card
-                key={title}
-                padding="lg"
-                className="h-full bg-white/90 shadow-lg shadow-primary-500/5 backdrop-blur dark:bg-gray-800/90"
-              >
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-300">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                      {title}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-secondary">
-                    {description}{' '}
-                    {link && linkLabel && (
-                      <a
-                        href={link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary-600 hover:underline dark:text-primary-400"
-                      >
-                        {linkLabel}
-                      </a>
-                    )}
-                  </p>
-                </div>
-              </Card>
-            ))}
-          </Grid>
+        <section className="flex flex-col gap-4" data-testid="collections-section">
+          <SectionHeader
+            title="Recent collections"
+            count={collections.length}
+            viewAllTo={collections.length > 0 ? '/collections' : undefined}
+            viewAllTestId="view-all-collections"
+          />
+
+          {collectionsLoading ? (
+            <div className="flex justify-center py-6">
+              <Loader />
+            </div>
+          ) : collections.length === 0 ? (
+            <ListEmptyState
+              title="No collections yet"
+              actionLabel="Create collection"
+              onAction={() => navigate('/collections/create')}
+              testId="empty-collections-home"
+            />
+          ) : (
+            <div
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              data-testid="collection-previews"
+            >
+              {recentCollections.map((collection) => (
+                <CollectionPreviewCard key={collection.id} collection={collection} />
+              ))}
+            </div>
+          )}
         </section>
 
-        <section className="flex flex-col items-center text-center">
+        <section className="flex flex-col items-center gap-1 text-center">
           <p className="text-sm text-subtle">
             Data sourced from{' '}
             <a
               href="https://wahapedia.ru"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary-600 dark:text-primary-400 hover:underline"
+              className="text-primary-600 hover:underline dark:text-primary-400"
             >
               Wahapedia
             </a>
           </p>
-          <p className="text-xs text-subtle">Last Updated: {dataVersionLabel}</p>
+          <p className="text-xs text-subtle">Last updated: {dataVersionLabel}</p>
         </section>
       </div>
     </AppLayout>

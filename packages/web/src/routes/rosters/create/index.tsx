@@ -2,12 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import useFaction from '@/hooks/use-faction';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
-import { getCollectionLabels } from '@/utils/collection';
+import { COLLECTION_LABELS } from '@/utils/collection';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Card, Field, SelectField, Button, Alert } from '@/components/ui';
@@ -18,10 +17,8 @@ const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
-  const { settings } = useSettingsContext();
   const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
 
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState<string | null>(null);

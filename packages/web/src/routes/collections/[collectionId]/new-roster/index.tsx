@@ -11,7 +11,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/components/shared/selection-summary';
 import type { SelectionGroup } from '@/components/shared/selection-summary';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
-import { getCollectionLabels } from '@/utils/collection';
+import { COLLECTION_LABELS } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
@@ -26,8 +26,7 @@ const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
   const { settings } = useSettingsContext();
-  const usePileLabel = settings.usePileOfShameLabel ?? true;
-  const labels = getCollectionLabels(usePileLabel);
+  const labels = COLLECTION_LABELS;
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);

@@ -69,6 +69,17 @@ describe('isExportedCollection', () => {
     expect(isExportedCollection(payload)).toBe(true);
   });
 
+  it('accepts export with optional edition field', () => {
+    const payload: ExportedCollection = {
+      kind: 'collection',
+      version: 1,
+      dataVersion: null,
+      edition: 'wh40k10ed',
+      collection: baseCollection
+    };
+    expect(isExportedCollection(payload)).toBe(true);
+  });
+
   it('rejects missing fields', () => {
     expect(isExportedCollection({})).toBe(false);
     expect(

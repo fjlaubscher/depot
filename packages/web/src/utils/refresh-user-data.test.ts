@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { depot } from '@depot/core';
-import { refreshRosterData, refreshCollectionData } from './refresh-user-data';
+import {
+  formatRebindSummaryMessage,
+  refreshRosterData,
+  refreshCollectionData,
+  refreshCollectionDataWithReport
+} from './refresh-user-data';
 
 const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet => ({
   id: 'ds-1',
@@ -27,7 +32,7 @@ const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet =
   options: [],
   wargear: [],
   unitComposition: [],
-  modelCosts: [],
+  modelCosts: [{ datasheetId: 'ds-1', line: '1', description: '10', cost: '10' }],
   stratagems: [],
   enhancements: [],
   detachmentAbilities: [],
@@ -129,7 +134,7 @@ describe('refresh-user-data utilities', () => {
     expect(result.detachment.name).toBe('New Detachment');
     expect(result.units[0].datasheet.name).toBe('Unit One Updated');
     expect(result.units[0].datasheetSlug).toBe('unit-one-new');
-    expect(result.points.current).toBe(10); // unchanged because cost stayed the same
+    expect(result.points.current).toBe(10);
   });
 
   it('refreshCollectionData updates datasheets, recalculates points, and dataVersion', async () => {
@@ -144,6 +149,68 @@ describe('refresh-user-data utilities', () => {
     expect(result.dataVersion).toBe('new-version');
     expect(result.items[0].datasheetSlug).toBe('unit-one-new');
     expect(result.points.current).toBe(10);
+  });
+
+  it('falls back to name match via faction manifest when ids change', async () => {
+    const refreshedDatasheet = buildDatasheet({
+      id: 'ds-new',
+      slug: 'unit-one-renamed',
+      name: 'Unit One',
+      modelCosts: [{ datasheetId: 'ds-new', line: '1', description: '10', cost: '15' }]
+    });
+
+    const getDatasheet = vi
+      .fn()
+      .mockResolvedValueOnce(null) // id miss
+      .mockResolvedValueOnce(null) // slug miss
+      .mockResolvedValueOnce(refreshedDatasheet); // after name match
+
+    const getFactionManifest = vi.fn().mockResolvedValue({
+      id: 'faction-1',
+      slug: 'faction-1',
+      name: 'Faction',
+      link: '',
+      datasheets: [
+        {
+          id: 'ds-new',
+          slug: 'unit-one-renamed',
+          name: 'Unit One',
+          factionId: 'faction-1',
+          factionSlug: 'faction-1',
+          role: 'Battleline',
+          path: '',
+          link: '',
+          isForgeWorld: false,
+          isLegends: false
+        }
+      ],
+      detachments: [],
+      datasheetCount: 1,
+      detachmentCount: 0
+    });
+
+    const result = await refreshCollectionDataWithReport({
+      collection: baseCollection,
+      currentDataVersion: 'new-version',
+      getDatasheet,
+      getFactionManifest
+    });
+
+    expect(result.summary.ok).toBe(1);
+    expect(result.collection.items[0].datasheet.id).toBe('ds-new');
+    expect(result.collection.items[0].modelCost.cost).toBe('15');
+  });
+
+  it('keeps missing units and reports them', async () => {
+    const result = await refreshCollectionDataWithReport({
+      collection: baseCollection,
+      currentDataVersion: 'new-version',
+      getDatasheet: vi.fn().mockResolvedValue(null)
+    });
+
+    expect(result.summary.missing).toBe(1);
+    expect(result.collection.items[0].datasheet.id).toBe('ds-1');
+    expect(result.collection.dataVersion).toBe('new-version');
   });
 
   it('throws when currentDataVersion is missing for roster refresh', async () => {
@@ -165,5 +232,15 @@ describe('refresh-user-data utilities', () => {
         getDatasheet: vi.fn()
       })
     ).rejects.toThrow('currentDataVersion is required');
+  });
+
+  it('formatRebindSummaryMessage describes partial and missing counts', () => {
+    expect(formatRebindSummaryMessage({ ok: 2, partial: 0, missing: 0 })).toBeNull();
+    expect(formatRebindSummaryMessage({ ok: 1, partial: 2, missing: 1 })).toContain(
+      '2 units partially matched'
+    );
+    expect(formatRebindSummaryMessage({ ok: 0, partial: 0, missing: 1 })).toContain(
+      '1 unit not found'
+    );
   });
 });

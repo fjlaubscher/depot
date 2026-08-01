@@ -64,8 +64,7 @@ const createCollection = (overrides: Partial<Collection> = {}): Collection => ({
   dataVersion: overrides.dataVersion ?? null,
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   updatedAt: overrides.updatedAt ?? new Date().toISOString(),
-  notes: overrides.notes ?? '',
-  usePileOfShameLabel: overrides.usePileOfShameLabel ?? false
+  notes: overrides.notes ?? ''
 });
 
 const createUnit = (state: CollectionUnitState, cost: string) => ({

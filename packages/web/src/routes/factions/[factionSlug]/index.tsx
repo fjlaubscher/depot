@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Share2 } from 'lucide-react';
+import { Bookmark, BookmarkCheck, Share2 } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -9,13 +9,16 @@ import { BackButton } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
+import useBookmarks from '@/hooks/use-bookmarks';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
+import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
 import { getFactionAlliance } from '@depot/core/utils/common';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
+import { createFactionBookmark, factionBookmarkId } from '@/utils/bookmarks';
 
 // Components
 import Skeleton from './_components/skeleton';
@@ -29,6 +32,8 @@ const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
+  const { showToast } = useToast();
+  const { isBookmarked, toggleBookmark } = useBookmarks();
   const [activeTab, setActiveTab] = useState(0);
 
   const showLegends = settings.showLegends ?? false;
@@ -43,6 +48,29 @@ const Faction: React.FC = () => {
   );
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
+  const bookmarked = faction ? isBookmarked(factionBookmarkId(faction.slug)) : false;
+
+  const handleToggleBookmark = useCallback(async () => {
+    if (!faction) return;
+    try {
+      const next = await toggleBookmark(createFactionBookmark(faction));
+      showToast({
+        type: 'success',
+        title: next ? 'Bookmarked' : 'Bookmark removed',
+        message: next
+          ? `${faction.name} pinned to your desk.`
+          : `${faction.name} removed from bookmarks.`
+      });
+    } catch (err) {
+      console.error('Failed to toggle faction bookmark', err);
+      showToast({
+        type: 'error',
+        title: 'Bookmark failed',
+        message: 'Could not update bookmarks.'
+      });
+    }
+  }, [faction, showToast, toggleBookmark]);
+
   const shareAction = useShareAction({
     title: faction?.name,
     url: faction ? buildAbsoluteUrl(`/faction/${faction.slug}`) : undefined,
@@ -113,12 +141,23 @@ const Faction: React.FC = () => {
         <PageHeader
           title={faction.name}
           subtitle={alliance}
-          action={{
-            icon: shareAction.icon ?? <Share2 size={16} />,
-            onClick: () => shareAction.onClick(),
-            ariaLabel: shareAction.ariaLabel ?? 'Share faction',
-            testId: shareAction['data-testid']
-          }}
+          actions={[
+            {
+              icon: bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />,
+              onClick: () => {
+                void handleToggleBookmark();
+              },
+              ariaLabel: bookmarked ? 'Remove bookmark' : 'Bookmark faction',
+              variant: bookmarked ? 'primary' : 'ghost',
+              'data-testid': 'bookmark-faction-button'
+            },
+            {
+              icon: shareAction.icon ?? <Share2 size={16} />,
+              onClick: () => shareAction.onClick(),
+              ariaLabel: shareAction.ariaLabel ?? 'Share faction',
+              'data-testid': shareAction['data-testid']
+            }
+          ]}
         />
 
         <Tabs

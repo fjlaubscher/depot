@@ -22,8 +22,20 @@ const STORES = {
 
 const KEYS = {
   SETTINGS: 'settings',
-  DATA_VERSION: 'data-version'
+  DATA_VERSION: 'data-version',
+  BOOKMARKS: 'bookmarks'
 } as const;
+
+const stampTimestamps = <T extends { createdAt?: string; updatedAt?: string }>(
+  entity: T
+): T & { createdAt: string; updatedAt: string } => {
+  const now = new Date().toISOString();
+  return {
+    ...entity,
+    createdAt: entity.createdAt ?? now,
+    updatedAt: now
+  };
+};
 
 const req = <T>(r: IDBRequest<T>): Promise<T> =>
   new Promise<T>((res, rej) => {
@@ -294,7 +306,7 @@ class OfflineStorage {
   async saveCollection(collection: depot.Collection): Promise<void> {
     try {
       const store = await this.store(STORES.COLLECTIONS, 'readwrite');
-      await req(store.put(normalizeCollection(collection)));
+      await req(store.put(stampTimestamps(normalizeCollection(collection))));
     } catch (error) {
       console.error(`Failed to save collection ${collection.id} in IndexedDB:`, error);
       throw error;
@@ -388,11 +400,58 @@ class OfflineStorage {
     }
   }
 
+  // Bookmark Operations (USER_DATA key-value)
+  async getBookmarks(): Promise<depot.Bookmark[]> {
+    try {
+      const store = await this.store(STORES.USER_DATA);
+      const stored = (await req(store.get(KEYS.BOOKMARKS))) as depot.Bookmark[] | undefined;
+      return Array.isArray(stored) ? stored : [];
+    } catch (error) {
+      console.error('Failed to get bookmarks from IndexedDB:', error);
+      return [];
+    }
+  }
+
+  async setBookmarks(bookmarks: depot.Bookmark[]): Promise<void> {
+    try {
+      const store = await this.store(STORES.USER_DATA, 'readwrite');
+      await req(store.put(bookmarks, KEYS.BOOKMARKS));
+    } catch (error) {
+      console.error('Failed to set bookmarks in IndexedDB:', error);
+      throw error;
+    }
+  }
+
+  async addBookmark(bookmark: depot.Bookmark): Promise<void> {
+    const existing = await this.getBookmarks();
+    if (existing.some((entry) => entry.id === bookmark.id)) {
+      return;
+    }
+    await this.setBookmarks([bookmark, ...existing]);
+  }
+
+  async removeBookmark(id: string): Promise<void> {
+    const existing = await this.getBookmarks();
+    await this.setBookmarks(existing.filter((entry) => entry.id !== id));
+  }
+
+  /** Returns true when the bookmark is present after the toggle. */
+  async toggleBookmark(bookmark: depot.Bookmark): Promise<boolean> {
+    const existing = await this.getBookmarks();
+    const isPresent = existing.some((entry) => entry.id === bookmark.id);
+    if (isPresent) {
+      await this.setBookmarks(existing.filter((entry) => entry.id !== bookmark.id));
+      return false;
+    }
+    await this.setBookmarks([bookmark, ...existing]);
+    return true;
+  }
+
   // Roster Operations
   async saveRoster(roster: depot.Roster): Promise<void> {
     try {
       const store = await this.store(STORES.ROSTERS, 'readwrite');
-      await req(store.put(normalizeRoster(roster)));
+      await req(store.put(stampTimestamps(normalizeRoster(roster))));
     } catch (error) {
       console.error(`Failed to save roster ${roster.id} in IndexedDB:`, error);
       throw error;
