@@ -1,6 +1,6 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { vi, type Mock } from 'vitest';
 import { LayoutProvider } from '@/contexts/layout/context';
 import { ToastProvider } from '@/contexts/toast/context';
 import { AppProvider } from '@/contexts/app-provider';
@@ -20,13 +20,16 @@ export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   </MemoryRouter>
 );
 
+// `Mock`-annotated so the inferred return type stays nameable for declaration emit
+const mockFn = (): Mock => vi.fn();
+
 // Mock functions factory
 export const createMockFunctions = () => ({
-  mockUseFaction: vi.fn(),
-  mockUseDatasheet: vi.fn(),
-  mockNavigate: vi.fn(),
-  mockShowToast: vi.fn(),
-  mockUseToastContext: vi.fn(),
+  mockUseFaction: mockFn(),
+  mockUseDatasheet: mockFn(),
+  mockNavigate: mockFn(),
+  mockShowToast: mockFn(),
+  mockUseToastContext: mockFn(),
   mockAppContext: {
     state: {
       factionIndex: null,
@@ -35,11 +38,11 @@ export const createMockFunctions = () => ({
       error: null,
       settings: null
     },
-    dispatch: vi.fn(),
-    getFactionManifest: vi.fn(),
-    getDatasheet: vi.fn(),
-    clearOfflineData: vi.fn(),
-    updateSettings: vi.fn()
+    dispatch: mockFn(),
+    getFactionManifest: mockFn(),
+    getDatasheet: mockFn(),
+    clearOfflineData: mockFn(),
+    updateSettings: mockFn()
   }
 });
 

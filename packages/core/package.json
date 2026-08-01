@@ -66,10 +66,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "prettier": "^3.8.4",
-    "rimraf": "^5.0.10",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.6"
+    "prettier": "^3.9.6",
+    "rimraf": "^6.1.3",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "author": "Francois Laubscher",
   "license": "MIT"

@@ -16,8 +16,7 @@ export interface ToastState {
 
 // Toast action types
 export type ToastAction =
-  | { type: 'ADD_TOAST'; payload: Toast }
-  | { type: 'REMOVE_TOAST'; payload: string }; // toast id
+  { type: 'ADD_TOAST'; payload: Toast } | { type: 'REMOVE_TOAST'; payload: string }; // toast id
 
 // Toast context interface
 export interface ToastContextType {

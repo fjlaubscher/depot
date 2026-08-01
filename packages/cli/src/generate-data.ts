@@ -134,25 +134,22 @@ const buildDatasheet = (
 
   const stratagems = data.datasheetStratagems
     .filter((ds: wahapedia.DatasheetStratagem) => ds.datasheetId === datasheet.id)
-    .map(
-      (ds: wahapedia.DatasheetStratagem) =>
-        data.stratagems.find((s: wahapedia.Stratagem) => s.id === ds.stratagemId)!
+    .map((ds: wahapedia.DatasheetStratagem) =>
+      data.stratagems.find((s: wahapedia.Stratagem) => s.id === ds.stratagemId)!
     );
 
   const enhancements = data.datasheetEnhancements
     .filter((de: wahapedia.DatasheetEnhancement) => de.datasheetId === datasheet.id)
-    .map(
-      (de: wahapedia.DatasheetEnhancement) =>
-        data.enhancements.find((e: wahapedia.Enhancement) => e.id === de.enhancementId)!
+    .map((de: wahapedia.DatasheetEnhancement) =>
+      data.enhancements.find((e: wahapedia.Enhancement) => e.id === de.enhancementId)!
     );
 
   const detachmentAbilities = data.datasheetDetachmentAbilities
     .filter((dda: wahapedia.DatasheetDetachmentAbility) => dda.datasheetId === datasheet.id)
-    .map(
-      (dda: wahapedia.DatasheetDetachmentAbility) =>
-        data.detachmentAbilities.find(
-          (da: wahapedia.DetachmentAbility) => da.id === dda.detachmentAbilityId
-        )!
+    .map((dda: wahapedia.DatasheetDetachmentAbility) =>
+      data.detachmentAbilities.find(
+        (da: wahapedia.DetachmentAbility) => da.id === dda.detachmentAbilityId
+      )!
     );
 
   const leaders = data.datasheetLeaders

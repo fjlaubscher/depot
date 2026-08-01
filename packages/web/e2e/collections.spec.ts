@@ -32,7 +32,7 @@ test.describe('Collections', () => {
 
     await page.getByTestId('create-collection-submit').click();
 
-    await expect(page).toHaveURL(/\/collections\/[a-z0-9-]+$/i);
+    await expect(page).toHaveURL(/\/collections\/[0-9a-f-]{36}$/i);
     await expect(page.getByRole('heading', { name: uniqueName })).toBeVisible();
     await expect(page.getByTestId('add-collection-units-button')).toBeVisible();
 
@@ -68,7 +68,7 @@ test.describe('Collections', () => {
     await factionSelect.selectOption('astra-militarum');
 
     await page.getByTestId('create-collection-submit').click();
-    await expect(page).toHaveURL(/\/collections\/[a-z0-9-]+$/i);
+    await expect(page).toHaveURL(/\/collections\/[0-9a-f-]{36}$/i);
 
     const collectionUrl = page.url();
     await expect(page.getByRole('heading', { name: uniqueName })).toBeVisible();

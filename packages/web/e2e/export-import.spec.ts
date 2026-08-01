@@ -38,7 +38,7 @@ test.describe('Export/Import JSON', () => {
     await page.getByLabel('Faction').selectOption('astra-militarum');
 
     await page.getByTestId('create-collection-submit').click();
-    await expect(page).toHaveURL(/\/collections\/[a-z0-9-]+$/i);
+    await expect(page).toHaveURL(/\/collections\/[0-9a-f-]{36}$/i);
     const collectionUrl = page.url();
 
     // Add at least one unit so export is available

@@ -21,14 +21,14 @@
   "author": "Francois Laubscher",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.19.43",
-    "prettier": "^3.8.4",
-    "rimraf": "^5.0.10",
-    "typescript": "^5.9.3",
-    "vitest": "^3.2.6"
+    "@types/node": "^24.13.3",
+    "prettier": "^3.9.6",
+    "rimraf": "^6.1.3",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "@depot/core": "workspace:*",
-    "node-html-parser": "^7.1.0"
+    "node-html-parser": "^9.0.1"
   }
 }
