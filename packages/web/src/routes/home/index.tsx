@@ -28,10 +28,7 @@ const Home: React.FC = () => {
   const dataVersionLabel = dataVersion ?? 'Unknown';
 
   const recentRosters = useMemo(() => takeRecent(rosters, PREVIEW_LIMIT), [rosters]);
-  const recentCollections = useMemo(
-    () => takeRecent(collections, PREVIEW_LIMIT),
-    [collections]
-  );
+  const recentCollections = useMemo(() => takeRecent(collections, PREVIEW_LIMIT), [collections]);
 
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">

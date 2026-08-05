@@ -82,10 +82,11 @@ export function matchDatasheetIdentity<T extends { id: string; slug: string; nam
 /**
  * Resolve identity keys from a collection/roster unit for catalog lookup.
  */
-export function unitDatasheetIdentity(unit: {
-  datasheet: Datasheet;
-  datasheetSlug?: string;
-}): { id?: string; slug?: string; name?: string } {
+export function unitDatasheetIdentity(unit: { datasheet: Datasheet; datasheetSlug?: string }): {
+  id?: string;
+  slug?: string;
+  name?: string;
+} {
   return {
     id: unit.datasheet.id,
     slug: unit.datasheetSlug || unit.datasheet.slug,
@@ -277,9 +278,11 @@ export function rebindRosterUnit(
   };
 }
 
-export function summarizeRebindStatuses(
-  statuses: RebindStatus[]
-): { ok: number; partial: number; missing: number } {
+export function summarizeRebindStatuses(statuses: RebindStatus[]): {
+  ok: number;
+  partial: number;
+  missing: number;
+} {
   return statuses.reduce(
     (acc, status) => {
       acc[status] += 1;

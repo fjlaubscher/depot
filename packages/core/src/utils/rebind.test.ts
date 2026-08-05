@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type {
-  Ability,
-  CollectionUnit,
-  Datasheet,
-  ModelCost,
-  Wargear
-} from '../types/depot.js';
+import type { Ability, CollectionUnit, Datasheet, ModelCost, Wargear } from '../types/depot.js';
 import {
   applyCollectionRebind,
   matchDatasheetIdentity,
@@ -122,7 +116,10 @@ describe('rebindModelCost', () => {
   });
 
   it('falls back to first cost when unmatched', () => {
-    const result = rebindModelCost(cost({ line: '9', description: 'unknown', cost: '1' }), available);
+    const result = rebindModelCost(
+      cost({ line: '9', description: 'unknown', cost: '1' }),
+      available
+    );
     expect(result.matched).toBe(false);
     expect(result.modelCost.line).toBe('1');
   });

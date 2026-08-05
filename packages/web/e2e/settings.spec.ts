@@ -10,8 +10,7 @@ const toggles = [
     testId: 'include-wargear-toggle',
     defaultChecked: true
   },
-  { name: 'Use Native Sharing', testId: 'use-native-sharing-toggle', defaultChecked: true },
-  { name: 'Call It What It Is', testId: 'call-it-what-it-is-toggle', defaultChecked: true }
+  { name: 'Use Native Sharing', testId: 'use-native-sharing-toggle', defaultChecked: true }
 ];
 
 test.describe('Settings', () => {

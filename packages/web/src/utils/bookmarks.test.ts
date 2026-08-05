@@ -11,9 +11,7 @@ import {
 describe('bookmark helpers', () => {
   it('builds stable ids', () => {
     expect(factionBookmarkId('space-marines')).toBe('faction:space-marines');
-    expect(datasheetBookmarkId('space-marines', 'captain')).toBe(
-      'datasheet:space-marines:captain'
-    );
+    expect(datasheetBookmarkId('space-marines', 'captain')).toBe('datasheet:space-marines:captain');
   });
 
   it('builds paths for faction and datasheet bookmarks', () => {

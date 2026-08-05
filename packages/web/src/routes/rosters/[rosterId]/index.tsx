@@ -9,10 +9,7 @@ import useCoreStratagems from '@/hooks/use-core-stratagems';
 import { downloadFile } from '@/utils/file';
 import { safeSlug } from '@depot/core/utils/common';
 import { CURRENT_GAME_EDITION, type ExportedRoster } from '@/types/export';
-import {
-  formatRebindSummaryMessage,
-  refreshRosterDataWithReport
-} from '@/utils/refresh-user-data';
+import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useFactionsContext } from '@/contexts/factions/context';
 

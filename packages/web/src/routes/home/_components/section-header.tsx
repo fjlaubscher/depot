@@ -35,10 +35,7 @@ const SectionHeader: FC<SectionHeaderProps> = ({
         </h2>
         {typeof count === 'number' ? (
           <span
-            className={classNames(
-              'text-sm tabular-nums',
-              onMedia ? 'text-white/70' : 'text-muted'
-            )}
+            className={classNames('text-sm tabular-nums', onMedia ? 'text-white/70' : 'text-muted')}
             data-testid="section-count"
           >
             {count}
@@ -50,9 +47,7 @@ const SectionHeader: FC<SectionHeaderProps> = ({
           to={viewAllTo}
           className={classNames(
             'text-sm font-medium hover:underline',
-            onMedia
-              ? 'text-primary-200 hover:text-white'
-              : 'text-primary-600 dark:text-primary-400'
+            onMedia ? 'text-primary-200 hover:text-white' : 'text-primary-600 dark:text-primary-400'
           )}
           data-testid={viewAllTestId}
         >

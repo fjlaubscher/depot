@@ -38,9 +38,7 @@ const DatasheetPage: FC = () => {
   const { isBookmarked, toggleBookmark } = useBookmarks();
 
   const bookmarked =
-    faction && datasheet
-      ? isBookmarked(datasheetBookmarkId(faction.slug, datasheet.slug))
-      : false;
+    faction && datasheet ? isBookmarked(datasheetBookmarkId(faction.slug, datasheet.slug)) : false;
 
   const handleToggleBookmark = useCallback(async () => {
     if (!faction || !datasheet) return;

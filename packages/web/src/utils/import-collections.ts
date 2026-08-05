@@ -82,7 +82,7 @@ export const formatCollectionImportToast = (
       title: 'Import failed',
       message:
         total === 1
-          ? result.failed[0]?.reason ?? 'Could not import this file.'
+          ? (result.failed[0]?.reason ?? 'Could not import this file.')
           : `None of the ${total} files looked like valid exports.`
     };
   }
