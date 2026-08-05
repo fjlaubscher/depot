@@ -598,7 +598,13 @@ describe('OfflineStorage', () => {
       });
 
       await expect(offlineStorage.saveRoster(mockRoster)).resolves.toBeUndefined();
-      expect(mockObjectStore.put).toHaveBeenCalledWith(mockRoster);
+      expect(mockObjectStore.put).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...mockRoster,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String)
+        })
+      );
     });
 
     it('should get roster from IndexedDB', async () => {
