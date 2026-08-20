@@ -103,6 +103,32 @@ export const refreshRosterData = async ({
   return result.roster;
 };
 
+/** Rebind roster units onto the current catalog (id → slug → name). */
+export const rebindRosterUnits = async (
+  units: depot.RosterUnit[],
+  factionSlug: string | undefined,
+  getDatasheet: GetDatasheet,
+  getFactionManifest?: GetFactionManifest,
+  manifestCache = new Map<string, depot.FactionManifest | null>()
+): Promise<{ units: depot.RosterUnit[]; summary: RefreshRosterResult['summary'] }> => {
+  const summary = emptySummary();
+  const rebound = await Promise.all(
+    units.map(async (unit) => {
+      const datasheet = await resolveDatasheetForUnit(
+        unit,
+        factionSlug,
+        getDatasheet,
+        getFactionManifest,
+        manifestCache
+      );
+      const result = rebindRosterUnit(unit, datasheet);
+      addStatus(summary, result.status);
+      return result.unit;
+    })
+  );
+  return { units: rebound, summary };
+};
+
 export const refreshRosterDataWithReport = async ({
   roster,
   currentDataVersion,
@@ -124,20 +150,12 @@ export const refreshRosterDataWithReport = async ({
     manifestCache.set(factionSlug, manifest);
   }
 
-  const summary = emptySummary();
-  const updatedUnits = await Promise.all(
-    roster.units.map(async (unit) => {
-      const datasheet = await resolveDatasheetForUnit(
-        unit,
-        factionSlug,
-        getDatasheet,
-        getFactionManifest,
-        manifestCache
-      );
-      const rebound = rebindRosterUnit(unit, datasheet);
-      addStatus(summary, rebound.status);
-      return rebound.unit;
-    })
+  const { units: updatedUnits, summary } = await rebindRosterUnits(
+    roster.units,
+    factionSlug,
+    getDatasheet,
+    getFactionManifest,
+    manifestCache
   );
 
   const { detachment: _legacyDetachment, ...rest } = roster;

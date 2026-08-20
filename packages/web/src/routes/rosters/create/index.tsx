@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useFaction from '@/hooks/use-faction';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useToast } from '@/contexts/toast/use-toast-context';
+import { formatRebindSummaryMessage, rebindRosterUnits } from '@/utils/refresh-user-data';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
 import { COLLECTION_LABELS } from '@/utils/collection';
@@ -18,7 +20,14 @@ const CreateRoster: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { createRoster } = useRoster();
-  const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
+  const {
+    factionIndex: factions,
+    loading: factionsLoading,
+    dataVersion,
+    getDatasheet,
+    getFactionManifest
+  } = useFactionsContext();
+  const { showToast } = useToast();
   const labels = COLLECTION_LABELS;
 
   const [name, setName] = useState('');
@@ -101,7 +110,7 @@ const CreateRoster: React.FC = () => {
     return prefillUnits.reduce((acc, unit) => acc + parseInt(unit.modelCost.cost, 10) || 0, 0);
   }, [prefillUnits]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const nextErrors: typeof errors = {};
 
@@ -141,6 +150,22 @@ const CreateRoster: React.FC = () => {
       return;
     }
 
+    // Collection snapshots may predate the current catalog; rebind them before stamping dataVersion.
+    let units = prefillUnits;
+    if (units.length > 0 && dataVersion) {
+      const rebound = await rebindRosterUnits(
+        units,
+        selectedFactionIndex.slug,
+        getDatasheet,
+        getFactionManifest
+      );
+      units = rebound.units;
+      const note = formatRebindSummaryMessage(rebound.summary);
+      if (note) {
+        showToast({ type: 'warning', title: 'Units updated to current data', message: note });
+      }
+    }
+
     const newId = createRoster({
       name: name.trim(),
       factionId: selectedFactionIndex.id,
@@ -149,7 +174,7 @@ const CreateRoster: React.FC = () => {
       dataVersion: dataVersion ?? null,
       maxPoints,
       detachments,
-      units: prefillUnits
+      units
     });
     navigate(`/rosters/${newId}/edit`);
   };
@@ -168,7 +193,11 @@ const CreateRoster: React.FC = () => {
           </Alert>
         ) : null}
         <Card>
-          <form data-testid="roster-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form
+            data-testid="roster-form"
+            onSubmit={(e) => void handleSubmit(e)}
+            className="flex flex-col gap-4"
+          >
             <Field data-testid="roster-name-field">
               <label htmlFor="roster-name" className="block text-sm font-medium text-body">
                 Roster Name

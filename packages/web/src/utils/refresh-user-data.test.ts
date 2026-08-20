@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import type { depot } from '@depot/core';
 import {
   formatRebindSummaryMessage,
+  rebindRosterUnits,
   refreshRosterData,
   refreshCollectionData,
   refreshCollectionDataWithReport
@@ -149,6 +150,22 @@ describe('refresh-user-data utilities', () => {
     expect(result.units[0].datasheet.name).toBe('Unit One Updated');
     expect(result.units[0].datasheetSlug).toBe('unit-one-new');
     expect(result.points.current).toBe(10);
+  });
+
+  it('rebindRosterUnits rebinds units in place and reports missing ones', async () => {
+    const refreshedDatasheet = buildDatasheet({ name: 'Unit One Updated', slug: 'unit-one-new' });
+    const getDatasheet = vi.fn().mockResolvedValueOnce(refreshedDatasheet).mockResolvedValue(null);
+
+    const result = await rebindRosterUnits(
+      [baseRoster.units[0], { ...baseRoster.units[0], id: 'unit-2' }],
+      'faction-1',
+      getDatasheet
+    );
+
+    expect(result.units[0].datasheet.name).toBe('Unit One Updated');
+    expect(result.units[1].datasheet.name).toBe(baseRoster.units[0].datasheet.name);
+    expect(result.summary.missing).toBe(1);
+    expect(result.summary.ok + result.summary.partial).toBe(1);
   });
 
   it('refreshCollectionData updates datasheets, recalculates points, and dataVersion', async () => {
