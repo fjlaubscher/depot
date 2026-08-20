@@ -78,7 +78,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       dataVersion?: string | null;
       maxPoints: number;
       name: string;
-      detachment: depot.Detachment;
+      detachments: depot.Detachment[];
       units?: depot.RosterUnit[];
     }): string => {
       const newId = crypto.randomUUID();
@@ -88,12 +88,12 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     []
   );
 
-  const setDetachment = useCallback((detachment: depot.Detachment): void => {
-    dispatch({ type: 'SET_DETACHMENT', payload: detachment });
+  const setDetachments = useCallback((detachments: depot.Detachment[]): void => {
+    dispatch({ type: 'SET_DETACHMENTS', payload: detachments });
   }, []);
 
   const updateRosterDetails = useCallback(
-    (payload: { name: string; detachment: depot.Detachment; maxPoints: number }): void => {
+    (payload: { name: string; detachments: depot.Detachment[]; maxPoints: number }): void => {
       dispatch({ type: 'UPDATE_DETAILS', payload });
     },
     []
@@ -157,7 +157,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       value={{
         state,
         createRoster,
-        setDetachment,
+        setDetachments,
         updateRosterDetails,
         addUnit,
         duplicateUnit,

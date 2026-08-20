@@ -21,7 +21,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - `pnpm clean` - clean all package outputs
 
 ## Data + Build Flow
-1. CLI fetches CSV from Wahapedia URLs. Edition path defaults to `wh40k10ed`; override with `WAHAPEDIA_EDITION=wh40k11ed`.
+1. CLI fetches CSV from Wahapedia URLs at `https://wahapedia.ru/wh40k11ed/{File}.csv`.
 2. CSV is converted to JSON using `@depot/core` types.
 3. Output lands in `packages/cli/dist/json/` and `packages/cli/dist/data/`.
 4. `scripts/copy-data.mjs` copies `dist/data/` into `packages/web/public/data/`.
@@ -31,7 +31,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - `scripts/copy-data.mjs` deletes the existing `packages/web/public/data` directory, then copies `packages/cli/dist/data` into it. It runs automatically in `pnpm start` and `pnpm build`; manual runs are rarely needed.
 
 ## Functions
-- Cloudflare Pages Functions live under the root `functions/` directory (currently just `[[path]].ts`, which injects og/meta tags for faction and datasheet routes).
+- Cloudflare Pages Functions live under the root `functions/` directory (currently just `[[path]].ts`, which injects og/meta tags for faction, datasheet and detachment routes).
 - Code there runs on the Pages runtime: rely on Web-standard APIs only (no Node built-ins).
 - Local iteration: `pnpm dev:wrangler` serves the built web app through the Pages runtime.
 
@@ -42,7 +42,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 ## Shared Utilities
 - All cross-package helpers now live in `@depot/core/src/utils`. The main entry points are:
   - `utils/common` (slug safety, keyword grouping, enhancement helpers, array sorters, breadcrumb builders).
-  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/collection`, `utils/datasheets`, `utils/paths`, and `utils/roster-share`.
+  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/collection`, `utils/datasheets`, `utils/paths`, `utils/detachments`, `utils/model-costs`, and `utils/roster-share`.
 - Add Vitest coverage beside any new helper in core before wiring it into CLI/web.
 - `packages/web/src/utils` should only contain UI-specific wrappers (e.g., tag styles, absolute URL builders that read browser env). When moving a helper into core, delete the old web tests and recreate them beside the new shared file.
 

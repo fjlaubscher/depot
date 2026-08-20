@@ -55,6 +55,21 @@
       "types": "./dist/utils/rebind.d.ts",
       "import": "./dist/utils/rebind.js",
       "default": "./dist/utils/rebind.js"
+    },
+    "./utils/detachments": {
+      "types": "./dist/utils/detachments.d.ts",
+      "import": "./dist/utils/detachments.js",
+      "default": "./dist/utils/detachments.js"
+    },
+    "./utils/roster-legality": {
+      "types": "./dist/utils/roster-legality.d.ts",
+      "import": "./dist/utils/roster-legality.js",
+      "default": "./dist/utils/roster-legality.js"
+    },
+    "./utils/model-costs": {
+      "types": "./dist/utils/model-costs.d.ts",
+      "import": "./dist/utils/model-costs.js",
+      "default": "./dist/utils/model-costs.js"
     }
   },
   "files": [

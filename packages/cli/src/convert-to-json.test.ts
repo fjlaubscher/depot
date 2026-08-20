@@ -17,6 +17,7 @@ describe('convertToJSON', () => {
   it('strips unwanted HTML but preserves allowed elements', () => {
     const htmlCell =
       'Text <div class="abName">Ability Name</div>' +
+      '<p class="ShowFluff abLegend">Fluff legend</p>' +
       ' <span class="kwb">KW</span> ' +
       '<a href="#">anchor</a> ' +
       '<i>italic</i> ' +
@@ -31,6 +32,8 @@ describe('convertToJSON', () => {
 
     // Removed elements
     expect(value).not.toContain('<div');
+    expect(value).not.toContain('abLegend');
+    expect(value).not.toContain('Fluff legend');
     expect(value).not.toContain('<i>');
     expect(value).not.toContain('<a ');
 
@@ -43,6 +46,30 @@ describe('convertToJSON', () => {
 
     // Anchor inner text preserved
     expect(value).toContain('anchor');
+  });
+
+  it('skips blank rows between header and trailing delimiter', () => {
+    const input = 'Name|Cost|\r\n' + 'Alice|10|\r\n' + '\r\n' + '||||\r\n' + 'Bob|20|\r\n';
+    const result = convertToJSON(input);
+    expect(result).toEqual([
+      { name: 'Alice', cost: '10' },
+      { name: 'Bob', cost: '20' }
+    ]);
+  });
+
+  it('rejoins records split by newlines inside a field', () => {
+    const input =
+      'Name|Legend|Cost|\r\n' +
+      'Guided Fire|Firing on coordinates\r\n' +
+      'with pinpoint precision.|1|\r\n';
+    const result = convertToJSON(input);
+    expect(result).toEqual([
+      {
+        name: 'Guided Fire',
+        legend: 'Firing on coordinates\nwith pinpoint precision.',
+        cost: '1'
+      }
+    ]);
   });
 
   it('normalizes malformed markup and strips unsafe attributes', () => {

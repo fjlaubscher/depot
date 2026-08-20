@@ -18,11 +18,13 @@ declare class HTMLRewriter {
 
 type RouteMatch =
   | { type: 'faction'; factionSlug: string }
-  | { type: 'datasheet'; factionSlug: string; datasheetSlug: string };
+  | { type: 'datasheet'; factionSlug: string; datasheetSlug: string }
+  | { type: 'detachment'; factionSlug: string; detachmentSlug: string };
 
 type Metadata = { title: string; description: string; url: string };
 
-type DatasheetSummary = { id: string; slug?: string; name: string; role?: string; path: string };
+type DatasheetSummary = { id: string; slug?: string; name: string; path: string };
+type DetachmentSummary = { id: string; slug?: string; name: string; legend?: string };
 
 type FactionManifest = {
   name: string;
@@ -30,7 +32,7 @@ type FactionManifest = {
   datasheetCount?: number;
   detachmentCount?: number;
   datasheets?: DatasheetSummary[];
-  detachments?: unknown[];
+  detachments?: DetachmentSummary[];
 };
 
 export const onRequest = async ({ request, env }: PagesContext): Promise<Response> => {
@@ -105,6 +107,15 @@ const matchRoute = (pathname: string): RouteMatch | null => {
     };
   }
 
+  const detachmentMatch = pathname.match(/^\/faction\/([^/]+)\/detachment\/([^/]+)\/?$/i);
+  if (detachmentMatch) {
+    return {
+      type: 'detachment',
+      factionSlug: decodeURIComponent(detachmentMatch[1]).toLowerCase(),
+      detachmentSlug: decodeURIComponent(detachmentMatch[2]).toLowerCase()
+    };
+  }
+
   const factionMatch = pathname.match(/^\/faction\/([^/]+)\/?$/i);
   if (factionMatch) {
     return {
@@ -135,7 +146,8 @@ const buildMetadata = async (
   if (match.type === 'faction') {
     const datasheetTotal = manifest.datasheetCount ?? manifest.datasheets?.length ?? 0;
     const detachmentTotal =
-      manifest.detachmentCount ?? (Array.isArray(manifest.detachments) ? manifest.detachments.length : 0);
+      manifest.detachmentCount ??
+      (Array.isArray(manifest.detachments) ? manifest.detachments.length : 0);
 
     return {
       title: `${manifest.name} - depot`,
@@ -147,18 +159,35 @@ const buildMetadata = async (
     };
   }
 
+  if (match.type === 'detachment') {
+    const detachment = (manifest.detachments ?? []).find(
+      (entry) => (entry.slug ?? '').toLowerCase() === match.detachmentSlug
+    );
+    if (!detachment) {
+      return null;
+    }
+    const legend = detachment.legend ? truncateText(stripHtml(detachment.legend)) : '';
+    return {
+      title: `${detachment.name} - ${manifest.name} | depot`,
+      description:
+        legend || `${detachment.name} detachment rules for ${manifest.name} in Warhammer 40,000.`,
+      url: canonicalUrl
+    };
+  }
+
   const datasheetEntry = findDatasheet(manifest, match.datasheetSlug);
   if (!datasheetEntry) {
     return null;
   }
 
-  const datasheetDetails = await fetchJson<{ legend?: string }>(env, requestUrl, datasheetEntry.path);
+  const datasheetDetails = await fetchJson<{ legend?: string }>(
+    env,
+    requestUrl,
+    datasheetEntry.path
+  );
   const legend = datasheetDetails?.legend ? truncateText(stripHtml(datasheetDetails.legend)) : '';
   const description =
-    legend ||
-    `${datasheetEntry.name} datasheet for ${manifest.name} in Warhammer 40,000.${
-      datasheetEntry.role ? ` Role: ${datasheetEntry.role}.` : ''
-    }`;
+    legend || `${datasheetEntry.name} datasheet for ${manifest.name} in Warhammer 40,000.`;
 
   return {
     title: `${datasheetEntry.name} - ${manifest.name} | depot`,
@@ -194,7 +223,10 @@ const findDatasheet = (manifest: FactionManifest, slugOrId: string): DatasheetSu
 };
 
 const stripHtml = (value: string): string =>
-  value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  value
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
 const truncateText = (value: string, maxLength = 200): string =>
   value.length <= maxLength ? value : `${value.slice(0, maxLength - 3).trimEnd()}...`;

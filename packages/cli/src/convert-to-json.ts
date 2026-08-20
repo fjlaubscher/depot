@@ -12,7 +12,10 @@ const stripHtml = (input: string) => {
     return input;
   }
 
-  body.querySelectorAll('div.abName,script,style').forEach((element) => element.remove());
+  // abLegend duplicates the separate `legend` column; drop it so fluff isn't rendered twice.
+  body
+    .querySelectorAll('div.abName,p.abLegend,script,style')
+    .forEach((element) => element.remove());
   // Reverse so nested elements unwrap before their parents capture innerHTML.
   body
     .querySelectorAll('a,i')
@@ -37,15 +40,37 @@ const convertToCamelCase = (input: string) =>
 
 const getHeaders = (rows: string[]) => rows[0].split('|').map(convertToCamelCase);
 
+const isBlankRow = (row: string) => !row.replace(/\|/g, '').trim();
+
+const assembleRecords = (rows: string[]): string[] => {
+  const expected = rows[0].split('|').length;
+  const assembled: string[] = [];
+  let buffer = '';
+
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!buffer && isBlankRow(row)) {
+      continue;
+    }
+
+    buffer = buffer ? `${buffer}\n${row}` : row;
+    if (buffer.split('|').length >= expected) {
+      assembled.push(buffer);
+      buffer = '';
+    }
+  }
+
+  return assembled;
+};
+
 const convertToJSON = (input: string) => {
   const rows = cleanCSV(input);
   const headers = getHeaders(rows);
   const result: Record<string, string>[] = [];
 
-  // always skip the first row and ignore the last
-  for (let i = 1; i < rows.length - 1; i++) {
+  for (const record of assembleRecords(rows)) {
     const data: Record<string, string> = {};
-    const columns = rows[i].split('|');
+    const columns = record.split('|');
 
     // always ignore the last column
     for (let col = 0; col < columns.length - 1; col++) {

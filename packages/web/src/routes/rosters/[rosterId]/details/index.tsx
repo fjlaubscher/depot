@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FC, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FC, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 
@@ -9,19 +9,12 @@ import { useToast } from '@/contexts/toast/use-toast-context';
 import useFaction from '@/hooks/use-faction';
 
 import AppLayout from '@/components/layout';
-import {
-  PageHeader,
-  Loader,
-  Breadcrumbs,
-  Button,
-  Card,
-  Field,
-  SelectField,
-  Alert
-} from '@/components/ui';
+import { PageHeader, Loader, Breadcrumbs, Button, Card, Field, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { BackButton, RosterHeader } from '@/components/shared';
+import { getRosterDetachments, getRosterDetachmentNames } from '@depot/core/utils/roster';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
+import DetachmentPicker from '@/routes/rosters/_components/detachment-picker';
 
 const RosterDetailsContent: FC = () => {
   const { state: roster, updateRosterDetails } = useRoster();
@@ -32,28 +25,20 @@ const RosterDetailsContent: FC = () => {
   const { data: faction, loading: factionLoading, error: factionError } = useFaction(factionSlug);
 
   const [name, setName] = useState('');
-  const [selectedDetachment, setSelectedDetachment] = useState('');
+  const [selectedDetachments, setSelectedDetachments] = useState<string[]>([]);
   const [maxPoints, setMaxPoints] = useState(2000);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     if (roster.id) {
       setName(roster.name);
-      setSelectedDetachment(roster.detachment?.slug ?? '');
+      setSelectedDetachments(getRosterDetachments(roster).map((detachment) => detachment.slug));
       setMaxPoints(roster.points.max);
     }
-  }, [roster.id, roster.name, roster.detachment?.slug, roster.points.max]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roster.id, roster.name, roster.detachments, roster.points.max]);
 
-  const detachmentOptions = useMemo(() => {
-    const detachments = faction?.detachments ?? [];
-    return detachments
-      .slice()
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((detachment) => ({
-        value: detachment.slug,
-        label: detachment.name
-      }));
-  }, [faction?.detachments]);
+  const factionDetachments = faction?.detachments ?? [];
 
   const isLoading = !roster.id || (!faction && factionLoading);
 
@@ -80,11 +65,11 @@ const RosterDetailsContent: FC = () => {
       return;
     }
 
-    if (!selectedDetachment) {
+    if (selectedDetachments.length === 0) {
       showToast({
         type: 'error',
         title: 'Validation Error',
-        message: 'Please select a detachment.'
+        message: 'Please select at least one detachment.'
       });
       return;
     }
@@ -98,22 +83,22 @@ const RosterDetailsContent: FC = () => {
       return;
     }
 
-    const detachment = (faction?.detachments ?? []).find(
-      (item) => item.slug === selectedDetachment
+    const detachments = factionDetachments.filter((item) =>
+      selectedDetachments.includes(item.slug)
     );
 
-    if (!detachment) {
+    if (detachments.length === 0) {
       showToast({
         type: 'error',
         title: 'Validation Error',
-        message: 'Selected detachment could not be found.'
+        message: 'Selected detachments could not be found.'
       });
       return;
     }
 
     updateRosterDetails({
       name: name.trim(),
-      detachment,
+      detachments,
       maxPoints
     });
 
@@ -126,12 +111,17 @@ const RosterDetailsContent: FC = () => {
     navigate(`/rosters/${roster.id}/edit`);
   };
 
-  const subtitle = roster.detachment?.name
-    ? `${roster.faction?.name ?? ''} • ${roster.detachment.name}`.trim()
+  const detachmentNames = getRosterDetachmentNames(roster);
+  const subtitle = detachmentNames
+    ? `${roster.faction?.name ?? ''} • ${detachmentNames}`.trim()
     : (roster.faction?.name ?? '');
 
   const saveDisabled =
-    !name.trim() || !selectedDetachment || maxPoints <= 0 || factionLoading || !!factionError;
+    !name.trim() ||
+    selectedDetachments.length === 0 ||
+    maxPoints <= 0 ||
+    factionLoading ||
+    !!factionError;
 
   return (
     <div className="flex flex-col gap-4">
@@ -189,15 +179,13 @@ const RosterDetailsContent: FC = () => {
             >
               {factionError}
             </Alert>
-          ) : detachmentOptions.length > 0 ? (
-            <SelectField
-              label="Detachment"
-              options={detachmentOptions}
-              value={selectedDetachment}
-              onChange={(event) => setSelectedDetachment(event.target.value)}
-              placeholder="Select a detachment"
-              required
+          ) : factionDetachments.length > 0 ? (
+            <DetachmentPicker
               data-testid="detachment-select"
+              detachments={factionDetachments}
+              selectedSlugs={selectedDetachments}
+              maxPoints={maxPoints}
+              onChange={setSelectedDetachments}
             />
           ) : (
             <Alert

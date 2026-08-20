@@ -10,6 +10,7 @@ import WargearSelectionContainer from './wargear-selection-container';
 import ModelCostSelection from './model-cost-selection';
 import WargearAbilitiesSelection from './wargear-abilities-selection';
 import { parseLoadoutWargear } from '@depot/core/utils/wargear';
+import { modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 import {
   getWargearAbilities,
   normalizeSelectedWargearAbilities
@@ -34,6 +35,8 @@ interface UnitEditShellProps {
   subtitle?: string;
   headerTestId: string;
   saveButtonTestId: string;
+  /** Cost rows offered for this unit; defaults to the first-copy bracket. */
+  modelCosts?: depot.ModelCost[];
   /** Extra cards rendered at the top of the left column (e.g. collection build state). */
   beforeModelCost?: React.ReactNode;
   /** Extra cards rendered below the grid (e.g. roster enhancements/warlord). */
@@ -53,11 +56,13 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   subtitle,
   headerTestId,
   saveButtonTestId,
+  modelCosts,
   beforeModelCost,
   afterGrid,
   onSave
 }) => {
   const navigate = useNavigate();
+  const availableModelCosts = modelCosts ?? modelCostsForOrdinal(unit.datasheet.modelCosts);
 
   // Track which unit we've initialized to avoid resetting user selections
   const initializedUnitRef = useRef<string | null>(null);
@@ -138,13 +143,13 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
           {beforeModelCost}
 
           {/* Model Cost Selection - only show if there are multiple options */}
-          {unit.datasheet.modelCosts.length > 1 && (
+          {availableModelCosts.length > 1 && (
             <Card data-testid="model-cost-section">
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
                 <p className="text-sm text-muted">Choose the number of models for this unit</p>
                 <ModelCostSelection
-                  unit={unit}
+                  modelCosts={availableModelCosts}
                   selectedModelCost={selectedModelCost || unit.modelCost}
                   onModelCostChange={setSelectedModelCost}
                 />

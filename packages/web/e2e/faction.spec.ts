@@ -40,4 +40,27 @@ test.describe('Faction detail', () => {
       await expect(page.getByText(/No detachments available/i)).toBeVisible();
     }
   });
+
+  test('Space Marines Gladius shows DP and Force Disposition', async ({ page }) => {
+    await page.goto('/faction/space-marines');
+    await page.getByTestId('faction-tab-detachments').click();
+
+    const detachments = page.getByTestId('faction-detachments');
+    await expect(detachments).toBeVisible();
+    await expect(detachments).toContainText(/Gladius Task Force/i);
+
+    await detachments.getByRole('link', { name: /Gladius Task Force/i }).click();
+    await expect(page).toHaveURL(/\/detachment\/gladius-task-force$/);
+    await expect(page.getByTestId('detachment-header')).toContainText(/Gladius Task Force/i);
+    const meta = page.getByTestId('detachment-meta');
+    await expect(meta).toContainText(/\d+\s*DP/);
+    await expect(meta).toContainText(
+      /Take and Hold|Disruption|Purge the Foe|Priority Assets|Reconnaissance/
+    );
+    await expect(page.getByTestId('detachment-stratagems')).toBeVisible();
+
+    await page.goto('/faction/space-marines/detachment/shield-of-the-void');
+    await expect(page.getByTestId('detachment-header')).toContainText(/Shield of the Void/i);
+    await expect(page.getByTestId('detachment-meta')).toContainText(/Boarding Actions/);
+  });
 });

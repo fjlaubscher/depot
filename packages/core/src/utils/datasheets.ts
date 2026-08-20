@@ -1,5 +1,5 @@
 import type { Datasheet, DatasheetSummary } from '../types/depot.js';
-import { groupBy, sortByName } from './common.js';
+import { sortByName } from './common.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
 
@@ -19,14 +19,6 @@ export interface SupplementMetadata {
   hasCodexDatasheets: boolean;
   options: SupplementOption[];
 }
-
-export const groupDatasheetsByRole = <T extends DatasheetListItem>(datasheets: T[]) => {
-  const grouped = groupBy(datasheets, (datasheet) => datasheet.role);
-  Object.keys(grouped).forEach((key) => {
-    grouped[key] = sortByName(grouped[key]);
-  });
-  return grouped;
-};
 
 export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
   datasheets: T[],

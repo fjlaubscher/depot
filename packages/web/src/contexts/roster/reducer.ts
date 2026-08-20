@@ -7,69 +7,53 @@ import {
 import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
 import type { RosterState, RosterAction } from './types';
 import { initialState } from './constants';
-import { calculateTotalPoints } from '@depot/core/utils/roster';
+import { calculateTotalPoints, getRosterDetachments } from '@depot/core/utils/roster';
+import { enforceCostBrackets } from '@depot/core/utils/roster-legality';
+
+const normalizeUnit = (unit: depot.RosterUnit): depot.RosterUnit => {
+  const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
+  return {
+    ...unit,
+    datasheet: normalizedDatasheet,
+    selectedWargear: normalizeSelectedWargear(unit.selectedWargear, normalizedDatasheet.wargear),
+    selectedWargearAbilities: normalizeSelectedWargearAbilities(
+      unit.selectedWargearAbilities,
+      normalizedDatasheet.abilities
+    ),
+    datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
+  };
+};
+
+/** Re-apply repeat-cost brackets and recompute the points total after any change. */
+const finalize = (state: depot.Roster): depot.Roster => {
+  const units = enforceCostBrackets(state.units);
+  const next = units.some((unit, index) => unit !== state.units[index])
+    ? { ...state, units }
+    : state;
+  return { ...next, points: { ...next.points, current: calculateTotalPoints(next) } };
+};
 
 export const rosterReducer = (state: RosterState, action: RosterAction): RosterState => {
   switch (action.type) {
     case 'SET_ROSTER': {
-      const fallbackSlug =
-        action.payload.factionSlug ?? action.payload.faction?.slug ?? action.payload.factionId;
+      const { detachment: _legacyDetachment, ...payload } = action.payload;
+      const fallbackSlug = payload.factionSlug ?? payload.faction?.slug ?? payload.factionId;
 
-      const normalisedRoster: depot.Roster = {
-        ...action.payload,
-        dataVersion: action.payload.dataVersion ?? null,
+      return finalize({
+        ...payload,
+        dataVersion: payload.dataVersion ?? null,
         factionSlug: fallbackSlug,
-        faction: action.payload.faction
-          ? { ...action.payload.faction, slug: action.payload.faction.slug ?? fallbackSlug }
-          : action.payload.faction,
-        warlordUnitId: action.payload.warlordUnitId ?? null,
-        units: action.payload.units.map((unit) => {
-          const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
-          return {
-            ...unit,
-            datasheet: normalizedDatasheet,
-            selectedWargear: normalizeSelectedWargear(
-              unit.selectedWargear,
-              normalizedDatasheet.wargear
-            ),
-            selectedWargearAbilities: normalizeSelectedWargearAbilities(
-              unit.selectedWargearAbilities,
-              normalizedDatasheet.abilities
-            ),
-            datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
-          };
-        })
-      };
-
-      return {
-        ...normalisedRoster,
-        points: {
-          ...normalisedRoster.points,
-          current: calculateTotalPoints(normalisedRoster)
-        }
-      };
+        faction: payload.faction
+          ? { ...payload.faction, slug: payload.faction.slug ?? fallbackSlug }
+          : payload.faction,
+        detachments: getRosterDetachments(action.payload),
+        warlordUnitId: payload.warlordUnitId ?? null,
+        units: payload.units.map(normalizeUnit)
+      });
     }
 
     case 'CREATE_ROSTER':
-      const initialUnits =
-        action.payload.units?.map((unit) => {
-          const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
-          return {
-            ...unit,
-            datasheet: normalizedDatasheet,
-            selectedWargear: normalizeSelectedWargear(
-              unit.selectedWargear,
-              normalizedDatasheet.wargear
-            ),
-            selectedWargearAbilities: normalizeSelectedWargearAbilities(
-              unit.selectedWargearAbilities,
-              normalizedDatasheet.abilities
-            ),
-            datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
-          };
-        }) ?? [];
-
-      const createdRoster: depot.Roster = {
+      return finalize({
         ...initialState,
         id: action.payload.id,
         name: action.payload.name,
@@ -77,98 +61,45 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         factionSlug: action.payload.factionSlug,
         faction: action.payload.faction,
         dataVersion: action.payload.dataVersion ?? null,
-        detachment: action.payload.detachment,
-        points: {
-          current: initialUnits.length > 0 ? 0 : initialState.points.current,
-          max: action.payload.maxPoints
-        },
+        detachments: action.payload.detachments,
+        points: { current: 0, max: action.payload.maxPoints },
         warlordUnitId: null,
-        units: initialUnits,
+        units: action.payload.units?.map(normalizeUnit) ?? [],
         enhancements: []
-      };
+      });
 
-      return {
-        ...createdRoster,
-        points: {
-          ...createdRoster.points,
-          current: calculateTotalPoints(createdRoster)
-        }
-      };
-
-    case 'UPDATE_DETAILS': {
-      const updatedState: depot.Roster = {
+    case 'UPDATE_DETAILS':
+      return finalize({
         ...state,
         name: action.payload.name,
-        detachment: action.payload.detachment,
-        points: {
-          ...state.points,
-          max: action.payload.maxPoints
-        }
-      };
+        detachments: action.payload.detachments,
+        points: { ...state.points, max: action.payload.maxPoints }
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'SET_DETACHMENT':
-      return {
-        ...state,
-        detachment: action.payload
-      };
+    case 'SET_DETACHMENTS':
+      return { ...state, detachments: action.payload };
 
     case 'ADD_UNIT': {
       const normalizedDatasheet = normalizeDatasheetWargear(action.payload.datasheet);
-      const defaultWargear = getDefaultWargearSelection(normalizedDatasheet);
       const newUnit: depot.RosterUnit = {
         id: crypto.randomUUID(),
         datasheet: normalizedDatasheet,
         modelCost: action.payload.modelCost,
-        selectedWargear: defaultWargear,
+        selectedWargear: getDefaultWargearSelection(normalizedDatasheet),
         selectedWargearAbilities: [],
         datasheetSlug: normalizedDatasheet.slug
       };
-
-      const updatedState = {
-        ...state,
-        units: [...state.units, newUnit]
-      };
-
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
+      return finalize({ ...state, units: [...state.units, newUnit] });
     }
 
-    case 'DUPLICATE_UNIT': {
-      const duplicatedUnit: depot.RosterUnit = {
-        ...action.payload.unit,
-        id: crypto.randomUUID()
-      };
-
-      const updatedState = {
+    case 'DUPLICATE_UNIT':
+      return finalize({
         ...state,
-        units: [...state.units, duplicatedUnit]
-      };
+        units: [...state.units, { ...action.payload.unit, id: crypto.randomUUID() }]
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'REMOVE_UNIT': {
-      const updatedState = {
+    case 'REMOVE_UNIT':
+      return finalize({
         ...state,
         units: state.units.filter((unit) => unit.id !== action.payload.rosterUnitId),
         enhancements: state.enhancements.filter(
@@ -176,131 +107,65 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         ),
         warlordUnitId:
           state.warlordUnitId === action.payload.rosterUnitId ? null : state.warlordUnitId
-      };
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'UPDATE_UNIT_WARGEAR': {
-      const updatedState = {
+    case 'UPDATE_UNIT_WARGEAR':
+      return finalize({
         ...state,
         units: state.units.map((unit) =>
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargear: action.payload.wargear }
             : unit
         )
-      };
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'UPDATE_UNIT_WARGEAR_ABILITIES': {
-      const updatedState = {
+    case 'UPDATE_UNIT_WARGEAR_ABILITIES':
+      return finalize({
         ...state,
         units: state.units.map((unit) =>
           unit.id === action.payload.rosterUnitId
             ? { ...unit, selectedWargearAbilities: action.payload.abilities }
             : unit
         )
-      };
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'UPDATE_UNIT_MODEL_COST': {
-      const updatedState = {
+    case 'UPDATE_UNIT_MODEL_COST':
+      return finalize({
         ...state,
         units: state.units.map((unit) =>
           unit.id === action.payload.rosterUnitId
             ? { ...unit, modelCost: action.payload.modelCost }
             : unit
         )
-      };
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'APPLY_ENHANCEMENT': {
-      const updatedState = {
+    case 'APPLY_ENHANCEMENT':
+      return finalize({
         ...state,
         enhancements: [
           ...state.enhancements,
-          {
-            enhancement: action.payload.enhancement,
-            unitId: action.payload.targetUnitId
-          }
+          { enhancement: action.payload.enhancement, unitId: action.payload.targetUnitId }
         ]
-      };
+      });
 
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
-
-    case 'REMOVE_ENHANCEMENT': {
-      const updatedState = {
+    case 'REMOVE_ENHANCEMENT':
+      return finalize({
         ...state,
         enhancements: state.enhancements.filter(
           ({ enhancement }) => enhancement.id !== action.payload.enhancementId
         )
-      };
-
-      return {
-        ...updatedState,
-        points: {
-          ...updatedState.points,
-          current: calculateTotalPoints(updatedState)
-        }
-      };
-    }
+      });
 
     case 'SET_WARLORD': {
       const { unitId } = action.payload;
-      const nextWarlordId =
-        unitId && state.units.some((unit) => unit.id === unitId) ? unitId : null;
-
       return {
         ...state,
-        warlordUnitId: nextWarlordId
+        warlordUnitId: unitId && state.units.some((unit) => unit.id === unitId) ? unitId : null
       };
     }
 
     case 'RECALCULATE_POINTS':
-      return {
-        ...state,
-        points: {
-          ...state.points,
-          current: calculateTotalPoints(state)
-        }
-      };
+      return finalize(state);
 
     default:
       return state;

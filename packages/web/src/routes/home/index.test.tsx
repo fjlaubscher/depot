@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { depot } from '@depot/core';
 
 import { TestWrapper } from '@/test/test-utils';
@@ -84,32 +84,25 @@ describe('Home', () => {
     mockFactionsContext.dataVersion = '2024.10.01';
   });
 
-  it('renders notice and dashboard sections', () => {
+  it('renders hero, hero links and footer when there is no local data', () => {
     render(
       <TestWrapper>
         <Home />
       </TestWrapper>
     );
 
-    expect(screen.queryByText('Your desk')).not.toBeInTheDocument();
-    expect(screen.getByTestId('edition-notice')).toBeInTheDocument();
-    expect(screen.getByTestId('bookmarks-section')).toBeInTheDocument();
-    expect(screen.getByTestId('rosters-section')).toBeInTheDocument();
-    expect(screen.getByTestId('collections-section')).toBeInTheDocument();
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('11th edition is here');
+    const links = within(screen.getByTestId('hero-links'));
+    expect(links.getByRole('link', { name: /Factions/ })).toHaveAttribute('href', '/factions');
+    expect(links.getByRole('link', { name: /Collections/ })).toHaveAttribute(
+      'href',
+      '/collections'
+    );
+    expect(links.getByRole('link', { name: /Rosters/ })).toHaveAttribute('href', '/rosters');
+    expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
     expect(screen.getByText(/Last updated: 2024.10.01/i)).toBeInTheDocument();
-  });
-
-  it('shows empty states when there is no local data', () => {
-    render(
-      <TestWrapper>
-        <Home />
-      </TestWrapper>
-    );
-
-    expect(screen.getByTestId('empty-bookmarks-home')).toBeInTheDocument();
-    expect(screen.getByText('Your bookmarks will show up here')).toBeInTheDocument();
-    expect(screen.getByTestId('empty-rosters-home')).toBeInTheDocument();
-    expect(screen.getByTestId('empty-collections-home')).toBeInTheDocument();
   });
 
   it('previews bookmarks and recent rosters when present', () => {
@@ -150,5 +143,6 @@ describe('Home', () => {
     expect(rosterCards).toHaveLength(2);
     expect(rosterCards[0]).toHaveTextContent('Newest List');
     expect(screen.getByTestId('view-all-rosters')).toBeInTheDocument();
+    expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
   });
 });

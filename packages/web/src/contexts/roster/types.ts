@@ -14,15 +14,15 @@ export type RosterAction =
         dataVersion?: string | null;
         maxPoints: number;
         name: string;
-        detachment: depot.Detachment;
+        detachments: depot.Detachment[];
         units?: depot.RosterUnit[];
       };
     }
   | {
       type: 'UPDATE_DETAILS';
-      payload: { name: string; detachment: depot.Detachment; maxPoints: number };
+      payload: { name: string; detachments: depot.Detachment[]; maxPoints: number };
     }
-  | { type: 'SET_DETACHMENT'; payload: depot.Detachment }
+  | { type: 'SET_DETACHMENTS'; payload: depot.Detachment[] }
   | { type: 'ADD_UNIT'; payload: { datasheet: depot.Datasheet; modelCost: depot.ModelCost } }
   | { type: 'DUPLICATE_UNIT'; payload: { unit: depot.RosterUnit } }
   | { type: 'REMOVE_UNIT'; payload: { rosterUnitId: string } }
@@ -49,13 +49,13 @@ export interface RosterContextValue {
     dataVersion?: string | null;
     maxPoints: number;
     name: string;
-    detachment: depot.Detachment;
+    detachments: depot.Detachment[];
     units?: depot.RosterUnit[];
   }) => string;
-  setDetachment: (detachment: depot.Detachment) => void;
+  setDetachments: (detachments: depot.Detachment[]) => void;
   updateRosterDetails: (payload: {
     name: string;
-    detachment: depot.Detachment;
+    detachments: depot.Detachment[];
     maxPoints: number;
   }) => void;
   setRoster: (roster: depot.Roster) => void;

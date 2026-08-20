@@ -2,7 +2,7 @@ import type { depot } from '@depot/core';
 
 type UnknownRecord = Record<string, unknown>;
 
-/** Wahapedia edition path the export was built against (e.g. wh40k10ed). */
+/** Wahapedia edition path the export was built against (e.g. wh40k11ed). */
 export type GameEdition = string;
 
 export interface ExportedRoster {
@@ -23,8 +23,8 @@ export interface ExportedCollection {
   collection: depot.Collection;
 }
 
-/** Current catalog edition shipped by depot (mirrors CLI WAHAPEDIA_EDITION default). */
-export const CURRENT_GAME_EDITION = 'wh40k10ed';
+/** Current catalog edition shipped by depot. Hardcoded; not a build switch. */
+export const CURRENT_GAME_EDITION = 'wh40k11ed';
 
 const isObject = (value: unknown): value is UnknownRecord =>
   typeof value === 'object' && value !== null;
@@ -33,13 +33,14 @@ const hasRosterShape = (value: unknown): value is depot.Roster => {
   if (!isObject(value)) return false;
   const points = (value as UnknownRecord).points;
   const detachment = (value as UnknownRecord).detachment;
+  const detachments = (value as UnknownRecord).detachments;
   return (
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.factionId === 'string' &&
     Array.isArray(value.units) &&
     Array.isArray(value.enhancements) &&
-    isObject(detachment) &&
+    (Array.isArray(detachments) || isObject(detachment)) &&
     isObject(points) &&
     typeof points.current === 'number' &&
     typeof points.max === 'number'

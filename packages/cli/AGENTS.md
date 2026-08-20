@@ -14,7 +14,7 @@ Fetches Wahapedia CSV exports and converts them into the JSON payloads the PWA c
 - `pnpm --filter @depot/cli clean` — remove `dist/`
 
 ## Processing Pipeline
-1. **Fetch** (`src/index.ts`): Downloads CSVs from URLs in `src/config/supplements.ts`.
+1. **Fetch** (`src/index.ts`): Downloads CSVs from `https://wahapedia.ru/wh40k11ed/{File}.csv`.
 2. **Convert** (`src/convert-to-json.ts`): Transforms CSV -> JSON with cleaning/normalization.
 3. **Generate** (`src/generate-data.ts`): Builds faction-level payloads and navigation index consumed by the web app.
    - Forge World / Legends flags are derived from source names inline in `buildDatasheet` (`src/generate-data.ts`).

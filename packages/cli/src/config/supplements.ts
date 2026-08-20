@@ -15,9 +15,7 @@ const supplements: Record<string, SupplementInfo> = {
   '000000036': { slug: 'space-wolves', name: 'Space Wolves' },
   '000000360': { slug: 'space-wolves', name: 'Space Wolves (Legends)' },
   '000000162': { slug: 'black-templars', name: 'Black Templars' },
-  '000000372': { slug: 'black-templars', name: 'Black Templars (Legends)' },
   '000000035': { slug: 'deathwatch', name: 'Deathwatch' },
-  '000000287': { slug: 'ultramarines-legends', name: 'Ultramarines (Legends)' },
   '000000363': { slug: 'imperial-agents-legends', name: 'Imperial Agents (Legends)' }
 };
 

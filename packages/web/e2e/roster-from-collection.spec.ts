@@ -7,7 +7,8 @@ test.describe('Roster from Collection', () => {
   });
 
   test('creates a roster prefilled from a collection', async ({ page }) => {
-    await page.goto('/collections/create');
+    await page.goto('/collections');
+    await page.getByTestId('create-collection-button').click();
 
     const collectionName = `E2E Collection Roster ${Date.now()}`;
     await page.getByLabel('Name').fill(collectionName);
@@ -67,10 +68,10 @@ test.describe('Roster from Collection', () => {
     await expect(selectionSummary).toBeVisible();
     await selectionSummary.getByRole('button', { name: 'Confirm' }).click();
 
-    await expect(page).toHaveURL(/\/rosters\/create\?fromCollection=/);
+    await expect(page.getByTestId('create-roster-sheet')).toBeVisible();
 
-    await page.getByTestId('detachment-field-select').waitFor({ state: 'visible', timeout: 20000 });
-    await page.getByTestId('detachment-field-select').selectOption({ index: 1 });
+    await page.getByTestId('detachment-field').waitFor({ state: 'visible', timeout: 20000 });
+    await page.locator('[data-testid^="detachment-toggle-"]').first().click();
 
     await page.getByTestId('submit-button').click();
     await expect(page).toHaveURL(/\/rosters\/[a-z0-9-]+\/edit$/i);

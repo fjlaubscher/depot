@@ -16,6 +16,9 @@ export * as abilities from './utils/abilities.js';
 // Export roster helpers
 export * as roster from './utils/roster.js';
 
+// Export list-legality helpers
+export * as rosterLegality from './utils/roster-legality.js';
+
 // Export collection helpers
 export * as collection from './utils/collection.js';
 
@@ -27,6 +30,12 @@ export * as datasheets from './utils/datasheets.js';
 
 // Export rebind / edition-migration helpers
 export * as rebind from './utils/rebind.js';
+
+// Export detachment join / display helpers
+export * as detachments from './utils/detachments.js';
+
+// Export model-cost normalization helpers
+export * as modelCosts from './utils/model-costs.js';
 
 // Export all wahapedia types
 export * as wahapedia from './types/wahapedia.js';

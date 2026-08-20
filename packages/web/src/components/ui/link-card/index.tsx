@@ -12,6 +12,8 @@ interface LinkCardProps extends Omit<
   className?: string;
   description?: string;
   icon?: ReactNode;
+  /** Override the icon chip colours (defaults to primary tint). */
+  iconClassName?: string;
   showArrow?: boolean;
 }
 
@@ -21,6 +23,7 @@ const LinkCard: FC<LinkCardProps> = ({
   className,
   description,
   icon,
+  iconClassName,
   showArrow = false,
   ...rest
 }) => {
@@ -32,7 +35,18 @@ const LinkCard: FC<LinkCardProps> = ({
       {...rest}
     >
       <Card interactive className="flex h-full flex-col gap-2">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start justify-between gap-3">
+          {icon ? (
+            <span
+              className={classNames(
+                'inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl transition-colors duration-200',
+                iconClassName ??
+                  'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200'
+              )}
+            >
+              {icon}
+            </span>
+          ) : null}
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <Card.Title
               as="h2"
@@ -64,11 +78,6 @@ const LinkCard: FC<LinkCardProps> = ({
                   d="M7 17L17 7M10 7h7v7"
                 />
               </svg>
-            </span>
-          ) : null}
-          {icon ? (
-            <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 transition-colors duration-200 dark:bg-primary-500/15 dark:text-primary-200">
-              {icon}
             </span>
           ) : null}
         </div>

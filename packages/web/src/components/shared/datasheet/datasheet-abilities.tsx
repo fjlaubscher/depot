@@ -4,7 +4,7 @@ import type { depot } from '@depot/core';
 import classNames from 'classnames';
 
 import { Tag, TagSection } from '@/components/ui';
-import AbilityModal from '@/components/shared/ability-modal';
+import AbilitySheet from '@/components/shared/ability-sheet';
 import { formatAbilityName, sortAbilitiesByType } from '@depot/core/utils/abilities';
 import { getAbilityTypeMeta } from '@/utils/abilities';
 
@@ -26,10 +26,8 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
 
   const sortedAbilities = useMemo(() => sortAbilitiesByType(abilities), [abilities]);
 
-  const handleClose = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedAbility(null);
-  }, []);
+  // Keep the ability mounted on close so the sheet content stays during the slide-out.
+  const handleClose = useCallback(() => setIsModalOpen(false), []);
 
   const handleOpen = useCallback((event: MouseEvent<HTMLButtonElement>, ability: depot.Ability) => {
     event.stopPropagation();
@@ -75,7 +73,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
         })}
       </TagSection>
 
-      <AbilityModal ability={selectedAbility} open={isModalOpen} onClose={handleClose} />
+      <AbilitySheet ability={selectedAbility} open={isModalOpen} onClose={handleClose} />
     </>
   );
 };

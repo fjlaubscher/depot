@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
@@ -7,8 +7,8 @@ import { useCollections } from '@/hooks/use-collections';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, ErrorState } from '@/components/ui';
-import { ListEmptyState } from '@/components/shared';
+import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
+import { RosterEmptyState } from '@/components/shared/roster';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { getCollectionsSnapshotCopy } from '@/utils/collection';
@@ -19,16 +19,22 @@ import {
 import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
 import CollectionStateChart from './_components/collection-state-chart';
+import CreateCollectionSheet from './_components/create-collection-sheet';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { collections, loading, error, refresh } = useCollections();
-  const { dataVersion } = useFactionsContext();
+  const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
   const { showToast } = useToast();
   const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections]);
   const hasSnapshotData = snapshot.items.length > 0;
 
-  const handleCreate = () => navigate('/collections/create');
+  const hasStaleCollections = Boolean(
+    dataVersion && collections.some((collection) => collection.dataVersion !== dataVersion)
+  );
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const handleCreate = () => setCreateOpen(true);
 
   const handleDelete = async (collectionId: string) => {
     try {
@@ -83,6 +89,8 @@ const CollectionsPage: React.FC = () => {
     try {
       const result = await importCollectionsFromFiles(files, {
         dataVersion: dataVersion ?? null,
+        getDatasheet,
+        getFactionManifest,
         saveCollection: (collection) => offlineStorage.saveCollection(collection)
       });
 
@@ -123,6 +131,18 @@ const CollectionsPage: React.FC = () => {
           />
         </div>
 
+        {hasStaleCollections ? (
+          <Alert
+            variant="info"
+            title="Existing collections need a refresh"
+            data-testid="stale-collections-notice"
+          >
+            <p className="text-sm">
+              They were built on 10th edition data. Open a collection and hit Refresh to bring it
+              onto 11th.
+            </p>
+          </Alert>
+        ) : null}
         {loading ? (
           <div className="flex justify-center py-8">
             <Loader />
@@ -130,11 +150,10 @@ const CollectionsPage: React.FC = () => {
         ) : error ? (
           <ErrorState title="Failed to load collections" message={error} />
         ) : collections.length === 0 ? (
-          <ListEmptyState
-            title="Nothing here yet"
-            actionLabel="Create"
-            onAction={() => navigate('/collections/create')}
-            testId="empty-collections"
+          <RosterEmptyState
+            title="No collections yet"
+            dataTestId="empty-collections"
+            action={{ label: 'Create collection', onClick: handleCreate, icon: <Plus size={14} /> }}
           />
         ) : (
           <div className="flex flex-col gap-4">
@@ -162,6 +181,7 @@ const CollectionsPage: React.FC = () => {
           </div>
         )}
       </div>
+      <CreateCollectionSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </AppLayout>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useMemo, useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Bookmark, BookmarkCheck, Share2 } from 'lucide-react';
 
 // UI Components
@@ -23,10 +23,7 @@ import { createFactionBookmark, factionBookmarkId } from '@/utils/bookmarks';
 // Components
 import Skeleton from './_components/skeleton';
 import FactionDatasheets from './_components/faction-datasheets';
-import FactionDetachments from './_components/detachments';
-
-// Types
-import type { depot } from '@depot/core';
+import FactionDetachments from './_components/faction-detachments';
 
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
@@ -34,7 +31,11 @@ const Faction: React.FC = () => {
   const { settings } = useSettingsContext();
   const { showToast } = useToast();
   const { isBookmarked, toggleBookmark } = useBookmarks();
-  const [activeTab, setActiveTab] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Tab lives in the URL so back-nav from a detachment page lands on the right tab.
+  const activeTab = searchParams.get('tab') === 'detachments' ? 1 : 0;
+  const setActiveTab = (index: number) =>
+    setSearchParams(index === 1 ? { tab: 'detachments' } : {}, { replace: true });
 
   const showLegends = settings.showLegends ?? false;
   const showForgeWorld = settings.showForgeWorld ?? false;
@@ -167,7 +168,7 @@ const Faction: React.FC = () => {
           tabTestIdPrefix="faction-tab"
         >
           <FactionDatasheets datasheets={faction.datasheets} filters={datasheetFilters} />
-          <FactionDetachments detachments={faction.detachments} />
+          <FactionDetachments factionSlug={faction.slug} detachments={faction.detachments} />
         </Tabs>
       </div>
     </AppLayout>

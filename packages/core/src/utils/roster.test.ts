@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Ability, ModelCost, Roster, RosterUnit, Wargear } from '../types/depot.js';
-import {
-  calculateTotalPoints,
-  createRosterDuplicate,
-  generateRosterShareText,
-  groupRosterUnitsByRole
-} from './roster.js';
+import { calculateTotalPoints, createRosterDuplicate, generateRosterShareText } from './roster.js';
 
 const createModelCost = (overrides: Partial<ModelCost> = {}): ModelCost => ({
   datasheetId: overrides.datasheetId ?? 'ds-1',
@@ -70,8 +65,7 @@ const createRosterUnit = (overrides: Partial<RosterUnit> = {}): RosterUnit => ({
       supplementLabel: undefined,
       isSupplement: false,
       legend: '',
-      role: 'Leader',
-      roleLabel: 'Leader',
+      isSupport: false,
       loadout: '',
       transport: '',
       virtual: false,
@@ -96,10 +90,7 @@ const createRosterUnit = (overrides: Partial<RosterUnit> = {}): RosterUnit => ({
     } as RosterUnit['datasheet']),
   modelCost: overrides.modelCost ?? createModelCost(),
   selectedWargear: overrides.selectedWargear ?? [createWargear()],
-  selectedWargearAbilities: overrides.selectedWargearAbilities ?? [createAbility()],
-  enhancements: overrides.enhancements ?? [],
-  detachmentRules: overrides.detachmentRules ?? [],
-  datasheetRole: overrides.datasheetRole ?? 'Leader'
+  selectedWargearAbilities: overrides.selectedWargearAbilities ?? [createAbility()]
 });
 
 const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
@@ -107,10 +98,22 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
   name: overrides.name ?? 'Strike Force',
   factionId: overrides.factionId ?? 'test',
   factionSlug: overrides.factionSlug ?? 'test',
-  faction: overrides.faction ?? null,
-  detachment: overrides.detachment ?? { id: 'det-1', name: 'Gladius Task Force', slug: 'gladius' },
-  detachmentId: overrides.detachmentId,
-  detachmentSlug: overrides.detachmentSlug,
+  faction: overrides.faction ?? undefined,
+  detachments: overrides.detachments ?? [
+    {
+      id: 'det-1',
+      slug: 'gladius',
+      name: 'Gladius Task Force',
+      legend: '',
+      type: '',
+      dp: '2',
+      forceDisposition: 'Take and Hold',
+      chapterDp: [],
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    }
+  ],
   units: overrides.units ?? [createRosterUnit()],
   enhancements: overrides.enhancements ?? [
     {
@@ -130,10 +133,7 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
   warlordUnitId: overrides.warlordUnitId ?? overrides.units?.[0]?.id ?? 'unit-1',
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   updatedAt: overrides.updatedAt ?? new Date().toISOString(),
-  dataVersion: overrides.dataVersion ?? null,
-  notes: overrides.notes ?? '',
-  factionKeyword: overrides.factionKeyword ?? 'ADEPTUS ASTARTES',
-  shareCode: overrides.shareCode ?? null
+  dataVersion: overrides.dataVersion ?? null
 });
 
 describe('roster utils', () => {
@@ -159,29 +159,6 @@ describe('roster utils', () => {
     expect(calculateTotalPoints(roster)).toBe(135);
   });
 
-  it('groups roster units by role and sorts names', () => {
-    const units = [
-      createRosterUnit({
-        id: 'unit-1',
-        datasheet: { ...createRosterUnit().datasheet, role: 'Battleline', name: 'B' }
-      }),
-      createRosterUnit({
-        id: 'unit-2',
-        datasheet: { ...createRosterUnit().datasheet, role: 'Battleline', name: 'A' }
-      }),
-      createRosterUnit({
-        id: 'unit-3',
-        datasheet: { ...createRosterUnit().datasheet, role: 'Leader', name: 'Captain' }
-      })
-    ];
-
-    const grouped = groupRosterUnitsByRole(units);
-
-    expect(Object.keys(grouped)).toEqual(['Battleline', 'Leader']);
-    expect(grouped.Battleline[0].datasheet.name).toBe('A');
-    expect(grouped.Battleline[1].datasheet.name).toBe('B');
-  });
-
   it('generates share text containing wargear when requested', () => {
     const roster = createRoster({
       units: [
@@ -199,7 +176,9 @@ describe('roster utils', () => {
     });
 
     expect(text).toContain('*Faction:* Space Marines');
+    expect(text).toContain('*Detachment:* Gladius Task Force · 2 DP · Take and Hold');
     expect(text).toContain('- [Warlord] Captain - Captain (80 pts)');
+    expect(text).not.toContain('*Leader*');
     expect(text).toContain('Power sword');
     expect(text).toContain('[Wargear Ability] Duellist Strike');
   });

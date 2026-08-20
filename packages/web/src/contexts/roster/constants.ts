@@ -14,13 +14,7 @@ export const initialState: depot.Roster = {
     datasheetCount: 0,
     detachmentCount: 0
   },
-  detachment: {
-    slug: '',
-    name: '',
-    abilities: [],
-    enhancements: [],
-    stratagems: []
-  },
+  detachments: [],
   points: {
     current: 0,
     max: 2000

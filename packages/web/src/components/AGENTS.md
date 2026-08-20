@@ -4,7 +4,7 @@ Component library organized by reusability and domain specificity. Components le
 
 ## Directory Structure
 - `ui/` - Base UI primitives with no business logic (buttons, cards, alerts, table, layout, search, filters, tags, select, steppers, collapsible sections, dashboards, loaders, page headers, skeletons, tabs, etc.). Exported via `@/components/ui`.
-- `shared/` - Domain-aware components that accept `depot.*` types (e.g., `AbilityModal`, `Datasheet`, `StratagemCard`, `Roster`, wargear components, error boundaries).
+- `shared/` - Domain-aware components that accept `depot.*` types (e.g., `AbilitySheet`, `Datasheet`, `StratagemCard`, `Roster`, wargear components, error boundaries).
 - `shared/roster/` - Roster-focused components for building/editing units and lists.
 - `layout/` — Core application layout components.
 - `logo/` — Branding assets.

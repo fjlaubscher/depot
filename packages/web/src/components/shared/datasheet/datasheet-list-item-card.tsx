@@ -12,21 +12,19 @@ import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetListItemCardProps {
   datasheet: DatasheetListItem;
-  roleLabel?: string | null;
   supplementMetadataHasSupplements?: boolean;
 }
 
 const DatasheetListItemCard: FC<DatasheetListItemCardProps> = ({
   datasheet,
-  roleLabel,
   supplementMetadataHasSupplements = false
 }) => {
   const tags: ReactNode[] = [];
 
-  if (roleLabel) {
+  if (datasheet.isSupport) {
     tags.push(
-      <Tag key="role" size="sm" variant="default">
-        {roleLabel}
+      <Tag key="support" size="sm" variant="secondary">
+        Support
       </Tag>
     );
   }

@@ -22,14 +22,14 @@ export const selectFactionAndDetachment = async (
   factionLabel: string = DEFAULT_FACTION
 ) => {
   await page.getByLabel('Faction').selectOption({ label: factionLabel });
-  const detachmentSelect = page.getByLabel('Detachment');
-  await detachmentSelect.waitFor({ state: 'visible' });
-  await detachmentSelect.selectOption({ index: 1 });
+  await page.getByTestId('detachment-field').waitFor({ state: 'visible' });
+  await page.locator('[data-testid^="detachment-toggle-"]').first().click();
 };
 
 export const createRoster = async (page: Page, options?: { factionLabel?: string }) => {
-  await page.goto('/rosters/create');
-  await expect(page.getByTestId('page-header')).toBeVisible();
+  await page.goto('/rosters');
+  await page.getByRole('button', { name: 'Create new roster' }).click();
+  await expect(page.getByTestId('create-roster-sheet')).toBeVisible();
 
   const rosterName = `E2E Roster ${Date.now()}`;
   await page.getByLabel('Roster Name').fill(rosterName);

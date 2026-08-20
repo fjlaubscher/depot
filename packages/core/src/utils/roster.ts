@@ -1,6 +1,18 @@
-import type { Roster, RosterUnit } from '../types/depot.js';
-import { groupBy } from './common.js';
+import type { Detachment, Roster } from '../types/depot.js';
 import { toTitleCase } from './datasheets.js';
+
+/** Selected detachments, falling back to the legacy single `detachment` field. */
+export const getRosterDetachments = (
+  roster: Partial<Pick<Roster, 'detachments' | 'detachment'>>
+): Detachment[] =>
+  roster.detachments?.length ? roster.detachments : roster.detachment ? [roster.detachment] : [];
+
+export const getRosterDetachmentNames = (
+  roster: Partial<Pick<Roster, 'detachments' | 'detachment'>>
+): string =>
+  getRosterDetachments(roster)
+    .map((detachment) => detachment.name)
+    .join(', ');
 
 // Available in Node >= 18 and all modern browsers; not declared by the ES2022 TS lib.
 declare const crypto: { randomUUID: () => string };
@@ -18,14 +30,6 @@ export const calculateTotalPoints = (roster: Roster): number => {
   });
 
   return total;
-};
-
-export const groupRosterUnitsByRole = (units: RosterUnit[]): Record<string, RosterUnit[]> => {
-  const grouped = groupBy(units, (unit) => unit.datasheet.role);
-  Object.values(grouped).forEach((group) =>
-    group.sort((a, b) => a.datasheet.name.localeCompare(b.datasheet.name))
-  );
-  return grouped;
 };
 
 export interface DuplicateRosterOptions {
@@ -85,42 +89,53 @@ export const generateRosterShareText = (
   if (factionName) {
     lines.push(`*Faction:* ${factionName}`);
   }
-  if (roster.detachment?.name) {
-    lines.push(`*Detachment:* ${roster.detachment.name}`);
+  const detachments = getRosterDetachments(roster);
+  if (detachments.length > 0) {
+    const label = detachments.length === 1 ? 'Detachment' : 'Detachments';
+    lines.push(
+      `*${label}:* ${detachments
+        .map((detachment) =>
+          [detachment.name, detachment.dp && `${detachment.dp} DP`, detachment.forceDisposition]
+            .filter(Boolean)
+            .join(' · ')
+        )
+        .join('; ')}`
+    );
   }
   lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
   lines.push('');
 
-  const unitsByRole = groupBy(roster.units, (unit) => unit.datasheet.role);
-  const sortedRoles = Object.keys(unitsByRole).sort();
-  sortedRoles.forEach((role) => {
-    lines.push(`*${role}*`);
-    unitsByRole[role].forEach((unit) => {
-      const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
-      const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
-      const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
-      lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
+  const sortedUnits = [...roster.units].sort((a, b) =>
+    a.datasheet.name.localeCompare(b.datasheet.name)
+  );
+  sortedUnits.forEach((unit) => {
+    const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
+    const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
+    const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
+    lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
 
-      if (includeWargear && unit.selectedWargear.length > 0) {
-        unit.selectedWargear.forEach((wargear) => {
-          lines.push(`  - ${wargear.name}`);
-        });
-      }
-
-      if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
-        unit.selectedWargearAbilities.forEach((ability) => {
-          lines.push(`  - [Wargear Ability] ${ability.name}`);
-        });
-      }
-
-      const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
-      unitEnhancements.forEach(({ enhancement }) => {
-        const enhancementCost = parseInt(enhancement.cost, 10) || 0;
-        lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
+    if (includeWargear && unit.selectedWargear.length > 0) {
+      unit.selectedWargear.forEach((wargear) => {
+        lines.push(`  - ${wargear.name}`);
       });
+    }
+
+    if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
+      unit.selectedWargearAbilities.forEach((ability) => {
+        lines.push(`  - [Wargear Ability] ${ability.name}`);
+      });
+    }
+
+    const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
+    unitEnhancements.forEach(({ enhancement }) => {
+      const enhancementCost = parseInt(enhancement.cost, 10) || 0;
+      lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
     });
-    lines.push('');
   });
+
+  if (sortedUnits.length > 0) {
+    lines.push('');
+  }
 
   return lines.join('\n');
 };

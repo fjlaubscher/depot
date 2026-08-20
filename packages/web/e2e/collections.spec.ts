@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Collections', () => {
   test('collection form waits for factions and enables submit once filled', async ({ page }) => {
-    await page.goto('/collections/create');
+    await page.goto('/collections');
+    await page.getByTestId('create-collection-button').click();
 
     const skeleton = page.getByTestId('field-skeleton');
     await skeleton.first().waitFor({ state: 'attached', timeout: 5000 }).catch(() => {});
@@ -22,7 +23,7 @@ test.describe('Collections', () => {
 
     // Start create flow
     await page.getByTestId('create-collection-button').click();
-    await expect(page).toHaveURL(/\/collections\/create/);
+    await expect(page.getByTestId('create-collection-sheet')).toBeVisible();
 
     const uniqueName = `E2E Collection ${Date.now()}`;
     await page.getByLabel('Name').fill(uniqueName);
@@ -59,7 +60,7 @@ test.describe('Collections', () => {
     await page.goto('/collections');
 
     await page.getByTestId('create-collection-button').click();
-    await expect(page).toHaveURL(/\/collections\/create/);
+    await expect(page.getByTestId('create-collection-sheet')).toBeVisible();
 
     const uniqueName = `Astra Militarum E2E ${Date.now()}`;
     await page.getByLabel('Name').fill(uniqueName);

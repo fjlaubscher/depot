@@ -18,15 +18,23 @@ const resetClientState = async (page: Page) => {
 };
 
 const gotoCreateRoster = async (page: Page) => {
-  await page.goto('/rosters/create');
-  await expect(page.getByRole('heading', { name: 'Create New Roster' })).toBeVisible();
+  await page.goto('/rosters');
+  await page.getByRole('button', { name: 'Create new roster' }).click();
+  await expect(page.getByRole('heading', { name: 'Create Roster' })).toBeVisible();
+};
+
+const selectDetachmentByName = async (page: Page, name: string) => {
+  await page.getByTestId('detachment-field').waitFor({ state: 'visible' });
+  await page
+    .locator('[data-testid^="detachment-option-"]')
+    .filter({ hasText: name })
+    .getByRole('switch')
+    .click();
 };
 
 const selectFactionAndDetachment = async (page: Page) => {
   await page.getByLabel('Faction').selectOption({ label: FACTION_NAME });
-  const detachmentSelect = page.getByLabel('Detachment');
-  await detachmentSelect.waitFor({ state: 'visible' });
-  await detachmentSelect.selectOption({ label: DETACHMENT_NAME });
+  await selectDetachmentByName(page, DETACHMENT_NAME);
 };
 
 test.beforeEach(async ({ page }) => {
@@ -75,10 +83,8 @@ test('creates a new roster and trims the name', async ({ page }) => {
   await expect(submitButton).toBeDisabled();
 
   await page.getByLabel('Faction').selectOption({ label: FACTION_NAME });
-  const detachmentSelect = page.getByLabel('Detachment');
-  await detachmentSelect.waitFor({ state: 'visible' });
   await expect(submitButton).toBeDisabled();
-  await detachmentSelect.selectOption({ label: DETACHMENT_NAME });
+  await selectDetachmentByName(page, DETACHMENT_NAME);
   await expect(submitButton).toBeEnabled();
 
   await submitButton.click();
@@ -91,6 +97,6 @@ test('cancel returns to the roster list', async ({ page }) => {
   await gotoCreateRoster(page);
 
   await page.getByTestId('cancel-button').click();
-  await expect(page).toHaveURL(/\/rosters$/);
+  await expect(page.getByTestId('create-roster-sheet')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'My Rosters' })).toBeVisible();
 });

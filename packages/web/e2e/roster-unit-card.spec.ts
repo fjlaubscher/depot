@@ -111,6 +111,6 @@ test.describe('Roster unit card view', () => {
     await expect(abilityTags.first()).toBeVisible();
     await abilityTags.first().click();
 
-    await expect(page.getByTestId('ability-modal')).toBeVisible();
+    await expect(page.getByTestId('ability-sheet')).toBeVisible();
   });
 });

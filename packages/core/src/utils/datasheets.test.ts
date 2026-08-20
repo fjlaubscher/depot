@@ -7,7 +7,6 @@ import {
   filterDatasheetsBySettings,
   filterDatasheetsBySupplement,
   getSupplementKey,
-  groupDatasheetsByRole,
   isSupplementEntry,
   normalizeSupplementValue,
   shouldResetSupplementSelection,
@@ -30,8 +29,7 @@ const makeDatasheet = (
   supplementLabel: overrides.supplementLabel,
   isSupplement: overrides.isSupplement,
   legend: overrides.legend ?? '',
-  role: overrides.role ?? 'Battleline',
-  roleLabel: overrides.roleLabel,
+  isSupport: overrides.isSupport ?? false,
   loadout: overrides.loadout ?? '',
   transport: overrides.transport ?? '',
   virtual: overrides.virtual ?? false,
@@ -56,19 +54,6 @@ const makeDatasheet = (
 });
 
 describe('datasheet utils', () => {
-  describe('groupDatasheetsByRole', () => {
-    it('groups datasheets and sorts within each role', () => {
-      const grouped = groupDatasheetsByRole([
-        makeDatasheet({ slug: 'intercessors', name: 'Intercessors', role: 'Battleline' }),
-        makeDatasheet({ slug: 'aggressors', name: 'Aggressors', role: 'Battleline' }),
-        makeDatasheet({ slug: 'captain', name: 'Captain', role: 'Leader' })
-      ]);
-
-      expect(Object.keys(grouped)).toEqual(['Battleline', 'Leader']);
-      expect(grouped.Battleline.map((item) => item.name)).toEqual(['Aggressors', 'Intercessors']);
-    });
-  });
-
   describe('filterDatasheetsBySettings', () => {
     it('filters legends and forge world entries', () => {
       const datasheets = [

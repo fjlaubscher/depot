@@ -13,6 +13,8 @@ import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-
 import EnhancementSelection from './_components/enhancement-selection';
 import WarlordSelection from './_components/warlord-selection';
 import { getRosterFactionName } from '@depot/core/utils/roster';
+import { getEligibleEnhancements, getUnitOrdinal } from '@depot/core/utils/roster-legality';
+import { modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 
 const EditRosterUnitView: React.FC = () => {
   const {
@@ -90,6 +92,7 @@ const EditRosterUnitView: React.FC = () => {
   const isCharacter = unit.datasheet.keywords.some((k) =>
     k.keyword.toLowerCase().includes('character')
   );
+  const eligibleEnhancements = getEligibleEnhancements(unit, roster);
 
   const handleSave = ({
     selectedWargear,
@@ -109,7 +112,7 @@ const EditRosterUnitView: React.FC = () => {
 
       // Then apply new enhancements
       selectedEnhancements.forEach((enhancementId) => {
-        const enhancement = roster.detachment?.enhancements.find((e) => e.id === enhancementId);
+        const enhancement = eligibleEnhancements.find((e) => e.id === enhancementId);
         if (enhancement) {
           applyEnhancement(enhancement, unitId);
         }
@@ -163,24 +166,31 @@ const EditRosterUnitView: React.FC = () => {
       subtitle={subtitle}
       headerTestId="edit-unit-header"
       saveButtonTestId="save-unit-button"
+      modelCosts={modelCostsForOrdinal(
+        unit.datasheet.modelCosts,
+        getUnitOrdinal(roster.units, unit.id)
+      )}
       afterGrid={
-        isCharacter ? (
-          <>
-            {/* Enhancement Selection for Characters */}
+        <>
+          {isCharacter || eligibleEnhancements.length > 0 ? (
             <Card data-testid="enhancement-section">
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
-                <p className="text-sm text-muted">Select enhancements for this character</p>
+                <p className="text-sm text-muted">
+                  {isCharacter
+                    ? 'Select one enhancement for this character'
+                    : 'Select one Upgrade for this unit'}
+                </p>
                 <EnhancementSelection
-                  unit={unit}
-                  roster={roster}
+                  enhancements={eligibleEnhancements}
                   selectedEnhancements={selectedEnhancements}
                   onEnhancementChange={setSelectedEnhancements}
                 />
               </div>
             </Card>
+          ) : null}
 
-            {/* Warlord Nomination for Characters */}
+          {isCharacter ? (
             <Card data-testid="warlord-section">
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
@@ -193,8 +203,8 @@ const EditRosterUnitView: React.FC = () => {
                 />
               </div>
             </Card>
-          </>
-        ) : null
+          ) : null}
+        </>
       }
       onSave={handleSave}
     />

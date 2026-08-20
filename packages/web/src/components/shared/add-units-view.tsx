@@ -23,7 +23,6 @@ interface AddUnitsViewProps {
   subtitle?: string;
   headerStats?: ReactNode;
   /** Noun used in the info alert copy, e.g. "roster" or "collection". */
-  contextLabel: string;
   onConfirm: (selectedUnits: SelectedUnit[], clearSelection: () => void) => void | Promise<void>;
 }
 
@@ -36,7 +35,6 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
   title,
   subtitle,
   headerStats,
-  contextLabel,
   onConfirm
 }) => {
   const { settings } = useSettingsContext();
@@ -132,11 +130,6 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
       </div>
 
       <PageHeader title={title} subtitle={subtitle} stats={headerStats} />
-
-      <Alert variant="info" title="Add Units">
-        Browse the datasheets below and queue units for your {contextLabel}. Use the summary drawer
-        to review quantities before confirming your additions.
-      </Alert>
 
       {factionError || datasheetError ? (
         <Alert variant="error" title="Unable to load datasheets">

@@ -14,7 +14,7 @@ export const mockDatasheet: depot.Datasheet = {
   sourceId: 'core',
   sourceName: 'Faction Pack: Space Marines',
   legend: '',
-  role: 'CHARACTER', // Updated for 10th edition
+  isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
@@ -290,8 +290,14 @@ export const mockDetachmentAbility: depot.DetachmentAbility = {
 };
 
 export const mockDetachment: depot.Detachment = {
+  id: '000000100',
   slug: 'gladius-task-force',
   name: 'Gladius Task Force',
+  legend: '',
+  type: '',
+  dp: '2',
+  forceDisposition: 'Take and Hold',
+  chapterDp: [{ keyword: 'Black Templars', dp: '2' }],
   abilities: [mockDetachmentAbility],
   enhancements: [mockEnhancement],
   stratagems: [mockStratagem]
@@ -317,7 +323,7 @@ export const toFactionManifest = (faction: depot.Faction): depot.FactionManifest
     name: sheet.name,
     factionId: sheet.factionId,
     factionSlug: sheet.factionSlug,
-    role: sheet.role,
+    isSupport: sheet.isSupport,
     path: `/data/factions/${sheet.factionSlug}/datasheets/${sheet.id}.json`,
     supplementSlug: sheet.supplementSlug,
     supplementName: sheet.supplementName,
@@ -441,7 +447,7 @@ export const mockRoster: depot.Roster = {
   factionId: 'SM',
   factionSlug: 'space-marines',
   faction: mockFactionIndex,
-  detachment: mockDetachment,
+  detachments: [mockDetachment],
   points: {
     current: 80,
     max: 2000

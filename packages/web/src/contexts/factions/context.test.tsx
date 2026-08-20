@@ -103,7 +103,7 @@ const mockManifest: depot.FactionManifest = {
       name: 'Test Datasheet',
       factionId: 'test-faction',
       factionSlug: 'test-faction',
-      role: 'Battleline',
+      isSupport: false,
       path: '/data/factions/test-faction/datasheets/test-datasheet.json',
       supplementSlug: undefined,
       supplementName: undefined,
@@ -114,8 +114,14 @@ const mockManifest: depot.FactionManifest = {
   ],
   detachments: [
     {
+      id: 'test-detachment',
       slug: 'test-detachment',
       name: 'Test Detachment',
+      legend: '',
+      type: '',
+      dp: '',
+      forceDisposition: '',
+      chapterDp: [],
       abilities: [],
       enhancements: [],
       stratagems: []
@@ -134,7 +140,7 @@ const mockDatasheet: depot.Datasheet = {
   sourceId: 'core',
   sourceName: 'Test Source',
   legend: '',
-  role: 'Battleline',
+  isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,

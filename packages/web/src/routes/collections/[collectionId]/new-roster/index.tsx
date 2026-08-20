@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ClipboardPlus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
 import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/components/shared';
-import { Alert, Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
+import { Alert, Breadcrumbs, Loader, PageHeader } from '@/components/ui';
+import { RosterEmptyState } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/components/shared/selection-summary';
@@ -14,13 +15,12 @@ import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { COLLECTION_LABELS } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import CreateRosterSheet from '@/routes/rosters/_components/create-roster-sheet';
 
 type CollectionDatasheetListItem = depot.Datasheet & {
   collectionUnitId: string;
   unit: depot.CollectionUnit;
 };
-
-const SESSION_KEY = 'collection-roster-prefill';
 
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
@@ -30,6 +30,7 @@ const CollectionNewRoster: React.FC = () => {
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const pageTitle = collection
     ? `${collection.name} - Build Roster`
@@ -177,18 +178,9 @@ const CollectionNewRoster: React.FC = () => {
 
   const handleCreateRoster = useCallback(() => {
     if (!collection || selectedRosterUnits.length === 0) return;
-
-    const payload = {
-      collectionId: collection.id,
-      factionSlug: collection.factionSlug ?? collection.factionId,
-      factionId: collection.factionId,
-      name: `${collection.name} roster`,
-      units: selectedRosterUnits
-    };
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
-    navigate(`/rosters/create?fromCollection=${collection.id}`);
-  }, [collection, navigate, selectedRosterUnits]);
+    setIsSummaryOpen(false);
+    setIsCreateOpen(true);
+  }, [collection, selectedRosterUnits]);
 
   const subtitle = collection
     ? `${collection.items.length} units - ${
@@ -237,15 +229,16 @@ const CollectionNewRoster: React.FC = () => {
 
         <PageHeader title={`Build roster from ${labels.singular}`} subtitle={subtitle} />
 
-        <Alert variant="info" title="Prefill a new roster">
-          Select units from your {labels.singular} to prefill a roster. Use the summary drawer to
-          review points before creating the roster.
-        </Alert>
-
         {collection.items.length === 0 ? (
-          <Card>
-            <p className="text-sm text-subtle">No units in this {labels.singular} yet.</p>
-          </Card>
+          <RosterEmptyState
+            title={`No units in this ${labels.singular}`}
+            dataTestId="empty-collection-state"
+            action={{
+              label: 'Add units',
+              onClick: () => navigate(`/collections/${collection.id}/add-units`),
+              icon: <Plus size={14} />
+            }}
+          />
         ) : (
           <div className="flex flex-col gap-4">
             {collectionDatasheets.length === 0 ? (
@@ -281,6 +274,15 @@ const CollectionNewRoster: React.FC = () => {
           </div>
         )}
       </div>
+      <CreateRosterSheet
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        prefill={{
+          name: `${collection.name} roster`,
+          factionSlug: collection.factionSlug ?? collection.factionId,
+          units: selectedRosterUnits
+        }}
+      />
     </AppLayout>
   );
 };

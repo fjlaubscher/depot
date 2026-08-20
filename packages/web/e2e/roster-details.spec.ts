@@ -3,27 +3,15 @@ import type { Page } from '@playwright/test';
 import { resetClientState, createRoster } from './utils';
 
 const pickAlternateDetachment = async (page: Page) => {
-  const detachmentSelect = page.getByLabel('Detachment');
-  const currentValue = await detachmentSelect.inputValue();
-  const options = await detachmentSelect.locator('option').evaluateAll((nodes) =>
-    nodes
-      .map((option) => ({
-        value: option.getAttribute('value') ?? '',
-        label: option.textContent?.trim() ?? ''
-      }))
-      .filter((option) => option.value)
-  );
-
-  const nextOption =
-    options.find((option) => option.value !== currentValue) ??
-    options.find((option) => option.value);
-
-  if (!nextOption) {
-    throw new Error('No detachment options available to select');
-  }
-
-  await detachmentSelect.selectOption(nextOption.value);
-  return nextOption;
+  // DetachmentPicker is a multi-select of toggles; flip on one that isn't selected yet.
+  const option = page
+    .locator('[data-testid^="detachment-option-"]')
+    .filter({ has: page.getByRole('switch', { checked: false }) })
+    .first();
+  await option.waitFor({ state: 'visible' });
+  const label = (await option.locator('span').first().textContent())?.trim() ?? '';
+  await option.getByRole('switch').click();
+  return { label };
 };
 
 test.describe('Roster details', () => {
