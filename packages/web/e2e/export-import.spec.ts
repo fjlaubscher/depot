@@ -31,7 +31,8 @@ test.describe('Export/Import JSON', () => {
   });
 
   test('exports a collection to JSON and imports it on the collections list', async ({ page }) => {
-    await page.goto('/collections/create');
+    await page.goto('/collections');
+    await page.getByTestId('create-collection-button').click();
 
     const collectionName = `E2E Collection ${Date.now()}`;
     await page.getByLabel('Name').fill(collectionName);

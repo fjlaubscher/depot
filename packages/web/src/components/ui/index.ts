@@ -18,6 +18,7 @@ export { default as PageHeader } from './page-header';
 export { default as QuantityStepper } from './quantity-stepper';
 export { default as Search } from './search';
 export { default as SelectField } from './select-field';
+export { default as Sheet } from './sheet';
 export { Skeleton, SkeletonCard, PageHeaderSkeleton } from './skeleton';
 export { default as StatCard } from './stat-card';
 export { default as StatsRow } from './stats-row';

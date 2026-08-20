@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
@@ -19,6 +19,7 @@ import {
 import ImportButton from '@/components/shared/import-button';
 import CollectionCard from './_components/collection-card';
 import CollectionStateChart from './_components/collection-state-chart';
+import CreateCollectionSheet from './_components/create-collection-sheet';
 
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +33,8 @@ const CollectionsPage: React.FC = () => {
     dataVersion && collections.some((collection) => collection.dataVersion !== dataVersion)
   );
 
-  const handleCreate = () => navigate('/collections/create');
+  const [createOpen, setCreateOpen] = useState(false);
+  const handleCreate = () => setCreateOpen(true);
 
   const handleDelete = async (collectionId: string) => {
     try {
@@ -151,7 +153,7 @@ const CollectionsPage: React.FC = () => {
           <ListEmptyState
             title="Nothing here yet"
             actionLabel="Create"
-            onAction={() => navigate('/collections/create')}
+            onAction={handleCreate}
             testId="empty-collections"
           />
         ) : (
@@ -180,6 +182,7 @@ const CollectionsPage: React.FC = () => {
           </div>
         )}
       </div>
+      <CreateCollectionSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </AppLayout>
   );
 };

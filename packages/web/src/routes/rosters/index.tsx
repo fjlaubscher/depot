@@ -1,5 +1,4 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
@@ -16,9 +15,9 @@ import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
 import { ListEmptyState } from '@/components/shared';
 import { RosterCard } from './_components/roster-card';
+import CreateRosterSheet from './_components/create-roster-sheet';
 
 const Rosters: React.FC = () => {
-  const navigate = useNavigate();
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
@@ -27,9 +26,8 @@ const Rosters: React.FC = () => {
     dataVersion && rosters.some((roster) => roster.dataVersion !== dataVersion)
   );
 
-  const handleCreate = () => {
-    navigate('/rosters/create');
-  };
+  const [createOpen, setCreateOpen] = useState(false);
+  const handleCreate = () => setCreateOpen(true);
 
   const handleDeleteRoster = async (rosterId: string) => {
     try {
@@ -205,6 +203,7 @@ const Rosters: React.FC = () => {
           </div>
         )}
       </div>
+      <CreateRosterSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </AppLayout>
   );
 };

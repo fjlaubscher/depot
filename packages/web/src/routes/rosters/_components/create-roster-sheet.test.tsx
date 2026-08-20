@@ -3,16 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockFactionIndexes, mockFaction } from '@/test/mock-data';
-import CreateRoster from './index';
-
-// Mock AppLayout to avoid sidebar duplication
-vi.mock('@/components/layout', () => ({
-  default: ({ children, title }: { children: React.ReactNode; title: string }) => (
-    <div data-testid="app-layout" data-title={title}>
-      {children}
-    </div>
-  )
-}));
+import CreateRosterSheet from './create-roster-sheet';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -60,7 +51,9 @@ vi.mock('@/contexts/roster/use-roster-context', () => ({
   useRoster: () => mockUseRoster
 }));
 
-describe('CreateRoster', () => {
+const CreateRoster = () => <CreateRosterSheet open onClose={vi.fn()} />;
+
+describe('CreateRosterSheet', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFactionsContext.factionIndex = mockFactionIndexes;
@@ -97,7 +90,7 @@ describe('CreateRoster', () => {
   it('renders form with all required fields', () => {
     render(<CreateRoster />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('page-header')).toBeInTheDocument();
+    expect(screen.getByTestId('create-roster-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('roster-form')).toBeInTheDocument();
     expect(screen.getByTestId('roster-name-field')).toBeInTheDocument();
     expect(screen.getByTestId('faction-field')).toBeInTheDocument();

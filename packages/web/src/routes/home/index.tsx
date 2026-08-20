@@ -53,7 +53,7 @@ const Home: React.FC = () => {
         {isEmpty ? (
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-2" data-testid="get-started">
             <LinkCard
-              to="/collections/create"
+              to="/collections"
               icon={<Boxes size={20} />}
               iconClassName="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
               showArrow
@@ -62,7 +62,7 @@ const Home: React.FC = () => {
               Create collection
             </LinkCard>
             <LinkCard
-              to="/rosters/create"
+              to="/rosters"
               icon={<ClipboardList size={20} />}
               showArrow
               description="Build a one-off list straight from the datasheets."

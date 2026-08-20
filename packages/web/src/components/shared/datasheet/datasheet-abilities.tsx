@@ -26,10 +26,8 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
 
   const sortedAbilities = useMemo(() => sortAbilitiesByType(abilities), [abilities]);
 
-  const handleClose = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedAbility(null);
-  }, []);
+  // Keep the ability mounted on close so the sheet content stays during the slide-out.
+  const handleClose = useCallback(() => setIsModalOpen(false), []);
 
   const handleOpen = useCallback((event: MouseEvent<HTMLButtonElement>, ability: depot.Ability) => {
     event.stopPropagation();

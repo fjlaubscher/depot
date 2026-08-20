@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ClipboardPlus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
@@ -14,22 +14,21 @@ import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { COLLECTION_LABELS } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import CreateRosterSheet from '@/routes/rosters/_components/create-roster-sheet';
 
 type CollectionDatasheetListItem = depot.Datasheet & {
   collectionUnitId: string;
   unit: depot.CollectionUnit;
 };
 
-const SESSION_KEY = 'collection-roster-prefill';
-
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const navigate = useNavigate();
   const { settings } = useSettingsContext();
   const labels = COLLECTION_LABELS;
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const pageTitle = collection
     ? `${collection.name} - Build Roster`
@@ -177,18 +176,9 @@ const CollectionNewRoster: React.FC = () => {
 
   const handleCreateRoster = useCallback(() => {
     if (!collection || selectedRosterUnits.length === 0) return;
-
-    const payload = {
-      collectionId: collection.id,
-      factionSlug: collection.factionSlug ?? collection.factionId,
-      factionId: collection.factionId,
-      name: `${collection.name} roster`,
-      units: selectedRosterUnits
-    };
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
-    navigate(`/rosters/create?fromCollection=${collection.id}`);
-  }, [collection, navigate, selectedRosterUnits]);
+    setIsSummaryOpen(false);
+    setIsCreateOpen(true);
+  }, [collection, selectedRosterUnits]);
 
   const subtitle = collection
     ? `${collection.items.length} units - ${
@@ -281,6 +271,15 @@ const CollectionNewRoster: React.FC = () => {
           </div>
         )}
       </div>
+      <CreateRosterSheet
+        open={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        prefill={{
+          name: `${collection.name} roster`,
+          factionSlug: collection.factionSlug ?? collection.factionId,
+          units: selectedRosterUnits
+        }}
+      />
     </AppLayout>
   );
 };

@@ -19,6 +19,6 @@ test.describe('Home', () => {
       .getByTestId('get-started')
       .getByRole('link', { name: /Create roster/ })
       .click();
-    await expect(page).toHaveURL(/\/rosters\/create$/);
+    await expect(page).toHaveURL(/\/rosters$/);
   });
 });

@@ -8,7 +8,6 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
 - `/faction/:factionSlug` -> `factions/[factionSlug]`
 - `/faction/:factionSlug/datasheet/:datasheetSlug` -> `factions/[factionSlug]/datasheet/[datasheetSlug]`
 - `/rosters` -> `rosters`
-- `/rosters/create` -> `rosters/create`
 - `/rosters/:rosterId` -> `rosters/[rosterId]`
 - `/rosters/:rosterId/edit` -> `rosters/[rosterId]/edit`
 - `/rosters/:rosterId/add-units` -> `rosters/[rosterId]/add-units`

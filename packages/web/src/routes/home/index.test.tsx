@@ -93,13 +93,10 @@ describe('Home', () => {
 
     expect(screen.getByTestId('home-hero')).toHaveTextContent('11th edition is here');
     expect(screen.getByTestId('get-started')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Create roster/ })).toHaveAttribute(
-      'href',
-      '/rosters/create'
-    );
+    expect(screen.getByRole('link', { name: /Create roster/ })).toHaveAttribute('href', '/rosters');
     expect(screen.getByRole('link', { name: /Create collection/ })).toHaveAttribute(
       'href',
-      '/collections/create'
+      '/collections'
     );
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
