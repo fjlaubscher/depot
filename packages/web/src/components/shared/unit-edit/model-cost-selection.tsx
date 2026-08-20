@@ -1,21 +1,20 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import { SelectField } from '@/components/ui';
-import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
+import { formatModelCostLabel } from '@depot/core/utils/model-costs';
 
 interface ModelCostSelectionProps {
-  unit: depot.RosterUnit;
+  /** Already filtered to the rows that apply to this unit (see `modelCostsForOrdinal`). */
+  modelCosts: depot.ModelCost[];
   selectedModelCost: depot.ModelCost;
   onModelCostChange: (modelCost: depot.ModelCost) => void;
 }
 
 const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
-  unit,
+  modelCosts: availableModelCosts,
   selectedModelCost,
   onModelCostChange
 }) => {
-  const availableModelCosts = selectableModelCosts(unit.datasheet.modelCosts);
-
   if (availableModelCosts.length === 0) {
     return (
       <div className="text-center py-8" data-testid="no-model-costs-available">

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   getCostBracketRange,
+  modelCostsForOrdinal,
   formatCostSection,
   formatModelCostLabel,
   groupModelCostsBySection,
@@ -175,6 +176,50 @@ describe('model cost helpers', () => {
         { cost: '80', description: '1 model' }
       ]).map((entry) => entry.description)
     ).toEqual(['1 model']);
+  });
+});
+
+describe('modelCostsForOrdinal', () => {
+  const costs = [
+    {
+      datasheetId: 'a',
+      line: '1',
+      description: '1 model',
+      cost: '75',
+      section: 'YOUR 1ST TO 2ND UNITS COST'
+    },
+    {
+      datasheetId: 'a',
+      line: '2',
+      description: '2 models',
+      cost: '150',
+      section: 'YOUR 1ST TO 2ND UNITS COST'
+    },
+    {
+      datasheetId: 'a',
+      line: '3',
+      description: '1 model',
+      cost: '85',
+      section: 'YOUR 3RD + UNIT COSTS'
+    },
+    {
+      datasheetId: 'a',
+      line: '4',
+      description: 'per Dark lance',
+      cost: '',
+      section: 'WARGEAR OPTIONS'
+    }
+  ];
+
+  it('returns only the rows whose bracket covers the ordinal', () => {
+    expect(modelCostsForOrdinal(costs).map((cost) => cost.line)).toEqual(['1', '2']);
+    expect(modelCostsForOrdinal(costs, 2).map((cost) => cost.line)).toEqual(['1', '2']);
+    expect(modelCostsForOrdinal(costs, 3).map((cost) => cost.line)).toEqual(['3']);
+  });
+
+  it('falls back to every selectable row when nothing matches', () => {
+    const single = [{ datasheetId: 'a', line: '1', description: '1 model', cost: '75' }];
+    expect(modelCostsForOrdinal(single, 9)).toEqual(single);
   });
 });
 

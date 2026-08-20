@@ -5,6 +5,7 @@ import {
   getBattleSize,
   getEligibleEnhancements,
   getRosterDpSpent,
+  getUnitOrdinal,
   validateRoster
 } from './roster-legality.js';
 
@@ -172,6 +173,16 @@ describe('enforceCostBrackets', () => {
       }
     }));
     expect(enforceCostBrackets(units)[2].modelCost.cost).toBe('150');
+  });
+});
+
+describe('getUnitOrdinal', () => {
+  it('counts copies of the same datasheet in roster order', () => {
+    const units = [talosUnit(), unit(captain), talosUnit()];
+    expect(getUnitOrdinal(units, units[0].id)).toBe(1);
+    expect(getUnitOrdinal(units, units[1].id)).toBe(1);
+    expect(getUnitOrdinal(units, units[2].id)).toBe(2);
+    expect(getUnitOrdinal(units, 'nope')).toBe(0);
   });
 });
 

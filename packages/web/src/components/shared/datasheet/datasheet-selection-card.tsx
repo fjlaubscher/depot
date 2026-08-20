@@ -4,7 +4,7 @@ import type { depot } from '@depot/core';
 
 import { Card, Tag, SelectField, Button } from '@/components/ui';
 import { groupKeywords } from '@depot/core/utils/common';
-import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
+import { formatModelCostLabel, modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetSelectionCardProps {
@@ -19,7 +19,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
   getUnitCount
 }) => {
   const availableModelCosts = useMemo(
-    () => selectableModelCosts(datasheet.modelCosts),
+    () => modelCostsForOrdinal(datasheet.modelCosts),
     [datasheet.modelCosts]
   );
 

@@ -44,6 +44,19 @@ export const getCostBracketRange = (section?: string): [number, number] => {
   return [ordinals[0], cleaned.includes('+') ? Infinity : ordinals[ordinals.length - 1]];
 };
 
+/**
+ * Selectable cost rows that apply to the Nth copy of a datasheet (default: the first).
+ * Falls back to every selectable row when no bracket covers that ordinal.
+ */
+export const modelCostsForOrdinal = <T extends ModelCost>(costs: T[], ordinal = 1): T[] => {
+  const selectable = selectableModelCosts(costs);
+  const matching = selectable.filter((cost) => {
+    const [min, max] = getCostBracketRange(cost.section);
+    return ordinal >= min && ordinal <= max;
+  });
+  return matching.length > 0 ? matching : selectable;
+};
+
 export const formatModelCostLabel = (
   cost: Pick<ModelCost, 'description' | 'cost' | 'section'>,
   fallbackName?: string

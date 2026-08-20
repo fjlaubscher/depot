@@ -63,6 +63,13 @@ export const enforceCostBrackets = (units: RosterUnit[]): RosterUnit[] => {
   });
 };
 
+/** 1-based position of a unit among roster units sharing its datasheet (0 if absent). */
+export const getUnitOrdinal = (units: RosterUnit[], unitId: string): number => {
+  const unit = units.find((entry) => entry.id === unitId);
+  if (!unit) return 0;
+  return units.filter((entry) => entry.datasheet.id === unit.datasheet.id).indexOf(unit) + 1;
+};
+
 /** Enhancements a unit may take: characters take any, other units only Upgrades, Epic Heroes none. */
 export const getEligibleEnhancements = (
   unit: RosterUnit,

@@ -13,7 +13,8 @@ import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-
 import EnhancementSelection from './_components/enhancement-selection';
 import WarlordSelection from './_components/warlord-selection';
 import { getRosterFactionName } from '@depot/core/utils/roster';
-import { getEligibleEnhancements } from '@depot/core/utils/roster-legality';
+import { getEligibleEnhancements, getUnitOrdinal } from '@depot/core/utils/roster-legality';
+import { modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 
 const EditRosterUnitView: React.FC = () => {
   const {
@@ -165,6 +166,10 @@ const EditRosterUnitView: React.FC = () => {
       subtitle={subtitle}
       headerTestId="edit-unit-header"
       saveButtonTestId="save-unit-button"
+      modelCosts={modelCostsForOrdinal(
+        unit.datasheet.modelCosts,
+        getUnitOrdinal(roster.units, unit.id)
+      )}
       afterGrid={
         <>
           {isCharacter || eligibleEnhancements.length > 0 ? (
