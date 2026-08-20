@@ -4,6 +4,7 @@ import type { depot } from '@depot/core';
 
 import { Card, Tag, SelectField, Button } from '@/components/ui';
 import { groupKeywords } from '@depot/core/utils/common';
+import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetSelectionCardProps {
@@ -17,25 +18,30 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
   onAdd,
   getUnitCount
 }) => {
+  const availableModelCosts = useMemo(
+    () => selectableModelCosts(datasheet.modelCosts),
+    [datasheet.modelCosts]
+  );
+
   const [selectedCostLine, setSelectedCostLine] = useState<string | null>(
-    datasheet.modelCosts[0]?.line ?? null
+    availableModelCosts[0]?.line ?? null
   );
 
   const modelCostOptions = useMemo(() => {
-    return datasheet.modelCosts.map((cost) => ({
-      label: cost.description || datasheet.name,
+    return availableModelCosts.map((cost) => ({
+      label: formatModelCostLabel(cost, datasheet.name),
       value: cost.line
     }));
-  }, [datasheet.modelCosts, datasheet.name]);
+  }, [availableModelCosts, datasheet.name]);
 
   const selectedModelCost = useMemo(() => {
-    if (!datasheet.modelCosts.length) {
+    if (!availableModelCosts.length) {
       return null;
     }
 
-    const matched = datasheet.modelCosts.find((cost) => cost.line === selectedCostLine);
-    return matched ?? datasheet.modelCosts[0];
-  }, [datasheet.modelCosts, selectedCostLine]);
+    const matched = availableModelCosts.find((cost) => cost.line === selectedCostLine);
+    return matched ?? availableModelCosts[0];
+  }, [availableModelCosts, selectedCostLine]);
 
   const factionKeywords = useMemo(() => {
     return groupKeywords(datasheet.keywords).faction;
@@ -93,8 +99,13 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
 
         <Card.Content className="flex flex-1 h-full flex-col gap-2 text-sm md:text-base">
           <div className="flex min-w-0 flex-col gap-1">
-            {(datasheet.isLegends || datasheet.isForgeWorld) && (
+            {(datasheet.isLegends || datasheet.isForgeWorld || datasheet.isSupport) && (
               <div className="flex w-fit flex-wrap gap-2 self-start">
+                {datasheet.isSupport ? (
+                  <Tag size="sm" variant="secondary">
+                    Support
+                  </Tag>
+                ) : null}
                 {datasheet.isLegends ? (
                   <Tag size="sm" variant="warning">
                     Warhammer Legends
@@ -125,7 +136,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           </div>
 
           <div className="mt-auto flex flex-wrap items-center gap-2">
-            {datasheet.modelCosts.length > 1 ? (
+            {availableModelCosts.length > 1 ? (
               <SelectField
                 fullWidth={false}
                 className="max-w-[14rem] md:max-w-[18rem]"

@@ -6,6 +6,7 @@ import { useFactionsContext } from '@/contexts/factions/context';
 import { useRoster } from '@/contexts/roster/use-roster-context';
 import { offlineStorage } from '@/data/offline-storage';
 import type { depot } from '@depot/core';
+import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 import { COLLECTION_LABELS } from '@/utils/collection';
 
 import AppLayout from '@/components/layout';
@@ -52,7 +53,7 @@ const CreateRoster: React.FC = () => {
     () =>
       sortedDetachments.map((detachment) => ({
         value: detachment.slug,
-        label: detachment.name
+        label: formatDetachmentOptionLabel(detachment)
       })),
     [sortedDetachments]
   );

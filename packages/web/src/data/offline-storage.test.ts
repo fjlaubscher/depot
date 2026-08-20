@@ -79,7 +79,7 @@ const mockFaction: depot.Faction = {
       sourceId: 'core',
       sourceName: 'Faction Pack: Space Marines',
       legend: '',
-      role: 'HQ',
+      isSupport: false,
       loadout: '',
       transport: '',
       virtual: false,
@@ -105,8 +105,14 @@ const mockFaction: depot.Faction = {
   ],
   detachments: [
     {
+      id: '000000100',
       slug: 'gladius-task-force',
       name: 'Gladius Task Force',
+      legend: '',
+      type: '',
+      dp: '2',
+      forceDisposition: 'Take and Hold',
+      chapterDp: [],
       abilities: [],
       enhancements: [],
       stratagems: []
@@ -126,7 +132,7 @@ const mockManifest: depot.FactionManifest = {
       name: 'Captain',
       factionId: mockFaction.id,
       factionSlug: mockFaction.slug,
-      role: 'HQ',
+      isSupport: false,
       path: '/data/factions/space-marines/datasheets/captain.json',
       supplementSlug: undefined,
       supplementName: undefined,
@@ -576,8 +582,14 @@ describe('OfflineStorage', () => {
       },
       dataVersion: null,
       detachment: {
+        id: 'test-detachment',
         slug: 'test-detachment',
         name: 'Test Detachment',
+        legend: '',
+        type: '',
+        dp: '',
+        forceDisposition: '',
+        chapterDp: [],
         abilities: [],
         enhancements: [],
         stratagems: []

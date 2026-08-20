@@ -77,7 +77,7 @@ describe('CreateRoster', () => {
         name: ds.name,
         factionId: ds.factionId,
         factionSlug: ds.factionSlug,
-        role: ds.role,
+        isSupport: ds.isSupport,
         path: `/data/factions/${ds.factionSlug}/datasheets/${ds.id}.json`,
         supplementSlug: ds.supplementSlug,
         supplementName: ds.supplementName,

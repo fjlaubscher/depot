@@ -83,7 +83,7 @@ describe('remapCollectionIds', () => {
             factionSlug: 'astra-militarum',
             sourceId: 'core',
             legend: '',
-            role: 'Battleline',
+            isSupport: false,
             loadout: '',
             transport: '',
             virtual: false,

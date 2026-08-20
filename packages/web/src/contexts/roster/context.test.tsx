@@ -47,8 +47,14 @@ const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
       },
       maxPoints: 2000,
       detachment: {
+        id: 'test-detachment',
         slug: 'test-detachment',
         name: 'Test Detachment',
+        legend: '',
+        type: '',
+        dp: '',
+        forceDisposition: '',
+        chapterDp: [],
         abilities: [],
         enhancements: [],
         stratagems: []

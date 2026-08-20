@@ -4,6 +4,7 @@ import DetachmentAbilityCard from '@/routes/factions/[factionSlug]/_components/d
 import EnhancementCard from '@/routes/factions/[factionSlug]/_components/enhancement-card';
 import StratagemCard from '@/components/shared/stratagem-card';
 import { sortByName } from '@depot/core/utils/common';
+import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 
 interface DetachmentTabProps {
   detachment: depot.Detachment;
@@ -12,7 +13,7 @@ interface DetachmentTabProps {
 }
 
 const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhancements, units }) => {
-  const { name, abilities, stratagems } = detachment;
+  const { abilities, stratagems } = detachment;
 
   const sortedAbilities = useMemo(() => sortByName(abilities), [abilities]);
   const sortedStratagems = useMemo(() => sortByName(stratagems), [stratagems]);
@@ -40,6 +41,11 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
 
   return (
     <div className="flex flex-col gap-4" data-testid="detachment-overview">
+      <div className="flex flex-col gap-1" data-testid="detachment-heading">
+        <h3 className="text-base font-semibold text-foreground">
+          {formatDetachmentOptionLabel(detachment)}
+        </h3>
+      </div>
       <section className="flex flex-col gap-2" data-testid="detachment-abilities-section">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
           Detachment Abilities

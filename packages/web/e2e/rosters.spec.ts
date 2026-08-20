@@ -22,11 +22,20 @@ const gotoCreateRoster = async (page: Page) => {
   await expect(page.getByRole('heading', { name: 'Create New Roster' })).toBeVisible();
 };
 
-const selectFactionAndDetachment = async (page: Page) => {
-  await page.getByLabel('Faction').selectOption({ label: FACTION_NAME });
+const selectDetachmentByName = async (page: Page, name: string) => {
   const detachmentSelect = page.getByLabel('Detachment');
   await detachmentSelect.waitFor({ state: 'visible' });
-  await detachmentSelect.selectOption({ label: DETACHMENT_NAME });
+  const value = await detachmentSelect
+    .locator('option')
+    .filter({ hasText: name })
+    .first()
+    .getAttribute('value');
+  await detachmentSelect.selectOption(value ?? '');
+};
+
+const selectFactionAndDetachment = async (page: Page) => {
+  await page.getByLabel('Faction').selectOption({ label: FACTION_NAME });
+  await selectDetachmentByName(page, DETACHMENT_NAME);
 };
 
 test.beforeEach(async ({ page }) => {
@@ -75,10 +84,8 @@ test('creates a new roster and trims the name', async ({ page }) => {
   await expect(submitButton).toBeDisabled();
 
   await page.getByLabel('Faction').selectOption({ label: FACTION_NAME });
-  const detachmentSelect = page.getByLabel('Detachment');
-  await detachmentSelect.waitFor({ state: 'visible' });
   await expect(submitButton).toBeDisabled();
-  await detachmentSelect.selectOption({ label: DETACHMENT_NAME });
+  await selectDetachmentByName(page, DETACHMENT_NAME);
   await expect(submitButton).toBeEnabled();
 
   await submitButton.click();

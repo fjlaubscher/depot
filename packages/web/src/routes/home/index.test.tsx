@@ -84,7 +84,7 @@ describe('Home', () => {
     mockFactionsContext.dataVersion = '2024.10.01';
   });
 
-  it('renders notice and dashboard sections', () => {
+  it('renders dashboard sections', () => {
     render(
       <TestWrapper>
         <Home />
@@ -92,7 +92,7 @@ describe('Home', () => {
     );
 
     expect(screen.queryByText('Your desk')).not.toBeInTheDocument();
-    expect(screen.getByTestId('edition-notice')).toBeInTheDocument();
+    expect(screen.queryByTestId('edition-notice')).not.toBeInTheDocument();
     expect(screen.getByTestId('bookmarks-section')).toBeInTheDocument();
     expect(screen.getByTestId('rosters-section')).toBeInTheDocument();
     expect(screen.getByTestId('collections-section')).toBeInTheDocument();

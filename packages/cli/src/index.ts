@@ -41,12 +41,12 @@ const WAHAPEDIA_CSV_FILES = [
   'Abilities.csv',
   'Enhancements.csv',
   'Detachment_abilities.csv',
+  'Detachments.csv',
+  'Detachments_chapter_dp.csv',
   'Last_update.csv'
 ];
 
-// Wahapedia serves each edition under its own path. 11ed exports exist but are still a stale copy
-// of 10ed (older last_update), so keep 10ed as the default until that flips.
-const EDITION = process.env.WAHAPEDIA_EDITION ?? 'wh40k10ed';
+const WAHAPEDIA_BASE_URL = 'https://wahapedia.ru/wh40k11ed/';
 
 const fetchCSV = (url: string) => fetch(url).then((response) => response.text());
 
@@ -73,9 +73,9 @@ const init = async () => {
   let results: string[];
 
   if (shouldDownload) {
-    log(`Fetching CSV data from Wahapedia (${EDITION})`);
+    log('Fetching CSV data from Wahapedia (wh40k11ed)');
     const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
-      fetchCSV(`https://wahapedia.ru/${EDITION}/${fileName}`)
+      fetchCSV(`${WAHAPEDIA_BASE_URL}${fileName}`)
     );
     results = await Promise.all(requests);
 
@@ -121,8 +121,7 @@ const init = async () => {
       name: datasheet.name,
       factionId: faction.id,
       factionSlug: faction.slug,
-      role: datasheet.role,
-      roleLabel: datasheet.roleLabel,
+      isSupport: datasheet.isSupport,
       supplementKey: datasheet.supplementKey,
       path: `/data/factions/${faction.slug}/datasheets/${datasheet.id}.json`,
       supplementSlug: datasheet.supplementSlug,

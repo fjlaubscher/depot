@@ -9,6 +9,7 @@ import {
   type RebindStatus
 } from '@depot/core/utils/rebind';
 import { calculateTotalPoints } from '@depot/core/utils/roster';
+import { matchDetachment } from '@depot/core/utils/detachments';
 
 type GetDatasheet = (
   factionSlug: string,
@@ -115,8 +116,7 @@ export const refreshRosterDataWithReport = async ({
   const factionSlug = roster.factionSlug || roster.faction?.slug || roster.factionId;
   const manifest = factionSlug ? await getFactionManifest(factionSlug) : null;
   const resolvedDetachment =
-    manifest?.detachments.find((entry) => entry.slug === roster.detachment?.slug) ??
-    roster.detachment;
+    matchDetachment(roster.detachment, manifest?.detachments ?? []) ?? roster.detachment;
 
   const manifestCache = new Map<string, depot.FactionManifest | null>();
   if (factionSlug && manifest) {

@@ -4,7 +4,7 @@ test.describe('Home', () => {
   test('shows dashboard content and sections', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByTestId('edition-notice')).toBeVisible();
+    await expect(page.getByTestId('edition-notice')).toHaveCount(0);
     await expect(page.getByTestId('bookmarks-section')).toBeVisible();
     await expect(page.getByTestId('rosters-section')).toBeVisible();
     await expect(page.getByTestId('collections-section')).toBeVisible();

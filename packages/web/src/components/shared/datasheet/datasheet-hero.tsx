@@ -8,6 +8,7 @@ import { DatasheetComposition } from '@/components/shared';
 
 // utils
 import { groupKeywords } from '@depot/core/utils/common';
+import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
@@ -27,9 +28,9 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({
     [groupedKeywords]
   );
 
-  const pointTags = datasheet.modelCosts.map((cost) => ({
+  const pointTags = selectableModelCosts(datasheet.modelCosts).map((cost) => ({
     key: `${cost.datasheetId}-${cost.line}`,
-    label: cost.description ? `${cost.cost} pts (${cost.description})` : `${cost.cost} pts`
+    label: formatModelCostLabel(cost)
   }));
 
   return (
@@ -41,6 +42,14 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({
         variant={compositionVariant}
         data-testid="unit-composition"
       />
+
+      {datasheet.isSupport ? (
+        <TagGroup spacing="sm" data-testid="datasheet-support">
+          <Tag variant="secondary" size="sm">
+            Support
+          </Tag>
+        </TagGroup>
+      ) : null}
 
       {showPoints && pointTags.length > 0 ? (
         <TagGroup spacing="sm" className="flex-wrap" data-testid="datasheet-points">

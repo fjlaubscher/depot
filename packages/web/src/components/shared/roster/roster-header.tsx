@@ -5,6 +5,7 @@ interface RosterHeaderProps {
   roster: {
     points: { current: number; max?: number };
     enhancements?: { enhancement: depot.Enhancement; unitId: string }[];
+    detachment?: depot.Detachment;
   };
   showEnhancements?: boolean;
   showMax?: boolean;
@@ -29,13 +30,27 @@ const RosterHeader: FC<RosterHeaderProps> = ({
     : roster.points.current;
 
   return (
-    <div className="flex items-center gap-4 text-sm">
+    <div className="flex flex-wrap items-center gap-4 text-sm">
       <div className="flex items-center gap-2">
         <span className="text-subtle">Points</span>
         <span className={`font-semibold ${pointsColor}`} data-testid="points-display">
           {pointsDisplay}
         </span>
       </div>
+      {roster.detachment?.dp ? (
+        <div className="flex items-center gap-2" data-testid="detachment-dp">
+          <span className="text-subtle">DP</span>
+          <span className="font-semibold text-foreground">{roster.detachment.dp}</span>
+        </div>
+      ) : null}
+      {roster.detachment?.forceDisposition ? (
+        <div className="flex items-center gap-2" data-testid="detachment-disposition">
+          <span className="text-subtle">Disposition</span>
+          <span className="font-semibold text-foreground">
+            {roster.detachment.forceDisposition}
+          </span>
+        </div>
+      ) : null}
       {showEnhancements ? (
         <div className="flex items-center gap-2">
           <span className="text-subtle">Enhancements</span>

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AppLayout from '@/components/layout';
-import { Alert, Loader } from '@/components/ui';
+import { Loader } from '@/components/ui';
 import { ListEmptyState } from '@/components/shared';
 import { useFactionsContext } from '@/contexts/factions/context';
 import useRosters from '@/hooks/use-rosters';
@@ -33,22 +33,6 @@ const Home: React.FC = () => {
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">
       <div className="flex flex-col gap-6">
-        <Alert variant="warning" title="11th edition isn't here yet" data-testid="edition-notice">
-          <p className="text-sm">
-            Wahapedia has updated their site, but their data exports are still 10th edition. depot
-            will follow once they do. Track it on{' '}
-            <a
-              href="https://github.com/fjlaubscher/depot/issues/46"
-              target="_blank"
-              rel="noreferrer"
-              className="font-semibold underline"
-            >
-              issue #46
-            </a>
-            .
-          </p>
-        </Alert>
-
         <BookmarksPanel
           header={
             bookmarks.length > 0 ? (

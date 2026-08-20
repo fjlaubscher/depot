@@ -8,6 +8,7 @@ import {
   mockRosterUnit,
   mockEnhancement,
   createMockDatasheet,
+  createMockDetachment,
   createMockRoster
 } from '@/test/mock-data';
 
@@ -43,13 +44,10 @@ describe('rosterReducer', () => {
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
         dataVersion: null,
-        detachment: {
+        detachment: createMockDetachment({
           slug: 'test-detachment',
-          name: 'Test Detachment',
-          abilities: [],
-          enhancements: [],
-          stratagems: []
-        },
+          name: 'Test Detachment'
+        }),
         points: {
           current: 500,
           max: 2000
@@ -134,13 +132,10 @@ describe('rosterReducer', () => {
 
   describe('CREATE_ROSTER', () => {
     it('should create a new roster with provided data', () => {
-      const mockDetachment: depot.Detachment = {
+      const mockDetachment = createMockDetachment({
         slug: 'test-detachment',
-        name: 'Test Detachment',
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      };
+        name: 'Test Detachment'
+      });
 
       const action: RosterAction = {
         type: 'CREATE_ROSTER',
@@ -184,13 +179,10 @@ describe('rosterReducer', () => {
     });
 
     it('should preserve initial detachment structure', () => {
-      const mockDetachment: depot.Detachment = {
+      const mockDetachment = createMockDetachment({
         slug: 'combat-patrol',
-        name: 'Combat Patrol',
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      };
+        name: 'Combat Patrol'
+      });
 
       const action: RosterAction = {
         type: 'CREATE_ROSTER',
@@ -237,13 +229,10 @@ describe('rosterReducer', () => {
         points: { current: 999, max: 2000 }
       });
 
-      const updatedDetachment: depot.Detachment = {
+      const updatedDetachment = createMockDetachment({
         slug: 'ironstorm-spearhead',
-        name: 'Ironstorm Spearhead',
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      };
+        name: 'Ironstorm Spearhead'
+      });
 
       const action: RosterAction = {
         type: 'UPDATE_DETAILS',
@@ -274,7 +263,7 @@ describe('rosterReducer', () => {
         faction: mockFactionIndex
       };
 
-      const mockDetachment: depot.Detachment = {
+      const mockDetachment = createMockDetachment({
         slug: 'gladius-task-force',
         name: 'Gladius Task Force',
         abilities: [
@@ -286,10 +275,8 @@ describe('rosterReducer', () => {
             description: 'Test ability',
             detachment: 'Gladius Task Force'
           }
-        ],
-        enhancements: [],
-        stratagems: []
-      };
+        ]
+      });
 
       const action: RosterAction = {
         type: 'SET_DETACHMENT',
@@ -311,22 +298,16 @@ describe('rosterReducer', () => {
         factionId: 'SM',
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
-        detachment: {
+        detachment: createMockDetachment({
           slug: 'original-detachment',
-          name: 'Original Detachment',
-          abilities: [],
-          enhancements: [],
-          stratagems: []
-        }
+          name: 'Original Detachment'
+        })
       };
 
-      const newDetachment: depot.Detachment = {
+      const newDetachment = createMockDetachment({
         slug: 'new-detachment',
-        name: 'New Detachment',
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      };
+        name: 'New Detachment'
+      });
 
       const action: RosterAction = {
         type: 'SET_DETACHMENT',
@@ -432,6 +413,12 @@ describe('rosterReducer', () => {
             detachment: {
               slug: 'immutability-detachment',
               name: 'Test',
+              id: 'immutability-detachment',
+              legend: '',
+              type: '',
+              dp: '',
+              forceDisposition: '',
+              chapterDp: [],
               abilities: [],
               enhancements: [],
               stratagems: []
@@ -440,13 +427,10 @@ describe('rosterReducer', () => {
         },
         {
           type: 'SET_DETACHMENT',
-          payload: {
+          payload: createMockDetachment({
             slug: 'set-detachment',
-            name: 'New Det',
-            abilities: [],
-            enhancements: [],
-            stratagems: []
-          }
+            name: 'New Det'
+          })
         },
         {
           type: 'SET_WARLORD',

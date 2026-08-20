@@ -15,8 +15,14 @@ export const initialState: depot.Roster = {
     detachmentCount: 0
   },
   detachment: {
+    id: '',
     slug: '',
     name: '',
+    legend: '',
+    type: '',
+    dp: '',
+    forceDisposition: '',
+    chapterDp: [],
     abilities: [],
     enhancements: [],
     stratagems: []

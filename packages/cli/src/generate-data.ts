@@ -1,8 +1,13 @@
 import { readFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { slug as slugUtils, wargear as wargearUtils } from '@depot/core';
+import {
+  detachments as detachmentUtils,
+  slug as slugUtils,
+  wargear as wargearUtils
+} from '@depot/core';
 import { sortByName } from '@depot/core/utils/common';
+import { normalizeModelCosts } from '@depot/core/utils/model-costs';
 import type { wahapedia, depot } from '@depot/core';
 import { getSupplementInfo } from './config/supplements.js';
 
@@ -13,22 +18,6 @@ const CODEX_SLUG = 'codex';
 
 const readFileAndParseToJSON = <T>(fileName: string): T[] =>
   JSON.parse(readFileSync(join(JSON_DIR, fileName), { encoding: 'utf-8' }));
-
-const formatRoleLabel = (value: string | null | undefined) => {
-  if (!value) {
-    return null;
-  }
-
-  return value
-    .split(' ')
-    .map((word) =>
-      word
-        .split('-')
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
-        .join('-')
-    )
-    .join(' ');
-};
 
 const DATA_FILES: Record<keyof Omit<wahapedia.Data, 'lastUpdate'>, string> = {
   factions: 'factions.json',
@@ -48,7 +37,9 @@ const DATA_FILES: Record<keyof Omit<wahapedia.Data, 'lastUpdate'>, string> = {
   stratagems: 'stratagems.json',
   abilities: 'abilities.json',
   enhancements: 'enhancements.json',
-  detachmentAbilities: 'detachment-abilities.json'
+  detachmentAbilities: 'detachment-abilities.json',
+  detachments: 'detachments.json',
+  detachmentChapterDp: 'detachments-chapter-dp.json'
 };
 
 const consolidateFiles = (): wahapedia.Data => {
@@ -128,8 +119,10 @@ const buildDatasheet = (
   const unitComposition = data.datasheetUnitComposition.filter(
     (uc: wahapedia.DatasheetUnitComposition) => uc.datasheetId === datasheet.id
   );
-  const modelCosts = data.datasheetModelCosts.filter(
-    (mc: wahapedia.DatasheetModelCost) => mc.datasheetId === datasheet.id
+  const modelCosts = normalizeModelCosts(
+    data.datasheetModelCosts.filter(
+      (mc: wahapedia.DatasheetModelCost) => mc.datasheetId === datasheet.id
+    )
   );
 
   const stratagems = data.datasheetStratagems
@@ -141,8 +134,10 @@ const buildDatasheet = (
   const enhancements = data.datasheetEnhancements
     .filter((de: wahapedia.DatasheetEnhancement) => de.datasheetId === datasheet.id)
     .map((de: wahapedia.DatasheetEnhancement) =>
-      data.enhancements.find((e: wahapedia.Enhancement) => e.id === de.enhancementId)!
-    );
+      data.enhancements.find((e: wahapedia.Enhancement) => e.id === de.enhancementId)
+    )
+    .filter((enhancement): enhancement is wahapedia.Enhancement => Boolean(enhancement))
+    .map(detachmentUtils.toDepotEnhancement);
 
   const detachmentAbilities = data.datasheetDetachmentAbilities
     .filter((dda: wahapedia.DatasheetDetachmentAbility) => dda.datasheetId === datasheet.id)
@@ -172,11 +167,28 @@ const buildDatasheet = (
   const wargear = wargearUtils.groupWargearProfiles(rawWargear);
 
   return {
-    ...datasheet,
+    id: datasheet.id,
     slug: datasheetSlug,
+    name: datasheet.name,
+    factionId: datasheet.factionId,
     factionSlug,
-    virtual: datasheet.virtual === 'true',
+    sourceId: datasheet.sourceId,
+    sourceName: source ? `${source.type}: ${source.name}` : undefined,
     supplementKey,
+    supplementSlug: supplementInfo?.slug,
+    supplementName: supplementInfo?.name,
+    supplementLabel,
+    isSupplement,
+    legend: datasheet.legend,
+    isSupport: datasheet.isSupport === 'true',
+    loadout: datasheet.loadout,
+    transport: datasheet.transport,
+    virtual: datasheet.virtual === 'true',
+    leaderHead: datasheet.leaderHead,
+    leaderFooter: datasheet.leaderFooter,
+    damagedW: datasheet.damagedW,
+    damagedDescription: datasheet.damagedDescription,
+    link: datasheet.link,
     abilities,
     keywords,
     models,
@@ -188,68 +200,9 @@ const buildDatasheet = (
     enhancements,
     detachmentAbilities,
     leaders,
-    supplementSlug: supplementInfo?.slug,
-    supplementName: supplementInfo?.name,
-    supplementLabel,
-    isSupplement,
-    roleLabel: formatRoleLabel(datasheet.role) ?? datasheet.role,
-    sourceName: source ? `${source.type}: ${source.name}` : undefined,
     isForgeWorld,
     isLegends
   };
-};
-
-const buildDetachments = (
-  detachmentAbilities: wahapedia.DetachmentAbility[],
-  enhancements: wahapedia.Enhancement[],
-  stratagems: wahapedia.Stratagem[],
-  createSlug: (value: string) => string
-): depot.Detachment[] => {
-  const detachments = new Map<string, depot.Detachment>();
-
-  const addToDetachment = (
-    name: string,
-    type: 'abilities' | 'enhancements' | 'stratagems',
-    entry: wahapedia.DetachmentAbility | wahapedia.Enhancement | wahapedia.Stratagem
-  ) => {
-    if (!name) {
-      return;
-    }
-
-    if (!detachments.has(name)) {
-      detachments.set(name, {
-        slug: createSlug(name),
-        name,
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      });
-    }
-
-    const detachment = detachments.get(name);
-    if (!detachment) {
-      return;
-    }
-
-    detachment[type].push(entry as never);
-  };
-
-  detachmentAbilities.forEach((ability) =>
-    addToDetachment(ability.detachment, 'abilities', ability)
-  );
-  enhancements.forEach((enhancement) =>
-    addToDetachment(enhancement.detachment, 'enhancements', enhancement)
-  );
-  stratagems.forEach((stratagem) => addToDetachment(stratagem.detachment, 'stratagems', stratagem));
-
-  const builtDetachments = Array.from(detachments.values());
-  builtDetachments.forEach((detachment) => {
-    sortByName(detachment.abilities);
-    sortByName(detachment.enhancements);
-    sortByName(detachment.stratagems);
-  });
-
-  return sortByName(builtDetachments);
 };
 
 const buildCoreStratagems = (stratagems: wahapedia.Stratagem[]): depot.Stratagem[] => {
@@ -280,12 +233,15 @@ const buildFactionData = (
   );
   const detachmentAbilities = data.detachmentAbilities.filter((da) => da.factionId === faction.id);
   const detachmentSlugGenerator = slugUtils.createSlugGenerator(`${factionSlug}-detachment`);
-  const detachments = buildDetachments(
-    detachmentAbilities,
+  const detachments = detachmentUtils.buildFactionDetachments({
+    factionId: faction.id,
+    detachments: data.detachments,
+    chapterDp: data.detachmentChapterDp,
+    abilities: detachmentAbilities,
     enhancements,
     stratagems,
-    detachmentSlugGenerator
-  );
+    createSlug: detachmentSlugGenerator
+  });
 
   return {
     ...faction,

@@ -17,14 +17,16 @@ import {
   RosterEmptyState,
   RosterUnitGrid
 } from '@/components/shared/roster';
-import { getRosterFactionName, groupRosterUnitsByRole } from '@depot/core/utils/roster';
+import { getRosterFactionName } from '@depot/core/utils/roster';
+import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 
 const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
-  const groupedUnits = groupRosterUnitsByRole(roster.units);
-  const roleKeys = Object.keys(groupedUnits).sort();
+  const sortedUnits = [...roster.units].sort((a, b) =>
+    a.datasheet.name.localeCompare(b.datasheet.name)
+  );
 
   useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
   useScrollToHash({ enabled: Boolean(roster.id) });
@@ -46,8 +48,8 @@ const RosterEdit: FC = () => {
   const factionName = getRosterFactionName(roster);
 
   const subtitle =
-    factionName && roster.detachment?.name
-      ? `${factionName} • ${roster.detachment.name}`
+    factionName && roster.detachment
+      ? `${factionName} • ${formatDetachmentOptionLabel(roster.detachment)}`
       : factionName;
 
   const handleViewRoster = () => {
@@ -112,28 +114,20 @@ const RosterEdit: FC = () => {
 
       {/* Units List */}
       {roster.units.length > 0 ? (
-        <div className="flex flex-col gap-4">
-          {roleKeys.map((role) => (
-            <RosterSection
-              key={role}
-              title={`${role.toUpperCase()} (${groupedUnits[role].length})`}
-              data-testid="unit-role-section"
-            >
-              <RosterUnitGrid>
-                {groupedUnits[role].map((unit) => (
-                  <RosterUnitCardEdit
-                    key={unit.id}
-                    unit={unit}
-                    rosterId={roster.id}
-                    onRemove={removeUnit}
-                    onDuplicate={duplicateUnit}
-                    dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
-                  />
-                ))}
-              </RosterUnitGrid>
-            </RosterSection>
-          ))}
-        </div>
+        <RosterSection title={`Units (${sortedUnits.length})`} data-testid="roster-units-section">
+          <RosterUnitGrid>
+            {sortedUnits.map((unit) => (
+              <RosterUnitCardEdit
+                key={unit.id}
+                unit={unit}
+                rosterId={roster.id}
+                onRemove={removeUnit}
+                onDuplicate={duplicateUnit}
+                dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
+              />
+            ))}
+          </RosterUnitGrid>
+        </RosterSection>
       ) : (
         <RosterEmptyState
           title="No units in this roster"

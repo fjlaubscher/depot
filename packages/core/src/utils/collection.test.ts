@@ -28,8 +28,7 @@ const createDatasheet = (overrides: Partial<Datasheet> = {}): Datasheet => ({
   supplementLabel: overrides.supplementLabel,
   isSupplement: overrides.isSupplement ?? false,
   legend: overrides.legend ?? '',
-  role: overrides.role ?? 'Battleline',
-  roleLabel: overrides.roleLabel ?? 'Battleline',
+  isSupport: overrides.isSupport ?? false,
   loadout: overrides.loadout ?? '',
   transport: overrides.transport ?? '',
   virtual: overrides.virtual ?? false,
@@ -63,8 +62,7 @@ const createCollection = (overrides: Partial<Collection> = {}): Collection => ({
   points: overrides.points ?? { current: 0 },
   dataVersion: overrides.dataVersion ?? null,
   createdAt: overrides.createdAt ?? new Date().toISOString(),
-  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
-  notes: overrides.notes ?? ''
+  updatedAt: overrides.updatedAt ?? new Date().toISOString()
 });
 
 const createUnit = (state: CollectionUnitState, cost: string) => ({

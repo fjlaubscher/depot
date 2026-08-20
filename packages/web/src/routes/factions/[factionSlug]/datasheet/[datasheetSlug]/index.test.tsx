@@ -42,7 +42,7 @@ describe('DatasheetPage', () => {
       name: ds.name,
       factionId: faction.id,
       factionSlug: faction.slug,
-      role: ds.role,
+      isSupport: ds.isSupport,
       path: `/data/factions/${faction.slug}/datasheets/${ds.id}.json`,
       supplementSlug: ds.supplementSlug,
       supplementName: ds.supplementName,
@@ -74,7 +74,7 @@ describe('DatasheetPage', () => {
     await setupCommonMocks(mocks);
   });
 
-  it('renders datasheet name and role', () => {
+  it('renders datasheet name', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('datasheet-header')).toHaveTextContent('Faction Pack: Space Marines');
-    expect(screen.getByTestId('datasheet-points')).toHaveTextContent('80 pts (Captain)');
+    expect(screen.getByTestId('datasheet-points')).toHaveTextContent('Captain (80 pts)');
   });
 
   it('renders child components with correct data', () => {

@@ -33,7 +33,7 @@ const datasheet = (overrides: Partial<Datasheet> = {}): Datasheet => ({
   factionSlug: 'space-marines',
   sourceId: 'core',
   legend: '',
-  role: 'Battleline',
+  isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,

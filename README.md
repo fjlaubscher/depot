@@ -55,7 +55,7 @@ pnpm start
 This will:
 
 1. Build `@depot/core` and `@depot/cli`.
-2. Run the CLI to download Wahapedia CSVs and convert them to JSON.
+2. Run the CLI to download Wahapedia 11th-edition CSVs (`https://wahapedia.ru/wh40k11ed/`) and convert them to JSON.
 3. Copy generated data into `packages/web/public/data/`.
 4. Start the web dev server.
 

@@ -15,7 +15,16 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
   return (
     <Card className="p-4 space-y-2 h-full">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-foreground text-sm leading-tight">{enhancement.name}</h3>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <h3 className="font-semibold text-foreground text-sm leading-tight">
+            {enhancement.name}
+          </h3>
+          {enhancement.upgrade ? (
+            <Tag variant="secondary" size="sm">
+              UPGRADE
+            </Tag>
+          ) : null}
+        </div>
         {enhancement.cost ? (
           <Tag variant="success" size="sm">
             {enhancement.cost} pts
@@ -31,6 +40,14 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
         className="text-sm text-body leading-relaxed"
         dangerouslySetInnerHTML={{ __html: enhancement.description }}
       />
+
+      {enhancement.supportLeader ? (
+        <div
+          className="text-sm text-body leading-relaxed"
+          data-testid="enhancement-support-leader"
+          dangerouslySetInnerHTML={{ __html: enhancement.supportLeader }}
+        />
+      ) : null}
     </Card>
   );
 };

@@ -21,6 +21,7 @@ export interface Datasheet {
   sourceId: string;
   legend: string;
   role: string;
+  isSupport: string;
   loadout: string;
   transport: string;
   virtual: string;
@@ -132,6 +133,7 @@ export interface Stratagem {
   phase: string;
   description: string;
   detachment: string;
+  detachmentId: string;
 }
 
 export interface Ability {
@@ -151,6 +153,9 @@ export interface Enhancement {
   description: string;
   cost: string;
   detachment: string;
+  detachmentId: string;
+  upgrade: string;
+  supportLeader: string;
 }
 
 export interface DetachmentAbility {
@@ -160,6 +165,23 @@ export interface DetachmentAbility {
   legend: string;
   description: string;
   detachment: string;
+  detachmentId: string;
+}
+
+export interface Detachment {
+  id: string;
+  factionId: string;
+  name: string;
+  legend: string;
+  type: string;
+  dp: string;
+  forceDisposition: string;
+}
+
+export interface DetachmentChapterDp {
+  detachmentId: string;
+  keyword: string;
+  dp: string;
 }
 
 export interface LastUpdate {
@@ -185,5 +207,7 @@ export interface Data {
   abilities: Ability[];
   enhancements: Enhancement[];
   detachmentAbilities: DetachmentAbility[];
+  detachments: Detachment[];
+  detachmentChapterDp: DetachmentChapterDp[];
   lastUpdate: string | null;
 }

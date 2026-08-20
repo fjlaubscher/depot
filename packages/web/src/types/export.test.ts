@@ -14,8 +14,14 @@ const baseRoster: depot.Roster = {
   factionId: 'f1',
   factionSlug: 'f1',
   detachment: {
+    id: 'det',
     slug: 'det',
     name: 'Det',
+    legend: '',
+    type: '',
+    dp: '',
+    forceDisposition: '',
+    chapterDp: [],
     abilities: [],
     enhancements: [],
     stratagems: []
@@ -74,7 +80,7 @@ describe('isExportedCollection', () => {
       kind: 'collection',
       version: 1,
       dataVersion: null,
-      edition: 'wh40k10ed',
+      edition: 'wh40k11ed',
       collection: baseCollection
     };
     expect(isExportedCollection(payload)).toBe(true);

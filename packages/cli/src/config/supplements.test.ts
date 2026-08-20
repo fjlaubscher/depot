@@ -12,4 +12,9 @@ describe('supplements config', () => {
   it('returns undefined for unmapped sources', () => {
     expect(getSupplementInfo('unknown')).toBeUndefined();
   });
+
+  it('does not map removed 10th-edition legend source IDs', () => {
+    expect(getSupplementInfo('000000372')).toBeUndefined();
+    expect(getSupplementInfo('000000287')).toBeUndefined();
+  });
 });

@@ -14,7 +14,7 @@ Shared TypeScript types + lightweight utilities. This package is the single sour
 - `src/index.ts` - exports types + utils (re-export every helper from here)
 - `src/types/depot.ts` / `src/types/wahapedia.ts` - processed + raw schemas
 - `src/utils/common/` - framework-agnostic helpers (array, strings, keywords, enhancements, faction mapping, breadcrumb builders) with colocated tests
-- `src/utils/{wargear,abilities,roster,roster-share,collection,datasheets}.ts` - domain helpers consumed by CLI + web
+- `src/utils/{wargear,abilities,roster,roster-share,collection,datasheets,detachments,model-costs}.ts` - domain helpers consumed by CLI + web
 - `src/utils/paths.ts` - pure data/image path helpers (no environment reads)
 - `src/constants/` - reserved for future shared constants
 

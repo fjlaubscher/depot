@@ -3,10 +3,7 @@ import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datashee
 import { useSupplementSelectionGuard } from '@/hooks/use-supplement-selection-guard';
 import { useSupplementState } from '@/hooks/use-supplement-state';
 import type { DatasheetListItem } from '@depot/core/utils/datasheets';
-import DatasheetSupplementTabs, {
-  type SupplementTab as SupplementTabsOption
-} from './datasheet-supplement-tabs';
-import DatasheetRoleTabs from './datasheet-role-tabs';
+import DatasheetSupplementTabs from './datasheet-supplement-tabs';
 import DatasheetFilterBar from './datasheet-filter-bar';
 import DatasheetResultsGrid from './datasheet-results-grid';
 import DatasheetEmptyState from './datasheet-empty-state';
@@ -20,24 +17,7 @@ interface DatasheetBrowserProps<T extends DatasheetListItem> {
   emptyStateMessage?: string;
   showItemCount?: boolean;
   filters?: DatasheetFilters;
-  initialRole?: string | null;
 }
-
-const formatRoleLabel = (value: string | null | undefined) => {
-  if (!value) {
-    return null;
-  }
-
-  return value
-    .split(' ')
-    .map((word) =>
-      word
-        .split('-')
-        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
-        .join('-')
-    )
-    .join(' ');
-};
 
 export const DatasheetBrowser = <T extends DatasheetListItem>({
   datasheets,
@@ -45,8 +25,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   searchPlaceholder = 'Search datasheets...',
   emptyStateMessage = 'No datasheets found.',
   showItemCount = true,
-  filters,
-  initialRole = null
+  filters
 }: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState<string>('all');
 
@@ -77,14 +56,11 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     query,
     setQuery,
     debouncedQuery,
-    activeRole,
-    setActiveRole,
-    tabs,
     filteredDatasheets,
     hasResults,
     totalCount,
     clearFilters
-  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters, 300, initialRole ?? null);
+  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters);
 
   const visibleDatasheets = useMemo(() => {
     return sortDatasheetsBySupplementPreference(
@@ -106,21 +82,18 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   const defaultRenderDatasheet = (datasheet: DatasheetListItem) => (
     <DatasheetListItemCard
       datasheet={datasheet}
-      roleLabel={datasheet.roleLabel ?? formatRoleLabel(datasheet.role)}
       supplementMetadataHasSupplements={supplementMetadata.hasSupplements}
     />
   );
 
   const renderItem: (datasheet: T) => ReactNode =
     renderDatasheet ?? ((item) => defaultRenderDatasheet(item));
-  const isRoleFiltered = activeRole !== initialRole;
   const isSupplementFiltered =
     supplementMetadata.hasSupplements && normalizedSelectedSupplement !== 'all';
-  const showClear = Boolean(query.trim()) || isRoleFiltered || isSupplementFiltered;
-  const emptyMessage =
-    debouncedQuery || isRoleFiltered
-      ? 'No datasheets found matching your filters.'
-      : emptyStateMessage;
+  const showClear = Boolean(query.trim()) || isSupplementFiltered;
+  const emptyMessage = debouncedQuery
+    ? 'No datasheets found matching your filters.'
+    : emptyStateMessage;
 
   return (
     <div className="flex flex-col gap-4">
@@ -133,7 +106,6 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
           />
         ) : null}
 
-        <DatasheetRoleTabs tabs={tabs} activeRole={activeRole} onChange={setActiveRole} />
         <DatasheetFilterBar
           query={query}
           onQueryChange={setQuery}

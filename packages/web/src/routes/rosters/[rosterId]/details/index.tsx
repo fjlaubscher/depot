@@ -21,6 +21,7 @@ import {
 } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { BackButton, RosterHeader } from '@/components/shared';
+import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 
 const RosterDetailsContent: FC = () => {
@@ -51,7 +52,7 @@ const RosterDetailsContent: FC = () => {
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((detachment) => ({
         value: detachment.slug,
-        label: detachment.name
+        label: formatDetachmentOptionLabel(detachment)
       }));
   }, [faction?.detachments]);
 
@@ -126,8 +127,8 @@ const RosterDetailsContent: FC = () => {
     navigate(`/rosters/${roster.id}/edit`);
   };
 
-  const subtitle = roster.detachment?.name
-    ? `${roster.faction?.name ?? ''} • ${roster.detachment.name}`.trim()
+  const subtitle = roster.detachment
+    ? `${roster.faction?.name ?? ''} • ${formatDetachmentOptionLabel(roster.detachment)}`.trim()
     : (roster.faction?.name ?? '');
 
   const saveDisabled =

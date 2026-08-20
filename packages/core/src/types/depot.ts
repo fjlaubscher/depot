@@ -93,6 +93,8 @@ export interface ModelCost {
   line: string;
   description: string;
   cost: string;
+  /** Preceding cost-bracket header, e.g. `YOUR 1ST TO 3RD UNITS COST`. */
+  section?: string;
 }
 
 export interface Enhancement {
@@ -103,6 +105,8 @@ export interface Enhancement {
   description: string;
   cost: string;
   detachment: string;
+  upgrade?: boolean;
+  supportLeader?: string;
 }
 
 export interface DetachmentAbility {
@@ -137,11 +141,7 @@ export interface Datasheet {
    */
   isSupplement?: boolean;
   legend: string;
-  role: string;
-  /**
-   * User-facing role label (title-cased, dash-preserving).
-   */
-  roleLabel?: string;
+  isSupport: boolean;
   loadout: string;
   transport: string;
   virtual: boolean;
@@ -172,8 +172,7 @@ export interface DatasheetSummary {
   factionId: string;
   factionSlug: string;
   dataVersion?: string;
-  role: string;
-  roleLabel?: string;
+  isSupport: boolean;
   path: string;
   supplementKey?: string;
   supplementSlug?: string;
@@ -225,10 +224,15 @@ export interface Settings {
   useNativeShare?: boolean;
 }
 
-// Detachment, composed from other types
 export interface Detachment {
+  id: string;
   slug: string;
   name: string;
+  legend: string;
+  type: string;
+  dp: string;
+  forceDisposition: string;
+  chapterDp: { keyword: string; dp: string }[];
   abilities: DetachmentAbility[];
   enhancements: Enhancement[];
   stratagems: Stratagem[];

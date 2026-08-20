@@ -1,27 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
+import Tag from '@/components/ui/tag';
+import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { formatChapterDpLine } from '@depot/core/utils/detachments';
 import DetachmentAccordion from './detachment-accordion';
 import DetachmentPillNav from './detachment-pill-nav';
 import DetachmentSectionContent from './detachment-section-content';
 import type { DetachmentSectionKey } from './types';
 
 interface DetachmentCardProps {
-  detachmentName: string;
-  abilities: depot.DetachmentAbility[];
-  enhancements: depot.Enhancement[];
-  stratagems: depot.Stratagem[];
+  detachment: depot.Detachment;
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const DetachmentCard: React.FC<DetachmentCardProps> = ({
-  detachmentName,
-  abilities,
-  enhancements,
-  stratagems,
-  isOpen,
-  onToggle
-}) => {
+const DetachmentCard: React.FC<DetachmentCardProps> = ({ detachment, isOpen, onToggle }) => {
+  const { settings } = useSettingsContext();
+  const showFluff = settings.showFluff ?? true;
+  const { abilities, enhancements, stratagems } = detachment;
+
   const initialSection: DetachmentSectionKey = useMemo(() => {
     if (abilities.length > 0) return 'abilities';
     if (enhancements.length > 0) return 'enhancements';
@@ -71,9 +68,44 @@ const DetachmentCard: React.FC<DetachmentCardProps> = ({
     setActiveSection(target.key);
   };
 
+  const chapterDpLine =
+    detachment.chapterDp.length > 0 ? formatChapterDpLine(detachment.chapterDp) : '';
+
   return (
-    <DetachmentAccordion title={detachmentName} isOpen={isOpen} onToggle={onToggle}>
+    <DetachmentAccordion title={detachment.name} isOpen={isOpen} onToggle={onToggle}>
       <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2" data-testid="detachment-meta">
+            {detachment.dp ? (
+              <Tag size="sm" variant="primary">
+                {detachment.dp} DP
+              </Tag>
+            ) : null}
+            {detachment.forceDisposition ? (
+              <Tag size="sm" variant="default">
+                {detachment.forceDisposition}
+              </Tag>
+            ) : null}
+            {detachment.type ? (
+              <Tag size="sm" variant="secondary">
+                {detachment.type}
+              </Tag>
+            ) : null}
+          </div>
+          {chapterDpLine ? (
+            <p className="text-xs text-subtle" data-testid="detachment-chapter-dp">
+              {chapterDpLine}
+            </p>
+          ) : null}
+          {showFluff && detachment.legend ? (
+            <div
+              className="text-sm text-muted italic"
+              data-testid="detachment-legend"
+              dangerouslySetInnerHTML={{ __html: detachment.legend }}
+            />
+          ) : null}
+        </div>
+
         <DetachmentPillNav
           sections={sections}
           activeKey={activeSection}

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import { SelectField } from '@/components/ui';
+import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
 
 interface ModelCostSelectionProps {
   unit: depot.RosterUnit;
@@ -13,7 +14,7 @@ const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
   selectedModelCost,
   onModelCostChange
 }) => {
-  const availableModelCosts = unit.datasheet.modelCosts;
+  const availableModelCosts = selectableModelCosts(unit.datasheet.modelCosts);
 
   if (availableModelCosts.length === 0) {
     return (
@@ -38,7 +39,7 @@ const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
 
   const modelCostOptions = availableModelCosts.map((cost) => ({
     value: cost.line,
-    label: `${cost.description} (${cost.cost} pts)`
+    label: formatModelCostLabel(cost)
   }));
 
   const currentValue = selectedModelCost?.line || '';

@@ -35,11 +35,8 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ detachments }) 
 
         return (
           <DetachmentCard
-            key={detachment.slug}
-            detachmentName={detachment.name}
-            abilities={detachment.abilities}
-            enhancements={detachment.enhancements}
-            stratagems={detachment.stratagems}
+            key={detachment.id || detachment.slug}
+            detachment={detachment}
             isOpen={isOpen}
             onToggle={handleToggle}
           />

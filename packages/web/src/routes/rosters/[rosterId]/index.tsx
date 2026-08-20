@@ -18,6 +18,7 @@ import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/componen
 import { BackButton, RosterHeader } from '@/components/shared';
 import { generateRosterShareText } from '@/utils/roster';
 import { getRosterFactionName } from '@depot/core/utils/roster';
+import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
@@ -153,8 +154,8 @@ const RosterView: FC = () => {
   }
 
   const subtitle =
-    factionName && roster.detachment?.name
-      ? `${factionName} • ${roster.detachment.name}`
+    factionName && roster.detachment
+      ? `${factionName} • ${formatDetachmentOptionLabel(roster.detachment)}`
       : factionName;
 
   const tabLabels: string[] = ['Units'];

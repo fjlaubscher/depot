@@ -16,8 +16,7 @@ const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet =
   sourceId: 'src',
   sourceName: 'Source',
   legend: '',
-  role: 'Battleline',
-  roleLabel: 'Battleline',
+  isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
@@ -56,8 +55,14 @@ describe('refresh-user-data utilities', () => {
     },
     dataVersion: 'old-version',
     detachment: {
+      id: 'det-1',
       slug: 'det-1',
       name: 'Old Detachment',
+      legend: '',
+      type: '',
+      dp: '',
+      forceDisposition: '',
+      chapterDp: [],
       abilities: [],
       enhancements: [],
       stratagems: []
@@ -106,8 +111,14 @@ describe('refresh-user-data utilities', () => {
   it('refreshRosterData updates datasheets, detachment, points, and dataVersion', async () => {
     const refreshedDatasheet = buildDatasheet({ name: 'Unit One Updated', slug: 'unit-one-new' });
     const refreshedDetachment: depot.Detachment = {
+      id: 'det-1',
       slug: 'det-1',
       name: 'New Detachment',
+      legend: '',
+      type: '',
+      dp: '2',
+      forceDisposition: 'Take and Hold',
+      chapterDp: [],
       abilities: [],
       enhancements: [],
       stratagems: []
@@ -132,6 +143,7 @@ describe('refresh-user-data utilities', () => {
 
     expect(result.dataVersion).toBe('new-version');
     expect(result.detachment.name).toBe('New Detachment');
+    expect(result.detachment.dp).toBe('2');
     expect(result.units[0].datasheet.name).toBe('Unit One Updated');
     expect(result.units[0].datasheetSlug).toBe('unit-one-new');
     expect(result.points.current).toBe(10);
@@ -177,7 +189,7 @@ describe('refresh-user-data utilities', () => {
           name: 'Unit One',
           factionId: 'faction-1',
           factionSlug: 'faction-1',
-          role: 'Battleline',
+          isSupport: false,
           path: '',
           link: '',
           isForgeWorld: false,

@@ -28,5 +28,11 @@ export * as datasheets from './utils/datasheets.js';
 // Export rebind / edition-migration helpers
 export * as rebind from './utils/rebind.js';
 
+// Export detachment join / display helpers
+export * as detachments from './utils/detachments.js';
+
+// Export model-cost normalization helpers
+export * as modelCosts from './utils/model-costs.js';
+
 // Export all wahapedia types
 export * as wahapedia from './types/wahapedia.js';

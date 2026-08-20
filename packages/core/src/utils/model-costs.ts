@@ -1,0 +1,100 @@
+import type { ModelCost } from '../types/depot.js';
+
+const NUMERIC_COST = /^\d+$/;
+
+export const hasNumericCost = (cost: string | undefined | null): boolean =>
+  Boolean(cost && NUMERIC_COST.test(cost.trim()));
+
+export const selectableModelCosts = <T extends { cost: string }>(costs: T[]): T[] =>
+  costs.filter((cost) => hasNumericCost(cost.cost));
+
+const stripTags = (value: string): string =>
+  value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+/**
+ * `YOUR 1ST TO 3RD UNITS COST` → `1st to 3rd units`
+ */
+export const formatCostSection = (section: string): string => {
+  const cleaned = stripTags(section)
+    .replace(/^YOUR\s+/i, '')
+    .replace(/\s+COSTS?$/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return cleaned.toLowerCase();
+};
+
+export const formatModelCostLabel = (
+  cost: Pick<ModelCost, 'description' | 'cost' | 'section'>,
+  fallbackName?: string
+): string => {
+  const description = cost.description || fallbackName || 'Unit';
+  const pts = `(${cost.cost} pts)`;
+  if (!cost.section) {
+    return `${description} ${pts}`;
+  }
+
+  return `${description} · ${formatCostSection(cost.section)} ${pts}`;
+};
+
+type RawModelCost = {
+  datasheetId: string;
+  line: string;
+  description: string;
+  cost: string;
+};
+
+const collapseDuplicateCosts = (costs: ModelCost[]): ModelCost[] => {
+  const seen = new Set<string>();
+  return costs.filter((cost) => {
+    const key = `${cost.description}\0${cost.cost}\0${cost.section ?? ''}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+};
+
+const normalizeDatasheetCosts = (rows: RawModelCost[]): ModelCost[] => {
+  let section: string | undefined;
+  const costs: ModelCost[] = [];
+
+  for (const row of rows) {
+    if (!hasNumericCost(row.cost)) {
+      const header = stripTags(row.description);
+      if (header) {
+        section = header;
+      }
+      continue;
+    }
+
+    costs.push({
+      datasheetId: row.datasheetId,
+      line: row.line,
+      description: row.description,
+      cost: row.cost.trim(),
+      ...(section ? { section } : {})
+    });
+  }
+
+  return collapseDuplicateCosts(costs);
+};
+
+/**
+ * Drop empty-cost header rows, stamp the preceding header onto real cost rows as
+ * `section`, and collapse exact (description, cost, section) duplicates.
+ */
+export const normalizeModelCosts = (rows: RawModelCost[]): ModelCost[] => {
+  const byDatasheet = new Map<string, RawModelCost[]>();
+  for (const row of rows) {
+    const group = byDatasheet.get(row.datasheetId) ?? [];
+    group.push(row);
+    byDatasheet.set(row.datasheetId, group);
+  }
+
+  return Array.from(byDatasheet.values()).flatMap(normalizeDatasheetCosts);
+};

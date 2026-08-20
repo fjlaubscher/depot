@@ -10,6 +10,7 @@ import WargearSelectionContainer from './wargear-selection-container';
 import ModelCostSelection from './model-cost-selection';
 import WargearAbilitiesSelection from './wargear-abilities-selection';
 import { parseLoadoutWargear } from '@depot/core/utils/wargear';
+import { selectableModelCosts } from '@depot/core/utils/model-costs';
 import {
   getWargearAbilities,
   normalizeSelectedWargearAbilities
@@ -138,7 +139,7 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
           {beforeModelCost}
 
           {/* Model Cost Selection - only show if there are multiple options */}
-          {unit.datasheet.modelCosts.length > 1 && (
+          {selectableModelCosts(unit.datasheet.modelCosts).length > 1 && (
             <Card data-testid="model-cost-section">
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
