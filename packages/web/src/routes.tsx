@@ -7,6 +7,7 @@ import About from './routes/about';
 import Factions from './routes/factions';
 import Faction from './routes/factions/[factionSlug]';
 import Datasheet from './routes/factions/[factionSlug]/datasheet/[datasheetSlug]';
+import Detachment from './routes/factions/[factionSlug]/detachment/[detachmentSlug]';
 import Settings from './routes/settings';
 import Rosters from './routes/rosters';
 import CreateRoster from './routes/rosters/create';
@@ -31,6 +32,7 @@ const AppRoutes = () => (
     <Route path="/factions" element={<Factions />} />
     <Route path="/faction/:factionSlug" element={<Faction />} />
     <Route path="/faction/:factionSlug/datasheet/:datasheetSlug" element={<Datasheet />} />
+    <Route path="/faction/:factionSlug/detachment/:detachmentSlug" element={<Detachment />} />
     <Route path="/settings" element={<Settings />} />
     <Route path="/collections" element={<Collections />} />
     <Route path="/collections/create" element={<CreateCollection />} />

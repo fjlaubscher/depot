@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Bookmark, FileText, Users } from 'lucide-react';
+import { Bookmark, FileText, Shield, Users } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import { bookmarkPath } from '@/utils/bookmarks';
@@ -12,7 +12,7 @@ interface BookmarkCardProps {
 const BookmarkCard: FC<BookmarkCardProps> = ({ bookmark }) => {
   const path = bookmarkPath(bookmark);
   const isFaction = bookmark.kind === 'faction';
-  const Icon = isFaction ? Users : FileText;
+  const Icon = isFaction ? Users : bookmark.kind === 'detachment' ? Shield : FileText;
 
   return (
     <Link

@@ -31,7 +31,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - `scripts/copy-data.mjs` deletes the existing `packages/web/public/data` directory, then copies `packages/cli/dist/data` into it. It runs automatically in `pnpm start` and `pnpm build`; manual runs are rarely needed.
 
 ## Functions
-- Cloudflare Pages Functions live under the root `functions/` directory (currently just `[[path]].ts`, which injects og/meta tags for faction and datasheet routes).
+- Cloudflare Pages Functions live under the root `functions/` directory (currently just `[[path]].ts`, which injects og/meta tags for faction, datasheet and detachment routes).
 - Code there runs on the Pages runtime: rely on Web-standard APIs only (no Node built-ins).
 - Local iteration: `pnpm dev:wrangler` serves the built web app through the Pages runtime.
 

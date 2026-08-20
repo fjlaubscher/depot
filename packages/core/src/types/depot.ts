@@ -303,7 +303,7 @@ export interface Collection {
   updatedAt?: string;
 }
 
-/** User-pinned faction or datasheet for the home dashboard. */
+/** User-pinned faction, datasheet or detachment for the home dashboard. */
 export type Bookmark =
   | {
       id: string;
@@ -317,6 +317,15 @@ export type Bookmark =
       kind: 'datasheet';
       factionSlug: string;
       datasheetSlug: string;
+      name: string;
+      factionName?: string;
+      createdAt: string;
+    }
+  | {
+      id: string;
+      kind: 'detachment';
+      factionSlug: string;
+      detachmentSlug: string;
       name: string;
       factionName?: string;
       createdAt: string;

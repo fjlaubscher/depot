@@ -3,8 +3,10 @@ import { describe, it, expect } from 'vitest';
 import {
   bookmarkPath,
   createDatasheetBookmark,
+  createDetachmentBookmark,
   createFactionBookmark,
   datasheetBookmarkId,
+  detachmentBookmarkId,
   factionBookmarkId
 } from './bookmarks';
 
@@ -12,6 +14,9 @@ describe('bookmark helpers', () => {
   it('builds stable ids', () => {
     expect(factionBookmarkId('space-marines')).toBe('faction:space-marines');
     expect(datasheetBookmarkId('space-marines', 'captain')).toBe('datasheet:space-marines:captain');
+    expect(detachmentBookmarkId('space-marines', 'gladius-task-force')).toBe(
+      'detachment:space-marines:gladius-task-force'
+    );
   });
 
   it('builds paths for faction and datasheet bookmarks', () => {
@@ -35,6 +40,17 @@ describe('bookmark helpers', () => {
         createdAt: '2020-01-01T00:00:00.000Z'
       })
     ).toBe('/faction/space-marines/datasheet/captain');
+
+    expect(
+      bookmarkPath({
+        id: 'detachment:space-marines:gladius-task-force',
+        kind: 'detachment',
+        factionSlug: 'space-marines',
+        detachmentSlug: 'gladius-task-force',
+        name: 'Gladius Task Force',
+        createdAt: '2020-01-01T00:00:00.000Z'
+      })
+    ).toBe('/faction/space-marines/detachment/gladius-task-force');
   });
 
   it('creates faction and datasheet bookmarks', () => {
@@ -51,6 +67,16 @@ describe('bookmark helpers', () => {
     expect(datasheet.id).toBe('datasheet:orks:boyz');
     if (datasheet.kind === 'datasheet') {
       expect(datasheet.factionName).toBe('Orks');
+    }
+
+    const detachment = createDetachmentBookmark(
+      { slug: 'orks', name: 'Orks' },
+      { slug: 'waaagh-tribe', name: 'Waaagh! Tribe' }
+    );
+    expect(detachment.kind).toBe('detachment');
+    expect(detachment.id).toBe('detachment:orks:waaagh-tribe');
+    if (detachment.kind === 'detachment') {
+      expect(detachment.factionName).toBe('Orks');
     }
   });
 });

@@ -1,18 +1,25 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import DetachmentAbilityCard from '@/routes/factions/[factionSlug]/_components/detachment-ability-card';
-import EnhancementCard from '@/routes/factions/[factionSlug]/_components/enhancement-card';
+import { Link } from 'react-router-dom';
+import DetachmentAbilityCard from '@/components/shared/detachment-ability-card';
+import EnhancementCard from '@/components/shared/enhancement-card';
 import StratagemCard from '@/components/shared/stratagem-card';
 import { sortByName } from '@depot/core/utils/common';
 import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 
 interface DetachmentTabProps {
   detachment: depot.Detachment;
+  factionSlug?: string;
   rosterEnhancements: depot.Roster['enhancements'];
   units: depot.RosterUnit[];
 }
 
-const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhancements, units }) => {
+const DetachmentTab: React.FC<DetachmentTabProps> = ({
+  detachment,
+  factionSlug,
+  rosterEnhancements,
+  units
+}) => {
   const { abilities, stratagems } = detachment;
 
   const sortedAbilities = useMemo(() => sortByName(abilities), [abilities]);
@@ -43,7 +50,17 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({ detachment, rosterEnhance
     <div className="flex flex-col gap-4" data-testid="detachment-overview">
       <div className="flex flex-col gap-1" data-testid="detachment-heading">
         <h3 className="text-base font-semibold text-foreground">
-          {formatDetachmentOptionLabel(detachment)}
+          {factionSlug ? (
+            <Link
+              to={`/faction/${factionSlug}/detachment/${detachment.slug}`}
+              className="hover:text-accent transition-colors"
+              data-testid="detachment-link"
+            >
+              {formatDetachmentOptionLabel(detachment)}
+            </Link>
+          ) : (
+            formatDetachmentOptionLabel(detachment)
+          )}
         </h3>
       </div>
       <section className="flex flex-col gap-2" data-testid="detachment-abilities-section">

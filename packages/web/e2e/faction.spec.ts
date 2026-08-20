@@ -49,13 +49,18 @@ test.describe('Faction detail', () => {
     await expect(detachments).toBeVisible();
     await expect(detachments).toContainText(/Gladius Task Force/i);
 
-    await page.getByRole('button', { name: /Gladius Task Force/i }).click();
-    await expect(detachments.getByTestId('detachment-meta')).toContainText(/\d+\s*DP/);
-    await expect(detachments.getByTestId('detachment-meta')).toContainText(
+    await detachments.getByRole('link', { name: /Gladius Task Force/i }).click();
+    await expect(page).toHaveURL(/\/detachment\/gladius-task-force$/);
+    await expect(page.getByTestId('detachment-header')).toContainText(/Gladius Task Force/i);
+    const meta = page.getByTestId('detachment-meta');
+    await expect(meta).toContainText(/\d+\s*DP/);
+    await expect(meta).toContainText(
       /Take and Hold|Disruption|Purge the Foe|Priority Assets|Reconnaissance/
     );
+    await expect(page.getByTestId('detachment-stratagems')).toBeVisible();
 
-    await page.getByRole('button', { name: /Shield of the Void/i }).click();
-    await expect(detachments.getByTestId('detachment-meta')).toContainText(/Boarding Actions/);
+    await page.goto('/faction/space-marines/detachment/shield-of-the-void');
+    await expect(page.getByTestId('detachment-header')).toContainText(/Shield of the Void/i);
+    await expect(page.getByTestId('detachment-meta')).toContainText(/Boarding Actions/);
   });
 });
