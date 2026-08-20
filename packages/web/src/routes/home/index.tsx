@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Bookmark, Boxes, ClipboardList } from 'lucide-react';
 
 import AppLayout from '@/components/layout';
-import { LinkCard, Loader } from '@/components/ui';
+import { Loader } from '@/components/ui';
 import { useFactionsContext } from '@/contexts/factions/context';
 import useRosters from '@/hooks/use-rosters';
 import useCollections from '@/hooks/use-collections';
@@ -26,7 +26,6 @@ const Home: React.FC = () => {
   const loading = rostersLoading || collectionsLoading || bookmarksLoading;
   const recentRosters = useMemo(() => takeRecent(rosters, PREVIEW_LIMIT), [rosters]);
   const recentCollections = useMemo(() => takeRecent(collections, PREVIEW_LIMIT), [collections]);
-  const isEmpty = !loading && rosters.length === 0 && collections.length === 0;
 
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">
@@ -47,28 +46,6 @@ const Home: React.FC = () => {
                 <BookmarkCard key={bookmark.id} bookmark={bookmark} />
               ))}
             </div>
-          </section>
-        ) : null}
-
-        {isEmpty ? (
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2" data-testid="get-started">
-            <LinkCard
-              to="/collections"
-              icon={<Boxes size={20} />}
-              iconClassName="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
-              showArrow
-              description="Catalogue the armies you own once, then spin up list after list from them."
-            >
-              Create collection
-            </LinkCard>
-            <LinkCard
-              to="/rosters"
-              icon={<ClipboardList size={20} />}
-              showArrow
-              description="Build a one-off list straight from the datasheets."
-            >
-              Create roster
-            </LinkCard>
           </section>
         ) : null}
 

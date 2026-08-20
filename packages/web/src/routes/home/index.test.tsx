@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { depot } from '@depot/core';
 
 import { TestWrapper } from '@/test/test-utils';
@@ -84,7 +84,7 @@ describe('Home', () => {
     mockFactionsContext.dataVersion = '2024.10.01';
   });
 
-  it('renders hero, get-started and footer when there is no local data', () => {
+  it('renders hero, hero links and footer when there is no local data', () => {
     render(
       <TestWrapper>
         <Home />
@@ -92,12 +92,13 @@ describe('Home', () => {
     );
 
     expect(screen.getByTestId('home-hero')).toHaveTextContent('11th edition is here');
-    expect(screen.getByTestId('get-started')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Create roster/ })).toHaveAttribute('href', '/rosters');
-    expect(screen.getByRole('link', { name: /Create collection/ })).toHaveAttribute(
+    const links = within(screen.getByTestId('hero-links'));
+    expect(links.getByRole('link', { name: /Factions/ })).toHaveAttribute('href', '/factions');
+    expect(links.getByRole('link', { name: /Collections/ })).toHaveAttribute(
       'href',
       '/collections'
     );
+    expect(links.getByRole('link', { name: /Rosters/ })).toHaveAttribute('href', '/rosters');
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
@@ -134,7 +135,6 @@ describe('Home', () => {
       </TestWrapper>
     );
 
-    expect(screen.queryByTestId('get-started')).not.toBeInTheDocument();
     expect(screen.getByTestId('bookmark-previews')).toBeInTheDocument();
     expect(screen.getByTestId('bookmark-card')).toHaveTextContent('Space Marines');
     expect(screen.getByText('Bookmarks')).toBeInTheDocument();
