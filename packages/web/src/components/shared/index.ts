@@ -13,6 +13,7 @@ export { default as ListEmptyState } from './list-empty-state';
 
 // Cards
 export { default as StratagemCard } from './stratagem-card';
+export { default as PointsCosts } from './points-costs';
 export { default as EnhancementCard } from './enhancement-card';
 export { default as DetachmentAbilityCard } from './detachment-ability-card';
 

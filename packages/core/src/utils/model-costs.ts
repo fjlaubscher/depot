@@ -15,16 +15,19 @@ const stripTags = (value: string): string =>
     .trim();
 
 /**
- * `YOUR 1ST TO 3RD UNITS COST` → `1st to 3rd units`
+ * `YOUR 1ST TO 3RD UNITS COST` → `1st to 3rd units`, `YOUR 3RD + UNIT COSTS` → `3rd+ unit`.
+ * The generic `YOUR UNIT COSTS` header carries no information and formats to ``.
  */
 export const formatCostSection = (section: string): string => {
   const cleaned = stripTags(section)
     .replace(/^YOUR\s+/i, '')
     .replace(/\s+COSTS?$/i, '')
+    .replace(/\s*\+/g, '+')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .toLowerCase();
 
-  return cleaned.toLowerCase();
+  return /^units?$/.test(cleaned) ? '' : cleaned;
 };
 
 export const formatModelCostLabel = (
@@ -32,12 +35,30 @@ export const formatModelCostLabel = (
   fallbackName?: string
 ): string => {
   const description = cost.description || fallbackName || 'Unit';
+  const section = cost.section ? formatCostSection(cost.section) : '';
   const pts = `(${cost.cost} pts)`;
-  if (!cost.section) {
-    return `${description} ${pts}`;
-  }
+  return section ? `${description} · ${section} ${pts}` : `${description} ${pts}`;
+};
 
-  return `${description} · ${formatCostSection(cost.section)} ${pts}`;
+export interface ModelCostGroup<T extends ModelCost = ModelCost> {
+  /** Human label for the cost bracket, `` when the datasheet has a single generic bracket. */
+  section: string;
+  costs: T[];
+}
+
+/** Selectable costs grouped by cost bracket, in source order. */
+export const groupModelCostsBySection = <T extends ModelCost>(costs: T[]): ModelCostGroup<T>[] => {
+  const groups: ModelCostGroup<T>[] = [];
+  for (const cost of selectableModelCosts(costs)) {
+    const section = cost.section ? formatCostSection(cost.section) : '';
+    const group = groups.find((entry) => entry.section === section);
+    if (group) {
+      group.costs.push(cost);
+    } else {
+      groups.push({ section, costs: [cost] });
+    }
+  }
+  return groups;
 };
 
 type RawModelCost = {

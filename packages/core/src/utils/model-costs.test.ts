@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatCostSection,
   formatModelCostLabel,
+  groupModelCostsBySection,
   hasNumericCost,
   normalizeModelCosts,
   selectableModelCosts
@@ -127,6 +128,8 @@ describe('model cost helpers', () => {
 
   it('formats option labels with a humanized section', () => {
     expect(formatCostSection('YOUR 1ST TO 3RD UNITS COST')).toBe('1st to 3rd units');
+    expect(formatCostSection('YOUR 3RD + UNIT COSTS')).toBe('3rd+ unit');
+    expect(formatCostSection('YOUR UNIT COSTS')).toBe('');
     expect(
       formatModelCostLabel({
         description: '4 models',
@@ -135,6 +138,33 @@ describe('model cost helpers', () => {
       })
     ).toBe('4 models · 1st to 3rd units (170 pts)');
     expect(formatModelCostLabel({ description: 'Captain', cost: '80' })).toBe('Captain (80 pts)');
+    expect(
+      formatModelCostLabel({ description: '10 models', cost: '75', section: 'YOUR UNIT COSTS' })
+    ).toBe('10 models (75 pts)');
+  });
+
+  it('groups selectable costs by bracket in source order', () => {
+    const cost = (line: string, description: string, value: string, section?: string) => ({
+      datasheetId: 'ds',
+      line,
+      description,
+      cost: value,
+      ...(section ? { section } : {})
+    });
+    expect(
+      groupModelCostsBySection([
+        cost('1', '5 models', '60', 'YOUR 1ST TO 2ND UNITS COST'),
+        cost('2', '10 models', '120', 'YOUR 1ST TO 2ND UNITS COST'),
+        cost('3', '5 models', '65', 'YOUR 3RD + UNIT COSTS'),
+        cost('4', 'header', '')
+      ]).map((group) => ({ section: group.section, lines: group.costs.map((c) => c.line) }))
+    ).toEqual([
+      { section: '1st to 2nd units', lines: ['1', '2'] },
+      { section: '3rd+ unit', lines: ['3'] }
+    ]);
+    expect(groupModelCostsBySection([cost('1', '10 models', '75', 'YOUR UNIT COSTS')])).toEqual([
+      { section: '', costs: [cost('1', '10 models', '75', 'YOUR UNIT COSTS')] }
+    ]);
   });
 
   it('filters to selectable numeric costs', () => {

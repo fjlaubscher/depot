@@ -5,22 +5,17 @@ import type { depot } from '@depot/core';
 // components
 import { Tag, TagSection, TagGroup } from '@/components/ui';
 import { DatasheetComposition } from '@/components/shared';
+import PointsCosts from '@/components/shared/points-costs';
 
 // utils
 import { groupKeywords } from '@depot/core/utils/common';
-import { formatModelCostLabel, selectableModelCosts } from '@depot/core/utils/model-costs';
 
 interface DatasheetHeroProps {
   datasheet: depot.Datasheet;
   showPoints?: boolean;
-  compositionVariant?: 'default' | 'compact';
 }
 
-const DatasheetHero: FC<DatasheetHeroProps> = ({
-  datasheet,
-  showPoints = true,
-  compositionVariant = 'default'
-}) => {
+const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, showPoints = true }) => {
   const { keywords, unitComposition, loadout, transport } = datasheet;
   const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
   const keywordTags = useMemo(
@@ -28,18 +23,12 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({
     [groupedKeywords]
   );
 
-  const pointTags = selectableModelCosts(datasheet.modelCosts).map((cost) => ({
-    key: `${cost.datasheetId}-${cost.line}`,
-    label: formatModelCostLabel(cost)
-  }));
-
   return (
     <div className="flex flex-col gap-2">
       <DatasheetComposition
         composition={unitComposition}
         loadout={loadout}
         transport={transport}
-        variant={compositionVariant}
         data-testid="unit-composition"
       />
 
@@ -51,14 +40,12 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({
         </TagGroup>
       ) : null}
 
-      {showPoints && pointTags.length > 0 ? (
-        <TagGroup spacing="sm" className="flex-wrap" data-testid="datasheet-points">
-          {pointTags.map((entry) => (
-            <Tag key={entry.key} variant="primary" size="sm">
-              {entry.label}
-            </Tag>
-          ))}
-        </TagGroup>
+      {showPoints ? (
+        <PointsCosts
+          costs={datasheet.modelCosts}
+          fallbackName={datasheet.name}
+          data-testid="datasheet-points"
+        />
       ) : null}
 
       {/* Keywords */}

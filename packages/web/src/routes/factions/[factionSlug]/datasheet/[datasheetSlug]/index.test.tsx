@@ -84,7 +84,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('datasheet-header')).toHaveTextContent('Faction Pack: Space Marines');
-    expect(screen.getByTestId('datasheet-points')).toHaveTextContent('Captain (80 pts)');
+    expect(screen.getByTestId('datasheet-points')).toHaveTextContent('Captain · 80 pts');
   });
 
   it('renders child components with correct data', () => {

@@ -9,20 +9,18 @@ interface DatasheetCompositionProps {
   loadout?: string;
   transport?: string;
   'data-testid'?: string;
-  variant?: 'default' | 'compact';
 }
 
 export const DatasheetComposition: FC<DatasheetCompositionProps> = ({
   composition,
   loadout,
   transport,
-  'data-testid': testId,
-  variant = 'default'
+  'data-testid': testId
 }) => {
   const safeComposition = Array.isArray(composition) ? composition : [];
   const safeLoadout = typeof loadout === 'string' ? loadout : '';
   const safeTransport = typeof transport === 'string' ? transport : '';
-  const textClass = variant === 'compact' ? 'text-sm text-body' : 'text-sm md:text-base text-body';
+  const textClass = 'text-sm text-body';
 
   return (
     <Card className="flex flex-col gap-2 p-4" data-testid={testId}>
