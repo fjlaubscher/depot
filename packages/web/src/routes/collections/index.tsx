@@ -23,7 +23,7 @@ import CollectionStateChart from './_components/collection-state-chart';
 const CollectionsPage: React.FC = () => {
   const navigate = useNavigate();
   const { collections, loading, error, refresh } = useCollections();
-  const { dataVersion } = useFactionsContext();
+  const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
   const { showToast } = useToast();
   const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections]);
   const hasSnapshotData = snapshot.items.length > 0;
@@ -83,6 +83,8 @@ const CollectionsPage: React.FC = () => {
     try {
       const result = await importCollectionsFromFiles(files, {
         dataVersion: dataVersion ?? null,
+        getDatasheet,
+        getFactionManifest,
         saveCollection: (collection) => offlineStorage.saveCollection(collection)
       });
 

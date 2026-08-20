@@ -9,6 +9,7 @@ import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { readJsonFile } from '@/utils/file';
 import { isExportedRoster } from '@/types/export';
+import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, ErrorState } from '@/components/ui';
@@ -20,7 +21,7 @@ const Rosters: React.FC = () => {
   const navigate = useNavigate();
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
-  const { dataVersion } = useFactionsContext();
+  const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
 
   const handleCreate = () => {
     navigate('/rosters/create');
@@ -109,13 +110,25 @@ const Rosters: React.FC = () => {
         return;
       }
 
-      const imported = remapRosterIds(parsed.roster);
+      let imported = remapRosterIds(parsed.roster);
+      let rebindNote: string | null = null;
+      // Migrate legacy exports onto the current catalog (10th → 11th rebinds by id/slug/name).
+      if (dataVersion && imported.dataVersion !== dataVersion) {
+        const result = await refreshRosterDataWithReport({
+          roster: imported,
+          currentDataVersion: dataVersion,
+          getDatasheet,
+          getFactionManifest
+        });
+        imported = result.roster;
+        rebindNote = formatRebindSummaryMessage(result.summary);
+      }
       await offlineStorage.saveRoster(imported);
       await refresh();
       showToast({
-        type: 'success',
+        type: rebindNote ? 'warning' : 'success',
         title: 'Roster imported',
-        message: `Imported "${imported.name}".`
+        message: [`Imported "${imported.name}".`, rebindNote].filter(Boolean).join(' ')
       });
     } catch (err) {
       console.error('Failed to import roster', err);

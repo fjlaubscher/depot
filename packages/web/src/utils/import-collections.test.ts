@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { depot } from '@depot/core';
+import { mockDatasheet } from '@/test/mock-data';
 
 import {
   formatCollectionImportToast,
@@ -47,8 +48,38 @@ describe('importCollectionsFromFiles', () => {
     expect(result.failed).toHaveLength(0);
     expect(saved).toHaveLength(2);
     expect(saved[0].id).not.toBe('c1');
-    expect(saved[0].dataVersion).toBe('new-version');
+    expect(saved[0].dataVersion).toBe('old'); // no catalog access → left as-is (stale banner handles it)
     expect(saved.map((c) => c.name).sort()).toEqual(['A', 'B']);
+  });
+
+  it('migrates legacy exports onto the current catalog when it can', async () => {
+    const saved: depot.Collection[] = [];
+    const oldDatasheet: depot.Datasheet = {
+      ...mockDatasheet,
+      modelCosts: [
+        { datasheetId: mockDatasheet.id, line: '9', description: '1 model', cost: '999' }
+      ],
+      wargear: []
+    };
+    const item: depot.CollectionUnit = {
+      id: 'item-1',
+      datasheet: oldDatasheet,
+      modelCost: oldDatasheet.modelCosts[0],
+      selectedWargear: [],
+      state: 'sprue'
+    };
+    const getDatasheet = vi.fn(async () => mockDatasheet);
+
+    const result = await importCollectionsFromFiles(
+      [fileFrom('a.json', exportPayload({ ...baseCollection, items: [item] }))],
+      { dataVersion: 'new-version', getDatasheet, saveCollection: async (c) => void saved.push(c) }
+    );
+
+    expect(getDatasheet).toHaveBeenCalledWith('space-marines', mockDatasheet.id);
+    expect(saved[0].dataVersion).toBe('new-version');
+    expect(saved[0].items[0].datasheet.modelCosts).toEqual(mockDatasheet.modelCosts);
+    expect(saved[0].items[0].modelCost.cost).toBe(mockDatasheet.modelCosts[0].cost);
+    expect(result.summary.ok + result.summary.partial).toBe(1);
   });
 
   it('skips invalid files and continues', async () => {
@@ -59,6 +90,8 @@ describe('importCollectionsFromFiles', () => {
     ];
 
     const result = await importCollectionsFromFiles(files, {
+      dataVersion: 'new-version',
+      getDatasheet: async () => null,
       saveCollection: async () => undefined
     });
 
@@ -122,6 +155,7 @@ describe('remapCollectionIds', () => {
 describe('formatCollectionImportToast', () => {
   it('reports full success', () => {
     const toast = formatCollectionImportToast({
+      summary: { ok: 0, partial: 0, missing: 0 },
       imported: [baseCollection, baseCollection],
       failed: []
     });
@@ -131,6 +165,7 @@ describe('formatCollectionImportToast', () => {
 
   it('reports partial success', () => {
     const toast = formatCollectionImportToast({
+      summary: { ok: 0, partial: 0, missing: 0 },
       imported: [baseCollection],
       failed: [{ fileName: 'x.json', reason: 'bad' }]
     });
@@ -140,6 +175,7 @@ describe('formatCollectionImportToast', () => {
 
   it('reports total failure', () => {
     const toast = formatCollectionImportToast({
+      summary: { ok: 0, partial: 0, missing: 0 },
       imported: [],
       failed: [{ fileName: 'x.json', reason: 'Not a depot collection export' }]
     });

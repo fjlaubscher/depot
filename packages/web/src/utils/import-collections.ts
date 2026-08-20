@@ -3,21 +3,30 @@ import { calculateCollectionPoints } from '@depot/core/utils/collection';
 
 import { readJsonFile } from '@/utils/file';
 import { isExportedCollection } from '@/types/export';
+import {
+  formatRebindSummaryMessage,
+  refreshCollectionDataWithReport,
+  type RefreshCollectionParams
+} from '@/utils/refresh-user-data';
+
+type RebindSummary = { ok: number; partial: number; missing: number };
 
 export type ImportCollectionsResult = {
   imported: depot.Collection[];
   failed: Array<{ fileName: string; reason: string }>;
+  /** Rebind outcome across every imported unit (only populated when migrated to current data). */
+  summary: RebindSummary;
 };
 
 export type ImportCollectionsDeps = {
   dataVersion?: string | null;
   saveCollection: (collection: depot.Collection) => Promise<void>;
+  /** When provided with `dataVersion`, imported units are rebound to the current catalog. */
+  getDatasheet?: RefreshCollectionParams['getDatasheet'];
+  getFactionManifest?: RefreshCollectionParams['getFactionManifest'];
 };
 
-export const remapCollectionIds = (
-  collection: depot.Collection,
-  dataVersion?: string | null
-): depot.Collection => {
+export const remapCollectionIds = (collection: depot.Collection): depot.Collection => {
   const items = collection.items.map((item) => ({
     ...item,
     id: crypto.randomUUID()
@@ -27,7 +36,7 @@ export const remapCollectionIds = (
     ...collection,
     id: crypto.randomUUID(),
     items,
-    dataVersion: dataVersion ?? collection.dataVersion ?? null,
+    dataVersion: collection.dataVersion ?? null,
     points: { current: calculateCollectionPoints({ ...collection, items }) }
   };
 };
@@ -42,6 +51,7 @@ export const importCollectionsFromFiles = async (
 ): Promise<ImportCollectionsResult> => {
   const imported: depot.Collection[] = [];
   const failed: Array<{ fileName: string; reason: string }> = [];
+  const summary: RebindSummary = { ok: 0, partial: 0, missing: 0 };
 
   for (const file of files) {
     try {
@@ -54,7 +64,20 @@ export const importCollectionsFromFiles = async (
         continue;
       }
 
-      const collection = remapCollectionIds(parsed.collection, deps.dataVersion);
+      let collection = remapCollectionIds(parsed.collection);
+      // Migrate legacy exports onto the current catalog (10th → 11th rebinds by id/slug/name).
+      if (deps.getDatasheet && deps.dataVersion && collection.dataVersion !== deps.dataVersion) {
+        const result = await refreshCollectionDataWithReport({
+          collection,
+          currentDataVersion: deps.dataVersion,
+          getDatasheet: deps.getDatasheet,
+          getFactionManifest: deps.getFactionManifest
+        });
+        collection = result.collection;
+        summary.ok += result.summary.ok;
+        summary.partial += result.summary.partial;
+        summary.missing += result.summary.missing;
+      }
       await deps.saveCollection(collection);
       imported.push(collection);
     } catch {
@@ -65,7 +88,7 @@ export const importCollectionsFromFiles = async (
     }
   }
 
-  return { imported, failed };
+  return { imported, failed, summary };
 };
 
 const describeImportedCount = (count: number): string =>
@@ -87,17 +110,26 @@ export const formatCollectionImportToast = (
     };
   }
 
+  const rebindNote = formatRebindSummaryMessage(result.summary);
+
   if (result.failed.length === 0) {
     return {
-      type: 'success',
+      type: rebindNote ? 'warning' : 'success',
       title: 'Import complete',
-      message: `Imported ${describeImportedCount(result.imported.length)}.`
+      message: [`Imported ${describeImportedCount(result.imported.length)}.`, rebindNote]
+        .filter(Boolean)
+        .join(' ')
     };
   }
 
   return {
     type: 'warning',
     title: 'Import partially complete',
-    message: `Imported ${result.imported.length} of ${total} files. ${result.failed.length} skipped.`
+    message: [
+      `Imported ${result.imported.length} of ${total} files. ${result.failed.length} skipped.`,
+      rebindNote
+    ]
+      .filter(Boolean)
+      .join(' ')
   };
 };
