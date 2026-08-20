@@ -18,7 +18,6 @@ import {
   RosterUnitGrid
 } from '@/components/shared/roster';
 import { getRosterFactionName } from '@depot/core/utils/roster';
-import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 
 const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
@@ -48,9 +47,7 @@ const RosterEdit: FC = () => {
   const factionName = getRosterFactionName(roster);
 
   const subtitle =
-    factionName && roster.detachment
-      ? `${factionName} • ${formatDetachmentOptionLabel(roster.detachment)}`
-      : factionName;
+    factionName && roster.detachment ? `${factionName} • ${roster.detachment.name}` : factionName;
 
   const handleViewRoster = () => {
     navigate(`/rosters/${roster.id}`);

@@ -128,7 +128,7 @@ const RosterDetailsContent: FC = () => {
   };
 
   const subtitle = roster.detachment
-    ? `${roster.faction?.name ?? ''} • ${formatDetachmentOptionLabel(roster.detachment)}`.trim()
+    ? `${roster.faction?.name ?? ''} • ${roster.detachment.name}`.trim()
     : (roster.faction?.name ?? '');
 
   const saveDisabled =

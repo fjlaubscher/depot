@@ -11,7 +11,6 @@ import AppLayout from '@/components/layout';
 import { Loader } from '@/components/ui';
 import { RosterHeader } from '@/components/shared';
 import AddUnitsView from '@/components/shared/add-units-view';
-import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -29,7 +28,7 @@ const AddRosterUnitsView: FC = () => {
   const factionName = roster.faction?.name;
   const subtitle =
     factionName && roster.detachment
-      ? `${factionName} • ${formatDetachmentOptionLabel(roster.detachment)}`
+      ? `${factionName} • ${roster.detachment.name}`
       : factionName || roster.factionSlug;
 
   const handleAddSelectedUnits = (selectedUnits: SelectedUnit[]) => {
