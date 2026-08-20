@@ -229,11 +229,6 @@ const CollectionNewRoster: React.FC = () => {
 
         <PageHeader title={`Build roster from ${labels.singular}`} subtitle={subtitle} />
 
-        <Alert variant="info" title="Prefill a new roster">
-          Select units from your {labels.singular} to prefill a roster. Use the summary drawer to
-          review points before creating the roster.
-        </Alert>
-
         {collection.items.length === 0 ? (
           <RosterEmptyState
             title={`No units in this ${labels.singular}`}

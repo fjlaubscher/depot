@@ -64,7 +64,6 @@ const AddRosterUnitsView: FC = () => {
       title={roster.name}
       subtitle={subtitle}
       headerStats={<RosterHeader roster={roster} />}
-      contextLabel="roster"
       onConfirm={handleAddSelectedUnits}
     />
   );

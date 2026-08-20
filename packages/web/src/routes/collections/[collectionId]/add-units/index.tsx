@@ -88,7 +88,6 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       ]}
       title={collection.name}
       subtitle={subtitle}
-      contextLabel={labels.singular}
       onConfirm={handleAddSelectedUnits}
     />
   );
