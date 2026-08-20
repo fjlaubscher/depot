@@ -12,7 +12,7 @@ import { isExportedRoster } from '@/types/export';
 import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
 import { ListEmptyState } from '@/components/shared';
 import { RosterCard } from './_components/roster-card';
@@ -22,6 +22,10 @@ const Rosters: React.FC = () => {
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { showToast } = useToast();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
+
+  const hasStaleRosters = Boolean(
+    dataVersion && rosters.some((roster) => roster.dataVersion !== dataVersion)
+  );
 
   const handleCreate = () => {
     navigate('/rosters/create');
@@ -160,6 +164,18 @@ const Rosters: React.FC = () => {
             inputTestId="import-roster-input"
           />
         </div>
+        {hasStaleRosters ? (
+          <Alert
+            variant="info"
+            title="Existing rosters need a refresh"
+            data-testid="stale-rosters-notice"
+          >
+            <p className="text-sm">
+              They were built on 10th edition data. Open a roster and hit Refresh to bring it onto
+              11th.
+            </p>
+          </Alert>
+        ) : null}
         {loading ? (
           <div className="flex justify-center py-8">
             <Loader />

@@ -1,43 +1,31 @@
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
-import classNames from 'classnames';
+import type { LucideIcon } from 'lucide-react';
 
 interface SectionHeaderProps {
+  icon?: LucideIcon;
   title: string;
   count?: number;
   viewAllTo?: string;
   viewAllLabel?: string;
   viewAllTestId?: string;
-  /** Use on dark hero backgrounds. */
-  tone?: 'default' | 'on-media';
 }
 
 const SectionHeader: FC<SectionHeaderProps> = ({
+  icon: Icon,
   title,
   count,
   viewAllTo,
   viewAllLabel = 'View all',
-  viewAllTestId,
-  tone = 'default'
+  viewAllTestId
 }) => {
-  const onMedia = tone === 'on-media';
-
   return (
     <div className="flex items-center justify-between gap-2">
-      <div className="flex min-w-0 items-baseline gap-2">
-        <h2
-          className={classNames(
-            'text-lg font-semibold',
-            onMedia ? 'text-white' : 'text-foreground'
-          )}
-        >
-          {title}
-        </h2>
+      <div className="flex min-w-0 items-center gap-2">
+        {Icon ? <Icon size={18} className="shrink-0 text-muted" aria-hidden /> : null}
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
         {typeof count === 'number' ? (
-          <span
-            className={classNames('text-sm tabular-nums', onMedia ? 'text-white/70' : 'text-muted')}
-            data-testid="section-count"
-          >
+          <span className="text-sm tabular-nums text-muted" data-testid="section-count">
             {count}
           </span>
         ) : null}
@@ -45,10 +33,7 @@ const SectionHeader: FC<SectionHeaderProps> = ({
       {viewAllTo ? (
         <Link
           to={viewAllTo}
-          className={classNames(
-            'text-sm font-medium hover:underline',
-            onMedia ? 'text-primary-200 hover:text-white' : 'text-primary-600 dark:text-primary-400'
-          )}
+          className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
           data-testid={viewAllTestId}
         >
           {viewAllLabel}

@@ -7,7 +7,7 @@ import { useCollections } from '@/hooks/use-collections';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, ErrorState } from '@/components/ui';
+import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
 import { ListEmptyState } from '@/components/shared';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
@@ -27,6 +27,10 @@ const CollectionsPage: React.FC = () => {
   const { showToast } = useToast();
   const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections]);
   const hasSnapshotData = snapshot.items.length > 0;
+
+  const hasStaleCollections = Boolean(
+    dataVersion && collections.some((collection) => collection.dataVersion !== dataVersion)
+  );
 
   const handleCreate = () => navigate('/collections/create');
 
@@ -125,6 +129,18 @@ const CollectionsPage: React.FC = () => {
           />
         </div>
 
+        {hasStaleCollections ? (
+          <Alert
+            variant="info"
+            title="Existing collections need a refresh"
+            data-testid="stale-collections-notice"
+          >
+            <p className="text-sm">
+              They were built on 10th edition data. Open a collection and hit Refresh to bring it
+              onto 11th.
+            </p>
+          </Alert>
+        ) : null}
         {loading ? (
           <div className="flex justify-center py-8">
             <Loader />

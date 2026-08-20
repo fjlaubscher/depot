@@ -3,23 +3,19 @@ import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
 import { Card, Tag } from '@/components/ui';
-import { getRosterDetachments } from '@depot/core/utils/roster';
 
 interface RosterPreviewCardProps {
   roster: depot.Roster;
 }
 
 const RosterPreviewCard: FC<RosterPreviewCardProps> = ({ roster }) => {
-  const unitCount = roster.units.length;
-  const unitLabel = unitCount === 1 ? 'unit' : 'units';
-
   return (
     <Link
       to={`/rosters/${roster.id}`}
       className="group/link block h-full text-decoration-none"
       data-testid="roster-preview-card"
     >
-      <Card interactive className="flex h-full flex-col gap-2">
+      <Card interactive className="h-full">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <Card.Title
@@ -34,21 +30,6 @@ const RosterPreviewCard: FC<RosterPreviewCardProps> = ({ roster }) => {
           </div>
           <Tag variant="primary" size="sm" className="shrink-0 whitespace-nowrap">
             {roster.points.current}/{roster.points.max}
-          </Tag>
-        </div>
-        <div className="mt-auto flex flex-wrap items-center gap-1">
-          {getRosterDetachments(roster).map((detachment) => (
-            <Tag
-              key={detachment.id}
-              size="sm"
-              variant="secondary"
-              className="uppercase tracking-wide"
-            >
-              {detachment.name}
-            </Tag>
-          ))}
-          <Tag size="sm" variant="default">
-            {unitCount} {unitLabel}
           </Tag>
         </div>
       </Card>

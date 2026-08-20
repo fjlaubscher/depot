@@ -84,32 +84,27 @@ describe('Home', () => {
     mockFactionsContext.dataVersion = '2024.10.01';
   });
 
-  it('renders dashboard sections', () => {
+  it('renders hero, get-started and footer when there is no local data', () => {
     render(
       <TestWrapper>
         <Home />
       </TestWrapper>
     );
 
-    expect(screen.queryByText('Your desk')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('edition-notice')).not.toBeInTheDocument();
-    expect(screen.getByTestId('bookmarks-section')).toBeInTheDocument();
-    expect(screen.getByTestId('rosters-section')).toBeInTheDocument();
-    expect(screen.getByTestId('collections-section')).toBeInTheDocument();
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('11th edition is here');
+    expect(screen.getByTestId('get-started')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Create roster/ })).toHaveAttribute(
+      'href',
+      '/rosters/create'
+    );
+    expect(screen.getByRole('link', { name: /Create collection/ })).toHaveAttribute(
+      'href',
+      '/collections/create'
+    );
+    expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
     expect(screen.getByText(/Last updated: 2024.10.01/i)).toBeInTheDocument();
-  });
-
-  it('shows empty states when there is no local data', () => {
-    render(
-      <TestWrapper>
-        <Home />
-      </TestWrapper>
-    );
-
-    expect(screen.getByTestId('empty-bookmarks-home')).toBeInTheDocument();
-    expect(screen.getByText('Your bookmarks will show up here')).toBeInTheDocument();
-    expect(screen.getByTestId('empty-rosters-home')).toBeInTheDocument();
-    expect(screen.getByTestId('empty-collections-home')).toBeInTheDocument();
   });
 
   it('previews bookmarks and recent rosters when present', () => {
@@ -142,6 +137,7 @@ describe('Home', () => {
       </TestWrapper>
     );
 
+    expect(screen.queryByTestId('get-started')).not.toBeInTheDocument();
     expect(screen.getByTestId('bookmark-previews')).toBeInTheDocument();
     expect(screen.getByTestId('bookmark-card')).toHaveTextContent('Space Marines');
     expect(screen.getByText('Bookmarks')).toBeInTheDocument();
@@ -150,5 +146,6 @@ describe('Home', () => {
     expect(rosterCards).toHaveLength(2);
     expect(rosterCards[0]).toHaveTextContent('Newest List');
     expect(screen.getByTestId('view-all-rosters')).toBeInTheDocument();
+    expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
   });
 });
