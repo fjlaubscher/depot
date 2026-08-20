@@ -1,11 +1,15 @@
 import type { FC } from 'react';
 import type { depot } from '@depot/core';
+import { getRosterDetachments } from '@depot/core/utils/roster';
+import { getBattleSize, getRosterDpSpent } from '@depot/core/utils/roster-legality';
 
 interface RosterHeaderProps {
   roster: {
     points: { current: number; max?: number };
     enhancements?: { enhancement: depot.Enhancement; unitId: string }[];
+    detachments?: depot.Detachment[];
     detachment?: depot.Detachment;
+    units?: depot.RosterUnit[];
   };
   showEnhancements?: boolean;
   showMax?: boolean;
@@ -29,6 +33,12 @@ const RosterHeader: FC<RosterHeaderProps> = ({
     ? `${roster.points.current}/${roster.points.max}`
     : roster.points.current;
 
+  const detachments = getRosterDetachments(roster);
+  const dpSpent = getRosterDpSpent({ ...roster, units: roster.units ?? [] });
+  const dpCap = hasCap ? getBattleSize(roster.points.max ?? 0).dp : null;
+  const dpColor =
+    dpCap !== null && detachments.length > 1 && dpSpent > dpCap ? 'text-danger' : 'text-foreground';
+
   return (
     <div className="flex flex-wrap items-center gap-4 text-sm">
       <div className="flex items-center gap-2">
@@ -37,17 +47,11 @@ const RosterHeader: FC<RosterHeaderProps> = ({
           {pointsDisplay}
         </span>
       </div>
-      {roster.detachment?.dp ? (
+      {detachments.length > 0 ? (
         <div className="flex items-center gap-2" data-testid="detachment-dp">
           <span className="text-subtle">DP</span>
-          <span className="font-semibold text-foreground">{roster.detachment.dp}</span>
-        </div>
-      ) : null}
-      {roster.detachment?.forceDisposition ? (
-        <div className="flex items-center gap-2" data-testid="detachment-disposition">
-          <span className="text-subtle">Disposition</span>
-          <span className="font-semibold text-foreground">
-            {roster.detachment.forceDisposition}
+          <span className={`font-semibold ${dpColor}`}>
+            {dpCap !== null ? `${dpSpent}/${dpCap}` : dpSpent}
           </span>
         </div>
       ) : null}

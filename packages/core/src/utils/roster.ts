@@ -1,5 +1,18 @@
-import type { Roster } from '../types/depot.js';
+import type { Detachment, Roster } from '../types/depot.js';
 import { toTitleCase } from './datasheets.js';
+
+/** Selected detachments, falling back to the legacy single `detachment` field. */
+export const getRosterDetachments = (
+  roster: Partial<Pick<Roster, 'detachments' | 'detachment'>>
+): Detachment[] =>
+  roster.detachments?.length ? roster.detachments : roster.detachment ? [roster.detachment] : [];
+
+export const getRosterDetachmentNames = (
+  roster: Partial<Pick<Roster, 'detachments' | 'detachment'>>
+): string =>
+  getRosterDetachments(roster)
+    .map((detachment) => detachment.name)
+    .join(', ');
 
 // Available in Node >= 18 and all modern browsers; not declared by the ES2022 TS lib.
 declare const crypto: { randomUUID: () => string };
@@ -76,14 +89,18 @@ export const generateRosterShareText = (
   if (factionName) {
     lines.push(`*Faction:* ${factionName}`);
   }
-  if (roster.detachment?.name) {
-    lines.push(`*Detachment:* ${roster.detachment.name}`);
-  }
-  if (roster.detachment?.dp) {
-    lines.push(`*DP:* ${roster.detachment.dp}`);
-  }
-  if (roster.detachment?.forceDisposition) {
-    lines.push(`*Force Disposition:* ${roster.detachment.forceDisposition}`);
+  const detachments = getRosterDetachments(roster);
+  if (detachments.length > 0) {
+    const label = detachments.length === 1 ? 'Detachment' : 'Detachments';
+    lines.push(
+      `*${label}:* ${detachments
+        .map((detachment) =>
+          [detachment.name, detachment.dp && `${detachment.dp} DP`, detachment.forceDisposition]
+            .filter(Boolean)
+            .join(' · ')
+        )
+        .join('; ')}`
+    );
   }
   lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
   lines.push('');

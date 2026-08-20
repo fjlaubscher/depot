@@ -11,6 +11,7 @@ import AppLayout from '@/components/layout';
 import { Loader } from '@/components/ui';
 import { RosterHeader } from '@/components/shared';
 import AddUnitsView from '@/components/shared/add-units-view';
+import { getRosterDetachmentNames } from '@depot/core/utils/roster';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -26,9 +27,10 @@ const AddRosterUnitsView: FC = () => {
   }
 
   const factionName = roster.faction?.name;
+  const detachmentNames = getRosterDetachmentNames(roster);
   const subtitle =
-    factionName && roster.detachment
-      ? `${factionName} • ${roster.detachment.name}`
+    factionName && detachmentNames
+      ? `${factionName} • ${detachmentNames}`
       : factionName || roster.factionSlug;
 
   const handleAddSelectedUnits = (selectedUnits: SelectedUnit[]) => {

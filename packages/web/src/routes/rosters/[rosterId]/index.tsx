@@ -17,7 +17,12 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
 import { generateRosterShareText } from '@/utils/roster';
-import { getRosterFactionName } from '@depot/core/utils/roster';
+import {
+  getRosterDetachmentNames,
+  getRosterDetachments,
+  getRosterFactionName
+} from '@depot/core/utils/roster';
+import RosterIssues from '@/routes/rosters/_components/roster-issues';
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
@@ -152,31 +157,35 @@ const RosterView: FC = () => {
     return <Loader />;
   }
 
+  const detachments = getRosterDetachments(roster);
+  const detachmentNames = getRosterDetachmentNames(roster);
   const subtitle =
-    factionName && roster.detachment ? `${factionName} • ${roster.detachment.name}` : factionName;
+    factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
 
   const tabLabels: string[] = ['Units'];
   const tabPanels: ReactNode[] = [<UnitsTab key="units" units={roster.units} />];
 
-  if (roster.detachment) {
-    tabLabels.push('Detachment');
+  detachments.forEach((detachment) => {
+    tabLabels.push(detachments.length === 1 ? 'Detachment' : detachment.name);
     tabPanels.push(
       <DetachmentTab
-        key="detachment"
-        detachment={roster.detachment}
+        key={`detachment-${detachment.id}`}
+        detachment={detachment}
         factionSlug={roster.factionSlug}
-        rosterEnhancements={roster.enhancements}
+        rosterEnhancements={roster.enhancements.filter((entry) =>
+          detachment.enhancements.some((candidate) => candidate.id === entry.enhancement.id)
+        )}
         units={roster.units}
       />
     );
-  }
+  });
 
   tabLabels.push('Stratagems');
   tabPanels.push(
     <StratagemsTab
       key="stratagems"
       coreStratagems={coreStratagems}
-      detachmentStratagems={roster.detachment?.stratagems ?? []}
+      detachmentStratagems={detachments.flatMap((detachment) => detachment.stratagems)}
       units={roster.units}
       loadingCore={loadingCoreStratagems}
       coreError={coreStratagemsError}
@@ -257,6 +266,8 @@ const RosterView: FC = () => {
           </div>
         </Alert>
       ) : null}
+
+      <RosterIssues roster={roster} />
 
       {/* Units, Detachment & Stratagems */}
       <Tabs tabs={tabLabels} data-testid="roster-tabs">

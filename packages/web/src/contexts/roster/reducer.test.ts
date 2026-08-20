@@ -44,10 +44,12 @@ describe('rosterReducer', () => {
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
         dataVersion: null,
-        detachment: createMockDetachment({
-          slug: 'test-detachment',
-          name: 'Test Detachment'
-        }),
+        detachments: [
+          createMockDetachment({
+            slug: 'test-detachment',
+            name: 'Test Detachment'
+          })
+        ],
         points: {
           current: 500,
           max: 2000
@@ -151,7 +153,7 @@ describe('rosterReducer', () => {
             name: 'Chaos Space Marines'
           },
           maxPoints: 1500,
-          detachment: mockDetachment
+          detachments: [mockDetachment]
         }
       };
 
@@ -169,7 +171,7 @@ describe('rosterReducer', () => {
           slug: 'chaos-space-marines',
           name: 'Chaos Space Marines'
         },
-        detachment: mockDetachment,
+        detachments: [mockDetachment],
         points: {
           current: 0,
           max: 1500
@@ -193,13 +195,13 @@ describe('rosterReducer', () => {
           factionSlug: 'space-marines',
           faction: mockFactionIndex,
           maxPoints: 2000,
-          detachment: mockDetachment
+          detachments: [mockDetachment]
         }
       };
 
       const result = rosterReducer(initialState, action);
 
-      expect(result.detachment).toEqual(mockDetachment);
+      expect(result.detachments).toEqual([mockDetachment]);
     });
   });
 
@@ -238,7 +240,7 @@ describe('rosterReducer', () => {
         type: 'UPDATE_DETAILS',
         payload: {
           name: 'Updated Roster',
-          detachment: updatedDetachment,
+          detachments: [updatedDetachment],
           maxPoints: 1500
         }
       };
@@ -246,13 +248,13 @@ describe('rosterReducer', () => {
       const result = rosterReducer(startingState, action);
 
       expect(result.name).toBe('Updated Roster');
-      expect(result.detachment).toEqual(updatedDetachment);
+      expect(result.detachments).toEqual([updatedDetachment]);
       expect(result.points.max).toBe(1500);
       expect(result.points.current).toBe(80);
     });
   });
 
-  describe('SET_DETACHMENT', () => {
+  describe('SET_DETACHMENTS', () => {
     it('should update the detachment', () => {
       const currentState: depot.Roster = {
         ...initialState,
@@ -279,13 +281,13 @@ describe('rosterReducer', () => {
       });
 
       const action: RosterAction = {
-        type: 'SET_DETACHMENT',
-        payload: mockDetachment
+        type: 'SET_DETACHMENTS',
+        payload: [mockDetachment]
       };
 
       const result = rosterReducer(currentState, action);
 
-      expect(result.detachment).toEqual(mockDetachment);
+      expect(result.detachments).toEqual([mockDetachment]);
       expect(result.id).toBe('test-id'); // Other properties unchanged
       expect(result.name).toBe('Test Roster');
       expect(result).not.toBe(currentState); // Ensure immutability
@@ -298,10 +300,12 @@ describe('rosterReducer', () => {
         factionId: 'SM',
         factionSlug: 'space-marines',
         faction: mockFactionIndex,
-        detachment: createMockDetachment({
-          slug: 'original-detachment',
-          name: 'Original Detachment'
-        })
+        detachments: [
+          createMockDetachment({
+            slug: 'original-detachment',
+            name: 'Original Detachment'
+          })
+        ]
       };
 
       const newDetachment = createMockDetachment({
@@ -310,14 +314,14 @@ describe('rosterReducer', () => {
       });
 
       const action: RosterAction = {
-        type: 'SET_DETACHMENT',
-        payload: newDetachment
+        type: 'SET_DETACHMENTS',
+        payload: [newDetachment]
       };
 
       const result = rosterReducer(currentState, action);
 
-      expect(currentState.detachment.name).toBe('Original Detachment');
-      expect(result.detachment.name).toBe('New Detachment');
+      expect(currentState.detachments[0].name).toBe('Original Detachment');
+      expect(result.detachments[0].name).toBe('New Detachment');
     });
   });
 
@@ -395,6 +399,48 @@ describe('rosterReducer', () => {
     });
   });
 
+  describe('cost brackets', () => {
+    it('moves repeat units onto the matching cost bracket as units are added and removed', () => {
+      const datasheet = createMockDatasheet({
+        id: 'talos',
+        modelCosts: [
+          {
+            datasheetId: 'talos',
+            line: '2',
+            description: '1 model',
+            cost: '75',
+            section: 'YOUR 1ST TO 2ND UNITS COST'
+          },
+          {
+            datasheetId: 'talos',
+            line: '5',
+            description: '1 model',
+            cost: '85',
+            section: 'YOUR 3RD + UNIT COSTS'
+          }
+        ]
+      });
+      const add: RosterAction = {
+        type: 'ADD_UNIT',
+        payload: { datasheet, modelCost: datasheet.modelCosts[0] }
+      };
+
+      let state = rosterReducer(createMockRoster({ units: [], enhancements: [] }), add);
+      state = rosterReducer(state, add);
+      state = rosterReducer(state, add);
+
+      expect(state.units.map((unit) => unit.modelCost.cost)).toEqual(['75', '75', '85']);
+      expect(state.points.current).toBe(235);
+
+      state = rosterReducer(state, {
+        type: 'REMOVE_UNIT',
+        payload: { rosterUnitId: state.units[0].id }
+      });
+      expect(state.units.map((unit) => unit.modelCost.cost)).toEqual(['75', '75']);
+      expect(state.points.current).toBe(150);
+    });
+  });
+
   describe('immutability', () => {
     it('should not mutate the original state for any action', () => {
       const originalState = { ...initialState };
@@ -410,27 +456,31 @@ describe('rosterReducer', () => {
             factionSlug: 'space-marines',
             faction: mockFactionIndex,
             maxPoints: 2000,
-            detachment: {
-              slug: 'immutability-detachment',
-              name: 'Test',
-              id: 'immutability-detachment',
-              legend: '',
-              type: '',
-              dp: '',
-              forceDisposition: '',
-              chapterDp: [],
-              abilities: [],
-              enhancements: [],
-              stratagems: []
-            }
+            detachments: [
+              {
+                slug: 'immutability-detachment',
+                name: 'Test',
+                id: 'immutability-detachment',
+                legend: '',
+                type: '',
+                dp: '',
+                forceDisposition: '',
+                chapterDp: [],
+                abilities: [],
+                enhancements: [],
+                stratagems: []
+              }
+            ]
           }
         },
         {
-          type: 'SET_DETACHMENT',
-          payload: createMockDetachment({
-            slug: 'set-detachment',
-            name: 'New Det'
-          })
+          type: 'SET_DETACHMENTS',
+          payload: [
+            createMockDetachment({
+              slug: 'set-detachment',
+              name: 'New Det'
+            })
+          ]
         },
         {
           type: 'SET_WARLORD',

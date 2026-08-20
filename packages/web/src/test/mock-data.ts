@@ -447,7 +447,7 @@ export const mockRoster: depot.Roster = {
   factionId: 'SM',
   factionSlug: 'space-marines',
   faction: mockFactionIndex,
-  detachment: mockDetachment,
+  detachments: [mockDetachment],
   points: {
     current: 80,
     max: 2000

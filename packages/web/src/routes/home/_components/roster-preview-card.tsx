@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { depot } from '@depot/core';
 
 import { Card, Tag } from '@/components/ui';
+import { getRosterDetachments } from '@depot/core/utils/roster';
 
 interface RosterPreviewCardProps {
   roster: depot.Roster;
@@ -36,11 +37,16 @@ const RosterPreviewCard: FC<RosterPreviewCardProps> = ({ roster }) => {
           </Tag>
         </div>
         <div className="mt-auto flex flex-wrap items-center gap-1">
-          {roster.detachment?.name ? (
-            <Tag size="sm" variant="secondary" className="uppercase tracking-wide">
-              {roster.detachment.name}
+          {getRosterDetachments(roster).map((detachment) => (
+            <Tag
+              key={detachment.id}
+              size="sm"
+              variant="secondary"
+              className="uppercase tracking-wide"
+            >
+              {detachment.name}
             </Tag>
-          ) : null}
+          ))}
           <Tag size="sm" variant="default">
             {unitCount} {unitLabel}
           </Tag>

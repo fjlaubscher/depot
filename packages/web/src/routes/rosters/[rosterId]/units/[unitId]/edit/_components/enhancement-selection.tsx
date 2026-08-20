@@ -4,41 +4,32 @@ import { ToggleSwitch } from '@/components/ui';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface EnhancementSelectionProps {
-  unit: depot.RosterUnit;
-  roster: depot.Roster;
+  enhancements: depot.Enhancement[];
   selectedEnhancements: string[];
   onEnhancementChange: (enhancementIds: string[]) => void;
 }
 
 const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
-  unit: _unit,
-  roster,
+  enhancements: availableEnhancements,
   selectedEnhancements,
   onEnhancementChange
 }) => {
   const { settings } = useSettingsContext();
-  const availableEnhancements = roster.detachment?.enhancements || [];
   const showFluff = settings.showFluff ?? true;
 
   const isEnhancementSelected = (enhancementId: string): boolean => {
     return selectedEnhancements.includes(enhancementId);
   };
 
+  // Core rules 25.04: no unit can have more than one enhancement, so selecting replaces.
   const toggleEnhancement = (enhancementId: string): void => {
-    if (isEnhancementSelected(enhancementId)) {
-      // Remove enhancement
-      onEnhancementChange(selectedEnhancements.filter((id) => id !== enhancementId));
-    } else {
-      // Add enhancement (typically only one enhancement per character)
-      // For now, we'll allow multiple but could add business logic to limit to one
-      onEnhancementChange([...selectedEnhancements, enhancementId]);
-    }
+    onEnhancementChange(isEnhancementSelected(enhancementId) ? [] : [enhancementId]);
   };
 
   if (availableEnhancements.length === 0) {
     return (
       <div className="text-center py-8" data-testid="no-enhancements-available">
-        <p className="text-subtle">No enhancements available for this detachment.</p>
+        <p className="text-subtle">No enhancements available for this unit.</p>
       </div>
     );
   }
@@ -51,9 +42,7 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
 
   return (
     <div className="flex flex-col gap-4" data-testid="enhancement-selection">
-      <div className="text-sm text-muted">
-        Select enhancements available to this character from your detachment.
-      </div>
+      <div className="text-sm text-muted">Select one enhancement from your detachments.</div>
 
       <div className="flex flex-col gap-3">
         {availableEnhancements.map((enhancement) => (
@@ -70,6 +59,11 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
                 <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-muted">
                   {formatCost(enhancement.cost)}
                 </span>
+                {enhancement.upgrade ? (
+                  <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium surface-info text-info-strong">
+                    Upgrade
+                  </span>
+                ) : null}
               </div>
 
               {enhancement.legend && showFluff && (

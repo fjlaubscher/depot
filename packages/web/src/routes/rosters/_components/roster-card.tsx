@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { depot } from '@depot/core';
 import { Trash2, Pencil, Copy } from 'lucide-react';
 import { Card, ActionGroup, Tag } from '@/components/ui';
+import { getRosterDetachments } from '@depot/core/utils/roster';
 
 interface RosterCardProps {
   roster: depot.Roster;
@@ -77,11 +78,18 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
         </Tag>
       </Card.Header>
 
-      {roster.detachment?.name ? (
+      {getRosterDetachments(roster).length > 0 ? (
         <Card.Content className="flex flex-wrap items-center gap-2 text-xs text-subtle">
-          <Tag size="sm" variant="secondary" className="uppercase tracking-wide">
-            {roster.detachment.name}
-          </Tag>
+          {getRosterDetachments(roster).map((detachment) => (
+            <Tag
+              key={detachment.id}
+              size="sm"
+              variant="secondary"
+              className="uppercase tracking-wide"
+            >
+              {detachment.name}
+            </Tag>
+          ))}
         </Card.Content>
       ) : null}
 

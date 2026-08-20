@@ -33,13 +33,14 @@ const hasRosterShape = (value: unknown): value is depot.Roster => {
   if (!isObject(value)) return false;
   const points = (value as UnknownRecord).points;
   const detachment = (value as UnknownRecord).detachment;
+  const detachments = (value as UnknownRecord).detachments;
   return (
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.factionId === 'string' &&
     Array.isArray(value.units) &&
     Array.isArray(value.enhancements) &&
-    isObject(detachment) &&
+    (Array.isArray(detachments) || isObject(detachment)) &&
     isObject(points) &&
     typeof points.current === 'number' &&
     typeof points.max === 'number'

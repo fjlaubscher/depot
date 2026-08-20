@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockFactionIndexes, mockFaction } from '@/test/mock-data';
@@ -139,6 +139,20 @@ describe('CreateRoster', () => {
     const maxPointsSelect = screen.getByTestId('max-points-field-select') as HTMLSelectElement;
     expect(maxPointsSelect.value).toBe('strike-force');
     expect(screen.queryByTestId('max-points-input')).not.toBeInTheDocument();
+  });
+
+  it('lets you pick multiple detachments and tracks DP against the battle size', () => {
+    render(<CreateRoster />, { wrapper: TestWrapper });
+
+    fireEvent.change(screen.getByTestId('faction-field-select'), {
+      target: { value: mockFaction.slug }
+    });
+
+    expect(screen.getByTestId('detachment-field')).toBeInTheDocument();
+    expect(screen.getByTestId('detachment-dp-total')).toHaveTextContent('0 / 3 DP');
+
+    fireEvent.click(screen.getByTestId(`detachment-toggle-${mockFaction.detachments[0].slug}`));
+    expect(screen.getByTestId('detachment-dp-total')).toHaveTextContent('2 / 3 DP');
   });
 
   it('handles empty faction list gracefully', () => {

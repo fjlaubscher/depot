@@ -13,19 +13,21 @@ const baseRoster: depot.Roster = {
   name: 'Test',
   factionId: 'f1',
   factionSlug: 'f1',
-  detachment: {
-    id: 'det',
-    slug: 'det',
-    name: 'Det',
-    legend: '',
-    type: '',
-    dp: '',
-    forceDisposition: '',
-    chapterDp: [],
-    abilities: [],
-    enhancements: [],
-    stratagems: []
-  },
+  detachments: [
+    {
+      id: 'det',
+      slug: 'det',
+      name: 'Det',
+      legend: '',
+      type: '',
+      dp: '',
+      forceDisposition: '',
+      chapterDp: [],
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    }
+  ],
   points: { current: 0, max: 2000 },
   warlordUnitId: null,
   units: [],

@@ -8,7 +8,7 @@ import {
   type RebindCollectionResult,
   type RebindStatus
 } from '@depot/core/utils/rebind';
-import { calculateTotalPoints } from '@depot/core/utils/roster';
+import { calculateTotalPoints, getRosterDetachments } from '@depot/core/utils/roster';
 import { matchDetachment } from '@depot/core/utils/detachments';
 
 type GetDatasheet = (
@@ -115,8 +115,9 @@ export const refreshRosterDataWithReport = async ({
 
   const factionSlug = roster.factionSlug || roster.faction?.slug || roster.factionId;
   const manifest = factionSlug ? await getFactionManifest(factionSlug) : null;
-  const resolvedDetachment =
-    matchDetachment(roster.detachment, manifest?.detachments ?? []) ?? roster.detachment;
+  const resolvedDetachments = getRosterDetachments(roster).map(
+    (detachment) => matchDetachment(detachment, manifest?.detachments ?? []) ?? detachment
+  );
 
   const manifestCache = new Map<string, depot.FactionManifest | null>();
   if (factionSlug && manifest) {
@@ -139,10 +140,11 @@ export const refreshRosterDataWithReport = async ({
     })
   );
 
+  const { detachment: _legacyDetachment, ...rest } = roster;
   const updatedRoster: depot.Roster = {
-    ...roster,
+    ...rest,
     dataVersion: currentDataVersion,
-    detachment: resolvedDetachment,
+    detachments: resolvedDetachments,
     units: updatedUnits
   };
 

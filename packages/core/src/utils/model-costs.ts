@@ -30,6 +30,20 @@ export const formatCostSection = (section: string): string => {
   return /^units?$/.test(cleaned) ? '' : cleaned;
 };
 
+/**
+ * Ordinal range of same-datasheet units a cost bracket applies to:
+ * `YOUR 1ST TO 2ND UNITS COST` → [1, 2], `YOUR 3RD + UNIT COSTS` → [3, Infinity],
+ * `YOUR 1ST UNIT COSTS` → [1, 1]. Generic / unparseable headers cover every unit.
+ */
+export const getCostBracketRange = (section?: string): [number, number] => {
+  const cleaned = stripTags(section ?? '');
+  const ordinals = cleaned.match(/\d+/g)?.map(Number) ?? [];
+  if (ordinals.length === 0) {
+    return [1, Infinity];
+  }
+  return [ordinals[0], cleaned.includes('+') ? Infinity : ordinals[ordinals.length - 1]];
+};
+
 export const formatModelCostLabel = (
   cost: Pick<ModelCost, 'description' | 'cost' | 'section'>,
   fallbackName?: string

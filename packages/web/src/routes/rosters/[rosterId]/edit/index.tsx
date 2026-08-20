@@ -17,7 +17,8 @@ import {
   RosterEmptyState,
   RosterUnitGrid
 } from '@/components/shared/roster';
-import { getRosterFactionName } from '@depot/core/utils/roster';
+import { getRosterDetachmentNames, getRosterFactionName } from '@depot/core/utils/roster';
+import RosterIssues from '@/routes/rosters/_components/roster-issues';
 
 const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
@@ -46,8 +47,9 @@ const RosterEdit: FC = () => {
 
   const factionName = getRosterFactionName(roster);
 
+  const detachmentNames = getRosterDetachmentNames(roster);
   const subtitle =
-    factionName && roster.detachment ? `${factionName} • ${roster.detachment.name}` : factionName;
+    factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
 
   const handleViewRoster = () => {
     navigate(`/rosters/${roster.id}`);
@@ -108,6 +110,8 @@ const RosterEdit: FC = () => {
           </Button>
         </div>
       </div>
+
+      <RosterIssues roster={roster} />
 
       {/* Units List */}
       {roster.units.length > 0 ? (

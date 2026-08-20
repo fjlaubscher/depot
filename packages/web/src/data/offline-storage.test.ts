@@ -581,19 +581,21 @@ describe('OfflineStorage', () => {
         detachmentCount: 4
       },
       dataVersion: null,
-      detachment: {
-        id: 'test-detachment',
-        slug: 'test-detachment',
-        name: 'Test Detachment',
-        legend: '',
-        type: '',
-        dp: '',
-        forceDisposition: '',
-        chapterDp: [],
-        abilities: [],
-        enhancements: [],
-        stratagems: []
-      },
+      detachments: [
+        {
+          id: 'test-detachment',
+          slug: 'test-detachment',
+          name: 'Test Detachment',
+          legend: '',
+          type: '',
+          dp: '',
+          forceDisposition: '',
+          chapterDp: [],
+          abilities: [],
+          enhancements: [],
+          stratagems: []
+        }
+      ],
       points: { current: 0, max: 2000 },
       warlordUnitId: null,
       units: [],

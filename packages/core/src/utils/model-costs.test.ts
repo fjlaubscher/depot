@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getCostBracketRange,
   formatCostSection,
   formatModelCostLabel,
   groupModelCostsBySection,
@@ -174,5 +175,21 @@ describe('model cost helpers', () => {
         { cost: '80', description: '1 model' }
       ]).map((entry) => entry.description)
     ).toEqual(['1 model']);
+  });
+});
+
+describe('getCostBracketRange', () => {
+  it('parses repeat-cost headers into ordinal ranges', () => {
+    expect(getCostBracketRange('YOUR 1ST TO 2ND UNITS COST')).toEqual([1, 2]);
+    expect(getCostBracketRange('YOUR 1ST TO 3RD UNITS COST')).toEqual([1, 3]);
+    expect(getCostBracketRange('YOUR 3RD + UNIT COSTS')).toEqual([3, Infinity]);
+    expect(getCostBracketRange('YOUR 1ST UNIT COSTS')).toEqual([1, 1]);
+    expect(getCostBracketRange('YOUR 2ND + UNIT COSTS')).toEqual([2, Infinity]);
+  });
+
+  it('treats generic or missing headers as covering every unit', () => {
+    expect(getCostBracketRange('YOUR UNIT COSTS')).toEqual([1, Infinity]);
+    expect(getCostBracketRange(undefined)).toEqual([1, Infinity]);
+    expect(getCostBracketRange('WARGEAR OPTIONS')).toEqual([1, Infinity]);
   });
 });

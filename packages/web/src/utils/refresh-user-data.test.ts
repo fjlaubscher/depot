@@ -54,19 +54,21 @@ describe('refresh-user-data utilities', () => {
       path: '/data/factions/faction-1/faction.json'
     },
     dataVersion: 'old-version',
-    detachment: {
-      id: 'det-1',
-      slug: 'det-1',
-      name: 'Old Detachment',
-      legend: '',
-      type: '',
-      dp: '',
-      forceDisposition: '',
-      chapterDp: [],
-      abilities: [],
-      enhancements: [],
-      stratagems: []
-    },
+    detachments: [
+      {
+        id: 'det-1',
+        slug: 'det-1',
+        name: 'Old Detachment',
+        legend: '',
+        type: '',
+        dp: '',
+        forceDisposition: '',
+        chapterDp: [],
+        abilities: [],
+        enhancements: [],
+        stratagems: []
+      }
+    ],
     points: { current: 10, max: 2000 },
     warlordUnitId: null,
     units: [
@@ -142,8 +144,8 @@ describe('refresh-user-data utilities', () => {
     });
 
     expect(result.dataVersion).toBe('new-version');
-    expect(result.detachment.name).toBe('New Detachment');
-    expect(result.detachment.dp).toBe('2');
+    expect(result.detachments[0].name).toBe('New Detachment');
+    expect(result.detachments[0].dp).toBe('2');
     expect(result.units[0].datasheet.name).toBe('Unit One Updated');
     expect(result.units[0].datasheetSlug).toBe('unit-one-new');
     expect(result.points.current).toBe(10);

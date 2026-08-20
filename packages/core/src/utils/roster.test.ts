@@ -99,19 +99,21 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
   factionId: overrides.factionId ?? 'test',
   factionSlug: overrides.factionSlug ?? 'test',
   faction: overrides.faction ?? undefined,
-  detachment: overrides.detachment ?? {
-    id: 'det-1',
-    slug: 'gladius',
-    name: 'Gladius Task Force',
-    legend: '',
-    type: '',
-    dp: '2',
-    forceDisposition: 'Take and Hold',
-    chapterDp: [],
-    abilities: [],
-    enhancements: [],
-    stratagems: []
-  },
+  detachments: overrides.detachments ?? [
+    {
+      id: 'det-1',
+      slug: 'gladius',
+      name: 'Gladius Task Force',
+      legend: '',
+      type: '',
+      dp: '2',
+      forceDisposition: 'Take and Hold',
+      chapterDp: [],
+      abilities: [],
+      enhancements: [],
+      stratagems: []
+    }
+  ],
   units: overrides.units ?? [createRosterUnit()],
   enhancements: overrides.enhancements ?? [
     {
@@ -174,9 +176,7 @@ describe('roster utils', () => {
     });
 
     expect(text).toContain('*Faction:* Space Marines');
-    expect(text).toContain('*Detachment:* Gladius Task Force');
-    expect(text).toContain('*DP:* 2');
-    expect(text).toContain('*Force Disposition:* Take and Hold');
+    expect(text).toContain('*Detachment:* Gladius Task Force · 2 DP · Take and Hold');
     expect(text).toContain('- [Warlord] Captain - Captain (80 pts)');
     expect(text).not.toContain('*Leader*');
     expect(text).toContain('Power sword');

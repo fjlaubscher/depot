@@ -260,7 +260,10 @@ export interface Roster {
   factionSlug?: string;
   faction?: Index; // Faction metadata from the index (name, path, counts, etc.)
   dataVersion?: string | null;
-  detachment: Detachment;
+  /** Selected detachments; their combined DP is capped by battle size (core rules 25.03). */
+  detachments: Detachment[];
+  /** @deprecated Pre-11th single-detachment saves. Read via `getRosterDetachments`. */
+  detachment?: Detachment;
   points: {
     current: number;
     max: number;

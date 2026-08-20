@@ -16,6 +16,9 @@ export * as abilities from './utils/abilities.js';
 // Export roster helpers
 export * as roster from './utils/roster.js';
 
+// Export list-legality helpers
+export * as rosterLegality from './utils/roster-legality.js';
+
 // Export collection helpers
 export * as collection from './utils/collection.js';
 
