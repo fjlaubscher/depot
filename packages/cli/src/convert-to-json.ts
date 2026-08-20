@@ -12,7 +12,10 @@ const stripHtml = (input: string) => {
     return input;
   }
 
-  body.querySelectorAll('div.abName,script,style').forEach((element) => element.remove());
+  // abLegend duplicates the separate `legend` column; drop it so fluff isn't rendered twice.
+  body
+    .querySelectorAll('div.abName,p.abLegend,script,style')
+    .forEach((element) => element.remove());
   // Reverse so nested elements unwrap before their parents capture innerHTML.
   body
     .querySelectorAll('a,i')

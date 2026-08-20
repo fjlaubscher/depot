@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 
 interface DrawerProps {
@@ -8,9 +9,11 @@ interface DrawerProps {
   children: ReactNode;
   className?: string;
   overlayClassName?: string;
-  position?: 'left' | 'right';
+  /** `bottom` renders a sheet sliding up from the bottom edge. */
+  position?: 'left' | 'right' | 'bottom';
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
+  'data-testid'?: string;
 }
 
 const transitionDurationMs = 200;
@@ -23,7 +26,8 @@ const Drawer: FC<DrawerProps> = ({
   overlayClassName,
   position = 'right',
   closeOnOverlayClick = true,
-  closeOnEscape = true
+  closeOnEscape = true,
+  'data-testid': testId
 }) => {
   const [isMounted, setIsMounted] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(isOpen);
@@ -53,6 +57,7 @@ const Drawer: FC<DrawerProps> = ({
 
     const handleKeydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        event.preventDefault();
         onClose?.();
       }
     };
@@ -63,13 +68,28 @@ const Drawer: FC<DrawerProps> = ({
     };
   }, [closeOnEscape, isOpen, onClose]);
 
+  // Lock page scroll while the panel is on screen.
+  useEffect(() => {
+    if (!isMounted) {
+      return undefined;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMounted]);
+
   if (!isMounted) {
     return null;
   }
 
+  const isBottom = position === 'bottom';
+
   const containerClasses = classNames('fixed inset-0 z-50 flex', {
     'justify-end': position === 'right',
-    'justify-start': position === 'left'
+    'justify-start': position === 'left',
+    'items-end justify-center': isBottom
   });
 
   const overlayClasses = classNames(
@@ -79,19 +99,22 @@ const Drawer: FC<DrawerProps> = ({
   );
 
   const panelClasses = classNames(
-    'relative z-10 h-full max-h-full w-full max-w-md transform transition-transform duration-200 ease-out pointer-events-auto',
-    position === 'right'
-      ? isVisible
-        ? 'translate-x-0'
-        : 'translate-x-full'
-      : isVisible
-        ? 'translate-x-0'
-        : '-translate-x-full',
+    'relative z-10 transform transition-transform duration-200 ease-out pointer-events-auto',
+    isBottom
+      ? classNames(
+          'flex w-full max-w-2xl max-h-[85vh] flex-col rounded-t-3xl surface-base shadow-xl',
+          isVisible ? 'translate-y-0' : 'translate-y-full'
+        )
+      : classNames('h-full max-h-full w-full max-w-md', {
+          'translate-x-0': isVisible,
+          'translate-x-full': !isVisible && position === 'right',
+          '-translate-x-full': !isVisible && position === 'left'
+        }),
     className
   );
 
-  return (
-    <div className={containerClasses}>
+  return createPortal(
+    <div className={containerClasses} data-testid={testId}>
       <div
         className={overlayClasses}
         role="presentation"
@@ -101,8 +124,16 @@ const Drawer: FC<DrawerProps> = ({
           }
         }}
       />
-      <div className={panelClasses}>{children}</div>
-    </div>
+      <div className={panelClasses}>
+        {isBottom ? (
+          <div className="flex justify-center pt-3" aria-hidden="true">
+            <div className="h-1.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700" />
+          </div>
+        ) : null}
+        {children}
+      </div>
+    </div>,
+    document.body
   );
 };
 

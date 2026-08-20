@@ -17,6 +17,7 @@ describe('convertToJSON', () => {
   it('strips unwanted HTML but preserves allowed elements', () => {
     const htmlCell =
       'Text <div class="abName">Ability Name</div>' +
+      '<p class="ShowFluff abLegend">Fluff legend</p>' +
       ' <span class="kwb">KW</span> ' +
       '<a href="#">anchor</a> ' +
       '<i>italic</i> ' +
@@ -31,6 +32,8 @@ describe('convertToJSON', () => {
 
     // Removed elements
     expect(value).not.toContain('<div');
+    expect(value).not.toContain('abLegend');
+    expect(value).not.toContain('Fluff legend');
     expect(value).not.toContain('<i>');
     expect(value).not.toContain('<a ');
 
