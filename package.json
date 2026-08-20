@@ -6,9 +6,9 @@
     "start": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
     "refresh-data": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start -- --force-download && node scripts/copy-data.mjs",
     "format": "pnpm -r format",
-    "lint": "pnpm -r lint",
+    "lint": "pnpm --filter @depot/core build && pnpm -r lint",
     "clean": "pnpm -r clean",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm --filter @depot/core build && pnpm -r typecheck",
     "test": "pnpm -r test",
     "dev": "pnpm --filter @depot/web dev",
     "dev:wrangler": "pnpm --filter @depot/web build && wrangler pages dev packages/web/dist"
