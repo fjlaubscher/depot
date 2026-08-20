@@ -13,7 +13,7 @@ import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils
 import AppLayout from '@/components/layout';
 import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
-import { ListEmptyState } from '@/components/shared';
+import { RosterEmptyState } from '@/components/shared/roster';
 import { RosterCard } from './_components/roster-card';
 import CreateRosterSheet from './_components/create-roster-sheet';
 
@@ -181,11 +181,10 @@ const Rosters: React.FC = () => {
         ) : error ? (
           <ErrorState title="Failed to load rosters" message={error} />
         ) : rosters.length === 0 ? (
-          <ListEmptyState
+          <RosterEmptyState
             title="No rosters yet"
-            actionLabel="Create roster"
-            onAction={handleCreate}
-            testId="empty-rosters"
+            dataTestId="empty-rosters"
+            action={{ label: 'Create roster', onClick: handleCreate, icon: <Plus size={14} /> }}
           />
         ) : (
           <div

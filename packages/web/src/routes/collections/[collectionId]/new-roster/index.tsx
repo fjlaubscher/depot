@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { ClipboardPlus } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
 import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/components/shared';
-import { Alert, Breadcrumbs, Button, Card, Loader, PageHeader, Tag } from '@/components/ui';
+import { Alert, Breadcrumbs, Loader, PageHeader } from '@/components/ui';
+import { RosterEmptyState } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/components/shared/selection-summary';
@@ -23,6 +24,7 @@ type CollectionDatasheetListItem = depot.Datasheet & {
 
 const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const navigate = useNavigate();
   const { settings } = useSettingsContext();
   const labels = COLLECTION_LABELS;
   const { collection, loading, error } = useCollection(collectionId);
@@ -233,9 +235,15 @@ const CollectionNewRoster: React.FC = () => {
         </Alert>
 
         {collection.items.length === 0 ? (
-          <Card>
-            <p className="text-sm text-subtle">No units in this {labels.singular} yet.</p>
-          </Card>
+          <RosterEmptyState
+            title={`No units in this ${labels.singular}`}
+            dataTestId="empty-collection-state"
+            action={{
+              label: 'Add units',
+              onClick: () => navigate(`/collections/${collection.id}/add-units`),
+              icon: <Plus size={14} />
+            }}
+          />
         ) : (
           <div className="flex flex-col gap-4">
             {collectionDatasheets.length === 0 ? (

@@ -8,7 +8,7 @@ import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/use-toast-context';
 import AppLayout from '@/components/layout';
 import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
-import { ListEmptyState } from '@/components/shared';
+import { RosterEmptyState } from '@/components/shared/roster';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { getCollectionsSnapshotCopy } from '@/utils/collection';
@@ -150,11 +150,10 @@ const CollectionsPage: React.FC = () => {
         ) : error ? (
           <ErrorState title="Failed to load collections" message={error} />
         ) : collections.length === 0 ? (
-          <ListEmptyState
-            title="Nothing here yet"
-            actionLabel="Create"
-            onAction={handleCreate}
-            testId="empty-collections"
+          <RosterEmptyState
+            title="No collections yet"
+            dataTestId="empty-collections"
+            action={{ label: 'Create collection', onClick: handleCreate, icon: <Plus size={14} /> }}
           />
         ) : (
           <div className="flex flex-col gap-4">
