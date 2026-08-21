@@ -37,7 +37,7 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
       data-testid="supplement-tabs"
       className={cx('flex flex-col gap-2', className)}
     >
-      <span className="text-sm font-medium text-secondary">Supplements</span>
+      <span className="text-sm font-medium text-muted">Supplements</span>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {tabs.map((tab) => {
           const isActive = tab.value === activeValue;
@@ -59,17 +59,17 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
               data-testid={`supplement-tab-${tab.value}`}
               data-supplement-key={isNeutral ? undefined : tab.value}
               className={cx(
-                'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
+                'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-sm border px-4 min-h-11 text-sm font-medium transition-colors',
                 isActive ? activeClass : inactiveClass
               )}
             >
               <span>{tab.label}</span>
               <span
                 className={cx(
-                  'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
+                  'inline-flex items-center justify-center font-mono text-xs font-bold',
                   isActive
-                    ? 'bg-white text-primary-600 dark:text-primary-500'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                    ? 'bg-surface-soft text-accent border border-border-strong'
+                    : 'bg-surface-muted text-muted border border-transparent'
                 )}
               >
                 {tab.count}

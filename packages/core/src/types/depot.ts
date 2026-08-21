@@ -187,6 +187,8 @@ export interface Index {
   detachmentCount?: number;
 }
 
+export type Theme = 'system' | 'light' | 'dark';
+
 export interface Settings {
   showForgeWorld?: boolean;
   showLegends?: boolean;
@@ -194,6 +196,7 @@ export interface Settings {
   showFluff?: boolean;
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
+  theme?: Theme;
 }
 
 export interface Detachment {

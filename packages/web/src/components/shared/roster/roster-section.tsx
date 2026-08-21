@@ -17,7 +17,13 @@ const RosterSection: FC<RosterSectionProps> = ({
 }) => {
   return (
     <div className={`flex flex-col gap-3 ${className}`} data-testid={dataTestId}>
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="type-section shrink-0">
+          <span aria-hidden="true">// </span>
+          {title}
+        </h3>
+        <div className="h-px flex-1 bg-border-subtle" />
+      </div>
       {belowContent ? <div className="flex flex-col gap-2">{belowContent}</div> : null}
       <div className="flex flex-col gap-3">{children}</div>
     </div>

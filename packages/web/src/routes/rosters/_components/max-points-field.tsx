@@ -63,7 +63,7 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
         </Field>
       )}
       {error && selectedOption === 'custom' ? (
-        <p className="text-sm text-danger" data-testid="max-points-error">
+        <p className="text-sm text-danger-fg" data-testid="max-points-error">
           {error}
         </p>
       ) : null}

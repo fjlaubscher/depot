@@ -60,8 +60,8 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
               type="button"
               onClick={(event) => handleOpen(event, ability)}
               className={cx(
-                'group inline-flex items-center rounded-full border border-transparent bg-white/80 px-0 py-0 text-left transition-all duration-150 dark:bg-gray-900/40 cursor-pointer',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900'
+                'group inline-flex items-center rounded-sm border border-transparent bg-surface-card px-0 py-0 text-left transition-all duration-150 cursor-pointer',
+                'focus-ring-primary'
               )}
               data-testid={`${sectionTestId}-tag-${ability.id || ability.name}`}
             >

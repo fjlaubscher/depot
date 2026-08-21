@@ -7,7 +7,7 @@ const LoadingSkeleton: React.FC = () => {
     <AppLayout title="Loading Faction">
       <div className="flex flex-col gap-4">
         <PageHeaderSkeleton />
-        <div className="border-b border-subtle">
+        <div className="border-b border-border-subtle">
           <nav className="-mb-px flex gap-4">
             {[0, 1].map((index) => (
               <div key={index} className="py-4 px-1 border-b-2 border-transparent">

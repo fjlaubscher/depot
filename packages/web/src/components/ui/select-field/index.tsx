@@ -35,9 +35,9 @@ const SelectField: FC<SelectFieldProps> = ({
   const selectClasses = cx(
     'appearance-none cursor-pointer',
     'input-base pr-10 text-sm',
-    'disabled:bg-gray-50 disabled:text-gray-500 dark:disabled:bg-gray-800 dark:disabled:text-gray-400 disabled:cursor-not-allowed',
+    'disabled:bg-surface-muted disabled:text-hint disabled:cursor-not-allowed',
     'transition-colors duration-200',
-    error ? 'border-red-500 dark:border-red-400' : '',
+    error ? 'border-danger-fg' : '',
     fullWidth ? 'w-full' : '',
     className
   );
@@ -73,7 +73,7 @@ const SelectField: FC<SelectFieldProps> = ({
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-hint pointer-events-none"
         />
       </div>
-      {error && <p className="text-sm text-danger">{error}</p>}
+      {error && <p className="text-sm text-danger-fg">{error}</p>}
     </div>
   );
 };

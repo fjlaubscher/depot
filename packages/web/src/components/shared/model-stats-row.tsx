@@ -31,7 +31,7 @@ const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {
           >
             <Shield size={16} className="text-subtle" />
             <span className="font-medium">Invulnerable Save</span>{' '}
-            <span className="font-bold text-primary-500">{normalizedInv}</span>
+            <span className="font-bold text-accent-500">{normalizedInv}</span>
           </div>
           {model.invSvDescr ? (
             <span className="text-subtle text-xs" data-testid="model-invulnerable-save-description">

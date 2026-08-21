@@ -23,7 +23,11 @@ const PillTabs = <T extends string>({
   ariaLabel,
   testIdPrefix
 }: PillTabsProps<T>) => (
-  <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label={ariaLabel}>
+  <div
+    className="flex flex-wrap items-center gap-0.5 rounded-sm bg-surface-muted p-0.5"
+    role="tablist"
+    aria-label={ariaLabel}
+  >
     {tabs.map((tab) => {
       const isActive = tab.value === active;
       return (
@@ -33,10 +37,10 @@ const PillTabs = <T extends string>({
           role="tab"
           aria-selected={isActive}
           className={cx(
-            'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
+            'flex items-center gap-2 rounded-sm border px-3 min-h-11 text-sm font-medium transition-colors',
             isActive
-              ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
-              : 'border-subtle text-secondary hover:text-foreground hover:border-border'
+              ? 'bg-surface-soft text-foreground border-border-strong'
+              : 'border-transparent text-muted hover:text-foreground'
           )}
           onClick={() => onChange(tab.value)}
           data-testid={testIdPrefix ? `${testIdPrefix}-${tab.value}` : undefined}
@@ -44,8 +48,8 @@ const PillTabs = <T extends string>({
           <span>{tab.label}</span>
           <span
             className={cx(
-              'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
-              isActive ? 'bg-white text-primary-600 dark:text-primary-500' : 'bg-soft text-muted'
+              'inline-flex items-center justify-center font-mono text-xs font-bold',
+              isActive ? 'text-accent' : 'text-subtle'
             )}
           >
             {tab.count}

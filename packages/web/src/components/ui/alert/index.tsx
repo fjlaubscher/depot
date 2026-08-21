@@ -9,20 +9,20 @@ interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const Alert: FC<AlertProps> = ({ variant = 'info', title, children, className, ...props }) => {
-  const baseClasses = 'flex flex-col gap-2 p-4 rounded-lg border';
+  const baseClasses = 'flex flex-col gap-2 p-4 rounded-sm border';
 
   const variantClasses = {
-    info: 'surface-info border-info text-info-strong',
-    warning: 'surface-warning border-warning text-warning-strong',
-    success: 'surface-success border-success text-success-strong',
-    error: 'surface-danger border-danger text-danger-strong'
+    info: 'bg-info-surface border-info-border text-info-fg',
+    warning: 'bg-warning-surface border-warning-border text-warning-fg',
+    success: 'bg-success-surface border-success-border text-success-fg',
+    error: 'bg-danger-surface border-danger-border text-danger-fg'
   };
 
   const iconClasses = {
-    info: 'text-info',
-    warning: 'text-warning',
-    success: 'text-success',
-    error: 'text-danger'
+    info: 'text-info-fg',
+    warning: 'text-warning-fg',
+    success: 'text-success-fg',
+    error: 'text-danger-fg'
   };
 
   const icons = {

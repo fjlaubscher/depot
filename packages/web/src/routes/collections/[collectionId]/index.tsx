@@ -261,7 +261,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       {isStale ? (
         <Alert variant="warning" title="Collection uses older data">
           <div className="flex flex-col gap-2">
-            <span className="text-sm text-secondary">
+            <span className="text-sm text-muted">
               Refresh to pull the latest Wahapedia data for these units.
             </span>
             <div>

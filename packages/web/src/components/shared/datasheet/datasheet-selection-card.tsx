@@ -69,7 +69,7 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
           </div>
           {selectedModelCost ? (
             <div className="flex items-start gap-3">
-              <Tag variant="primary" size="sm" className="rounded-md py-1">
+              <Tag variant="primary" size="sm" className="rounded-sm py-1">
                 {selectedModelCost.cost} pts
               </Tag>
             </div>

@@ -38,8 +38,8 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
             >
               <div
                 className={cx(
-                  'flex min-w-0 flex-1 flex-col gap-1 rounded-lg',
-                  selected && 'ring-2 ring-primary-500'
+                  'flex min-w-0 flex-1 flex-col gap-1 rounded-sm',
+                  selected && 'ring-2 ring-accent-500'
                 )}
               >
                 <EnhancementCard enhancement={enhancement} />

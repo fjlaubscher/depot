@@ -34,7 +34,7 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, showArrow = fals
           </div>
 
           {showArrow ? (
-            <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full surface-soft text-muted transition-colors duration-200 group-hover/link:surface-accent group-hover/link:text-accent-strong">
+            <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-soft text-muted transition-colors duration-200 group-hover/link:bg-surface-accent group-hover/link:text-accent">
               <ArrowUpRight size={16} />
             </span>
           ) : null}

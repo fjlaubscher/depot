@@ -5,9 +5,17 @@ import { RosterUnitCardCompact, RosterUnitProfilePanel } from '@/components/shar
 
 interface ViewRosterUnitCardProps {
   unit: depot.RosterUnit;
+  isWarlord?: boolean;
+  enhancementName?: string;
+  issues?: string[];
 }
 
-const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
+const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({
+  unit,
+  isWarlord,
+  enhancementName,
+  issues
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const actions = (
@@ -20,6 +28,9 @@ const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
     <RosterUnitCardCompact
       id={`unit-${unit.id}`}
       unit={unit}
+      isWarlord={isWarlord}
+      enhancementName={enhancementName}
+      issues={issues}
       actions={actions}
       onClick={() => setIsExpanded((prev) => !prev)}
       showWargearSummary={!isExpanded}

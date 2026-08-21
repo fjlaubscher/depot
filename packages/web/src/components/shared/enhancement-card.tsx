@@ -9,22 +9,21 @@ interface EnhancementCardProps {
 
 const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
   return (
-    <Card className="p-4 space-y-2 h-full">
+    <Card className="p-4 space-y-2 h-full border-l-2 border-l-success-fg">
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <h3 className="font-semibold text-foreground text-sm leading-tight">
-            {enhancement.name}
-          </h3>
+          <h3 className="font-bold text-foreground text-base leading-tight">{enhancement.name}</h3>
           {enhancement.upgrade ? (
-            <Tag variant="secondary" size="sm">
-              UPGRADE
+            <Tag variant="primary" size="sm" className="type-label uppercase">
+              Upgrade
             </Tag>
           ) : null}
         </div>
         {enhancement.cost ? (
-          <Tag variant="success" size="sm">
-            {enhancement.cost} pts
-          </Tag>
+          <div className="flex flex-shrink-0 items-center gap-1">
+            <span className="type-stat">{enhancement.cost}</span>
+            <span className="type-label">pts</span>
+          </div>
         ) : null}
       </div>
 

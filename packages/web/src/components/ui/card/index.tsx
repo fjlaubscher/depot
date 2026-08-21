@@ -26,7 +26,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
           'surface-card shadow-sm transition-shadow duration-200',
           paddingClasses[padding],
           isInteractive &&
-            'cursor-pointer hover:border-accent hover:shadow-md focus-visible:border-accent focus-visible:shadow-md focus-visible:outline-offset-2 focus-ring-primary',
+            'cursor-pointer hover:border-border-accent hover:shadow-md focus-visible:border-border-accent focus-visible:shadow-md focus-visible:outline-offset-2 focus-ring-primary',
           className
         )}
         onClick={onClick}
@@ -43,7 +43,7 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     <div
       ref={ref}
       className={cx(
-        'flex w-full flex-wrap items-start justify-between gap-2 border-b border-subtle pb-2',
+        'flex w-full flex-wrap items-start justify-between gap-2 border-b border-border-subtle pb-2',
         className
       )}
       {...props}
@@ -71,7 +71,7 @@ interface CardSubtitleProps extends HTMLAttributes<HTMLElement> {
 }
 
 const CardSubtitle = ({ as: Component = 'p', className, ...props }: CardSubtitleProps) => (
-  <Component className={cx('text-sm text-secondary', className)} {...props} />
+  <Component className={cx('text-sm text-muted', className)} {...props} />
 );
 
 CardSubtitle.displayName = 'Card.Subtitle';
@@ -107,7 +107,7 @@ const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     <div
       ref={ref}
       className={cx(
-        'flex w-full items-center justify-start gap-2 border-t border-subtle pt-2',
+        'flex w-full items-center justify-start gap-2 border-t border-border-subtle pt-2',
         className
       )}
       {...props}
@@ -124,12 +124,12 @@ interface CardBadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const badgeVariantClasses: Record<CardBadgeVariant, string> = {
-  accent: 'surface-accent text-accent-strong border-accent',
-  muted: 'surface-soft text-secondary border-subtle',
-  info: 'surface-info-strong text-info-strong border-info',
-  success: 'surface-success-strong text-success-strong border-success',
-  warning: 'surface-warning-strong text-warning-strong border-warning',
-  danger: 'surface-danger-strong text-danger-strong border-danger'
+  accent: 'bg-surface-accent text-accent border-border-accent',
+  muted: 'bg-surface-soft text-muted border-border-subtle',
+  info: 'bg-info-surface text-info-fg border-info-border',
+  success: 'bg-success-surface text-success-fg border-success-border',
+  warning: 'bg-warning-surface text-warning-fg border-warning-border',
+  danger: 'bg-danger-surface text-danger-fg border-danger-border'
 };
 
 const CardBadge = forwardRef<HTMLSpanElement, CardBadgeProps>(
@@ -137,7 +137,7 @@ const CardBadge = forwardRef<HTMLSpanElement, CardBadgeProps>(
     <span
       ref={ref}
       className={cx(
-        'inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium',
+        'inline-flex items-center gap-1 rounded-xs border px-2 py-1 text-xs font-medium',
         badgeVariantClasses[variant],
         className
       )}

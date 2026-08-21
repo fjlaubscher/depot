@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { DEFAULT_SETTINGS, mergeSettingsWithDefaults } from '@/constants/settings';
+import { applyTheme } from '@/utils/theme';
 
 export interface SettingsContextType {
   settings: depot.Settings;
@@ -33,6 +34,19 @@ export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
   useEffect(() => {
     document.documentElement.classList.toggle('hide-fluff', settings.showFluff === false);
   }, [settings.showFluff]);
+
+  // `.dark` class strategy — follows the OS while the setting is 'system'.
+  useEffect(() => {
+    const theme = settings.theme ?? 'system';
+    applyTheme(theme);
+
+    if (theme !== 'system') return;
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => applyTheme('system');
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, [settings.theme]);
 
   const updateSettings = useCallback(async (next: depot.Settings) => {
     const merged = mergeSettingsWithDefaults(next);

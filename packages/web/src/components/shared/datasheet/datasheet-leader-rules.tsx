@@ -83,10 +83,7 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
           {leaderTargets.map((target) => (
             <li key={target.key} data-testid="leader-target">
               {target.path ? (
-                <Link
-                  to={target.path}
-                  className="text-primary-600 hover:underline focus:underline dark:text-primary-400"
-                >
+                <Link to={target.path} className="text-accent hover:underline focus:underline">
                   {target.name}
                 </Link>
               ) : (

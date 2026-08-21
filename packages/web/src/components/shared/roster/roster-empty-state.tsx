@@ -21,7 +21,7 @@ const RosterEmptyState: FC<RosterEmptyStateProps> = ({
   action
 }) => (
   <div
-    className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-gray-300 py-12 text-center dark:border-gray-700"
+    className="flex flex-col items-center justify-center gap-4 rounded-sm border border-dashed border-border-strong py-12 text-center"
     data-testid={dataTestId}
   >
     <div className="flex flex-col gap-2">

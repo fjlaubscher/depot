@@ -81,7 +81,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
             {subtitle}
           </Card.Subtitle>
         </div>
-        <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
+        <Tag variant="primary" size="sm" className="rounded-sm py-1 whitespace-nowrap">
           {points}
         </Tag>
       </Card.Header>

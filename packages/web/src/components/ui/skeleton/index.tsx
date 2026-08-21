@@ -9,8 +9,8 @@ interface SkeletonProps {
 }
 
 const variantClasses = {
-  rectangular: 'rounded-none',
-  rounded: 'rounded-md',
+  rectangular: 'rounded-xs',
+  rounded: 'rounded-sm',
   circular: 'rounded-full'
 };
 
@@ -21,7 +21,7 @@ export const Skeleton: FC<SkeletonProps> = ({
   variant = 'rectangular'
 }) => (
   <div
-    className={cx('bg-gray-200 dark:bg-gray-700 animate-pulse', variantClasses[variant], className)}
+    className={cx('bg-surface-soft animate-pulse', variantClasses[variant], className)}
     style={{
       ...(width && { width: typeof width === 'number' ? `${width}px` : width }),
       ...(height && { height: typeof height === 'number' ? `${height}px` : height })

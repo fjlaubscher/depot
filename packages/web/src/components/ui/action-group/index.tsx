@@ -34,9 +34,9 @@ const getIconButtonVariant = (variant: Action['variant']): 'default' | 'ghost' =
 
 const getVariantClasses = (variant: Action['variant'] = 'ghost') => {
   const variantClasses = {
-    primary: 'text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300',
-    secondary: 'text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300',
-    danger: 'text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300',
+    primary: 'text-info-fg hover:bg-info-surface',
+    secondary: 'text-success-fg hover:bg-success-surface',
+    danger: 'text-danger-fg hover:bg-danger-surface',
     default: '',
     ghost: ''
   };

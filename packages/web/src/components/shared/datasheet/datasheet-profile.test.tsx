@@ -52,10 +52,10 @@ describe('DatasheetProfile', () => {
     const unitAbilityTag = screen.getByTestId('datasheet-abilities-tag-inline-1');
 
     expect(coreAbilityTag).toBeInTheDocument();
-    expect(coreAbilityTag.querySelector('span')).toHaveClass('bg-primary-100');
+    expect(coreAbilityTag.querySelector('span')).toHaveClass('bg-surface-accent');
 
     expect(unitAbilityTag).toBeInTheDocument();
-    expect(unitAbilityTag.querySelector('span')).toHaveClass('surface-success-strong');
+    expect(unitAbilityTag.querySelector('span')).toHaveClass('bg-success-surface');
 
     expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();

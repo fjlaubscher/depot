@@ -1,168 +1,258 @@
 @import 'tailwindcss';
 
-/* Font and color configuration */
+/* Theme is driven by a `.dark` class on <html>, set from the user setting
+   (system default) in contexts/settings. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Palette + static scales — direction "Cogitator", accent "signal ember".
+   --------------------------------------------------------------------------- */
 @theme {
-  --font-family-sans:
+  --font-sans:
     'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Map primary colors to orange palette */
-  --color-primary-50: var(--color-orange-50);
-  --color-primary-100: var(--color-orange-100);
-  --color-primary-200: var(--color-orange-200);
-  --color-primary-300: var(--color-orange-300);
-  --color-primary-400: var(--color-orange-400);
-  --color-primary-500: var(--color-orange-500);
-  --color-primary-600: var(--color-orange-600);
-  --color-primary-700: var(--color-orange-700);
-  --color-primary-800: var(--color-orange-800);
-  --color-primary-900: var(--color-orange-900);
+  --color-accent-50: #fff4ea;
+  --color-accent-100: #ffe6d0;
+  --color-accent-200: #ffcea3;
+  --color-accent-300: #ffb067;
+  --color-accent-400: #ff9a42;
+  --color-accent-500: #ff8a2a;
+  --color-accent-600: #e06a10;
+  --color-accent-700: #b84d00;
+  --color-accent-800: #8a3a02;
+  --color-accent-900: #5c2703;
+  /* text/icon colour that sits on a solid accent fill — 10.6:1 on accent-500 */
+  --color-accent-ink: #1a0e02;
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-  }
+/* ---------------------------------------------------------------------------
+   Semantic tokens — every one has a light and a dark value.
+   --------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --surface-base: #f6f8fa;
+  --surface-card: #ffffff;
+  --surface-muted: #eef1f5;
+  --surface-soft: #e4e9ef;
+  --surface-accent: #fff1e5;
+  --surface-elevated: #ffffff;
+  --surface-overlay: rgb(15 23 32 / 0.45);
+
+  --fg: #10161d;
+  --fg-body: #2e3a46;
+  --fg-muted: #5a6773;
+  --fg-subtle: #7a8794;
+  --fg-hint: #99a4b0;
+  --fg-accent: #b84d00;
+
+  --line-subtle: #dde3ea;
+  --line-strong: #c3ccd6;
+  --line-accent: #e06a10;
+
+  --success-fg: #116b33;
+  --success-surface: #e9f7ee;
+  --success-line: #b5e0c4;
+  --warning-fg: #8a5a00;
+  --warning-surface: #fff6e0;
+  --warning-line: #ebd49a;
+  --danger-fg: #b42318;
+  --danger-surface: #fdecea;
+  --danger-line: #f2b8b2;
+  --info-fg: #0b5cad;
+  --info-surface: #e8f2fd;
+  --info-line: #b3d4f5;
+
+  --elevation-1: 0 1px 2px rgb(16 22 29 / 0.08);
+  --elevation-2: 0 4px 12px rgb(16 22 29 / 0.12);
+  --elevation-3: 0 16px 40px rgb(16 22 29 / 0.2);
 }
 
-/* Custom styles will go here */
+.dark {
+  color-scheme: dark;
 
-/* Ensure font is applied to body */
+  --surface-base: #0b0d10;
+  --surface-card: #12151a;
+  --surface-muted: #0e1116;
+  --surface-soft: #161b22;
+  --surface-accent: #26160a;
+  --surface-elevated: #171c23;
+  --surface-overlay: rgb(0 0 0 / 0.6);
+
+  --fg: #eef2f6;
+  --fg-body: #c3cbd5;
+  --fg-muted: #8a93a0;
+  --fg-subtle: #5c6673;
+  --fg-hint: #454f5b;
+  --fg-accent: #ffb067;
+
+  --line-subtle: #1e242c;
+  --line-strong: #2a313c;
+  --line-accent: #ff8a2a;
+
+  --success-fg: #6fd388;
+  --success-surface: #10231a;
+  --success-line: #1f4a31;
+  --warning-fg: #ffce58;
+  --warning-surface: #241c08;
+  --warning-line: #55431a;
+  --danger-fg: #ff7a6e;
+  --danger-surface: #26100e;
+  --danger-line: #59231f;
+  --info-fg: #6eb8ff;
+  --info-surface: #0d1b2a;
+  --info-line: #1f3e5c;
+
+  /* shadows die on near-black — surface + border carry depth, shadow is secondary */
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elevation-2: 0 4px 12px rgb(0 0 0 / 0.5);
+  --elevation-3: 0 16px 40px rgb(0 0 0 / 0.6);
+}
+
+/* Expose the semantic tokens as Tailwind utilities. `inline` keeps them as
+   var() references so the .dark swap happens at runtime. */
+@theme inline {
+  --color-surface-base: var(--surface-base);
+  --color-surface-card: var(--surface-card);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-accent: var(--surface-accent);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-overlay: var(--surface-overlay);
+
+  --color-foreground: var(--fg);
+  --color-body: var(--fg-body);
+  --color-muted: var(--fg-muted);
+  --color-subtle: var(--fg-subtle);
+  --color-hint: var(--fg-hint);
+  --color-accent: var(--fg-accent);
+
+  --color-border-subtle: var(--line-subtle);
+  --color-border-strong: var(--line-strong);
+  --color-border-accent: var(--line-accent);
+
+  --color-success-fg: var(--success-fg);
+  --color-success-surface: var(--success-surface);
+  --color-success-border: var(--success-line);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-surface: var(--warning-surface);
+  --color-warning-border: var(--warning-line);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-surface: var(--danger-surface);
+  --color-danger-border: var(--danger-line);
+  --color-info-fg: var(--info-fg);
+  --color-info-surface: var(--info-surface);
+  --color-info-border: var(--info-line);
+
+  --shadow-e1: var(--elevation-1);
+  --shadow-e2: var(--elevation-2);
+  --shadow-e3: var(--elevation-3);
+}
+
 body {
-  font-family:
-    'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-family: var(--font-sans);
+  background-color: var(--surface-base);
+  color: var(--fg-body);
+}
+
+/* ---------------------------------------------------------------------------
+   Type scale — the four repeating patterns from the token sheet.
+   Page title = text-2xl font-bold, card title = text-base font-bold,
+   body = text-sm text-body. Those need no utility.
+   --------------------------------------------------------------------------- */
+@utility type-section {
+  @apply font-mono text-[11px] leading-[11px] font-bold tracking-widest uppercase text-accent;
+}
+
+@utility type-stat {
+  @apply font-mono text-[19px] leading-[22.8px] font-bold text-foreground;
+}
+
+@utility type-label {
+  @apply font-mono text-[11px] leading-[13.2px] font-medium text-muted;
+}
+
+@utility tag-keyword {
+  @apply inline-flex items-center font-mono text-[9.5px] leading-[10px] font-medium uppercase
+    px-1.5 py-1 rounded-xs bg-surface-soft border border-border-strong text-body;
+}
+
+/* ---------------------------------------------------------------------------
+   Composite surfaces + controls.
+   --------------------------------------------------------------------------- */
+@utility stat-cell {
+  @apply flex flex-col items-center justify-center gap-0.5 text-center
+    bg-surface-soft border-t-2 border-border-accent rounded-xs py-1 px-2;
+}
+
+@utility surface-card {
+  @apply bg-surface-card border border-border-subtle rounded-sm;
+}
+
+@utility sidebar-item {
+  @apply flex items-center gap-3 px-3 py-2 text-sm text-body rounded-sm border-l-2 border-transparent
+    hover:bg-surface-soft transition-colors duration-200;
+}
+
+@utility link-subtle {
+  @apply text-subtle hover:text-accent underline transition-colors duration-200;
+}
+
+@utility input-base {
+  @apply h-10 w-full bg-surface-muted border border-border-strong rounded-sm px-2.5 text-base text-foreground
+    placeholder:text-hint focus:outline-none focus:border-border-accent
+    focus-visible:ring-2 focus-visible:ring-accent-600 dark:focus-visible:ring-accent-500;
+}
+
+@utility focus-ring-primary {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 dark:focus-visible:outline-accent-500;
+}
+
+@utility focus-ring-info {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-info-fg;
+}
+
+@utility focus-ring-success {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success-fg;
+}
+
+@utility focus-ring-warning {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning-fg;
+}
+
+@utility focus-ring-danger {
+  @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger-fg;
+}
+
+/* Suppress focus outlines for non-interactive chart surfaces */
+.no-focus-outline,
+.no-focus-outline *:focus,
+.no-focus-outline *:focus-visible {
+  outline: none;
 }
 
 /* Keyword spans from Wahapedia data */
 span.kwb,
 span.kwbu,
 span.hi_custom {
-  @apply text-orange-500 dark:text-orange-400 font-semibold;
+  @apply text-accent font-bold;
 }
 
 @keyframes scroll-highlight {
   0% {
-    box-shadow: 0 0 0 6px rgba(251, 146, 60, 0.28);
-    background-color: rgba(251, 146, 60, 0.14);
+    box-shadow: 0 0 0 6px --alpha(var(--color-accent-500) / 28%);
+    background-color: --alpha(var(--color-accent-500) / 14%);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(251, 146, 60, 0);
+    box-shadow: 0 0 0 0 transparent;
     background-color: transparent;
   }
 }
 
 :target {
   animation: scroll-highlight 1.2s ease-out;
-}
-
-/* Shared utility classes */
-@utility text-foreground {
-  @apply text-gray-900 dark:text-white;
-}
-
-@utility text-body {
-  @apply text-gray-700 dark:text-gray-300;
-}
-
-@utility text-muted {
-  @apply text-gray-600 dark:text-gray-400;
-}
-
-@utility text-secondary {
-  @apply text-gray-600 dark:text-gray-300;
-}
-
-@utility text-subtle {
-  @apply text-gray-500 dark:text-gray-400;
-}
-
-@utility text-hint {
-  @apply text-gray-400 dark:text-gray-500;
-}
-
-@utility surface-card {
-  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg;
-}
-
-@utility surface-base {
-  @apply bg-white dark:bg-gray-800;
-}
-
-@utility surface-muted {
-  @apply bg-gray-50 dark:bg-gray-900;
-}
-
-@utility surface-soft {
-  @apply bg-gray-50 dark:bg-gray-800;
-}
-
-@utility text-accent {
-  @apply text-primary-700 dark:text-primary-400;
-}
-
-@utility text-accent-strong {
-  @apply text-primary-800 dark:text-primary-300;
-}
-
-@utility surface-accent {
-  @apply bg-primary-50 dark:bg-primary-800;
-}
-
-@utility surface-accent-strong {
-  @apply bg-primary-100 dark:bg-primary-700;
-}
-
-@utility border-accent {
-  @apply border-primary-200 dark:border-primary-500/60;
-}
-
-@utility sidebar-item {
-  @apply flex items-center gap-3 px-3 py-2 text-sm text-body hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200;
-}
-
-@utility sidebar-sub-item {
-  @apply flex items-center gap-3 px-3 py-2 text-sm text-muted hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-200;
-}
-
-@utility border-subtle {
-  @apply border-gray-200 dark:border-gray-700;
-}
-
-@utility link-subtle {
-  @apply text-subtle hover:text-primary-600 dark:hover:text-primary-400 underline transition-colors duration-200;
-}
-
-@utility input-base {
-  @apply border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground;
-}
-
-@utility focus-ring-primary {
-  @apply focus-visible:outline-2 focus-visible:outline-primary-200 dark:focus-visible:outline-primary-300;
-}
-
-@utility focus-ring-info {
-  @apply focus-visible:outline-2 focus-visible:outline-blue-400;
-}
-
-@utility focus-ring-success {
-  @apply focus-visible:outline-2 focus-visible:outline-green-400;
-}
-
-@utility focus-ring-warning {
-  @apply focus-visible:outline-2 focus-visible:outline-yellow-400;
-}
-
-@utility focus-ring-danger {
-  @apply focus-visible:outline-2 focus-visible:outline-red-400;
-}
-
-/* Utility to suppress focus outlines for non-interactive chart surfaces */
-.no-focus-outline,
-.no-focus-outline *:focus,
-.no-focus-outline *:focus-visible {
-  outline: none;
 }
 
 @layer components {
@@ -175,11 +265,11 @@ span.hi_custom {
     border-collapse: separate;
     border-spacing: 0;
     margin: 0.75rem 0;
-    @apply border border-subtle rounded-lg bg-gray-50 dark:bg-gray-900 p-4;
+    @apply border border-border-subtle rounded-sm bg-surface-muted p-4;
   }
 
   .ability-rich-text td {
-    @apply border-t border-subtle px-3 py-2;
+    @apply border-t border-border-subtle px-3 py-2;
   }
 
   .ability-rich-text p {
@@ -187,7 +277,7 @@ span.hi_custom {
   }
 
   .ability-rich-text .impact18 {
-    @apply text-base font-semibold text-foreground;
+    @apply text-base font-bold text-foreground;
   }
 
   .ability-rich-text .dsCharWrap {
@@ -195,15 +285,15 @@ span.hi_custom {
   }
 
   .ability-rich-text .dsCharFrame {
-    @apply flex flex-col items-center justify-center rounded-md border border-subtle bg-white dark:bg-gray-800 px-2 py-1 min-w-[52px];
+    @apply flex flex-col items-center justify-center rounded-sm border-t-2 border-border-accent bg-surface-soft px-2 py-1 min-w-[52px];
   }
 
   .ability-rich-text .dsCharName {
-    @apply text-[10px] uppercase tracking-wide text-subtle;
+    @apply type-label;
   }
 
   .ability-rich-text .dsCharValue {
-    @apply text-sm font-bold text-foreground;
+    @apply type-stat;
   }
 
   .ability-rich-text .BreakInsideAvoid {
@@ -250,19 +340,19 @@ span.hi_custom {
   }
 
   .markdown-content h1 {
-    @apply text-2xl font-semibold text-foreground mt-2 mb-3;
+    @apply text-2xl font-bold text-foreground mt-2 mb-3;
   }
 
   .markdown-content h2 {
-    @apply text-xl font-semibold text-foreground mt-2 mb-2;
+    @apply text-xl font-bold text-foreground mt-2 mb-2;
   }
 
   .markdown-content h3 {
-    @apply text-lg font-semibold text-foreground mt-2 mb-2;
+    @apply text-lg font-bold text-foreground mt-2 mb-2;
   }
 
   .markdown-content h4 {
-    @apply text-base font-semibold text-foreground mt-2 mb-1;
+    @apply text-base font-bold text-foreground mt-2 mb-1;
   }
 
   .markdown-content p {
@@ -283,98 +373,18 @@ span.hi_custom {
   }
 
   .markdown-content a {
-    @apply text-accent underline hover:text-accent-strong;
+    @apply text-accent underline hover:text-accent-500;
   }
 
   .markdown-content code {
-    @apply font-mono text-xs bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded;
+    @apply font-mono text-xs bg-surface-soft px-1 py-0.5 rounded-xs;
   }
 
   .markdown-content pre {
-    @apply font-mono text-xs bg-gray-900 text-gray-100 rounded-md p-3 overflow-x-auto my-3;
+    @apply font-mono text-xs bg-surface-soft text-foreground border border-border-subtle rounded-sm p-3 overflow-x-auto my-3;
   }
 
   .markdown-content blockquote {
-    @apply border-l-4 border-subtle pl-3 italic text-subtle my-2;
+    @apply border-l-2 border-border-accent pl-3 italic text-subtle my-2;
   }
-}
-
-@utility text-info-strong {
-  @apply text-blue-900 dark:text-blue-100;
-}
-
-@utility text-info {
-  @apply text-blue-700 dark:text-blue-300;
-}
-
-@utility surface-info {
-  @apply bg-blue-50 dark:bg-blue-900;
-}
-
-@utility surface-info-strong {
-  @apply bg-blue-100 dark:bg-blue-900;
-}
-
-@utility border-info {
-  @apply border-blue-200 dark:border-blue-800;
-}
-
-@utility text-success-strong {
-  @apply text-green-800 dark:text-green-200;
-}
-
-@utility text-success {
-  @apply text-green-600 dark:text-green-400;
-}
-
-@utility surface-success {
-  @apply bg-green-50 dark:bg-green-900;
-}
-
-@utility surface-success-strong {
-  @apply bg-green-100 dark:bg-green-900;
-}
-
-@utility border-success {
-  @apply border-green-200 dark:border-green-800;
-}
-
-@utility text-warning-strong {
-  @apply text-yellow-800 dark:text-yellow-200;
-}
-
-@utility text-warning {
-  @apply text-yellow-600 dark:text-yellow-400;
-}
-
-@utility surface-warning {
-  @apply bg-yellow-50 dark:bg-yellow-900;
-}
-
-@utility surface-warning-strong {
-  @apply bg-yellow-100 dark:bg-yellow-900;
-}
-
-@utility border-warning {
-  @apply border-yellow-200 dark:border-yellow-800;
-}
-
-@utility text-danger-strong {
-  @apply text-red-800 dark:text-red-200;
-}
-
-@utility text-danger {
-  @apply text-red-600 dark:text-red-400;
-}
-
-@utility surface-danger {
-  @apply bg-red-50 dark:bg-red-900;
-}
-
-@utility surface-danger-strong {
-  @apply bg-red-100 dark:bg-red-900;
-}
-
-@utility border-danger {
-  @apply border-red-200 dark:border-red-800;
 }

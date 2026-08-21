@@ -36,7 +36,13 @@ const Section: FC<{ title: string; testId: string; children: React.ReactNode }> 
   children
 }) => (
   <section className="flex flex-col gap-2" data-testid={testId}>
-    <h2 className="text-sm font-semibold uppercase tracking-wide text-body">{title}</h2>
+    <div className="flex items-center gap-2">
+      <h2 className="type-section shrink-0">
+        <span aria-hidden="true">// </span>
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-border-subtle" />
+    </div>
     {children}
   </section>
 );

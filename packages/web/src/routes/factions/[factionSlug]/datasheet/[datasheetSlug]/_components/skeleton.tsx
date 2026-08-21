@@ -14,10 +14,10 @@ const DatasheetSkeleton: React.FC = () => {
   return (
     <AppLayout title="Loading Datasheet">
       <div className="flex flex-col gap-4" data-testid="datasheet-loader">
-        <UISkeleton width="70%" height={28} className="rounded-md" />
-        <UISkeleton width="45%" height={14} className="rounded-md" />
+        <UISkeleton width="70%" height={28} className="rounded-sm" />
+        <UISkeleton width="45%" height={14} className="rounded-sm" />
 
-        <div className="border-b border-subtle">
+        <div className="border-b border-border-subtle">
           <nav className="-mb-px flex gap-4">
             {[0, 1].map((index) => (
               <div key={index} className="py-4 px-1 border-b-2 border-transparent">
@@ -27,20 +27,20 @@ const DatasheetSkeleton: React.FC = () => {
           </nav>
         </div>
 
-        <div className="surface-card p-4 rounded-md flex flex-col gap-2">
-          <UISkeleton width="100%" height={12} className="rounded-md" />
-          <UISkeleton width="95%" height={12} className="rounded-md" />
-          <UISkeleton width="88%" height={12} className="rounded-md" />
-          <UISkeleton width="92%" height={12} className="rounded-md" />
+        <div className="surface-card p-4 rounded-sm flex flex-col gap-2">
+          <UISkeleton width="100%" height={12} className="rounded-sm" />
+          <UISkeleton width="95%" height={12} className="rounded-sm" />
+          <UISkeleton width="88%" height={12} className="rounded-sm" />
+          <UISkeleton width="92%" height={12} className="rounded-sm" />
         </div>
 
         <div className="flex flex-col gap-2">
-          <UISkeleton width="30%" height={14} className="rounded-md" />
+          <UISkeleton width="30%" height={14} className="rounded-sm" />
           <PillRow />
         </div>
 
         <div className="flex flex-col gap-2">
-          <UISkeleton width="32%" height={14} className="rounded-md" />
+          <UISkeleton width="32%" height={14} className="rounded-sm" />
           <PillRow />
         </div>
       </div>
