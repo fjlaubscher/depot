@@ -1,6 +1,6 @@
 import { useState, useEffect, Children } from 'react';
 import type { FC, ReactNode, HTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   tabs: string[];
@@ -38,7 +38,7 @@ const Tabs: FC<TabsProps> = ({
   const validChildren = Children.toArray(children).filter((_, index) => tabs[index]?.trim() !== '');
 
   return (
-    <div className={classNames('w-full flex flex-col gap-4', className)} {...props}>
+    <div className={cx('w-full flex flex-col gap-4', className)} {...props}>
       <div className="border-b border-subtle">
         <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (
@@ -46,14 +46,11 @@ const Tabs: FC<TabsProps> = ({
               key={`tab-${index}`}
               onClick={() => handleTabClick(index)}
               data-testid={tabTestIdPrefix ? `${tabTestIdPrefix}-${slugify(tab)}` : undefined}
-              className={classNames(
+              className={cx(
                 'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0 cursor-pointer',
-                {
-                  'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400':
-                    activeTab === index,
-                  'border-transparent text-subtle hover:text-foreground hover:border-subtle':
-                    activeTab !== index
-                }
+                activeTab === index
+                  ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
+                  : 'border-transparent text-subtle hover:text-foreground hover:border-subtle'
               )}
               aria-current={activeTab === index ? 'page' : undefined}
             >

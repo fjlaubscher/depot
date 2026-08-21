@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 import { Tag, TagGroup } from '@/components/ui';
 import { parseWargearKeywords } from '@depot/core/utils/wargear';
@@ -109,13 +109,13 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
                       !hasKeywords ? 'border-b border-gray-100 dark:border-gray-800' : undefined
                     }
                   >
-                    <td className={classNames(statCellClasses, 'capitalize')}>{row.name}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.range}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.attacks}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.skill}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.strength}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.ap}</td>
-                    <td className={classNames(statCellClasses, 'text-center')}>{row.damage}</td>
+                    <td className={cx(statCellClasses, 'capitalize')}>{row.name}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.range}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.attacks}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.skill}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.strength}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.ap}</td>
+                    <td className={cx(statCellClasses, 'text-center')}>{row.damage}</td>
                   </tr>
                   {hasKeywords ? (
                     <tr className="pb-2 border-b border-subtle">

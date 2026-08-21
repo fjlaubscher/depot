@@ -43,24 +43,16 @@ export const categorizeAbilities = (abilities: Ability[]): CategorizedAbilities 
   referenced: abilities.filter(isReferencedAbility)
 });
 
-export const formatAbilityName = (ability: Ability): string => {
-  const name = ability.name?.trim() ?? '';
-  const parameter = ability.parameter?.trim();
+export const formatAbilityName = (ability: Ability): string =>
+  [ability.name?.trim(), ability.parameter?.trim()].filter(Boolean).join(' ');
 
-  if (parameter) {
-    return `${name} ${parameter}`.trim();
-  }
-
-  return name;
-};
-
-export const getWargearAbilities = (abilities: Ability[]): Ability[] => {
+export const getWargearAbilities = (abilities: Ability[] = []): Ability[] => {
   return abilities.filter((ability) => normalizeAbilityType(ability.type) === 'wargear');
 };
 
 export const normalizeSelectedWargearAbilities = (
   selectedAbilities: Ability[] | undefined,
-  datasheetAbilities: Ability[]
+  datasheetAbilities: Ability[] = []
 ): Ability[] => {
   if (!selectedAbilities?.length) {
     return [];

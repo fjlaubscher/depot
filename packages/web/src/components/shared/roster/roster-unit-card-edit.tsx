@@ -10,8 +10,6 @@ interface RosterUnitCardEditProps {
   rosterId: string;
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
-  basePath?: string;
-  state?: depot.CollectionUnitState;
   dataTestId?: string;
 }
 
@@ -20,14 +18,12 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   rosterId,
   onRemove,
   onDuplicate,
-  basePath = '/rosters',
-  state,
   dataTestId
 }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`${basePath}/${rosterId}/units/${unit.id}/edit`);
+    navigate(`/rosters/${rosterId}/units/${unit.id}/edit`);
   };
   const actions = (
     <div className="flex items-center gap-1">
@@ -64,7 +60,6 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
       unit={unit}
       actions={actions}
       onClick={handleCardClick}
-      state={state}
       dataTestId={dataTestId}
     />
   );

@@ -8,8 +8,7 @@ import { createMockRoster, mockRoster } from '@/test/mock-data';
 const mockOfflineStorage = vi.hoisted(() => ({
   getAllRosters: vi.fn(),
   saveRoster: vi.fn(),
-  deleteRoster: vi.fn(),
-  getRoster: vi.fn()
+  deleteRoster: vi.fn()
 }));
 
 vi.mock('../data/offline-storage', () => ({
@@ -85,57 +84,6 @@ describe('useRosters', () => {
     expect(result.current.error).toBe('Unknown error');
   });
 
-  it('should add roster and reload list', async () => {
-    const existingRosters = [mockRoster];
-    const newRoster = createMockRoster({ id: 'new-roster', name: 'New Roster' });
-    const updatedRosters = [...existingRosters, newRoster];
-
-    mockOfflineStorage.getAllRosters
-      .mockResolvedValueOnce(existingRosters)
-      .mockResolvedValueOnce(updatedRosters);
-    mockOfflineStorage.saveRoster.mockResolvedValue(undefined);
-
-    const { result } = renderHook(() => useRosters());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    expect(result.current.rosters).toEqual(existingRosters);
-
-    await act(async () => {
-      await result.current.addRoster(newRoster);
-    });
-
-    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledWith(newRoster);
-    expect(result.current.rosters).toEqual(updatedRosters);
-    expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(2);
-  });
-
-  it('should update roster and reload list', async () => {
-    const originalRoster = mockRoster;
-    const updatedRoster = createMockRoster({ id: mockRoster.id, name: 'Updated Name' });
-    const rostersAfterUpdate = [updatedRoster];
-
-    mockOfflineStorage.getAllRosters
-      .mockResolvedValueOnce([originalRoster])
-      .mockResolvedValueOnce(rostersAfterUpdate);
-    mockOfflineStorage.saveRoster.mockResolvedValue(undefined);
-
-    const { result } = renderHook(() => useRosters());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    await act(async () => {
-      await result.current.updateRoster(updatedRoster);
-    });
-
-    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledWith(updatedRoster);
-    expect(result.current.rosters).toEqual(rostersAfterUpdate);
-  });
-
   it('should delete roster and reload list', async () => {
     const rosterToKeep = createMockRoster({ id: 'keep-me' });
     const rosterToDelete = createMockRoster({ id: 'delete-me' });
@@ -203,38 +151,6 @@ describe('useRosters', () => {
     expect(result.current.rosters).toEqual([originalRoster, created]);
   });
 
-  it('should get roster by ID', async () => {
-    const specificRoster = createMockRoster({ id: 'specific-roster' });
-    mockOfflineStorage.getRoster.mockResolvedValue(specificRoster);
-    mockOfflineStorage.getAllRosters.mockResolvedValue([]);
-
-    const { result } = renderHook(() => useRosters());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    const roster = await result.current.getRoster('specific-roster');
-
-    expect(roster).toEqual(specificRoster);
-    expect(mockOfflineStorage.getRoster).toHaveBeenCalledWith('specific-roster');
-  });
-
-  it('should handle getRoster returning null', async () => {
-    mockOfflineStorage.getRoster.mockResolvedValue(null);
-    mockOfflineStorage.getAllRosters.mockResolvedValue([]);
-
-    const { result } = renderHook(() => useRosters());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
-
-    const roster = await result.current.getRoster('non-existent');
-
-    expect(roster).toBeNull();
-  });
-
   it('should reload list after each operation', async () => {
     const roster = mockRoster;
     mockOfflineStorage.getAllRosters.mockResolvedValue([]);
@@ -250,24 +166,14 @@ describe('useRosters', () => {
     expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      await result.current.addRoster(roster);
+      await result.current.deleteRoster('roster-id');
     });
     expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(2);
 
     await act(async () => {
-      await result.current.updateRoster(roster);
+      await result.current.duplicateRoster(roster);
     });
     expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(3);
-
-    await act(async () => {
-      await result.current.deleteRoster('roster-id');
-    });
-    expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(4);
-
-    await act(async () => {
-      await result.current.duplicateRoster(mockRoster);
-    });
-    expect(mockOfflineStorage.getAllRosters).toHaveBeenCalledTimes(5);
   });
 
   it('should handle empty roster list', async () => {

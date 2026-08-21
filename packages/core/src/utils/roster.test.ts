@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { Ability, ModelCost, Roster, RosterUnit, Wargear } from '../types/depot.js';
-import { calculateTotalPoints, createRosterDuplicate, generateRosterShareText } from './roster.js';
+import {
+  calculateTotalPoints,
+  createRosterDuplicate,
+  generateRosterShareText,
+  getRosterSubtitle,
+  remapRosterIds
+} from './roster.js';
 
 const createModelCost = (overrides: Partial<ModelCost> = {}): ModelCost => ({
   datasheetId: overrides.datasheetId ?? 'ds-1',
@@ -137,6 +143,11 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
 });
 
 describe('roster utils', () => {
+  it('builds the roster subtitle from faction and detachment names', () => {
+    expect(getRosterSubtitle(createRoster())).toBe('Test • Gladius Task Force');
+    expect(getRosterSubtitle(createRoster({ detachments: [] }))).toBe('Test');
+  });
+
   it('calculates total roster points from units and enhancements', () => {
     const roster = createRoster({
       units: [createRosterUnit({ modelCost: createModelCost({ cost: '110' }) })],
@@ -170,10 +181,7 @@ describe('roster utils', () => {
       ]
     });
 
-    const text = generateRosterShareText(roster, 'Space Marines', {
-      includeWargear: true,
-      includeWargearAbilities: true
-    });
+    const text = generateRosterShareText(roster, 'Space Marines', { includeWargear: true });
 
     expect(text).toContain('*Faction:* Space Marines');
     expect(text).toContain('*Detachment:* Gladius Task Force · 2 DP · Take and Hold');
@@ -225,5 +233,34 @@ describe('roster utils', () => {
     expect(duplicated.units[0].id).not.toBe('unit-abc');
     expect(duplicated.warlordUnitId).toBe(duplicated.units[0].id);
     expect(duplicated.name).toBe('Strike Force (Copy)');
+  });
+
+  it('remaps roster, unit, enhancement and warlord ids together', () => {
+    const roster = createRoster({
+      units: [createRosterUnit({ id: 'unit-abc' })],
+      warlordUnitId: 'unit-abc'
+    });
+
+    const remapped = remapRosterIds(roster);
+    const unitId = remapped.units[0].id;
+
+    expect(remapped.id).not.toBe(roster.id);
+    expect(unitId).not.toBe('unit-abc');
+    expect(remapped.enhancements[0].unitId).toBe(unitId);
+    expect(remapped.warlordUnitId).toBe(unitId);
+    expect(roster.units[0].id).toBe('unit-abc');
+  });
+
+  it('drops enhancements whose unit is missing', () => {
+    const roster = createRoster({ units: [createRosterUnit({ id: 'unit-abc' })] });
+    roster.enhancements = [
+      { ...roster.enhancements[0], unitId: 'unit-abc' },
+      { ...roster.enhancements[0], unitId: 'unit-gone' }
+    ];
+
+    const remapped = remapRosterIds(roster);
+
+    expect(remapped.enhancements).toHaveLength(1);
+    expect(remapped.enhancements[0].unitId).toBe(remapped.units[0].id);
   });
 });

@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Field, SelectField } from '@/components/ui';
-
-type MaxPointsOption = 'incursion' | 'strike-force' | 'custom';
 
 interface MaxPointsFieldProps {
   value: number;
@@ -11,20 +9,7 @@ interface MaxPointsFieldProps {
   'data-testid'?: string;
 }
 
-const PRESET_POINTS: Record<Exclude<MaxPointsOption, 'custom'>, number> = {
-  incursion: 1000,
-  'strike-force': 2000
-};
-
-const getOptionFromValue = (points: number): MaxPointsOption => {
-  if (points === PRESET_POINTS.incursion) {
-    return 'incursion';
-  }
-  if (points === PRESET_POINTS['strike-force']) {
-    return 'strike-force';
-  }
-  return 'custom';
-};
+const PRESET_POINTS: Record<string, number> = { incursion: 1000, 'strike-force': 2000 };
 
 const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
   value,
@@ -32,40 +17,10 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
   error,
   'data-testid': dataTestId
 }) => {
-  const [selectedOption, setSelectedOption] = useState<MaxPointsOption>(() =>
-    getOptionFromValue(value)
-  );
-  const [customValue, setCustomValue] = useState(() =>
-    getOptionFromValue(value) === 'custom' ? value.toString() : ''
-  );
-
-  useEffect(() => {
-    const optionFromValue = getOptionFromValue(value);
-    setSelectedOption(optionFromValue);
-    if (optionFromValue === 'custom') {
-      setCustomValue(value.toString());
-    }
-  }, [value]);
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const option = event.target.value as MaxPointsOption;
-    setSelectedOption(option);
-
-    if (option === 'custom') {
-      setCustomValue((prev) => (prev ? prev : value.toString()));
-      return;
-    }
-
-    onChange(PRESET_POINTS[option]);
-  };
-
-  const handleCustomChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const next = event.target.value;
-    setCustomValue(next);
-
-    const parsed = parseInt(next, 10);
-    onChange(Number.isNaN(parsed) ? 0 : parsed);
-  };
+  // Explicitly chosen "Custom" sticks even when the typed value matches a preset.
+  const [isCustom, setIsCustom] = useState(false);
+  const preset = Object.keys(PRESET_POINTS).find((key) => PRESET_POINTS[key] === value);
+  const selectedOption = isCustom || !preset ? 'custom' : preset;
 
   return (
     <div className="flex flex-col gap-4" data-testid={dataTestId}>
@@ -78,7 +33,11 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
         ]}
         selectDataTestId="max-points-field-select"
         value={selectedOption}
-        onChange={handleSelectChange}
+        onChange={(event) => {
+          const option = event.target.value;
+          setIsCustom(option === 'custom');
+          if (option !== 'custom') onChange(PRESET_POINTS[option]);
+        }}
         required
       />
 
@@ -95,9 +54,9 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
             id="custom-max-points"
             type="number"
             min={1}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
-            value={customValue}
-            onChange={handleCustomChange}
+            className="input-base"
+            value={value || ''}
+            onChange={(event) => onChange(parseInt(event.target.value, 10) || 0)}
             placeholder="Enter points limit"
             required
           />

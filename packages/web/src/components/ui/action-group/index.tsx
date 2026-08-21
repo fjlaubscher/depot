@@ -1,5 +1,5 @@
 import type { FC, ReactNode, MouseEvent } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import IconButton from '../icon-button';
 
 export interface Action {
@@ -7,7 +7,7 @@ export interface Action {
   onClick: (e?: MouseEvent) => void;
   ariaLabel: string;
   variant?: 'primary' | 'secondary' | 'danger' | 'default' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
   disabled?: boolean;
   className?: string;
   'data-testid'?: string;
@@ -28,20 +28,9 @@ const getSpacingClass = (spacing: ActionGroupProps['spacing'] = 'normal') => {
   return spacingClasses[spacing];
 };
 
-const getIconButtonVariant = (variant: Action['variant']): 'default' | 'ghost' => {
-  // Map our action variants to IconButton variants
-  switch (variant) {
-    case 'primary':
-    case 'secondary':
-    case 'danger':
-      return 'ghost'; // Use ghost so we can apply custom colors
-    case 'default':
-      return 'default';
-    case 'ghost':
-    default:
-      return 'ghost';
-  }
-};
+// Coloured variants use ghost so the custom text colours apply.
+const getIconButtonVariant = (variant: Action['variant']): 'default' | 'ghost' =>
+  variant === 'default' ? 'default' : 'ghost';
 
 const getVariantClasses = (variant: Action['variant'] = 'ghost') => {
   const variantClasses = {
@@ -60,7 +49,7 @@ export const ActionGroup: FC<ActionGroupProps> = ({ actions, className, spacing 
   }
 
   return (
-    <div className={classNames('flex items-center', getSpacingClass(spacing), className)}>
+    <div className={cx('flex items-center', getSpacingClass(spacing), className)}>
       {actions.map((action, index) => (
         <IconButton
           key={index}
@@ -69,7 +58,7 @@ export const ActionGroup: FC<ActionGroupProps> = ({ actions, className, spacing 
           variant={getIconButtonVariant(action.variant)}
           size={action.size || 'sm'}
           disabled={action.disabled}
-          className={classNames(getVariantClasses(action.variant), action.className)}
+          className={cx(getVariantClasses(action.variant), action.className)}
           data-testid={action['data-testid']}
         >
           {action.icon}

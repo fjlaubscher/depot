@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import Toast from '../toast';
 
 const ToastContainer: FC = () => {

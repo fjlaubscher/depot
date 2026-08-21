@@ -14,8 +14,9 @@ test.describe('Datasheet leader rules', () => {
     const leaderSection = page.getByTestId('datasheet-leader-rules');
     await expect(leaderSection).toBeVisible();
 
-    const leaderToggle = leaderSection.getByRole('button', { name: 'Leader' });
-    await expect(leaderToggle).toBeVisible();
+    // <summary> is the toggle; it has no ARIA role of its own (the disclosure state is native).
+    const leaderToggle = leaderSection.locator('summary');
+    await expect(leaderToggle).toContainText('Leader');
 
     await leaderToggle.click();
 

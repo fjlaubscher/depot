@@ -1,9 +1,9 @@
 import type { FC, HTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
 }
 
 const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, children, ...props }) => {
@@ -20,13 +20,12 @@ const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, childr
 
   const sizeClasses = {
     sm: 'px-2 py-0.5 text-xs',
-    md: 'px-2.5 py-0.5 text-sm',
-    lg: 'px-3 py-1 text-base'
+    md: 'px-2.5 py-0.5 text-sm'
   };
 
   return (
     <span
-      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={cx(baseClasses, variantClasses[variant], sizeClasses[size], className)}
       {...props}
     >
       {children}
@@ -47,7 +46,7 @@ const TagGroup: FC<TagGroupProps> = ({ spacing = 'md', className, children, ...p
 
   return (
     <div
-      className={classNames('flex flex-wrap items-center', spacingClasses[spacing], className)}
+      className={cx('flex flex-wrap items-center', spacingClasses[spacing], className)}
       {...props}
     >
       {children}
@@ -59,7 +58,6 @@ interface TagSectionProps extends HTMLAttributes<HTMLElement> {
   title: string;
   description?: string;
   spacing?: 'sm' | 'md' | 'lg';
-  groupClassName?: string;
 }
 
 const TagSection: FC<TagSectionProps> = ({
@@ -67,20 +65,17 @@ const TagSection: FC<TagSectionProps> = ({
   description,
   spacing = 'sm',
   className,
-  groupClassName,
   children,
   ...props
 }) => {
   return (
-    <section className={classNames('flex flex-col gap-2', className)} {...props}>
+    <section className={cx('flex flex-col gap-2', className)} {...props}>
       <div className="flex flex-col">
         <span className="text-sm font-semibold text-foreground">{title}</span>
         {description ? <p className="text-xs text-subtle">{description}</p> : null}
       </div>
 
-      <TagGroup spacing={spacing} className={groupClassName}>
-        {children}
-      </TagGroup>
+      <TagGroup spacing={spacing}>{children}</TagGroup>
     </section>
   );
 };

@@ -5,16 +5,14 @@ import WargearRow from './wargear-row';
 interface WargearSectionProps {
   wargear: depot.Wargear[];
   title: string;
-  showSelectionColumn?: boolean;
-  selectedWargear?: depot.Wargear[];
-  onSelectionChange?: (wargear: depot.Wargear, selected: boolean) => void;
+  selectedWargear: depot.Wargear[];
+  onSelectionChange: (wargear: depot.Wargear, selected: boolean) => void;
 }
 
 const WargearSection: React.FC<WargearSectionProps> = ({
   wargear,
   title,
-  showSelectionColumn = false,
-  selectedWargear = [],
+  selectedWargear,
   onSelectionChange
 }) => {
   if (wargear.length === 0) return null;
@@ -30,9 +28,8 @@ const WargearSection: React.FC<WargearSectionProps> = ({
           <WargearRow
             key={weapon.id}
             weapon={weapon}
-            showSelectionColumn={showSelectionColumn}
-            selectedWargear={selectedWargear}
-            onSelectionChange={onSelectionChange}
+            selected={selectedWargear.some((selected) => selected.id === weapon.id)}
+            onToggle={onSelectionChange}
           />
         ))}
       </div>

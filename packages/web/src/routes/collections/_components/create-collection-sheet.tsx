@@ -6,15 +6,13 @@ import { Sheet, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { offlineStorage } from '@/data/offline-storage';
-import { useToast } from '@/contexts/toast/use-toast-context';
-import { COLLECTION_LABELS } from '@/utils/collection';
+import { useToast } from '@/contexts/toast/context';
+import { sortByName } from '@depot/core/utils/common';
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
-
-const labels = COLLECTION_LABELS;
 
 const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const navigate = useNavigate();
@@ -23,10 +21,7 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
   const [name, setName] = useState('');
   const [factionSlug, setFactionSlug] = useState('');
 
-  const factionOptions =
-    factions
-      ?.map((f) => ({ value: f.slug, label: f.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)) || [];
+  const factionOptions = sortByName(factions ?? []).map((f) => ({ value: f.slug, label: f.name }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,11 +65,11 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
         <input
           id="collection-name"
           type="text"
-          className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
+          className="input-base"
           value={name}
           data-testid="collection-name-input"
           onChange={(e) => setName(e.target.value)}
-          placeholder={`My ${labels.singularTitle}`}
+          placeholder="My Collection"
           required
         />
       </Field>
@@ -89,9 +84,7 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
           value={factionSlug}
           onChange={(e) => {
             setFactionSlug(e.target.value);
-            setName(
-              (prev) => prev || (e.target.value ? `${e.target.value} ${labels.singular}` : '')
-            );
+            setName((prev) => prev || (e.target.value ? `${e.target.value} collection` : ''));
           }}
           placeholder="Select a Faction"
           required
@@ -119,7 +112,7 @@ const CreateCollectionSheet: React.FC<Props> = ({ open, onClose }) => (
   <Sheet
     open={open}
     onClose={onClose}
-    title={`Create ${labels.singularTitle}`}
+    title="Create Collection"
     data-testid="create-collection-sheet"
   >
     <CreateCollectionForm onClose={onClose} />

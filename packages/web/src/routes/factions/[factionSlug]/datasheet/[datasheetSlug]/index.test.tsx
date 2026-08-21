@@ -17,7 +17,7 @@ import DatasheetPage from './index';
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
 vi.mock('@/hooks/use-datasheet');
-vi.mock('@/contexts/toast/use-toast-context');
+vi.mock('@/contexts/toast/context', { spy: true });
 // Mock react-router-dom params and navigation
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {

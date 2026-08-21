@@ -6,23 +6,21 @@ import { StatCard, StatsRow } from '@/components/ui';
 
 interface ModelStatsRowProps {
   model: depot.Model;
-  variant?: 'default' | 'compact';
 }
 
-const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model, variant = 'default' }) => {
-  const statCardSize = 'compact';
+const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {
   const normalizedInv = normalizeInvulnerable(model.invSv);
   const showInvulnerable = Boolean(normalizedInv);
 
   return (
     <div className="flex flex-col gap-2">
-      <StatsRow title={model.name} subtitle={model.baseSize} variant={variant}>
-        <StatCard label="M" value={model.m} size={statCardSize} />
-        <StatCard label="T" value={model.t} size={statCardSize} />
-        <StatCard label="Sv" value={model.sv} size={statCardSize} />
-        <StatCard label="W" value={model.w} size={statCardSize} />
-        <StatCard label="Ld" value={model.ld} size={statCardSize} />
-        <StatCard label="OC" value={model.oc} size={statCardSize} />
+      <StatsRow title={model.name} subtitle={model.baseSize}>
+        <StatCard label="M" value={model.m} />
+        <StatCard label="T" value={model.t} />
+        <StatCard label="Sv" value={model.sv} />
+        <StatCard label="W" value={model.w} />
+        <StatCard label="Ld" value={model.ld} />
+        <StatCard label="OC" value={model.oc} />
       </StatsRow>
 
       {showInvulnerable ? (

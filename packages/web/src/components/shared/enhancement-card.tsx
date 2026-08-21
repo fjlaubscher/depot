@@ -2,16 +2,12 @@ import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface EnhancementCardProps {
   enhancement: depot.Enhancement;
 }
 
 const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
-  const { settings } = useSettingsContext();
-  const showFluff = settings.showFluff ?? true;
-
   return (
     <Card className="p-4 space-y-2 h-full">
       <div className="flex items-start justify-between gap-2">
@@ -32,8 +28,8 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
         ) : null}
       </div>
 
-      {showFluff && enhancement.legend ? (
-        <div className="text-sm text-muted font-medium italic">{enhancement.legend}</div>
+      {enhancement.legend ? (
+        <div className="ShowFluff text-sm text-muted font-medium italic">{enhancement.legend}</div>
       ) : null}
 
       <div

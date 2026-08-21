@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 import { Card, Tag, TagGroup } from '@/components/ui';
 import { COLLECTION_STATE_META } from '@/utils/collection';
@@ -41,11 +41,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
     <Card
       id={id}
       padding="sm"
-      className={classNames(
-        'relative flex h-full flex-col gap-2',
-        onClick && 'cursor-pointer',
-        className
-      )}
+      className={cx('relative flex h-full flex-col gap-2', onClick && 'cursor-pointer', className)}
       onClick={onClick}
       data-testid={dataTestId}
       data-state={state}

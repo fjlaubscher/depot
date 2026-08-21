@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 
-import RosterUnitProfile from './roster-unit-profile';
+import RosterUnitProfilePanel from './roster-unit-profile-panel';
 import { createMockDatasheet, createMockRosterUnit } from '@/test/mock-data';
 
-describe('RosterUnitProfile', () => {
+describe('RosterUnitProfilePanel', () => {
   it('renders model stats, abilities and selected wargear', () => {
     const datasheet = createMockDatasheet({
       abilities: [
@@ -33,7 +33,7 @@ describe('RosterUnitProfile', () => {
       selectedWargearAbilities: [datasheet.abilities[1]]
     });
 
-    render(<RosterUnitProfile unit={unit} abilitiesTestId="roster-unit-abilities" />);
+    render(<RosterUnitProfilePanel unit={unit} abilitiesTestId="roster-unit-abilities" />);
 
     expect(screen.getByTestId('roster-unit-profile')).toBeInTheDocument();
     expect(screen.getByTestId('roster-unit-abilities')).toBeInTheDocument();

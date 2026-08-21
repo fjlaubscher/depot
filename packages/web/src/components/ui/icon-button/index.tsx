@@ -1,46 +1,21 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
-import { useState, useRef, useEffect } from 'react';
-import classNames from 'classnames';
-import Loader from '../loader';
+import { cx } from '@/utils/cx';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  loading?: boolean;
+  size?: 'sm' | 'md';
   'aria-label': string; // Required for accessibility
 }
 
 const IconButton: FC<IconButtonProps> = ({
   variant = 'default',
   size = 'md',
-  loading = false,
   className,
-  disabled,
-  onClick,
   children,
   ...props
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!disabled && !loading) {
-      setIsPressed(true);
-      timeoutRef.current = setTimeout(() => setIsPressed(false), 60);
-      onClick?.(e);
-    }
-  };
-
   const baseClasses =
-    'inline-flex items-center justify-center rounded-md transition-all duration-75 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center rounded-md transition-all duration-75 cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
     default:
@@ -50,24 +25,15 @@ const IconButton: FC<IconButtonProps> = ({
 
   const sizeClasses = {
     sm: 'w-8 h-8 text-sm',
-    md: 'w-10 h-10 text-base',
-    lg: 'w-12 h-12 text-lg'
+    md: 'w-10 h-10 text-base'
   };
 
   return (
     <button
-      className={classNames(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        isPressed ? 'scale-95' : '',
-        className
-      )}
-      disabled={disabled || loading}
-      onClick={handleClick}
+      className={cx(baseClasses, variantClasses[variant], sizeClasses[size], className)}
       {...props}
     >
-      {loading ? <Loader size="sm" color="secondary" /> : children}
+      {children}
     </button>
   );
 };

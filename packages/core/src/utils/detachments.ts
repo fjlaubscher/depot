@@ -68,20 +68,12 @@ export const buildFactionDetachments = ({
 
 export const formatDetachmentOptionLabel = (
   detachment: Pick<Detachment, 'name' | 'type' | 'dp' | 'forceDisposition'>
-): string => {
-  if (detachment.type) {
-    return `${detachment.name} · ${detachment.type}`;
-  }
-
-  const parts = [detachment.name];
-  if (detachment.dp) {
-    parts.push(`${detachment.dp} DP`);
-  }
-  if (detachment.forceDisposition) {
-    parts.push(detachment.forceDisposition);
-  }
-  return parts.join(' · ');
-};
+): string =>
+  detachment.type
+    ? `${detachment.name} · ${detachment.type}`
+    : [detachment.name, detachment.dp && `${detachment.dp} DP`, detachment.forceDisposition]
+        .filter(Boolean)
+        .join(' · ');
 
 export const formatChapterDpLine = (chapterDp: { keyword: string; dp: string }[]): string =>
   chapterDp.map((entry) => `${entry.keyword} ${entry.dp} DP`).join(', ');
@@ -89,31 +81,9 @@ export const formatChapterDpLine = (chapterDp: { keyword: string; dp: string }[]
 export const matchDetachment = (
   current: { id?: string; slug?: string; name?: string } | undefined,
   candidates: Detachment[]
-): Detachment | undefined => {
-  if (!current || candidates.length === 0) {
-    return undefined;
-  }
-
-  if (current.id) {
-    const byId = candidates.find((entry) => entry.id === current.id);
-    if (byId) {
-      return byId;
-    }
-  }
-
-  if (current.slug) {
-    const bySlug = candidates.find((entry) => entry.slug === current.slug);
-    if (bySlug) {
-      return bySlug;
-    }
-  }
-
-  if (current.name) {
-    const byName = candidates.find((entry) => entry.name === current.name);
-    if (byName) {
-      return byName;
-    }
-  }
-
-  return undefined;
-};
+): Detachment | undefined =>
+  current &&
+  ((current.id && candidates.find((entry) => entry.id === current.id)) ||
+    (current.slug && candidates.find((entry) => entry.slug === current.slug)) ||
+    (current.name && candidates.find((entry) => entry.name === current.name)) ||
+    undefined);

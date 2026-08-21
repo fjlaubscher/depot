@@ -2,16 +2,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 // Context hooks
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader, ErrorState } from '@/components/ui';
+import { PageHeader, ErrorState, Filters, Search } from '@/components/ui';
 
 // Page components
 import Skeleton from './_components/skeleton';
 import AllianceSection from './_components/alliance-section';
-import SearchFilters from './_components/search-filters';
 
 // Utilities
 import {
@@ -72,7 +71,19 @@ const Factions: React.FC = () => {
           subtitle={`Browse ${totalFactions} factions across ${totalAlliances} alliances`}
         />
 
-        <SearchFilters query={query} onQueryChange={setQuery} onClear={() => setQuery('')} />
+        <Filters
+          showClear={!!query}
+          onClear={() => setQuery('')}
+          clearTestId="faction-search-clear"
+        >
+          <Search
+            label="Search by name"
+            value={query}
+            onChange={setQuery}
+            testId="faction-search"
+            className="w-full sm:max-w-3xl"
+          />
+        </Filters>
 
         {hasResults ? (
           <div className="flex flex-col gap-4">

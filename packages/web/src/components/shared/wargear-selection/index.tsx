@@ -5,18 +5,14 @@ import { separateWargearByType } from '@depot/core/utils/wargear';
 
 interface WargearSelectionProps {
   wargear: depot.Wargear[];
-  showSelectionColumn?: boolean;
-  selectedWargear?: depot.Wargear[];
-  onSelectionChange?: (wargear: depot.Wargear, selected: boolean) => void;
-  className?: string;
+  selectedWargear: depot.Wargear[];
+  onSelectionChange: (wargear: depot.Wargear, selected: boolean) => void;
 }
 
 const WargearSelection: React.FC<WargearSelectionProps> = ({
   wargear,
-  showSelectionColumn = false,
-  selectedWargear = [],
-  onSelectionChange,
-  className
+  selectedWargear,
+  onSelectionChange
 }) => {
   const { rangedWargear, meleeWargear, mixedWargear } = useMemo(() => {
     return separateWargearByType(wargear);
@@ -31,25 +27,22 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   }
 
   return (
-    <div className={`flex flex-col gap-4 ${className || ''}`} data-testid="wargear-table">
+    <div className="flex flex-col gap-4" data-testid="wargear-table">
       <WargearSection
         wargear={rangedWargear}
         title="Ranged Wargear"
-        showSelectionColumn={showSelectionColumn}
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={mixedWargear}
         title="Mixed Wargear"
-        showSelectionColumn={showSelectionColumn}
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={meleeWargear}
         title="Melee Wargear"
-        showSelectionColumn={showSelectionColumn}
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />

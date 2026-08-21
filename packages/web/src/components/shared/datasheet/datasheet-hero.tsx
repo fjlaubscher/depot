@@ -17,11 +17,10 @@ interface DatasheetHeroProps {
 
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, showPoints = true }) => {
   const { keywords, unitComposition, loadout, transport } = datasheet;
-  const groupedKeywords = useMemo(() => groupKeywords(keywords), [keywords]);
-  const keywordTags = useMemo(
-    () => [...groupedKeywords.datasheet, ...groupedKeywords.faction],
-    [groupedKeywords]
-  );
+  const keywordTags = useMemo(() => {
+    const grouped = groupKeywords(keywords);
+    return [...grouped.datasheet, ...grouped.faction];
+  }, [keywords]);
 
   return (
     <div className="flex flex-col gap-2">

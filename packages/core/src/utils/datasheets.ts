@@ -1,5 +1,5 @@
 import type { Datasheet, DatasheetSummary } from '../types/depot.js';
-import { sortByName } from './common.js';
+import { groupBy } from './common.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
 
@@ -23,23 +23,17 @@ export interface SupplementMetadata {
 export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
   datasheets: T[],
   filters?: DatasheetVisibilityFilters
-): T[] => {
-  if (!filters) {
-    return datasheets;
-  }
+): T[] =>
+  filters
+    ? datasheets.filter(
+        (sheet) =>
+          !(filters.showLegends === false && sheet.isLegends) &&
+          !(filters.showForgeWorld === false && sheet.isForgeWorld)
+      )
+    : datasheets;
 
-  return datasheets.filter((sheet) => {
-    if (filters.showLegends === false && sheet.isLegends) {
-      return false;
-    }
-
-    if (filters.showForgeWorld === false && sheet.isForgeWorld) {
-      return false;
-    }
-
-    return true;
-  });
-};
+export const isCharacter = (datasheet: Pick<Datasheet, 'keywords'>): boolean =>
+  datasheet.keywords.some((entry) => entry.keyword.toLowerCase().includes('character'));
 
 export const CODEX_SLUG = 'codex';
 
@@ -58,70 +52,39 @@ export const getSupplementKey = (sheet: DatasheetListItem) => sheet.supplementKe
 
 export const isSupplementEntry = (sheet: DatasheetListItem) => sheet.isSupplement === true;
 
-export const buildSupplementLabel = (slug: string, name?: string) => {
-  const normalizedSlug = normalizeSupplementValue(slug);
-
-  if (normalizedSlug === CODEX_SLUG) {
-    return 'None';
-  }
-
-  return name ?? toTitleCase(slug);
-};
+export const buildSupplementLabel = (slug: string, name?: string) =>
+  normalizeSupplementValue(slug) === CODEX_SLUG ? 'None' : (name ?? toTitleCase(slug));
 
 export const deriveSupplementMetadata = (datasheets: DatasheetListItem[]): SupplementMetadata => {
-  const hasSupplements = datasheets.some((sheet) => isSupplementEntry(sheet));
-  const hasCodexDatasheets = datasheets.some((sheet) => !isSupplementEntry(sheet));
-  const supplementCounts = new Map<string, number>();
-
-  datasheets.forEach((sheet) => {
-    const key = getSupplementKey(sheet);
-    supplementCounts.set(key, (supplementCounts.get(key) ?? 0) + 1);
-  });
-
+  const hasSupplements = datasheets.some(isSupplementEntry);
+  const hasCodexDatasheets = !datasheets.every(isSupplementEntry);
   if (!hasSupplements) {
-    return {
-      hasSupplements: false,
-      hasCodexDatasheets,
-      options: []
-    };
+    return { hasSupplements, hasCodexDatasheets, options: [] };
   }
 
-  const uniqueSupplements = new Map<string, string | undefined>();
-
-  datasheets.forEach((sheet) => {
-    if (!isSupplementEntry(sheet)) {
-      return;
-    }
-
-    const key = getSupplementKey(sheet);
-    if (uniqueSupplements.has(key)) {
-      return;
-    }
-
-    const label = sheet.supplementLabel ?? buildSupplementLabel(key, sheet.supplementName);
-    uniqueSupplements.set(key, label);
-  });
-
-  const supplementEntries = Array.from(uniqueSupplements.entries())
-    .map(([key, label]) => ({
-      value: key,
-      label: label ?? toTitleCase(key),
-      count: supplementCounts.get(key) ?? 0
-    }))
+  const bySupplement = groupBy(datasheets, getSupplementKey);
+  const supplementEntries = [...bySupplement]
+    .filter(([, sheets]) => sheets.some(isSupplementEntry))
+    .map(([key, sheets]) => {
+      const first = sheets.find(isSupplementEntry)!;
+      return {
+        value: key,
+        label: first.supplementLabel ?? buildSupplementLabel(key, first.supplementName),
+        count: sheets.length
+      };
+    })
     .sort((a, b) => a.label.localeCompare(b.label));
 
-  const options: SupplementOption[] = [
-    { label: 'All', value: 'all', count: datasheets.length },
-    ...(hasCodexDatasheets
-      ? [{ label: 'None', value: CODEX_SLUG, count: supplementCounts.get(CODEX_SLUG) ?? 0 }]
-      : []),
-    ...supplementEntries
-  ];
-
   return {
-    hasSupplements: true,
+    hasSupplements,
     hasCodexDatasheets,
-    options
+    options: [
+      { label: 'All', value: 'all', count: datasheets.length },
+      ...(hasCodexDatasheets
+        ? [{ label: 'None', value: CODEX_SLUG, count: bySupplement.get(CODEX_SLUG)?.length ?? 0 }]
+        : []),
+      ...supplementEntries
+    ]
   };
 };
 

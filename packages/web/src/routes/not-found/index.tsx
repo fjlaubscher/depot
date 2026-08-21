@@ -9,10 +9,6 @@ import Card from '@/components/ui/card';
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleGoHome = () => {
-    navigate('/');
-  };
-
   return (
     <AppLayout title="Page Not Found">
       <div className="flex flex-1 items-center justify-center p-4">
@@ -36,7 +32,7 @@ const NotFound: React.FC = () => {
 
             {/* Actions */}
             <div className="space-y-3">
-              <Button onClick={handleGoHome} className="w-full" data-testid="go-home-button">
+              <Button onClick={() => navigate('/')} className="w-full" data-testid="go-home-button">
                 <Home size={16} className="mr-2" />
                 Return to Home
               </Button>

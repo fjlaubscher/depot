@@ -2,16 +2,12 @@ import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface DetachmentAbilityCardProps {
   ability: depot.DetachmentAbility;
 }
 
 const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }) => {
-  const { settings } = useSettingsContext();
-  const showFluff = settings.showFluff ?? true;
-
   return (
     <Card className="p-4 space-y-2 h-full">
       <div className="flex items-start justify-between gap-2">
@@ -23,8 +19,8 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
         )}
       </div>
 
-      {showFluff && ability.legend && (
-        <div className="text-sm text-muted font-medium italic">{ability.legend}</div>
+      {ability.legend && (
+        <div className="ShowFluff text-sm text-muted font-medium italic">{ability.legend}</div>
       )}
 
       <div

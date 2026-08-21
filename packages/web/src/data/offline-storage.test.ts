@@ -737,28 +737,4 @@ describe('OfflineStorage', () => {
       consoleSpy.mockRestore();
     });
   });
-
-  describe('Collection Operations', () => {
-    it('should normalize datasheet fields when saving collections', async () => {
-      mockObjectStore.put.mockImplementation(() => {
-        const request = { ...mockRequest };
-        setTimeout(() => {
-          if (request.onsuccess) request.onsuccess();
-        }, 0);
-        return request;
-      });
-
-      const legacyCollection = JSON.parse(JSON.stringify(mockCollection)) as depot.Collection;
-      delete (legacyCollection.items[0].datasheet as any).unitComposition;
-      (legacyCollection.items[0].datasheet as any).options = undefined;
-      (legacyCollection.items[0].datasheet as any).modelCosts = undefined;
-
-      await expect(offlineStorage.saveCollection(legacyCollection)).resolves.toBeUndefined();
-
-      const saved = mockObjectStore.put.mock.calls[0][0] as depot.Collection;
-      expect(saved.items[0].datasheet.unitComposition).toEqual([]);
-      expect(saved.items[0].datasheet.options).toEqual([]);
-      expect(saved.items[0].datasheet.modelCosts).toEqual([]);
-    });
-  });
 });

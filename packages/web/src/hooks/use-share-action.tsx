@@ -2,13 +2,15 @@ import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import { Share2 } from 'lucide-react';
 import type { Action } from '@/components/ui/action-group';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useSettingsContext } from '@/contexts/settings/context';
+import { useToast } from '@/contexts/toast/context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 
 interface ShareActionOptions {
   title?: string;
   url?: string;
+  /** Share/copy this text instead of a URL. */
+  text?: string;
   ariaLabel?: string;
   testId?: string;
   icon?: ReactNode;
@@ -23,6 +25,7 @@ interface ShareActionOptions {
 export const useShareAction = ({
   title,
   url,
+  text,
   ariaLabel = 'Share link',
   testId,
   icon,
@@ -46,17 +49,31 @@ export const useShareAction = ({
       useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
     const copyFallback = async () => {
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(resolvedUrl);
-        showToast({ type: 'success', title: 'Link copied', message: copySuccessMessage });
-      } else {
+      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
         showToast({ type: 'error', title: 'Error', message: unavailableMessage });
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text ?? resolvedUrl);
+        showToast({
+          type: 'success',
+          title: text ? 'Copied' : 'Link copied',
+          message: copySuccessMessage
+        });
+      } catch {
+        showToast({
+          type: 'error',
+          title: 'Failed to copy',
+          message: 'Could not copy to the clipboard.'
+        });
       }
     };
 
     if (canUseNativeShare) {
       try {
-        await navigator.share({ title: resolvedTitle, url: resolvedUrl });
+        await navigator.share(
+          text ? { title: resolvedTitle, text } : { title: resolvedTitle, url: resolvedUrl }
+        );
         showToast({ type: 'success', title: 'Shared', message: shareSuccessMessage });
         return;
       } catch {
@@ -71,6 +88,7 @@ export const useShareAction = ({
     resolvedUrl,
     shareSuccessMessage,
     showToast,
+    text,
     unavailableMessage,
     useNativeShare
   ]);

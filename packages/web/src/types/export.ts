@@ -2,15 +2,12 @@ import type { depot } from '@depot/core';
 
 type UnknownRecord = Record<string, unknown>;
 
-/** Wahapedia edition path the export was built against (e.g. wh40k11ed). */
-export type GameEdition = string;
-
 export interface ExportedRoster {
   kind: 'roster';
   version: 1;
   dataVersion: string | null;
-  /** Optional; missing means legacy 10th-era export. */
-  edition?: GameEdition;
+  /** Wahapedia edition path (e.g. wh40k11ed); missing means legacy 10th-era export. */
+  edition?: string;
   roster: depot.Roster;
 }
 
@@ -18,8 +15,8 @@ export interface ExportedCollection {
   kind: 'collection';
   version: 1;
   dataVersion: string | null;
-  /** Optional; missing means legacy 10th-era export. */
-  edition?: GameEdition;
+  /** Wahapedia edition path (e.g. wh40k11ed); missing means legacy 10th-era export. */
+  edition?: string;
   collection: depot.Collection;
 }
 

@@ -23,7 +23,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 ## Data + Build Flow
 1. CLI fetches CSV from Wahapedia URLs at `https://wahapedia.ru/wh40k11ed/{File}.csv`.
 2. CSV is converted to JSON using `@depot/core` types.
-3. Output lands in `packages/cli/dist/json/` and `packages/cli/dist/data/`.
+3. Output lands in `packages/cli/dist/data/`.
 4. `scripts/copy-data.mjs` copies `dist/data/` into `packages/web/public/data/`.
 5. The web app reads from `public/data/` and caches in IndexedDB for offline use.
 
@@ -41,8 +41,8 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 
 ## Shared Utilities
 - All cross-package helpers now live in `@depot/core/src/utils`. The main entry points are:
-  - `utils/common` (slug safety, keyword grouping, enhancement helpers, array sorters, breadcrumb builders).
-  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/collection`, `utils/datasheets`, `utils/paths`, `utils/detachments`, `utils/model-costs`, and `utils/roster-share`.
+  - `utils/common` (slug safety, keyword grouping, faction alliances, array sorters, breadcrumb builders).
+  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/roster-legality`, `utils/rebind`, `utils/collection`, `utils/datasheets`, `utils/detachments`, `utils/model-costs`, and `utils/slug`.
 - Add Vitest coverage beside any new helper in core before wiring it into CLI/web.
 - `packages/web/src/utils` should only contain UI-specific wrappers (e.g., tag styles, absolute URL builders that read browser env). When moving a helper into core, delete the old web tests and recreate them beside the new shared file.
 
@@ -50,7 +50,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - Pure ESM with NodeNext; compiled output is in `packages/cli/dist`.
 - Relative imports inside `packages/cli/src` must include `.js` extensions.
 - Prefer `import type { wahapedia, depot } from '@depot/core'` for type-only usage; runtime helpers (e.g., `slug`) should be explicitly imported.
-- CLI reads/writes from `packages/cli/dist/{json,data,source_data}`; never point the web app directly at Wahapedia URLs.
+- CLI reads/writes from `packages/cli/dist/{data,source_data}`; never point the web app directly at Wahapedia URLs.
 
 ## E2E Tests
 - Playwright E2E specs live in `packages/web/e2e` and run via `pnpm --filter @depot/web test:e2e`.

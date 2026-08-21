@@ -3,21 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Plus, Pencil } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useRoster } from '@/contexts/roster/context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button } from '@/components/ui';
+import { PageHeader, Loader, Breadcrumbs, Button, Grid } from '@/components/ui';
 import { BackButton } from '@/components/shared';
 import {
   RosterHeader,
   RosterSection,
   RosterUnitCardEdit,
-  RosterEmptyState,
-  RosterUnitGrid
+  RosterEmptyState
 } from '@/components/shared/roster';
-import { getRosterDetachmentNames, getRosterFactionName } from '@depot/core/utils/roster';
+import { getRosterSubtitle } from '@depot/core/utils/roster';
 import RosterIssues from '@/routes/rosters/_components/roster-issues';
 
 const RosterEdit: FC = () => {
@@ -45,24 +44,6 @@ const RosterEdit: FC = () => {
     );
   }
 
-  const factionName = getRosterFactionName(roster);
-
-  const detachmentNames = getRosterDetachmentNames(roster);
-  const subtitle =
-    factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
-
-  const handleViewRoster = () => {
-    navigate(`/rosters/${roster.id}`);
-  };
-
-  const handleEditDetails = () => {
-    navigate(`/rosters/${roster.id}/details`);
-  };
-
-  const handleAddUnits = () => {
-    navigate(`/rosters/${roster.id}/add-units`);
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <BackButton to="/rosters" label="Rosters" ariaLabel="Back to Rosters" className="md:hidden" />
@@ -79,11 +60,11 @@ const RosterEdit: FC = () => {
 
       <PageHeader
         title={roster.name}
-        subtitle={subtitle}
+        subtitle={getRosterSubtitle(roster)}
         stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Pencil size={16} />,
-          onClick: handleEditDetails,
+          onClick: () => navigate(`/rosters/${roster.id}/details`),
           ariaLabel: 'Edit roster details'
         }}
       />
@@ -92,7 +73,7 @@ const RosterEdit: FC = () => {
         <div className="flex flex-wrap gap-2">
           <Button
             variant="secondary"
-            onClick={handleAddUnits}
+            onClick={() => navigate(`/rosters/${roster.id}/add-units`)}
             className="flex items-center gap-2"
             data-testid="add-units-button"
           >
@@ -101,7 +82,7 @@ const RosterEdit: FC = () => {
           </Button>
           <Button
             variant="secondary"
-            onClick={handleViewRoster}
+            onClick={() => navigate(`/rosters/${roster.id}`)}
             className="flex items-center gap-2"
             data-testid="view-roster-button"
           >
@@ -116,7 +97,7 @@ const RosterEdit: FC = () => {
       {/* Units List */}
       {roster.units.length > 0 ? (
         <RosterSection title={`Units (${sortedUnits.length})`} data-testid="roster-units-section">
-          <RosterUnitGrid>
+          <Grid cols={3}>
             {sortedUnits.map((unit) => (
               <RosterUnitCardEdit
                 key={unit.id}
@@ -127,7 +108,7 @@ const RosterEdit: FC = () => {
                 dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
               />
             ))}
-          </RosterUnitGrid>
+          </Grid>
         </RosterSection>
       ) : (
         <RosterEmptyState
@@ -135,7 +116,7 @@ const RosterEdit: FC = () => {
           dataTestId="empty-roster-state"
           action={{
             label: 'Add units',
-            onClick: handleAddUnits,
+            onClick: () => navigate(`/rosters/${roster.id}/add-units`),
             icon: <Plus size={14} />,
             testId: 'empty-roster-add-units'
           }}

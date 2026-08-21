@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { depot } from '@depot/core';
 
 import { Card, Tag, SelectField, Button } from '@/components/ui';
@@ -18,58 +18,37 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
   onAdd,
   getUnitCount
 }) => {
-  const availableModelCosts = useMemo(
-    () => modelCostsForOrdinal(datasheet.modelCosts),
-    [datasheet.modelCosts]
-  );
+  const availableModelCosts = modelCostsForOrdinal(datasheet.modelCosts);
 
   const [selectedCostLine, setSelectedCostLine] = useState<string | null>(
     availableModelCosts[0]?.line ?? null
   );
 
-  const modelCostOptions = useMemo(() => {
-    return availableModelCosts.map((cost) => ({
-      label: formatModelCostLabel(cost, datasheet.name),
-      value: cost.line
-    }));
-  }, [availableModelCosts, datasheet.name]);
+  const modelCostOptions = availableModelCosts.map((cost) => ({
+    label: formatModelCostLabel(cost, datasheet.name),
+    value: cost.line
+  }));
 
-  const selectedModelCost = useMemo(() => {
-    if (!availableModelCosts.length) {
-      return null;
-    }
+  const selectedModelCost =
+    availableModelCosts.find((cost) => cost.line === selectedCostLine) ??
+    availableModelCosts[0] ??
+    null;
 
-    const matched = availableModelCosts.find((cost) => cost.line === selectedCostLine);
-    return matched ?? availableModelCosts[0];
-  }, [availableModelCosts, selectedCostLine]);
+  const factionKeywords = groupKeywords(datasheet.keywords).faction;
+  const supplementStyles = getSupplementStyles(datasheet.supplementKey);
 
-  const factionKeywords = useMemo(() => {
-    return groupKeywords(datasheet.keywords).faction;
-  }, [datasheet.keywords]);
-
-  const supplementStyles = useMemo(
-    () => getSupplementStyles(datasheet.supplementKey),
-    [datasheet.supplementKey]
-  );
-
-  const isSupplementKeyword = (keyword: string): boolean => {
-    if (!datasheet.supplementKey && !datasheet.supplementLabel && !datasheet.supplementName) {
-      return false;
-    }
-
-    const normalize = (value: string) => value.toLowerCase().replace(/[\s-]+/g, '');
-    const keywordNorm = normalize(keyword);
-    const candidates = [
+  const normalize = (value: string) => value.toLowerCase().replace(/[\s-]+/g, '');
+  const supplementNames = new Set(
+    [
       datasheet.supplementLabel,
       datasheet.supplementName,
       datasheet.supplementSlug,
       datasheet.supplementKey
-    ].filter((value): value is string => Boolean(value));
-
-    const normalizedCandidates = candidates.map(normalize);
-
-    return normalizedCandidates.some((candidate) => candidate === keywordNorm);
-  };
+    ]
+      .filter((value): value is string => Boolean(value))
+      .map(normalize)
+  );
+  const isSupplementKeyword = (keyword: string) => supplementNames.has(normalize(keyword));
 
   const handleAdd = () => {
     if (selectedModelCost) {

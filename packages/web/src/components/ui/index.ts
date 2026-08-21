@@ -22,7 +22,6 @@ export { default as Sheet } from './sheet';
 export { Skeleton, SkeletonCard, PageHeaderSkeleton } from './skeleton';
 export { default as StatCard } from './stat-card';
 export { default as StatsRow } from './stats-row';
-export { default as Table } from './table';
 export { default as Tabs } from './tabs';
 export { Tag, TagGroup, TagSection } from './tag';
 export { default as Toast } from './toast';

@@ -1,47 +1,22 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
-import { useState, useRef, useEffect } from 'react';
-import classNames from 'classnames';
-import Loader from '../loader';
+import { cx } from '@/utils/cx';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'secondary' | 'accent' | 'error';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
   fullWidth?: boolean;
-  loading?: boolean;
 }
 
 const Button: FC<ButtonProps> = ({
   variant = 'default',
   size = 'md',
   fullWidth = false,
-  loading = false,
   className,
-  disabled,
-  onClick,
   children,
   ...props
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!disabled && !loading) {
-      setIsPressed(true);
-      timeoutRef.current = setTimeout(() => setIsPressed(false), 60);
-      onClick?.(e);
-    }
-  };
-
   const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-md transition-all duration-75 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
+    'inline-flex items-center justify-center font-medium rounded-md transition-all duration-75 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const variantClasses = {
     default: 'bg-primary-600 hover:bg-primary-700 text-white border border-primary-600',
@@ -54,34 +29,23 @@ const Button: FC<ButtonProps> = ({
 
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg'
+    md: 'px-4 py-2 text-base'
   };
 
   const widthClasses = fullWidth ? 'w-full' : '';
 
   return (
     <button
-      className={classNames(
+      className={cx(
         baseClasses,
         variantClasses[variant],
         sizeClasses[size],
         widthClasses,
-        isPressed ? 'scale-95' : '',
         className
       )}
-      disabled={disabled || loading}
-      onClick={handleClick}
       {...props}
     >
-      {loading ? (
-        <div className="flex items-center gap-2">
-          <Loader size="sm" color="white" />
-          Loading...
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </button>
   );
 };

@@ -4,64 +4,28 @@ import { SelectField } from '@/components/ui';
 import { formatModelCostLabel } from '@depot/core/utils/model-costs';
 
 interface ModelCostSelectionProps {
-  /** Already filtered to the rows that apply to this unit (see `modelCostsForOrdinal`). */
+  /** Already filtered to the rows that apply to this unit (see `modelCostsForOrdinal`); the shell only renders this with 2+ rows. */
   modelCosts: depot.ModelCost[];
   selectedModelCost: depot.ModelCost;
   onModelCostChange: (modelCost: depot.ModelCost) => void;
 }
 
 const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
-  modelCosts: availableModelCosts,
+  modelCosts,
   selectedModelCost,
   onModelCostChange
-}) => {
-  if (availableModelCosts.length === 0) {
-    return (
-      <div className="text-center py-8" data-testid="no-model-costs-available">
-        <p className="text-subtle">No unit size options available for this unit.</p>
-      </div>
-    );
-  }
-
-  if (availableModelCosts.length === 1) {
-    const singleCost = availableModelCosts[0];
-    return (
-      <div className="flex flex-col gap-2" data-testid="single-model-cost">
-        <div className="flex items-center justify-between p-3 border border-subtle rounded-lg surface-soft">
-          <span className="text-foreground">{singleCost.description}</span>
-          <span className="font-medium text-foreground">{singleCost.cost} pts</span>
-        </div>
-        <p className="text-sm text-subtle">This unit has only one size option available.</p>
-      </div>
-    );
-  }
-
-  const modelCostOptions = availableModelCosts.map((cost) => ({
-    value: cost.line,
-    label: formatModelCostLabel(cost)
-  }));
-
-  const currentValue = selectedModelCost?.line || '';
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLine = event.target.value;
-    const selectedCost = availableModelCosts.find((cost) => cost.line === selectedLine);
-
-    if (selectedCost) {
-      onModelCostChange(selectedCost);
-    }
-  };
-
-  return (
-    <SelectField
-      label="Unit Size"
-      value={currentValue}
-      onChange={handleChange}
-      options={modelCostOptions}
-      placeholder="Select unit size"
-      data-testid="model-cost-select"
-    />
-  );
-};
+}) => (
+  <SelectField
+    label="Unit Size"
+    value={selectedModelCost?.line || ''}
+    onChange={(event) => {
+      const selectedCost = modelCosts.find((cost) => cost.line === event.target.value);
+      if (selectedCost) onModelCostChange(selectedCost);
+    }}
+    options={modelCosts.map((cost) => ({ value: cost.line, label: formatModelCostLabel(cost) }))}
+    placeholder="Select unit size"
+    data-testid="model-cost-select"
+  />
+);
 
 export default ModelCostSelection;

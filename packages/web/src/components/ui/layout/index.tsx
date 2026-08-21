@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import type { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
@@ -16,21 +15,7 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({ children, title, sidebar }) => {
   const { sidebarOpen, closeSidebar, toggleSidebar } = useLayoutContext();
 
-  // Set document title
   useDocumentTitle(title);
-
-  // Close sidebar when resizing to desktop on mobile
-  useEffect(() => {
-    const handleResize = () => {
-      // Tailwind lg breakpoint
-      if (window.innerWidth >= 1024 && sidebarOpen) {
-        closeSidebar();
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarOpen, closeSidebar]);
 
   return (
     <div className="flex flex-col h-screen surface-muted">

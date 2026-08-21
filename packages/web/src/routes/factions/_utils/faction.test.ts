@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterFactionsByQuery, groupFactionsByAlliance, createTabLabels } from './faction';
+import { filterFactionsByQuery, groupFactionsByAlliance } from './faction';
 import type { depot } from '@depot/core';
 
 // Mock data for testing
@@ -96,13 +96,6 @@ describe('faction utilities', () => {
       expect(result).toHaveProperty('unaligned');
       expect(result.unaligned).toHaveLength(1);
       expect(result.unaligned[0].name).toBe('Unknown Faction');
-    });
-  });
-
-  describe('createTabLabels', () => {
-    it('should only show All Factions', () => {
-      const result = createTabLabels();
-      expect(result).toEqual(['All Factions']);
     });
   });
 });

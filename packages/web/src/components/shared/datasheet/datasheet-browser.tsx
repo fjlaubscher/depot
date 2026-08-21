@@ -1,13 +1,22 @@
-import { type ReactNode, useMemo, useState } from 'react';
-import { useDatasheetBrowser, type DatasheetFilters } from '@/hooks/use-datasheet-browser';
-import { useSupplementSelectionGuard } from '@/hooks/use-supplement-selection-guard';
-import { useSupplementState } from '@/hooks/use-supplement-state';
-import type { DatasheetListItem } from '@depot/core/utils/datasheets';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { sortByName } from '@depot/core/utils/common';
+import {
+  CODEX_SLUG,
+  type DatasheetListItem,
+  type DatasheetVisibilityFilters,
+  buildSupplementLabel,
+  deriveSupplementMetadata,
+  filterDatasheetsBySettings,
+  filterDatasheetsBySupplement,
+  getSupplementKey,
+  isSupplementEntry,
+  normalizeSupplementValue,
+  shouldResetSupplementSelection,
+  sortDatasheetsBySupplementPreference
+} from '@depot/core/utils/datasheets';
+import { Filters, Grid, Search } from '@/components/ui';
+import useDebounce from '@/hooks/use-debounce';
 import DatasheetSupplementTabs from './datasheet-supplement-tabs';
-import DatasheetFilterBar from './datasheet-filter-bar';
-import DatasheetResultsGrid from './datasheet-results-grid';
-import DatasheetEmptyState from './datasheet-empty-state';
-import { sortDatasheetsBySupplementPreference } from '@depot/core/utils/datasheets';
 import DatasheetListItemCard from './datasheet-list-item-card';
 
 interface DatasheetBrowserProps<T extends DatasheetListItem> {
@@ -16,8 +25,60 @@ interface DatasheetBrowserProps<T extends DatasheetListItem> {
   searchPlaceholder?: string;
   emptyStateMessage?: string;
   showItemCount?: boolean;
-  filters?: DatasheetFilters;
+  filters?: DatasheetVisibilityFilters;
 }
+
+const deriveSupplementState = <T extends DatasheetListItem>(
+  datasheets: T[],
+  filters: DatasheetVisibilityFilters | undefined,
+  selectedSupplement: string
+) => {
+  const metadata = deriveSupplementMetadata(filterDatasheetsBySettings(datasheets, filters));
+  const selected = normalizeSupplementValue(selectedSupplement || 'all');
+  const isFiltered = metadata.hasSupplements && selected !== 'all';
+  const codexDatasheets = metadata.hasSupplements
+    ? datasheets.filter((sheet) => !isSupplementEntry(sheet))
+    : [];
+  const activeDatasheets = !isFiltered
+    ? []
+    : selected === CODEX_SLUG
+      ? codexDatasheets
+      : datasheets.filter(
+          (sheet) => isSupplementEntry(sheet) && getSupplementKey(sheet) === selected
+        );
+  const filteredActive = filterDatasheetsBySettings(activeDatasheets, filters);
+
+  const label = !metadata.hasSupplements
+    ? null
+    : (metadata.options.find((option) => option.value === selectedSupplement)?.label ??
+      (selectedSupplement && selected !== 'all' ? buildSupplementLabel(selectedSupplement) : null));
+
+  let summary: string | null = null;
+  if (isFiltered && label) {
+    if (selected === CODEX_SLUG) {
+      summary = `${label} (core datasheets): ${filteredActive.length} datasheets`;
+    } else {
+      const shared = filterDatasheetsBySettings(codexDatasheets, filters).length;
+      summary =
+        shared === 0
+          ? `${label}: ${filteredActive.length} datasheets`
+          : `${label}: ${filteredActive.length} datasheets + ${shared} shared core datasheets`;
+    }
+  }
+
+  return {
+    hasSupplements: metadata.hasSupplements,
+    tabs: metadata.hasSupplements ? metadata.options : [],
+    selected,
+    isFiltered,
+    activeDatasheets,
+    filteredActive,
+    datasheets: metadata.hasSupplements
+      ? filterDatasheetsBySupplement(datasheets, selectedSupplement)
+      : datasheets,
+    summary
+  };
+};
 
 export const DatasheetBrowser = <T extends DatasheetListItem>({
   datasheets,
@@ -27,70 +88,77 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   showItemCount = true,
   filters
 }: DatasheetBrowserProps<T>) => {
-  const [selectedSupplement, setSelectedSupplement] = useState<string>('all');
+  const [selectedSupplement, setSelectedSupplement] = useState('all');
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
 
-  const {
-    supplementMetadata,
-    normalizedSelectedSupplement,
-    supplementTabs,
-    activeSupplementDatasheets,
-    supplementFilteredDatasheets,
-    filteredActiveSupplementDatasheets,
-    supplementSummary
-  } = useSupplementState<T>({
-    datasheets,
-    filters,
-    selectedSupplement
-  });
+  const supplement = useMemo(
+    () => deriveSupplementState(datasheets, filters, selectedSupplement),
+    [datasheets, filters, selectedSupplement]
+  );
 
-  useSupplementSelectionGuard({
-    filters,
-    supplementMetadata,
-    normalizedSelectedSupplement,
-    activeSupplementDatasheets,
-    filteredActiveSupplementDatasheets,
-    onResetSelection: () => setSelectedSupplement('all')
-  });
+  // Drop back to "all" when the selected supplement loses every visible datasheet
+  // (e.g. legends/forge world toggled off).
+  const prevFiltersRef = useRef(filters);
+  const prevActiveRef = useRef(supplement.activeDatasheets);
+  useEffect(() => {
+    const prevFilters = prevFiltersRef.current;
+    const prevActive = prevActiveRef.current;
+    prevFiltersRef.current = filters;
+    prevActiveRef.current = supplement.activeDatasheets;
 
-  const {
-    query,
-    setQuery,
-    debouncedQuery,
-    filteredDatasheets,
-    hasResults,
-    totalCount,
-    clearFilters
-  } = useDatasheetBrowser<T>(supplementFilteredDatasheets, filters);
+    if (!supplement.isFiltered) return;
 
+    if (prevActive.length > 0 && supplement.activeDatasheets.length === 0) {
+      setSelectedSupplement('all');
+      return;
+    }
+
+    const filtersChanged =
+      prevFilters !== undefined &&
+      (prevFilters.showLegends !== filters?.showLegends ||
+        prevFilters.showForgeWorld !== filters?.showForgeWorld);
+
+    if (
+      filtersChanged &&
+      shouldResetSupplementSelection(supplement.activeDatasheets, supplement.filteredActive)
+    ) {
+      setSelectedSupplement('all');
+    }
+  }, [filters, supplement]);
+
+  const filteredBySettings = useMemo(
+    () => filterDatasheetsBySettings(supplement.datasheets, filters),
+    [filters, supplement.datasheets]
+  );
+
+  const normalizedQuery = debouncedQuery.trim().toLowerCase();
   const visibleDatasheets = useMemo(() => {
+    const matches = normalizedQuery
+      ? filteredBySettings.filter((sheet) => sheet.name.toLowerCase().includes(normalizedQuery))
+      : filteredBySettings;
     return sortDatasheetsBySupplementPreference(
-      filteredDatasheets,
-      normalizedSelectedSupplement,
-      supplementMetadata.hasSupplements
+      sortByName(matches),
+      supplement.selected,
+      supplement.hasSupplements
     );
-  }, [filteredDatasheets, normalizedSelectedSupplement, supplementMetadata.hasSupplements]);
-
-  const handleSupplementChange = (value: string) => {
-    setSelectedSupplement(value);
-  };
+  }, [filteredBySettings, normalizedQuery, supplement.selected, supplement.hasSupplements]);
 
   const handleClearFilters = () => {
     setSelectedSupplement('all');
-    clearFilters();
+    setQuery('');
   };
 
-  const defaultRenderDatasheet = (datasheet: DatasheetListItem) => (
-    <DatasheetListItemCard
-      datasheet={datasheet}
-      supplementMetadataHasSupplements={supplementMetadata.hasSupplements}
-    />
-  );
-
   const renderItem: (datasheet: T) => ReactNode =
-    renderDatasheet ?? ((item) => defaultRenderDatasheet(item));
-  const isSupplementFiltered =
-    supplementMetadata.hasSupplements && normalizedSelectedSupplement !== 'all';
-  const showClear = Boolean(query.trim()) || isSupplementFiltered;
+    renderDatasheet ??
+    ((datasheet) => (
+      <DatasheetListItemCard
+        datasheet={datasheet}
+        supplementMetadataHasSupplements={supplement.hasSupplements}
+      />
+    ));
+
+  const showClear = Boolean(query.trim()) || supplement.isFiltered;
   const emptyMessage = debouncedQuery
     ? 'No datasheets found matching your filters.'
     : emptyStateMessage;
@@ -98,46 +166,53 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
-        {supplementTabs.length > 0 ? (
+        {supplement.tabs.length > 0 ? (
           <DatasheetSupplementTabs
-            tabs={supplementTabs}
-            activeValue={normalizedSelectedSupplement}
-            onChange={handleSupplementChange}
+            tabs={supplement.tabs}
+            activeValue={supplement.selected}
+            onChange={setSelectedSupplement}
           />
         ) : null}
 
-        <DatasheetFilterBar
-          query={query}
-          onQueryChange={setQuery}
-          onClear={handleClearFilters}
-          searchPlaceholder={searchPlaceholder}
+        <Filters
           showClear={showClear}
-          searchTestId="datasheet-search"
+          onClear={handleClearFilters}
           clearTestId="datasheet-search-clear"
-        />
-        {supplementSummary ? (
+        >
+          <Search
+            label="Search datasheets"
+            value={query}
+            onChange={setQuery}
+            placeholder={searchPlaceholder}
+            testId="datasheet-search"
+            className="w-full sm:max-w-3xl"
+          />
+        </Filters>
+        {supplement.summary ? (
           <span className="text-xs text-subtle" data-testid="supplement-summary">
-            {supplementSummary}
+            {supplement.summary}
           </span>
         ) : null}
         {showItemCount ? (
           <span className="text-sm text-subtle">
-            Showing {visibleDatasheets.length} of {totalCount} datasheets
-            {isSupplementFiltered ? ` (from ${datasheets.length} total)` : ''}
+            Showing {visibleDatasheets.length} of {filteredBySettings.length} datasheets
+            {supplement.isFiltered ? ` (from ${datasheets.length} total)` : ''}
           </span>
         ) : null}
       </div>
 
-      {hasResults ? (
-        <DatasheetResultsGrid>
+      {visibleDatasheets.length > 0 ? (
+        <Grid cols={3} className="min-h-[200px]" aria-live="polite" id="datasheet-results">
           {visibleDatasheets.map((datasheet) => (
             <div key={datasheet.slug} id={datasheet.id}>
               {renderItem(datasheet)}
             </div>
           ))}
-        </DatasheetResultsGrid>
+        </Grid>
       ) : (
-        <DatasheetEmptyState message={emptyMessage} />
+        <div className="flex flex-col items-center justify-center py-12 text-center text-subtle">
+          <p>{emptyMessage}</p>
+        </div>
       )}
     </div>
   );

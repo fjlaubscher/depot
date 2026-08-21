@@ -4,8 +4,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { createMockDatasheet } from '@/test/mock-data';
 import DatasheetProfile from './datasheet-profile';
 
-const mockModelStatsRow = vi.fn();
-
 vi.mock('./datasheet-hero', () => ({
   default: () => <div data-testid="datasheet-hero">Hero</div>
 }));
@@ -19,21 +17,10 @@ vi.mock('./datasheet-leader-rules', () => ({
 }));
 
 vi.mock('@/components/shared', () => ({
-  ModelStatsRow: (props: { model: unknown; variant?: string }) => {
-    mockModelStatsRow(props);
-    return (
-      <div data-testid="model-stats-row" data-variant={props.variant || 'default'}>
-        Model Row
-      </div>
-    );
-  }
+  ModelStatsRow: () => <div data-testid="model-stats-row">Model Row</div>
 }));
 
 describe('DatasheetProfile', () => {
-  beforeEach(() => {
-    mockModelStatsRow.mockClear();
-  });
-
   it('renders combined abilities with type-specific tag styles', () => {
     const datasheet = createMockDatasheet({
       abilities: [
@@ -80,32 +67,5 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
-  });
-
-  it('renders model rows using the default variant', () => {
-    const datasheet = createMockDatasheet({
-      models: [
-        {
-          line: '1',
-          datasheetId: 'model-1',
-          name: 'Test Model',
-          baseSize: '32mm',
-          baseSizeDescr: '',
-          m: '6"',
-          t: '4',
-          sv: '3+',
-          w: '2',
-          ld: '6+',
-          oc: '1',
-          invSv: '-',
-          invSvDescr: ''
-        }
-      ]
-    });
-
-    render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
-
-    expect(screen.getByTestId('model-stats-row')).toHaveAttribute('data-variant', 'default');
-    expect(mockModelStatsRow).toHaveBeenCalledWith(expect.objectContaining({ variant: 'default' }));
   });
 });

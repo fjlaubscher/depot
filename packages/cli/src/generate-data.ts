@@ -1,58 +1,12 @@
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-import {
-  detachments as detachmentUtils,
-  slug as slugUtils,
-  wargear as wargearUtils
-} from '@depot/core';
-import { sortByName } from '@depot/core/utils/common';
-import { normalizeModelCosts } from '@depot/core/utils/model-costs';
 import type { wahapedia, depot } from '@depot/core';
-import { getSupplementInfo } from './config/supplements.js';
+import { sortByName } from '@depot/core/utils/common';
+import { buildFactionDetachments, toDepotEnhancement } from '@depot/core/utils/detachments';
+import { normalizeModelCosts } from '@depot/core/utils/model-costs';
+import { createSlugGenerator } from '@depot/core/utils/slug';
+import { groupWargearProfiles } from '@depot/core/utils/wargear';
+import { supplements } from './config/supplements.js';
 
-const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const DIST_DIR = join(PKG_ROOT, 'dist');
-const JSON_DIR = join(DIST_DIR, 'json');
 const CODEX_SLUG = 'codex';
-
-const readFileAndParseToJSON = <T>(fileName: string): T[] =>
-  JSON.parse(readFileSync(join(JSON_DIR, fileName), { encoding: 'utf-8' }));
-
-const DATA_FILES: Record<keyof Omit<wahapedia.Data, 'lastUpdate'>, string> = {
-  factions: 'factions.json',
-  sources: 'source.json',
-  datasheets: 'datasheets.json',
-  datasheetAbilities: 'datasheets-abilities.json',
-  datasheetKeywords: 'datasheets-keywords.json',
-  datasheetModels: 'datasheets-models.json',
-  datasheetOptions: 'datasheets-options.json',
-  datasheetWargear: 'datasheets-wargear.json',
-  datasheetUnitComposition: 'datasheets-unit-composition.json',
-  datasheetModelCosts: 'datasheets-models-cost.json',
-  datasheetStratagems: 'datasheets-stratagems.json',
-  datasheetEnhancements: 'datasheets-enhancements.json',
-  datasheetDetachmentAbilities: 'datasheets-detachment-abilities.json',
-  datasheetLeaders: 'datasheets-leader.json',
-  stratagems: 'stratagems.json',
-  abilities: 'abilities.json',
-  enhancements: 'enhancements.json',
-  detachmentAbilities: 'detachment-abilities.json',
-  detachments: 'detachments.json',
-  detachmentChapterDp: 'detachments-chapter-dp.json'
-};
-
-const consolidateFiles = (): wahapedia.Data => {
-  const tables = Object.fromEntries(
-    Object.entries(DATA_FILES).map(([key, fileName]) => [key, readFileAndParseToJSON(fileName)])
-  ) as Omit<wahapedia.Data, 'lastUpdate'>;
-
-  return {
-    ...tables,
-    lastUpdate:
-      readFileAndParseToJSON<wahapedia.LastUpdate>('last-update.json')[0]?.lastUpdate ?? null
-  };
-};
 
 const buildDatasheet = (
   data: wahapedia.Data,
@@ -60,118 +14,68 @@ const buildDatasheet = (
   datasheetSlugs: Map<string, string>,
   factionSlugs: Map<string, string>
 ): depot.Datasheet => {
-  const abilities: depot.Ability[] = data.datasheetAbilities
-    .filter((ability: wahapedia.DatasheetAbility) => ability.datasheetId === datasheet.id)
-    .map((a: wahapedia.DatasheetAbility): depot.Ability | undefined => {
-      // If ability has an abilityId, look it up in the abilities table
-      if (a.abilityId) {
-        const referencedAbility = data.abilities.find(
-          (ability: wahapedia.Ability) => ability.id === a.abilityId
-        );
-        if (referencedAbility) {
-          return {
-            ...referencedAbility,
-            type: a.type, // Add the type from the datasheet-abilities data
-            parameter: a.parameter || referencedAbility.parameter
-          };
-        }
-        return undefined;
-      }
-      // If no abilityId but has name, use the inline ability data
-      else if (a.name) {
-        return {
-          id: '', // inline abilities don't have IDs
-          name: a.name,
-          legend: '', // inline abilities don't have legends
-          factionId: '', // inline abilities don't have factionIds
-          description: a.description,
-          type: a.type, // Add the type from the datasheet-abilities data
-          parameter: a.parameter
-        };
-      }
-      // Skip empty entries
-      return undefined;
-    })
-    .filter((ability): ability is depot.Ability => ability !== undefined);
+  const own = <T extends { datasheetId: string }>(rows: T[]): T[] =>
+    rows.filter((row) => row.datasheetId === datasheet.id);
+
+  const abilities = own(data.datasheetAbilities).flatMap((a): depot.Ability[] => {
+    if (a.abilityId) {
+      const referenced = data.abilities.find((ability) => ability.id === a.abilityId);
+      return referenced
+        ? [{ ...referenced, type: a.type, parameter: a.parameter || referenced.parameter }]
+        : [];
+    }
+    // Inline abilities carry no id / legend / factionId of their own.
+    return a.name
+      ? [
+          {
+            id: '',
+            name: a.name,
+            legend: '',
+            factionId: '',
+            description: a.description,
+            type: a.type,
+            parameter: a.parameter
+          }
+        ]
+      : [];
+  });
 
   const source = data.sources.find((entry) => entry.id === datasheet.sourceId);
   const sourceName = source?.name.trim() ?? '';
   const isForgeWorld = sourceName.endsWith('(Forge World)');
   const isLegends = sourceName.endsWith('(Warhammer Legends)') || sourceName.startsWith('Legends:');
 
-  const supplementInfo = getSupplementInfo(datasheet.sourceId);
+  const supplementInfo = supplements[datasheet.sourceId];
   const supplementKey = supplementInfo?.slug ?? CODEX_SLUG;
   const isSupplement = supplementKey !== CODEX_SLUG;
   const supplementLabel = isSupplement && supplementInfo ? supplementInfo.name : 'None';
 
-  const keywords = data.datasheetKeywords.filter(
-    (keyword: wahapedia.DatasheetKeyword) => keyword.datasheetId === datasheet.id
-  );
-  const models = data.datasheetModels.filter(
-    (model: wahapedia.DatasheetModel) => model.datasheetId === datasheet.id
-  );
-  const options = data.datasheetOptions.filter(
-    (option: wahapedia.DatasheetOption) => option.datasheetId === datasheet.id
-  );
-  const rawWargear = data.datasheetWargear.filter(
-    (wargear: wahapedia.DatasheetWargear) => wargear.datasheetId === datasheet.id
-  );
-  const unitComposition = data.datasheetUnitComposition.filter(
-    (uc: wahapedia.DatasheetUnitComposition) => uc.datasheetId === datasheet.id
-  );
-  const modelCosts = normalizeModelCosts(
-    data.datasheetModelCosts.filter(
-      (mc: wahapedia.DatasheetModelCost) => mc.datasheetId === datasheet.id
-    )
+  const stratagems = own(data.datasheetStratagems).map((ds) =>
+    data.stratagems.find((s) => s.id === ds.stratagemId)!
   );
 
-  const stratagems = data.datasheetStratagems
-    .filter((ds: wahapedia.DatasheetStratagem) => ds.datasheetId === datasheet.id)
-    .map((ds: wahapedia.DatasheetStratagem) =>
-      data.stratagems.find((s: wahapedia.Stratagem) => s.id === ds.stratagemId)!
-    );
+  const enhancements = own(data.datasheetEnhancements)
+    .map((de) => data.enhancements.find((e) => e.id === de.enhancementId))
+    .filter((e) => e !== undefined)
+    .map(toDepotEnhancement);
 
-  const enhancements = data.datasheetEnhancements
-    .filter((de: wahapedia.DatasheetEnhancement) => de.datasheetId === datasheet.id)
-    .map((de: wahapedia.DatasheetEnhancement) =>
-      data.enhancements.find((e: wahapedia.Enhancement) => e.id === de.enhancementId)
-    )
-    .filter((enhancement): enhancement is wahapedia.Enhancement => Boolean(enhancement))
-    .map(detachmentUtils.toDepotEnhancement);
-
-  const detachmentAbilities = data.datasheetDetachmentAbilities
-    .filter((dda: wahapedia.DatasheetDetachmentAbility) => dda.datasheetId === datasheet.id)
-    .map((dda: wahapedia.DatasheetDetachmentAbility) =>
-      data.detachmentAbilities.find(
-        (da: wahapedia.DetachmentAbility) => da.id === dda.detachmentAbilityId
-      )!
-    );
+  const detachmentAbilities = own(data.datasheetDetachmentAbilities).map((dda) =>
+    data.detachmentAbilities.find((da) => da.id === dda.detachmentAbilityId)!
+  );
 
   const leaders = data.datasheetLeaders
-    .filter((dl: wahapedia.DatasheetLeader) => dl.leaderId === datasheet.id)
-    .map((dl: wahapedia.DatasheetLeader) => ({
+    .filter((dl) => dl.leaderId === datasheet.id)
+    .map((dl) => ({
       id: dl.attachedId,
       slug: datasheetSlugs.get(dl.attachedId) ?? 'Unknown'
     }));
 
-  const factionSlug = factionSlugs.get(datasheet.factionId);
-  if (!factionSlug) {
-    throw new Error(`Missing slug for faction ${datasheet.factionId}`);
-  }
-
-  const datasheetSlug = datasheetSlugs.get(datasheet.id);
-  if (!datasheetSlug) {
-    throw new Error(`Missing slug for datasheet ${datasheet.id}`);
-  }
-
-  const wargear = wargearUtils.groupWargearProfiles(rawWargear);
-
   return {
     id: datasheet.id,
-    slug: datasheetSlug,
+    slug: datasheetSlugs.get(datasheet.id)!,
     name: datasheet.name,
     factionId: datasheet.factionId,
-    factionSlug,
+    factionSlug: factionSlugs.get(datasheet.factionId)!,
     sourceId: datasheet.sourceId,
     sourceName: source ? `${source.type}: ${source.name}` : undefined,
     supplementKey,
@@ -190,12 +94,12 @@ const buildDatasheet = (
     damagedDescription: datasheet.damagedDescription,
     link: datasheet.link,
     abilities,
-    keywords,
-    models,
-    options,
-    wargear,
-    unitComposition,
-    modelCosts,
+    keywords: own(data.datasheetKeywords),
+    models: own(data.datasheetModels),
+    options: own(data.datasheetOptions),
+    wargear: groupWargearProfiles(own(data.datasheetWargear)),
+    unitComposition: own(data.datasheetUnitComposition),
+    modelCosts: normalizeModelCosts(own(data.datasheetModelCosts)),
     stratagems,
     enhancements,
     detachmentAbilities,
@@ -205,21 +109,13 @@ const buildDatasheet = (
   };
 };
 
-const buildCoreStratagems = (stratagems: wahapedia.Stratagem[]): depot.Stratagem[] => {
-  const genericStratagems = stratagems.filter((stratagem) => !stratagem.factionId?.trim());
-  return sortByName(genericStratagems);
-};
-
 const buildFactionData = (
   data: wahapedia.Data,
   faction: wahapedia.Faction,
   datasheetSlugs: Map<string, string>,
   factionSlugs: Map<string, string>
 ): depot.Faction => {
-  const factionSlug = factionSlugs.get(faction.id);
-  if (!factionSlug) {
-    throw new Error(`Missing slug for faction ${faction.id}`);
-  }
+  const factionSlug = factionSlugs.get(faction.id)!;
 
   const datasheets = sortByName(
     data.datasheets
@@ -227,20 +123,14 @@ const buildFactionData = (
       .map((datasheet) => buildDatasheet(data, datasheet, datasheetSlugs, factionSlugs))
   );
 
-  const stratagems = data.stratagems.filter((strat) => strat.factionId === faction.id);
-  const enhancements = data.enhancements.filter(
-    (enhancement) => enhancement.factionId === faction.id
-  );
-  const detachmentAbilities = data.detachmentAbilities.filter((da) => da.factionId === faction.id);
-  const detachmentSlugGenerator = slugUtils.createSlugGenerator(`${factionSlug}-detachment`);
-  const detachments = detachmentUtils.buildFactionDetachments({
+  const detachments = buildFactionDetachments({
     factionId: faction.id,
     detachments: data.detachments,
     chapterDp: data.detachmentChapterDp,
-    abilities: detachmentAbilities,
-    enhancements,
-    stratagems,
-    createSlug: detachmentSlugGenerator
+    abilities: data.detachmentAbilities.filter((da) => da.factionId === faction.id),
+    enhancements: data.enhancements.filter((enhancement) => enhancement.factionId === faction.id),
+    stratagems: data.stratagems.filter((strat) => strat.factionId === faction.id),
+    createSlug: createSlugGenerator(`${factionSlug}-detachment`)
   });
 
   return {
@@ -251,29 +141,22 @@ const buildFactionData = (
   };
 };
 
-const generateData = () => {
-  const data = consolidateFiles();
-  const dataVersion = data.lastUpdate ?? null;
-
-  const factionSlugGenerator = slugUtils.createSlugGenerator('faction');
-  const datasheetSlugGenerator = slugUtils.createSlugGenerator('datasheet');
-  const factionSlugs = new Map<string, string>();
-  const datasheetSlugs = new Map<string, string>();
-
-  data.factions.forEach((faction) => {
-    factionSlugs.set(faction.id, factionSlugGenerator(faction.name));
-  });
-
-  data.datasheets.forEach((datasheet) => {
-    datasheetSlugs.set(datasheet.id, datasheetSlugGenerator(datasheet.name));
-  });
+const generateData = (data: wahapedia.Data) => {
+  const factionSlugGenerator = createSlugGenerator('faction');
+  const datasheetSlugGenerator = createSlugGenerator('datasheet');
+  const factionSlugs = new Map(data.factions.map((f) => [f.id, factionSlugGenerator(f.name)]));
+  const datasheetSlugs = new Map(
+    data.datasheets.map((d) => [d.id, datasheetSlugGenerator(d.name)])
+  );
 
   const factions = data.factions.map((f) =>
     buildFactionData(data, f, datasheetSlugs, factionSlugs)
   );
-  const coreStratagems = buildCoreStratagems(data.stratagems);
+  const coreStratagems = sortByName(
+    data.stratagems.filter((stratagem) => !stratagem.factionId?.trim())
+  );
 
-  return { factions, coreStratagems, dataVersion };
+  return { factions, coreStratagems, dataVersion: data.lastUpdate ?? undefined };
 };
 
 export default generateData;

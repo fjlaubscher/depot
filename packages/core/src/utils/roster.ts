@@ -1,5 +1,6 @@
 import type { Detachment, Roster } from '../types/depot.js';
 import { toTitleCase } from './datasheets.js';
+import { formatDetachmentOptionLabel } from './detachments.js';
 
 /** Selected detachments, falling back to the legacy single `detachment` field. */
 export const getRosterDetachments = (
@@ -14,49 +15,36 @@ export const getRosterDetachmentNames = (
     .map((detachment) => detachment.name)
     .join(', ');
 
-// Available in Node >= 18 and all modern browsers; not declared by the ES2022 TS lib.
-declare const crypto: { randomUUID: () => string };
-declare const structuredClone: <T>(value: T) => T;
+const points = (cost: string) => parseInt(cost, 10) || 0;
 
-export const calculateTotalPoints = (roster: Roster): number => {
-  let total = 0;
+export const calculateTotalPoints = (roster: Roster): number =>
+  roster.units.reduce((total, unit) => total + points(unit.modelCost.cost), 0) +
+  roster.enhancements.reduce((total, { enhancement }) => total + points(enhancement.cost), 0);
 
-  roster.units.forEach((unit) => {
-    total += parseInt(unit.modelCost.cost, 10) || 0;
-  });
-
-  roster.enhancements.forEach(({ enhancement }) => {
-    total += parseInt(enhancement.cost, 10) || 0;
-  });
-
-  return total;
+/** Fresh roster + unit ids, with enhancement/warlord references remapped to the new unit ids. */
+export const remapRosterIds = (roster: Roster): Roster => {
+  const unitIds = new Map(roster.units.map((unit) => [unit.id, crypto.randomUUID()]));
+  return {
+    ...roster,
+    id: crypto.randomUUID(),
+    units: roster.units.map((unit) => ({ ...unit, id: unitIds.get(unit.id)! })),
+    // Drop enhancements whose unit is missing — imports are untrusted files.
+    enhancements: roster.enhancements.flatMap((entry) => {
+      const unitId = unitIds.get(entry.unitId);
+      return unitId ? [{ ...entry, unitId }] : [];
+    }),
+    warlordUnitId: roster.warlordUnitId ? (unitIds.get(roster.warlordUnitId) ?? null) : null
+  };
 };
-
-export interface DuplicateRosterOptions {
-  dataVersion?: string | null;
-}
 
 export const createRosterDuplicate = (
   roster: Roster,
-  options: DuplicateRosterOptions = {}
+  options: { dataVersion?: string | null } = {}
 ): Roster => {
-  const copy = structuredClone(roster);
-  const unitIdMap = new Map(copy.units.map((unit) => [unit.id, crypto.randomUUID()]));
-
-  copy.id = crypto.randomUUID();
+  const copy = remapRosterIds(structuredClone(roster));
   copy.name = `${roster.name} (Copy)`;
   copy.dataVersion = options.dataVersion ?? roster.dataVersion ?? null;
-  copy.units.forEach((unit) => {
-    unit.id = unitIdMap.get(unit.id)!;
-  });
-  copy.enhancements.forEach((enhancement) => {
-    if (enhancement.unitId) {
-      enhancement.unitId = unitIdMap.get(enhancement.unitId) ?? enhancement.unitId;
-    }
-  });
-  copy.warlordUnitId = copy.warlordUnitId ? (unitIdMap.get(copy.warlordUnitId) ?? null) : null;
   copy.points.current = calculateTotalPoints(copy);
-
   return copy;
 };
 
@@ -69,9 +57,15 @@ export const getRosterFactionName = (roster: Roster): string => {
   return slug ? toTitleCase(slug) || slug : '';
 };
 
+/** "Faction • Detachment A, Detachment B" (or just the faction when no detachments). */
+export const getRosterSubtitle = (roster: Roster): string => {
+  const factionName = getRosterFactionName(roster);
+  const detachmentNames = getRosterDetachmentNames(roster);
+  return factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
+};
+
 export interface GenerateRosterShareTextOptions {
   includeWargear?: boolean;
-  includeWargearAbilities?: boolean;
 }
 
 export const generateRosterShareText = (
@@ -80,7 +74,6 @@ export const generateRosterShareText = (
   options: GenerateRosterShareTextOptions = {}
 ): string => {
   const includeWargear = options.includeWargear ?? false;
-  const includeWargearAbilities = options.includeWargearAbilities ?? includeWargear;
   const lines: string[] = [];
 
   lines.push(`*${roster.name}*`);
@@ -92,15 +85,7 @@ export const generateRosterShareText = (
   const detachments = getRosterDetachments(roster);
   if (detachments.length > 0) {
     const label = detachments.length === 1 ? 'Detachment' : 'Detachments';
-    lines.push(
-      `*${label}:* ${detachments
-        .map((detachment) =>
-          [detachment.name, detachment.dp && `${detachment.dp} DP`, detachment.forceDisposition]
-            .filter(Boolean)
-            .join(' · ')
-        )
-        .join('; ')}`
-    );
+    lines.push(`*${label}:* ${detachments.map(formatDetachmentOptionLabel).join('; ')}`);
   }
   lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
   lines.push('');
@@ -120,7 +105,7 @@ export const generateRosterShareText = (
       });
     }
 
-    if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
+    if (includeWargear && unit.selectedWargearAbilities?.length) {
       unit.selectedWargearAbilities.forEach((ability) => {
         lines.push(`  - [Wargear Ability] ${ability.name}`);
       });
