@@ -7,7 +7,7 @@ export interface Action {
   onClick: (e?: MouseEvent) => void;
   ariaLabel: string;
   variant?: 'primary' | 'secondary' | 'danger' | 'default' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
   disabled?: boolean;
   className?: string;
   'data-testid'?: string;
@@ -28,20 +28,9 @@ const getSpacingClass = (spacing: ActionGroupProps['spacing'] = 'normal') => {
   return spacingClasses[spacing];
 };
 
-const getIconButtonVariant = (variant: Action['variant']): 'default' | 'ghost' => {
-  // Map our action variants to IconButton variants
-  switch (variant) {
-    case 'primary':
-    case 'secondary':
-    case 'danger':
-      return 'ghost'; // Use ghost so we can apply custom colors
-    case 'default':
-      return 'default';
-    case 'ghost':
-    default:
-      return 'ghost';
-  }
-};
+// Coloured variants use ghost so the custom text colours apply.
+const getIconButtonVariant = (variant: Action['variant']): 'default' | 'ghost' =>
+  variant === 'default' ? 'default' : 'ghost';
 
 const getVariantClasses = (variant: Action['variant'] = 'ghost') => {
   const variantClasses = {

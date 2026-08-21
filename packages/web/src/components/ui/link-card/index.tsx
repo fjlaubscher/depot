@@ -1,5 +1,6 @@
 import type { AnchorHTMLAttributes, FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 import classNames from 'classnames';
 import Card from '../card';
 
@@ -10,23 +11,10 @@ interface LinkCardProps extends Omit<
   to: string;
   children: ReactNode;
   className?: string;
-  description?: string;
-  icon?: ReactNode;
-  /** Override the icon chip colours (defaults to primary tint). */
-  iconClassName?: string;
   showArrow?: boolean;
 }
 
-const LinkCard: FC<LinkCardProps> = ({
-  to,
-  children,
-  className,
-  description,
-  icon,
-  iconClassName,
-  showArrow = false,
-  ...rest
-}) => {
+const LinkCard: FC<LinkCardProps> = ({ to, children, className, showArrow = false, ...rest }) => {
   return (
     <Link
       to={to}
@@ -36,17 +24,6 @@ const LinkCard: FC<LinkCardProps> = ({
     >
       <Card interactive className="flex h-full flex-col gap-2">
         <div className="flex items-start justify-between gap-3">
-          {icon ? (
-            <span
-              className={classNames(
-                'inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl transition-colors duration-200',
-                iconClassName ??
-                  'bg-primary-50 text-primary-700 dark:bg-primary-500/15 dark:text-primary-200'
-              )}
-            >
-              {icon}
-            </span>
-          ) : null}
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <Card.Title
               as="h2"
@@ -54,30 +31,11 @@ const LinkCard: FC<LinkCardProps> = ({
             >
               {children}
             </Card.Title>
-            {description ? (
-              <Card.Description className="text-sm text-muted transition-colors duration-200 group-hover/link:text-body">
-                {description}
-              </Card.Description>
-            ) : null}
           </div>
 
           {showArrow ? (
             <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full surface-soft text-muted transition-colors duration-200 group-hover/link:surface-accent group-hover/link:text-accent-strong">
-              {/* callers can overlay their own arrow/icon if desired */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 17L17 7M10 7h7v7"
-                />
-              </svg>
+              <ArrowUpRight size={16} />
             </span>
           ) : null}
         </div>

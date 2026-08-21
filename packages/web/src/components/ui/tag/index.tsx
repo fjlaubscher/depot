@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
 }
 
 const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, children, ...props }) => {
@@ -20,8 +20,7 @@ const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, childr
 
   const sizeClasses = {
     sm: 'px-2 py-0.5 text-xs',
-    md: 'px-2.5 py-0.5 text-sm',
-    lg: 'px-3 py-1 text-base'
+    md: 'px-2.5 py-0.5 text-sm'
   };
 
   return (
@@ -59,7 +58,6 @@ interface TagSectionProps extends HTMLAttributes<HTMLElement> {
   title: string;
   description?: string;
   spacing?: 'sm' | 'md' | 'lg';
-  groupClassName?: string;
 }
 
 const TagSection: FC<TagSectionProps> = ({
@@ -67,7 +65,6 @@ const TagSection: FC<TagSectionProps> = ({
   description,
   spacing = 'sm',
   className,
-  groupClassName,
   children,
   ...props
 }) => {
@@ -78,9 +75,7 @@ const TagSection: FC<TagSectionProps> = ({
         {description ? <p className="text-xs text-subtle">{description}</p> : null}
       </div>
 
-      <TagGroup spacing={spacing} className={groupClassName}>
-        {children}
-      </TagGroup>
+      <TagGroup spacing={spacing}>{children}</TagGroup>
     </section>
   );
 };

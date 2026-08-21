@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import type { FC, ReactNode } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import classNames from 'classnames';
 
 interface CollapsibleSectionProps {
@@ -17,42 +16,25 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   children,
   className = '',
   dataTestId
-}) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-
-  // Generate unique ID for accessibility
-  const contentId = `collapsible-content-${Math.random().toString(36).substr(2, 9)}`;
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <div
-      className={classNames('border border-subtle rounded-lg', className)}
-      data-testid={dataTestId}
+}) => (
+  <details
+    open={defaultExpanded}
+    className={classNames('group border border-subtle rounded-lg', className)}
+    data-testid={dataTestId}
+  >
+    {/* role="button" keeps the a11y tree (and tests) identical to the old <button aria-expanded>. */}
+    <summary
+      role="button"
+      className="flex items-center justify-between p-4 list-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer [&::-webkit-details-marker]:hidden"
     >
-      <button
-        onClick={toggleExpanded}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-        aria-expanded={isExpanded}
-        aria-controls={contentId}
-      >
-        <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-        {isExpanded ? (
-          <ChevronUp size={20} className="text-subtle" />
-        ) : (
-          <ChevronDown size={20} className="text-subtle" />
-        )}
-      </button>
-
-      {isExpanded && (
-        <div id={contentId} className="border-t border-subtle p-4">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
+      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <ChevronDown
+        size={20}
+        className="text-subtle transition-transform duration-200 group-open:rotate-180"
+      />
+    </summary>
+    <div className="border-t border-subtle p-4">{children}</div>
+  </details>
+);
 
 export default CollapsibleSection;

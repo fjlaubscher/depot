@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import classNames from 'classnames';
 
 interface LoaderProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md';
   color?: 'primary' | 'secondary' | 'white';
   className?: string;
 }
@@ -10,8 +10,7 @@ interface LoaderProps {
 const Loader: FC<LoaderProps> = ({ size = 'md', color = 'primary', className }) => {
   const sizeClasses = {
     sm: 'w-4 h-4 border-2',
-    md: 'w-8 h-8 border-2',
-    lg: 'w-12 h-12 border-4'
+    md: 'w-8 h-8 border-2'
   };
 
   const colorClasses = {

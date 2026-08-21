@@ -2,36 +2,28 @@ import type { ElementType, HTMLAttributes } from 'react';
 import { forwardRef } from 'react';
 import classNames from 'classnames';
 
-export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+export type CardPadding = 'none' | 'sm' | 'md';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'outlined';
   padding?: CardPadding;
   interactive?: boolean;
 }
 
-const variantClasses: Record<NonNullable<CardProps['variant']>, string> = {
-  default: 'shadow-sm',
-  outlined: 'shadow-none'
-};
-
 const paddingClasses: Record<CardPadding, string> = {
   none: '',
   sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6'
+  md: 'p-4'
 };
 
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(
-  ({ variant = 'default', padding = 'md', className, interactive, onClick, ...props }, ref) => {
+  ({ padding = 'md', className, interactive, onClick, ...props }, ref) => {
     const isInteractive = interactive ?? typeof onClick === 'function';
 
     return (
       <div
         ref={ref}
         className={classNames(
-          'surface-card transition-shadow duration-200',
-          variantClasses[variant],
+          'surface-card shadow-sm transition-shadow duration-200',
           paddingClasses[padding],
           isInteractive &&
             'cursor-pointer hover:border-accent hover:shadow-md focus-visible:border-accent focus-visible:shadow-md focus-visible:outline-offset-2 focus-ring-primary',
@@ -114,23 +106,12 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(({ className, .
 
 CardContent.displayName = 'Card.Content';
 
-interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
-  align?: 'start' | 'center' | 'end';
-}
-
-const alignmentMap: Record<NonNullable<CardFooterProps['align']>, string> = {
-  start: 'justify-start',
-  center: 'justify-center',
-  end: 'justify-end'
-};
-
-const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ align = 'start', className, ...props }, ref) => (
+const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={classNames(
-        'flex w-full items-center gap-2 border-t border-subtle pt-2',
-        alignmentMap[align],
+        'flex w-full items-center justify-start gap-2 border-t border-subtle pt-2',
         className
       )}
       {...props}
@@ -142,11 +123,8 @@ CardFooter.displayName = 'Card.Footer';
 
 export type CardBadgeVariant = 'accent' | 'muted' | 'info' | 'success' | 'warning' | 'danger';
 
-export type CardBadgeSize = 'sm' | 'md';
-
 interface CardBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: CardBadgeVariant;
-  size?: CardBadgeSize;
 }
 
 const badgeVariantClasses: Record<CardBadgeVariant, string> = {
@@ -158,19 +136,13 @@ const badgeVariantClasses: Record<CardBadgeVariant, string> = {
   danger: 'surface-danger-strong text-danger-strong border-danger'
 };
 
-const badgeSizeClasses: Record<CardBadgeSize, string> = {
-  sm: 'px-2 py-1 text-xs',
-  md: 'px-3 py-1.5 text-sm'
-};
-
 const CardBadge = forwardRef<HTMLSpanElement, CardBadgeProps>(
-  ({ variant = 'accent', size = 'sm', className, ...props }, ref) => (
+  ({ variant = 'accent', className, ...props }, ref) => (
     <span
       ref={ref}
       className={classNames(
-        'inline-flex items-center gap-1 rounded-full border font-medium',
+        'inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium',
         badgeVariantClasses[variant],
-        badgeSizeClasses[size],
         className
       )}
       {...props}
@@ -180,26 +152,6 @@ const CardBadge = forwardRef<HTMLSpanElement, CardBadgeProps>(
 
 CardBadge.displayName = 'Card.Badge';
 
-interface CardBadgeGroupProps extends HTMLAttributes<HTMLDivElement> {
-  direction?: 'row' | 'column';
-}
-
-const CardBadgeGroup = forwardRef<HTMLDivElement, CardBadgeGroupProps>(
-  ({ direction = 'row', className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={classNames(
-        'flex gap-1',
-        direction === 'column' ? 'flex-col' : 'flex-row flex-wrap',
-        className
-      )}
-      {...props}
-    />
-  )
-);
-
-CardBadgeGroup.displayName = 'Card.BadgeGroup';
-
 const Card = Object.assign(CardRoot, {
   Header: CardHeader,
   Title: CardTitle,
@@ -208,8 +160,7 @@ const Card = Object.assign(CardRoot, {
   Legend: CardLegend,
   Content: CardContent,
   Footer: CardFooter,
-  Badge: CardBadge,
-  BadgeGroup: CardBadgeGroup
+  Badge: CardBadge
 });
 
 export default Card;

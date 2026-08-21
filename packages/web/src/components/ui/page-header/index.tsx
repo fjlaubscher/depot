@@ -13,15 +13,13 @@ interface PageHeaderProps extends HTMLAttributes<HTMLDivElement> {
     onClick: () => void;
     ariaLabel: string;
     variant?: 'default' | 'ghost';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'sm' | 'md';
     disabled?: boolean;
-    loading?: boolean;
     testId?: string;
   };
   actions?: Action[];
   className?: string;
   'data-testid'?: string;
-  alignActions?: 'inline' | 'right';
 }
 
 const PageHeader: FC<PageHeaderProps> = ({
@@ -31,12 +29,9 @@ const PageHeader: FC<PageHeaderProps> = ({
   action,
   actions,
   className,
-  alignActions = 'right',
   'data-testid': dataTestId,
   ...props
 }) => {
-  const actionsIsInline = alignActions === 'inline';
-
   const renderActions = () => {
     if (actions && actions.length > 0) {
       return (
@@ -53,7 +48,6 @@ const PageHeader: FC<PageHeaderProps> = ({
           aria-label={action.ariaLabel}
           variant={action.variant}
           size={action.size}
-          loading={action.loading}
           disabled={action.disabled}
           data-testid={action.testId || 'page-header-action'}
         >
@@ -71,17 +65,8 @@ const PageHeader: FC<PageHeaderProps> = ({
       data-testid={dataTestId || 'page-header'}
       {...props}
     >
-      <div
-        className={classNames(
-          'flex gap-2',
-          actionsIsInline ? 'items-center flex-wrap' : 'items-start justify-between'
-        )}
-      >
-        <div
-          className={classNames('min-w-0 flex flex-col', {
-            'flex-1': !actionsIsInline
-          })}
-        >
+      <div className="flex gap-2 items-start justify-between">
+        <div className="min-w-0 flex flex-col flex-1">
           <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>

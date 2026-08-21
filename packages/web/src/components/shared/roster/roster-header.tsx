@@ -11,16 +11,10 @@ interface RosterHeaderProps {
     detachment?: depot.Detachment;
     units?: depot.RosterUnit[];
   };
-  showEnhancements?: boolean;
-  showMax?: boolean;
 }
 
-const RosterHeader: FC<RosterHeaderProps> = ({
-  roster,
-  showEnhancements = true,
-  showMax = true
-}) => {
-  const hasCap = typeof roster.points.max === 'number' && showMax;
+const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
+  const hasCap = typeof roster.points.max === 'number';
   const pointsColor = hasCap
     ? roster.points.current > (roster.points.max ?? 0)
       ? 'text-danger'
@@ -55,12 +49,10 @@ const RosterHeader: FC<RosterHeaderProps> = ({
           </span>
         </div>
       ) : null}
-      {showEnhancements ? (
-        <div className="flex items-center gap-2">
-          <span className="text-subtle">Enhancements</span>
-          <span className="font-semibold text-foreground">{roster.enhancements?.length ?? 0}</span>
-        </div>
-      ) : null}
+      <div className="flex items-center gap-2">
+        <span className="text-subtle">Enhancements</span>
+        <span className="font-semibold text-foreground">{roster.enhancements?.length ?? 0}</span>
+      </div>
     </div>
   );
 };

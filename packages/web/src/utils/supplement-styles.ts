@@ -80,6 +80,4 @@ export const getSupplementStyles = (supplementKey?: string | null): SupplementSt
   return SUPPLEMENT_COLOR_MAP[normalized] ?? DEFAULT_STYLE;
 };
 
-export const supplementColorKeys = Object.keys(SUPPLEMENT_COLOR_MAP);
-
 export default getSupplementStyles;

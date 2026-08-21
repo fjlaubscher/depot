@@ -6,7 +6,6 @@ import { Button } from '@/components/ui';
 
 type ImportButtonProps = {
   label?: string;
-  accept?: string;
   multiple?: boolean;
   onFilesSelected: (files: File[]) => void;
   buttonTestId?: string;
@@ -15,7 +14,6 @@ type ImportButtonProps = {
 
 const ImportButton: FC<ImportButtonProps> = ({
   label = 'Import',
-  accept = 'application/json,.json',
   multiple = false,
   onFilesSelected,
   buttonTestId = 'import-button',
@@ -47,7 +45,7 @@ const ImportButton: FC<ImportButtonProps> = ({
         ref={fileInputRef}
         className="hidden"
         type="file"
-        accept={accept}
+        accept="application/json,.json"
         multiple={multiple}
         onChange={handleChange}
         data-testid={inputTestId}

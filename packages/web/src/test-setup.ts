@@ -8,6 +8,15 @@ beforeAll(() => {
   }
 });
 
+// jsdom does not implement <dialog> showModal/close.
+HTMLDialogElement.prototype.showModal ??= function () {
+  this.setAttribute('open', '');
+};
+HTMLDialogElement.prototype.close ??= function () {
+  this.removeAttribute('open');
+  this.dispatchEvent(new Event('close'));
+};
+
 // Mock IndexedDB globally for all tests
 const mockIDBDatabase = {
   transaction: vi.fn().mockReturnValue({
