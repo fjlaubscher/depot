@@ -1,8 +1,6 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, type Mock } from 'vitest';
-import { LayoutProvider } from '@/contexts/layout/context';
-import { ToastProvider } from '@/contexts/toast/context';
 import { AppProvider } from '@/contexts/app-provider';
 
 /**
@@ -12,11 +10,7 @@ import { AppProvider } from '@/contexts/app-provider';
 // Common test wrapper with all required providers - uses MemoryRouter for isolated testing
 export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <MemoryRouter>
-    <AppProvider>
-      <ToastProvider>
-        <LayoutProvider>{children}</LayoutProvider>
-      </ToastProvider>
-    </AppProvider>
+    <AppProvider>{children}</AppProvider>
   </MemoryRouter>
 );
 
@@ -63,7 +57,7 @@ export const setupCommonMocks = async (mocks: ReturnType<typeof createMockFuncti
   const useDatasheetMock = await import('@/hooks/use-datasheet');
   vi.mocked(useDatasheetMock.default).mockImplementation(mockUseDatasheet);
 
-  const useToastMock = await import('@/contexts/toast/use-toast-context');
+  const useToastMock = await import('@/contexts/toast/context');
   vi.mocked(useToastMock.useToast).mockImplementation(mockUseToastContext);
 
   return mocks;

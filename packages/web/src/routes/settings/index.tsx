@@ -11,9 +11,9 @@ import SettingsCard from './_components/settings-card';
 import SettingToggleItem from './_components/setting-toggle-item';
 
 // Hooks and Context
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 
 const Settings = () => {
   const { showToast } = useToast();

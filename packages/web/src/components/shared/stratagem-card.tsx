@@ -1,7 +1,6 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 
 interface StratagemCardProps {
   stratagem: depot.Stratagem;
@@ -9,9 +8,6 @@ interface StratagemCardProps {
 }
 
 const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = [] }) => {
-  const { settings } = useSettingsContext();
-  const showFluff = settings.showFluff ?? true;
-
   return (
     <Card className="flex h-full flex-col gap-3" padding="md">
       <Card.Header className="items-start gap-3">
@@ -23,8 +19,8 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
         </Card.Badge>
       </Card.Header>
 
-      {showFluff && stratagem.legend ? (
-        <Card.Legend className="text-sm">{stratagem.legend}</Card.Legend>
+      {stratagem.legend ? (
+        <Card.Legend className="ShowFluff text-sm">{stratagem.legend}</Card.Legend>
       ) : null}
 
       <Card.Badge variant="muted" className="self-start uppercase tracking-wide">

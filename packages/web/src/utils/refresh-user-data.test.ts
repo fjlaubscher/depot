@@ -3,8 +3,7 @@ import type { depot } from '@depot/core';
 import {
   formatRebindSummaryMessage,
   rebindRosterUnits,
-  refreshRosterData,
-  refreshCollectionData,
+  refreshRosterDataWithReport,
   refreshCollectionDataWithReport
 } from './refresh-user-data';
 
@@ -111,7 +110,7 @@ describe('refresh-user-data utilities', () => {
     points: { current: 10 }
   };
 
-  it('refreshRosterData updates datasheets, detachment, points, and dataVersion', async () => {
+  it('refreshRosterDataWithReport updates datasheets, detachment, points, and dataVersion', async () => {
     const refreshedDatasheet = buildDatasheet({ name: 'Unit One Updated', slug: 'unit-one-new' });
     const refreshedDetachment: depot.Detachment = {
       id: 'det-1',
@@ -127,7 +126,7 @@ describe('refresh-user-data utilities', () => {
       stratagems: []
     };
 
-    const result = await refreshRosterData({
+    const { roster: result } = await refreshRosterDataWithReport({
       roster: baseRoster,
       currentDataVersion: 'new-version',
       getDatasheet: vi.fn().mockResolvedValue(refreshedDatasheet),
@@ -168,10 +167,10 @@ describe('refresh-user-data utilities', () => {
     expect(result.summary.ok + result.summary.partial).toBe(1);
   });
 
-  it('refreshCollectionData updates datasheets, recalculates points, and dataVersion', async () => {
+  it('refreshCollectionDataWithReport updates datasheets, recalculates points, and dataVersion', async () => {
     const refreshedDatasheet = buildDatasheet({ name: 'Updated', slug: 'unit-one-new' });
 
-    const result = await refreshCollectionData({
+    const { collection: result } = await refreshCollectionDataWithReport({
       collection: baseCollection,
       currentDataVersion: 'new-version',
       getDatasheet: vi.fn().mockResolvedValue(refreshedDatasheet)
@@ -246,7 +245,7 @@ describe('refresh-user-data utilities', () => {
 
   it('throws when currentDataVersion is missing for roster refresh', async () => {
     await expect(
-      refreshRosterData({
+      refreshRosterDataWithReport({
         roster: baseRoster,
         currentDataVersion: null,
         getDatasheet: vi.fn(),
@@ -257,7 +256,7 @@ describe('refresh-user-data utilities', () => {
 
   it('throws when currentDataVersion is missing for collection refresh', async () => {
     await expect(
-      refreshCollectionData({
+      refreshCollectionDataWithReport({
         collection: baseCollection,
         currentDataVersion: null,
         getDatasheet: vi.fn()

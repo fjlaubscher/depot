@@ -1,7 +1,7 @@
 import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
-import { normalizeDatasheetWargear, normalizeSelectedWargear } from '@depot/core/utils/wargear';
-import { normalizeSelectedWargearAbilities } from '@depot/core/utils/abilities';
+import { normalizeDatasheetWargear } from '@depot/core/utils/wargear';
+import { normalizeUnit } from '@/contexts/roster/reducer';
 import type { CachedFaction } from '@/types/offline';
 
 // Database configuration constants
@@ -43,33 +43,6 @@ const req = <T>(r: IDBRequest<T>): Promise<T> =>
     r.onerror = () => rej(r.error);
   });
 
-const ensureArray = <T>(value: T[] | undefined): T[] => (Array.isArray(value) ? value : []);
-const ensureString = (value: string | undefined): string => value ?? '';
-
-const normalizeDatasheetStructure = (datasheet: depot.Datasheet): depot.Datasheet => {
-  const normalized = normalizeDatasheetWargear(datasheet);
-  return {
-    ...normalized,
-    abilities: ensureArray(normalized.abilities),
-    keywords: ensureArray(normalized.keywords),
-    models: ensureArray(normalized.models),
-    options: ensureArray(normalized.options),
-    wargear: ensureArray(normalized.wargear),
-    unitComposition: ensureArray(normalized.unitComposition),
-    modelCosts: ensureArray(normalized.modelCosts),
-    stratagems: ensureArray(normalized.stratagems),
-    enhancements: ensureArray(normalized.enhancements),
-    detachmentAbilities: ensureArray(normalized.detachmentAbilities),
-    leaders: ensureArray(normalized.leaders),
-    loadout: ensureString(normalized.loadout),
-    transport: ensureString(normalized.transport),
-    leaderHead: ensureString(normalized.leaderHead),
-    leaderFooter: ensureString(normalized.leaderFooter),
-    damagedW: ensureString(normalized.damagedW),
-    damagedDescription: ensureString(normalized.damagedDescription)
-  };
-};
-
 const normalizeRoster = (roster: depot.Roster): depot.Roster => {
   const factionSlug = roster.factionSlug ?? roster.faction?.slug ?? roster.factionId;
 
@@ -81,22 +54,7 @@ const normalizeRoster = (roster: depot.Roster): depot.Roster => {
       ? { ...roster.faction, slug: roster.faction.slug ?? factionSlug }
       : roster.faction,
     warlordUnitId: roster.warlordUnitId ?? null,
-    units: roster.units.map((unit) => {
-      const normalizedDatasheet = normalizeDatasheetStructure(unit.datasheet);
-      return {
-        ...unit,
-        datasheet: normalizedDatasheet,
-        selectedWargear: normalizeSelectedWargear(
-          unit.selectedWargear,
-          normalizedDatasheet.wargear
-        ),
-        selectedWargearAbilities: normalizeSelectedWargearAbilities(
-          unit.selectedWargearAbilities,
-          normalizedDatasheet.abilities
-        ),
-        datasheetSlug: unit.datasheetSlug ?? normalizedDatasheet.slug
-      };
-    })
+    units: roster.units.map(normalizeUnit)
   };
 };
 
@@ -110,22 +68,7 @@ const normalizeCollection = (collection: depot.Collection): depot.Collection => 
     faction: collection.faction
       ? { ...collection.faction, slug: collection.faction.slug ?? factionSlug }
       : collection.faction,
-    items: collection.items.map((item) => {
-      const normalizedDatasheet = normalizeDatasheetStructure(item.datasheet);
-      return {
-        ...item,
-        datasheet: normalizedDatasheet,
-        selectedWargear: normalizeSelectedWargear(
-          item.selectedWargear,
-          normalizedDatasheet.wargear
-        ),
-        selectedWargearAbilities: normalizeSelectedWargearAbilities(
-          item.selectedWargearAbilities,
-          normalizedDatasheet.abilities
-        ),
-        datasheetSlug: item.datasheetSlug ?? normalizedDatasheet.slug
-      };
-    }),
+    items: collection.items.map(normalizeUnit),
     points: {
       current:
         collection.points?.current ??
@@ -231,14 +174,9 @@ class OfflineStorage {
   }
 
   async setFactionIndex(index: depot.Index[]): Promise<void> {
-    try {
-      const store = await this.store(STORES.FACTION_INDEX, 'readwrite');
-      await req(store.clear());
-      await Promise.all(index.map((faction) => req(store.put(faction))));
-    } catch (error) {
-      console.error('Failed to set faction index in IndexedDB:', error);
-      throw error;
-    }
+    const store = await this.store(STORES.FACTION_INDEX, 'readwrite');
+    await req(store.clear());
+    await Promise.all(index.map((faction) => req(store.put(faction))));
   }
 
   // Faction Data Operations
@@ -253,13 +191,8 @@ class OfflineStorage {
   }
 
   async setFactionManifest(factionSlug: string, manifest: depot.FactionManifest): Promise<void> {
-    try {
-      const store = await this.store(STORES.FACTION_MANIFESTS, 'readwrite');
-      await req(store.put(manifest, factionSlug));
-    } catch (error) {
-      console.error(`Failed to set manifest for ${factionSlug} in IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.FACTION_MANIFESTS, 'readwrite');
+    await req(store.put(manifest, factionSlug));
   }
 
   async getDatasheet(datasheetId: string): Promise<depot.Datasheet | null> {
@@ -273,13 +206,8 @@ class OfflineStorage {
   }
 
   async setDatasheet(datasheet: depot.Datasheet): Promise<void> {
-    try {
-      const store = await this.store(STORES.DATASHEETS, 'readwrite');
-      await req(store.put(normalizeDatasheetStructure(datasheet), datasheet.id));
-    } catch (error) {
-      console.error(`Failed to set datasheet ${datasheet.id} in IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.DATASHEETS, 'readwrite');
+    await req(store.put(normalizeDatasheetWargear(datasheet), datasheet.id));
   }
 
   // Collections
@@ -304,23 +232,13 @@ class OfflineStorage {
   }
 
   async saveCollection(collection: depot.Collection): Promise<void> {
-    try {
-      const store = await this.store(STORES.COLLECTIONS, 'readwrite');
-      await req(store.put(stampTimestamps(normalizeCollection(collection))));
-    } catch (error) {
-      console.error(`Failed to save collection ${collection.id} in IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.COLLECTIONS, 'readwrite');
+    await req(store.put(stampTimestamps(normalizeCollection(collection))));
   }
 
   async deleteCollection(id: string): Promise<void> {
-    try {
-      const store = await this.store(STORES.COLLECTIONS, 'readwrite');
-      await req(store.delete(id));
-    } catch (error) {
-      console.error(`Failed to delete collection ${id} from IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.COLLECTIONS, 'readwrite');
+    await req(store.delete(id));
   }
 
   async getAllCachedFactions(): Promise<CachedFaction[]> {
@@ -371,13 +289,8 @@ class OfflineStorage {
   }
 
   async setSettings(settings: depot.Settings): Promise<void> {
-    try {
-      const store = await this.store(STORES.SETTINGS, 'readwrite');
-      await req(store.put(mergeSettingsWithDefaults(settings), KEYS.SETTINGS));
-    } catch (error) {
-      console.error('Failed to set settings in IndexedDB:', error);
-      throw error;
-    }
+    const store = await this.store(STORES.SETTINGS, 'readwrite');
+    await req(store.put(mergeSettingsWithDefaults(settings), KEYS.SETTINGS));
   }
 
   async getDataVersion(): Promise<string | null> {
@@ -391,13 +304,8 @@ class OfflineStorage {
   }
 
   async setDataVersion(version: string): Promise<void> {
-    try {
-      const store = await this.store(STORES.USER_DATA, 'readwrite');
-      await req(store.put(version, KEYS.DATA_VERSION));
-    } catch (error) {
-      console.error('Failed to set data version in IndexedDB:', error);
-      throw error;
-    }
+    const store = await this.store(STORES.USER_DATA, 'readwrite');
+    await req(store.put(version, KEYS.DATA_VERSION));
   }
 
   // Bookmark Operations (USER_DATA key-value)
@@ -413,26 +321,8 @@ class OfflineStorage {
   }
 
   async setBookmarks(bookmarks: depot.Bookmark[]): Promise<void> {
-    try {
-      const store = await this.store(STORES.USER_DATA, 'readwrite');
-      await req(store.put(bookmarks, KEYS.BOOKMARKS));
-    } catch (error) {
-      console.error('Failed to set bookmarks in IndexedDB:', error);
-      throw error;
-    }
-  }
-
-  async addBookmark(bookmark: depot.Bookmark): Promise<void> {
-    const existing = await this.getBookmarks();
-    if (existing.some((entry) => entry.id === bookmark.id)) {
-      return;
-    }
-    await this.setBookmarks([bookmark, ...existing]);
-  }
-
-  async removeBookmark(id: string): Promise<void> {
-    const existing = await this.getBookmarks();
-    await this.setBookmarks(existing.filter((entry) => entry.id !== id));
+    const store = await this.store(STORES.USER_DATA, 'readwrite');
+    await req(store.put(bookmarks, KEYS.BOOKMARKS));
   }
 
   /** Returns true when the bookmark is present after the toggle. */
@@ -449,13 +339,8 @@ class OfflineStorage {
 
   // Roster Operations
   async saveRoster(roster: depot.Roster): Promise<void> {
-    try {
-      const store = await this.store(STORES.ROSTERS, 'readwrite');
-      await req(store.put(stampTimestamps(normalizeRoster(roster))));
-    } catch (error) {
-      console.error(`Failed to save roster ${roster.id} in IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.ROSTERS, 'readwrite');
+    await req(store.put(stampTimestamps(normalizeRoster(roster))));
   }
 
   async getRoster(rosterId: string): Promise<depot.Roster | null> {
@@ -479,57 +364,35 @@ class OfflineStorage {
   }
 
   async deleteRoster(rosterId: string): Promise<void> {
-    try {
-      const store = await this.store(STORES.ROSTERS, 'readwrite');
-      await req(store.delete(rosterId));
-    } catch (error) {
-      console.error(`Failed to delete roster ${rosterId} from IndexedDB:`, error);
-      throw error;
-    }
+    const store = await this.store(STORES.ROSTERS, 'readwrite');
+    await req(store.delete(rosterId));
   }
 
   // Database Management
   async clearFactionData(): Promise<void> {
-    try {
-      const db = await this.getDB();
-      const transaction = db.transaction(
-        [STORES.FACTION_INDEX, STORES.FACTION_MANIFESTS, STORES.DATASHEETS],
-        'readwrite'
-      );
-
-      await Promise.all(
-        [STORES.FACTION_INDEX, STORES.FACTION_MANIFESTS, STORES.DATASHEETS].map((storeName) =>
-          req(transaction.objectStore(storeName).clear())
-        )
-      );
-    } catch (error) {
-      console.error('Failed to clear faction cache from IndexedDB:', error);
-      throw error;
-    }
+    const db = await this.getDB();
+    const stores = [STORES.FACTION_INDEX, STORES.FACTION_MANIFESTS, STORES.DATASHEETS];
+    const transaction = db.transaction(stores, 'readwrite');
+    await Promise.all(stores.map((storeName) => req(transaction.objectStore(storeName).clear())));
   }
 
   async destroy(): Promise<void> {
-    try {
-      // Close existing connections
-      if (this.dbPromise) {
-        const db = await this.dbPromise;
-        db.close();
-        this.dbPromise = null;
-      }
-
-      // Delete the database
-      const request = indexedDB.deleteDatabase(DB_CONFIG.NAME);
-
-      // Some mocks may not return a real request; guard accordingly
-      if (!request) {
-        return;
-      }
-
-      await req(request);
-    } catch (error) {
-      console.error('Failed to destroy IndexedDB:', error);
-      throw error;
+    // Close existing connections
+    if (this.dbPromise) {
+      const db = await this.dbPromise;
+      db.close();
+      this.dbPromise = null;
     }
+
+    // Delete the database
+    const request = indexedDB.deleteDatabase(DB_CONFIG.NAME);
+
+    // Some mocks may not return a real request; guard accordingly
+    if (!request) {
+      return;
+    }
+
+    await req(request);
   }
 }
 

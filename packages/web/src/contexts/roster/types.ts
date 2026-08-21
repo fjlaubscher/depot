@@ -22,7 +22,6 @@ export type RosterAction =
       type: 'UPDATE_DETAILS';
       payload: { name: string; detachments: depot.Detachment[]; maxPoints: number };
     }
-  | { type: 'SET_DETACHMENTS'; payload: depot.Detachment[] }
   | { type: 'ADD_UNIT'; payload: { datasheet: depot.Datasheet; modelCost: depot.ModelCost } }
   | { type: 'DUPLICATE_UNIT'; payload: { unit: depot.RosterUnit } }
   | { type: 'REMOVE_UNIT'; payload: { rosterUnitId: string } }
@@ -37,28 +36,16 @@ export type RosterAction =
     }
   | { type: 'APPLY_ENHANCEMENT'; payload: { enhancement: depot.Enhancement; targetUnitId: string } }
   | { type: 'REMOVE_ENHANCEMENT'; payload: { enhancementId: string } }
-  | { type: 'SET_WARLORD'; payload: { unitId: string | null } }
-  | { type: 'RECALCULATE_POINTS' };
+  | { type: 'SET_WARLORD'; payload: { unitId: string | null } };
+
+type Payload<T extends RosterAction['type']> = Extract<RosterAction, { type: T }>['payload'];
 
 export interface RosterContextValue {
   state: RosterState;
-  createRoster: (payload: {
-    factionId: string;
-    factionSlug: string;
-    faction: depot.Index;
-    dataVersion?: string | null;
-    maxPoints: number;
-    name: string;
-    detachments: depot.Detachment[];
-    units?: depot.RosterUnit[];
-  }) => string;
-  setDetachments: (detachments: depot.Detachment[]) => void;
-  updateRosterDetails: (payload: {
-    name: string;
-    detachments: depot.Detachment[];
-    maxPoints: number;
-  }) => void;
-  setRoster: (roster: depot.Roster) => void;
+  /** Returns the generated roster id. */
+  createRoster: (payload: Omit<Payload<'CREATE_ROSTER'>, 'id'>) => string;
+  updateRosterDetails: (payload: Payload<'UPDATE_DETAILS'>) => void;
+  setRoster: (roster: Payload<'SET_ROSTER'>) => void;
   addUnit: (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => void;
   duplicateUnit: (unit: depot.RosterUnit) => void;
   removeUnit: (rosterUnitId: string) => void;
@@ -68,5 +55,4 @@ export interface RosterContextValue {
   applyEnhancement: (enhancement: depot.Enhancement, targetUnitId: string) => void;
   removeEnhancement: (enhancementId: string) => void;
   setWarlord: (unitId: string | null) => void;
-  recalculatePoints: () => void;
 }

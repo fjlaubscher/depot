@@ -5,7 +5,7 @@ import type { depot } from '@depot/core';
 
 import { useCollections } from '@/hooks/use-collections';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import AppLayout from '@/components/layout';
 import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
 import { RosterEmptyState } from '@/components/shared/roster';

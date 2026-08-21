@@ -10,7 +10,13 @@ import { initialState } from './constants';
 import { calculateTotalPoints, getRosterDetachments } from '@depot/core/utils/roster';
 import { enforceCostBrackets } from '@depot/core/utils/roster-legality';
 
-const normalizeUnit = (unit: depot.RosterUnit): depot.RosterUnit => {
+type UnitLike = Pick<
+  depot.RosterUnit,
+  'datasheet' | 'selectedWargear' | 'selectedWargearAbilities' | 'datasheetSlug'
+>;
+
+/** Normalise a stored roster/collection unit against its datasheet (wargear, abilities, slug). */
+export const normalizeUnit = <T extends UnitLike>(unit: T): T => {
   const normalizedDatasheet = normalizeDatasheetWargear(unit.datasheet);
   return {
     ...unit,
@@ -75,9 +81,6 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         detachments: action.payload.detachments,
         points: { ...state.points, max: action.payload.maxPoints }
       });
-
-    case 'SET_DETACHMENTS':
-      return { ...state, detachments: action.payload };
 
     case 'ADD_UNIT': {
       const normalizedDatasheet = normalizeDatasheetWargear(action.payload.datasheet);
@@ -163,9 +166,6 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         warlordUnitId: unitId && state.units.some((unit) => unit.id === unitId) ? unitId : null
       };
     }
-
-    case 'RECALCULATE_POINTS':
-      return finalize(state);
 
     default:
       return state;

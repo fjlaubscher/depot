@@ -254,77 +254,6 @@ describe('rosterReducer', () => {
     });
   });
 
-  describe('SET_DETACHMENTS', () => {
-    it('should update the detachment', () => {
-      const currentState: depot.Roster = {
-        ...initialState,
-        id: 'test-id',
-        name: 'Test Roster',
-        factionId: 'SM',
-        factionSlug: 'space-marines',
-        faction: mockFactionIndex
-      };
-
-      const mockDetachment = createMockDetachment({
-        slug: 'gladius-task-force',
-        name: 'Gladius Task Force',
-        abilities: [
-          {
-            id: 'gladius-ability',
-            factionId: 'SM',
-            name: 'Combat Doctrines',
-            legend: 'Battle Tactic',
-            description: 'Test ability',
-            detachment: 'Gladius Task Force'
-          }
-        ]
-      });
-
-      const action: RosterAction = {
-        type: 'SET_DETACHMENTS',
-        payload: [mockDetachment]
-      };
-
-      const result = rosterReducer(currentState, action);
-
-      expect(result.detachments).toEqual([mockDetachment]);
-      expect(result.id).toBe('test-id'); // Other properties unchanged
-      expect(result.name).toBe('Test Roster');
-      expect(result).not.toBe(currentState); // Ensure immutability
-    });
-
-    it('should not mutate original state', () => {
-      const currentState: depot.Roster = {
-        ...initialState,
-        id: 'test-id',
-        factionId: 'SM',
-        factionSlug: 'space-marines',
-        faction: mockFactionIndex,
-        detachments: [
-          createMockDetachment({
-            slug: 'original-detachment',
-            name: 'Original Detachment'
-          })
-        ]
-      };
-
-      const newDetachment = createMockDetachment({
-        slug: 'new-detachment',
-        name: 'New Detachment'
-      });
-
-      const action: RosterAction = {
-        type: 'SET_DETACHMENTS',
-        payload: [newDetachment]
-      };
-
-      const result = rosterReducer(currentState, action);
-
-      expect(currentState.detachments[0].name).toBe('Original Detachment');
-      expect(result.detachments[0].name).toBe('New Detachment');
-    });
-  });
-
   describe('ADD_UNIT', () => {
     it('should preselect wargear based on datasheet loadout', () => {
       const datasheet = createMockDatasheet({
@@ -472,15 +401,6 @@ describe('rosterReducer', () => {
               }
             ]
           }
-        },
-        {
-          type: 'SET_DETACHMENTS',
-          payload: [
-            createMockDetachment({
-              slug: 'set-detachment',
-              name: 'New Det'
-            })
-          ]
         },
         {
           type: 'SET_WARLORD',

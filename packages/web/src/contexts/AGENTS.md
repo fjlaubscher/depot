@@ -1,39 +1,31 @@
 # Contexts
 
-React contexts follow a consistent modular pattern (actions, reducer, provider, consumer hook). Each folder encapsulates its own types and reducer logic.
-
-## Structure Pattern
-- `constants.ts` — action type constants
-- `types.ts` — state interfaces, action unions, context shape
-- `reducer.ts` — reducer + initial state (immutable updates via object spread)
-- `context.tsx` — provider component wiring `useReducer`
-- `use-<name>-context.ts` — consumer hook that throws if used outside provider
+Each context lives in one folder with a `context.tsx` that exports the provider **and** its consumer hook (which throws outside the provider). Only add extra files (`types.ts`, `reducer.ts`, `constants.ts`) when the reducer is big enough to test on its own.
 
 ## Active Contexts
-- **Factions** - faction index, data versioning, offline cache + data helpers
-- **Settings** - user preferences with IndexedDB persistence
-- **Layout** - sidebar + responsive UI state
-- **Toast** - notification system with auto-dismiss and reduced-motion respect
-- **Roster** - roster building state, unit selection, points calculations
+- **Factions** (`factions/`) - faction index, data versioning, offline cache + data helpers (`useFactionsContext`); reducer + index sync split out and unit-tested
+- **Settings** (`settings/`) - user preferences with IndexedDB persistence (`useSettingsContext`); toggles the `hide-fluff` root class
+- **Layout** (`layout/`) - sidebar state (`useLayoutContext`)
+- **Toast** (`toast/`) - `useState<Toast[]>` + 3s auto-dismiss (`useToast`)
+- **Roster** (`roster/`) - roster building state (`useRoster`); `reducer.ts` also exports `normalizeUnit`, reused by `data/offline-storage.ts`
+
+`app-provider.tsx` composes Factions → Settings → Toast → Layout. `RosterProvider` is mounted separately (it needs Toast).
 
 ## Usage
 ```tsx
 <AppProvider>
-  <ToastProvider>
-    <LayoutProvider>
-      <RosterProvider>
-        <App />
-      </RosterProvider>
-    </LayoutProvider>
-  </ToastProvider>
+  <RosterProvider>
+    <App />
+  </RosterProvider>
 </AppProvider>
 
-const { getFactionManifest, getDatasheet } = useFactionData();
-const { settings } = useSettings();
-const { showToast } = useToastContext();
+const { getFactionManifest, getDatasheet } = useFactionsContext();
+const { settings } = useSettingsContext();
+const { showToast } = useToast();
 const { state: roster, addUnit } = useRoster();
 ```
 
 ## Testing
-- Always wrap general UI tests with `TestWrapper` (`src/test/test-utils.tsx`) to get Router + App, Layout, and Toast providers; add `RosterProvider` explicitly when testing roster-specific flows or reducers that expect it.
-- Reducer unit tests should import from the specific folder and cover edge cases with table-driven Vitest tests.
+- Wrap general UI tests with `TestWrapper` (`src/test/test-utils.tsx`) = MemoryRouter + `AppProvider`; add `RosterProvider` explicitly for roster flows.
+- Reducer unit tests import from the specific folder and cover edge cases with table-driven Vitest tests.
+- To stub a hook that shares a file with its provider, use `vi.mock('@/contexts/toast/context', { spy: true })` so the provider keeps working.

@@ -22,27 +22,18 @@ export const usePersistedTagSelection = <T extends string>(
   });
 
   useEffect(() => {
+    if (isValid && !isValid(selection)) {
+      setSelection(defaultValue);
+      return;
+    }
     try {
-      if (isValid && !isValid(selection)) {
-        setSelection(defaultValue);
-        return;
-      }
       window.localStorage.setItem(storageKey, selection);
     } catch {
       // localStorage unavailable; selection stays in-memory only
     }
   }, [defaultValue, isValid, storageKey, selection]);
 
-  const clearSelection = () => {
-    try {
-      window.localStorage.removeItem(storageKey);
-    } catch {
-      // localStorage unavailable
-    }
-    setSelection(defaultValue);
-  };
-
-  return { selection, setSelection, clearSelection } as const;
+  return { selection, setSelection, clearSelection: () => setSelection(defaultValue) } as const;
 };
 
 export default usePersistedTagSelection;

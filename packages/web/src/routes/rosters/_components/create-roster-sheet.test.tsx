@@ -47,7 +47,7 @@ const mockUseRoster = vi.hoisted(() => ({
   createRoster: vi.fn()
 }));
 
-vi.mock('@/contexts/roster/use-roster-context', () => ({
+vi.mock('@/contexts/roster/context', () => ({
   useRoster: () => mockUseRoster
 }));
 

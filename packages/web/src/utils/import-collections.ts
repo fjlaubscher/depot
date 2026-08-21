@@ -6,10 +6,9 @@ import { isExportedCollection } from '@/types/export';
 import {
   formatRebindSummaryMessage,
   refreshCollectionDataWithReport,
+  type RebindSummary,
   type RefreshCollectionParams
 } from '@/utils/refresh-user-data';
-
-type RebindSummary = { ok: number; partial: number; missing: number };
 
 export type ImportCollectionsResult = {
   imported: depot.Collection[];
@@ -56,7 +55,7 @@ export const importCollectionsFromFiles = async (
   for (const file of files) {
     try {
       const parsed = await readJsonFile<unknown>(file);
-      if (!isExportedCollection(parsed) || parsed.version !== 1) {
+      if (!isExportedCollection(parsed)) {
         failed.push({
           fileName: file.name,
           reason: 'Not a depot collection export'

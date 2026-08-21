@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import { useFactionsContext } from '@/contexts/factions/context';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';

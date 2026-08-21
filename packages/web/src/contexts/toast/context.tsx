@@ -1,59 +1,54 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useReducer, useCallback } from 'react';
-import type { ToastContextType, Toast } from './types';
-import { toastReducer, initialToastState } from './reducer';
-import { TOAST_ACTIONS } from './constants';
+import { createContext, useCallback, useContext, useState } from 'react';
 
-// Create context
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
-// Provider component
-interface ToastProviderProps {
-  children: ReactNode;
+export interface Toast {
+  id: string;
+  title: string;
+  message?: string;
+  type: ToastType;
 }
 
-export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(toastReducer, initialToastState);
+export interface ToastContextType {
+  state: { toasts: Toast[] };
+  showToast: (toast: Omit<Toast, 'id'>) => void;
+  removeToast: (id: string) => void;
+}
 
-  // Generate unique ID for toasts
-  const generateId = useCallback(() => {
-    return `toast-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+const AUTO_DISMISS_MS = 3000;
+
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
+
+export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  // Show toast with auto-dismiss
   const showToast = useCallback(
-    (toastData: Omit<Toast, 'id'>) => {
-      const id = generateId();
-      const toast: Toast = {
-        id,
-        duration: 3000, // Default 3 second duration
-        ...toastData
-      };
-
-      dispatch({ type: TOAST_ACTIONS.ADD_TOAST, payload: toast });
-
-      // Auto-dismiss toast if duration is set
-      if (toast.duration && toast.duration > 0) {
-        setTimeout(() => {
-          dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
-        }, toast.duration);
-      }
+    (toast: Omit<Toast, 'id'>) => {
+      const id = crypto.randomUUID();
+      setToasts((prev) => [...prev, { id, ...toast }]);
+      setTimeout(() => removeToast(id), AUTO_DISMISS_MS);
     },
-    [generateId]
+    [removeToast]
   );
 
-  // Remove specific toast
-  const removeToast = useCallback((id: string) => {
-    dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
-  }, []);
+  return (
+    <ToastContext.Provider value={{ state: { toasts }, showToast, removeToast }}>
+      {children}
+    </ToastContext.Provider>
+  );
+};
 
-  const contextValue: ToastContextType = {
-    state,
-    showToast,
-    removeToast
-  };
-
-  return <ToastContext.Provider value={contextValue}>{children}</ToastContext.Provider>;
+export const useToast = (): ToastContextType => {
+  const context = useContext(ToastContext);
+  if (context === undefined) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+  return context;
 };
 
 export default ToastContext;

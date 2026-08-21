@@ -12,14 +12,8 @@ export interface FactionsContextType extends FactionsState {
   getFactionManifest: (slug: string) => Promise<depot.FactionManifest | null>;
   getDatasheet: (factionSlug: string, datasheetIdOrSlug: string) => Promise<depot.Datasheet | null>;
   clearOfflineData: () => Promise<void>;
-  checkForDataUpdates: () => Promise<{ updated: boolean; dataVersion: string | null }>;
+  checkForDataUpdates: () => Promise<void>;
 }
-
-const appendSearchParam = (url: string, key: string, value: string): string => {
-  const resolved = new URL(url, window.location.origin);
-  resolved.searchParams.set(key, value);
-  return `${resolved.pathname}${resolved.search}`;
-};
 
 const FactionsContext = createContext<FactionsContextType | undefined>(undefined);
 
@@ -31,9 +25,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(factionsReducer, initialFactionsState);
 
   const fetchIndex = useCallback(async (): Promise<depot.Index[]> => {
-    const indexPath = getDataPath('index.json');
-    const url = appendSearchParam(getDataUrl(indexPath), 't', Date.now().toString());
-    const response = await fetch(url, { cache: 'no-store' });
+    const response = await fetch(getDataUrl(getDataPath('index.json')), { cache: 'no-store' });
     if (!response.ok) {
       throw new Error('Failed to load faction index');
     }
@@ -85,11 +77,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         const path = getFactionManifestPath(slug);
         const resolvedPath = indexEntry?.path ? getDataPath(indexEntry.path) : path;
 
-        const manifestUrlBase = getDataUrl(resolvedPath);
-        const manifestUrl = state.dataVersion
-          ? appendSearchParam(manifestUrlBase, 'v', state.dataVersion)
-          : manifestUrlBase;
-        const response = await fetch(manifestUrl, { cache: 'no-store' });
+        const response = await fetch(getDataUrl(resolvedPath), { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Failed to load faction ${slug}`);
         }
@@ -112,10 +100,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         console.error(`Failed to load faction ${key}:`, error);
-        dispatch({
-          type: 'LOAD_FACTION_ERROR',
-          payload: { slug: key, error: message }
-        });
+        dispatch({ type: 'LOAD_INDEX_ERROR', payload: message });
         return null;
       }
     },
@@ -144,11 +129,7 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
         }
 
         const path = getDataPath(reference.path || getDatasheetPath(manifest.slug, reference.id));
-        const datasheetUrlBase = getDataUrl(path);
-        const datasheetUrl = state.dataVersion
-          ? appendSearchParam(datasheetUrlBase, 'v', state.dataVersion)
-          : datasheetUrlBase;
-        const response = await fetch(datasheetUrl, { cache: 'no-store' });
+        const response = await fetch(getDataUrl(path), { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`Failed to load datasheet ${reference.id}`);
         }
@@ -181,50 +162,30 @@ export const FactionsProvider: FC<FactionsProviderProps> = ({ children }) => {
     dispatch({ type: 'UPDATE_OFFLINE_FACTIONS', payload: [] });
   };
 
+  /** Sync the faction index (network → cache fallback); used on mount and on online/visibility. */
   const checkForDataUpdates = useCallback(async () => {
     try {
-      const result = await syncFactionIndex({
+      const { index, dataVersion } = await syncFactionIndex({
         fetchIndex,
         storage: offlineStorage,
         resetOfflineData
       });
-
-      dispatch({ type: 'LOAD_INDEX_SUCCESS', payload: result.index });
-      dispatch({ type: 'SET_DATA_VERSION', payload: result.dataVersion });
-
-      await refreshOfflineFactions();
-      return { updated: result.updated, dataVersion: result.dataVersion };
+      dispatch({ type: 'LOAD_INDEX_SUCCESS', payload: index });
+      dispatch({ type: 'SET_DATA_VERSION', payload: dataVersion });
     } catch (error) {
-      console.error('Failed to check for data updates:', error);
-      return { updated: false, dataVersion: state.dataVersion };
+      console.error('Failed to load faction index:', error);
+      dispatch({
+        type: 'LOAD_INDEX_ERROR',
+        payload: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
-  }, [fetchIndex, refreshOfflineFactions, resetOfflineData, state.dataVersion]);
+    await refreshOfflineFactions();
+  }, [fetchIndex, refreshOfflineFactions, resetOfflineData]);
 
   useEffect(() => {
-    const initializeData = async () => {
-      dispatch({ type: 'LOAD_INDEX_START' });
-
-      try {
-        const { index, dataVersion } = await syncFactionIndex({
-          fetchIndex,
-          storage: offlineStorage,
-          resetOfflineData
-        });
-
-        dispatch({ type: 'LOAD_INDEX_SUCCESS', payload: index });
-        dispatch({ type: 'SET_DATA_VERSION', payload: dataVersion });
-      } catch (error) {
-        dispatch({
-          type: 'LOAD_INDEX_ERROR',
-          payload: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-
-      await refreshOfflineFactions();
-    };
-
-    void initializeData();
-  }, [fetchIndex, refreshOfflineFactions, resetOfflineData]);
+    dispatch({ type: 'LOAD_INDEX_START' });
+    void checkForDataUpdates();
+  }, [checkForDataUpdates]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {

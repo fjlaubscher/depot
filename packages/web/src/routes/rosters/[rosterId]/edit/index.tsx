@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Plus, Pencil } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useRoster } from '@/contexts/roster/context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 

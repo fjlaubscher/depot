@@ -1,8 +1,7 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useReducer, useCallback, useEffect, useRef } from 'react';
-import type { depot } from '@depot/core';
+import { createContext, useContext, useReducer, useEffect, useMemo, useRef } from 'react';
 import { offlineStorage } from '@/data/offline-storage';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
@@ -70,109 +69,42 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     }
   }, [state, showToast]);
 
-  const createRoster = useCallback(
-    (payload: {
-      factionId: string;
-      factionSlug: string;
-      faction: depot.Index;
-      dataVersion?: string | null;
-      maxPoints: number;
-      name: string;
-      detachments: depot.Detachment[];
-      units?: depot.RosterUnit[];
-    }): string => {
-      const newId = crypto.randomUUID();
-      dispatch({ type: 'CREATE_ROSTER', payload: { ...payload, id: newId } });
-      return newId;
-    },
+  // `dispatch` is stable, so the action set is created once.
+  const actions = useMemo<Omit<RosterContextValue, 'state'>>(
+    () => ({
+      createRoster: (payload) => {
+        const id = crypto.randomUUID();
+        dispatch({ type: 'CREATE_ROSTER', payload: { ...payload, id } });
+        return id;
+      },
+      updateRosterDetails: (payload) => dispatch({ type: 'UPDATE_DETAILS', payload }),
+      setRoster: (payload) => dispatch({ type: 'SET_ROSTER', payload }),
+      addUnit: (datasheet, modelCost) =>
+        dispatch({ type: 'ADD_UNIT', payload: { datasheet, modelCost } }),
+      duplicateUnit: (unit) => dispatch({ type: 'DUPLICATE_UNIT', payload: { unit } }),
+      removeUnit: (rosterUnitId) => dispatch({ type: 'REMOVE_UNIT', payload: { rosterUnitId } }),
+      updateUnitWargear: (rosterUnitId, wargear) =>
+        dispatch({ type: 'UPDATE_UNIT_WARGEAR', payload: { rosterUnitId, wargear } }),
+      updateUnitWargearAbilities: (rosterUnitId, abilities) =>
+        dispatch({ type: 'UPDATE_UNIT_WARGEAR_ABILITIES', payload: { rosterUnitId, abilities } }),
+      updateUnitModelCost: (rosterUnitId, modelCost) =>
+        dispatch({ type: 'UPDATE_UNIT_MODEL_COST', payload: { rosterUnitId, modelCost } }),
+      applyEnhancement: (enhancement, targetUnitId) =>
+        dispatch({ type: 'APPLY_ENHANCEMENT', payload: { enhancement, targetUnitId } }),
+      removeEnhancement: (enhancementId) =>
+        dispatch({ type: 'REMOVE_ENHANCEMENT', payload: { enhancementId } }),
+      setWarlord: (unitId) => dispatch({ type: 'SET_WARLORD', payload: { unitId } })
+    }),
     []
   );
 
-  const setDetachments = useCallback((detachments: depot.Detachment[]): void => {
-    dispatch({ type: 'SET_DETACHMENTS', payload: detachments });
-  }, []);
+  return <RosterContext.Provider value={{ state, ...actions }}>{children}</RosterContext.Provider>;
+};
 
-  const updateRosterDetails = useCallback(
-    (payload: { name: string; detachments: depot.Detachment[]; maxPoints: number }): void => {
-      dispatch({ type: 'UPDATE_DETAILS', payload });
-    },
-    []
-  );
-
-  const addUnit = useCallback((datasheet: depot.Datasheet, modelCost: depot.ModelCost): void => {
-    dispatch({ type: 'ADD_UNIT', payload: { datasheet, modelCost } });
-  }, []);
-
-  const duplicateUnit = useCallback((unit: depot.RosterUnit): void => {
-    dispatch({ type: 'DUPLICATE_UNIT', payload: { unit } });
-  }, []);
-
-  const removeUnit = useCallback((rosterUnitId: string): void => {
-    dispatch({ type: 'REMOVE_UNIT', payload: { rosterUnitId } });
-  }, []);
-
-  const updateUnitWargear = useCallback((rosterUnitId: string, wargear: depot.Wargear[]): void => {
-    dispatch({ type: 'UPDATE_UNIT_WARGEAR', payload: { rosterUnitId, wargear } });
-  }, []);
-
-  const updateUnitWargearAbilities = useCallback(
-    (rosterUnitId: string, abilities: depot.Ability[]): void => {
-      dispatch({ type: 'UPDATE_UNIT_WARGEAR_ABILITIES', payload: { rosterUnitId, abilities } });
-    },
-    []
-  );
-
-  const updateUnitModelCost = useCallback(
-    (rosterUnitId: string, modelCost: depot.ModelCost): void => {
-      dispatch({ type: 'UPDATE_UNIT_MODEL_COST', payload: { rosterUnitId, modelCost } });
-    },
-    []
-  );
-
-  const applyEnhancement = useCallback(
-    (enhancement: depot.Enhancement, targetUnitId: string): void => {
-      dispatch({ type: 'APPLY_ENHANCEMENT', payload: { enhancement, targetUnitId } });
-    },
-    []
-  );
-
-  const removeEnhancement = useCallback((enhancementId: string): void => {
-    dispatch({ type: 'REMOVE_ENHANCEMENT', payload: { enhancementId } });
-  }, []);
-
-  const setWarlord = useCallback((unitId: string | null): void => {
-    dispatch({ type: 'SET_WARLORD', payload: { unitId } });
-  }, []);
-
-  const recalculatePoints = useCallback((): void => {
-    dispatch({ type: 'RECALCULATE_POINTS' });
-  }, []);
-
-  const setRoster = useCallback((roster: depot.Roster) => {
-    dispatch({ type: 'SET_ROSTER', payload: roster });
-  }, []);
-
-  return (
-    <RosterContext.Provider
-      value={{
-        state,
-        createRoster,
-        setDetachments,
-        updateRosterDetails,
-        addUnit,
-        duplicateUnit,
-        removeUnit,
-        updateUnitWargear,
-        updateUnitWargearAbilities,
-        updateUnitModelCost,
-        applyEnhancement,
-        removeEnhancement,
-        setWarlord,
-        recalculatePoints,
-        setRoster
-      }}
-    >
-      {children}
-    </RosterContext.Provider>
-  );
+export const useRoster = (): RosterContextValue => {
+  const context = useContext(RosterContext);
+  if (!context) {
+    throw new Error('useRoster must be used within a RosterProvider');
+  }
+  return context;
 };
