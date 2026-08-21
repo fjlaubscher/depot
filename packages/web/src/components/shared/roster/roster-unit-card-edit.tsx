@@ -11,6 +11,9 @@ interface RosterUnitCardEditProps {
   onRemove: (unitId: string) => void;
   onDuplicate: (unit: depot.RosterUnit) => void;
   dataTestId?: string;
+  isWarlord?: boolean;
+  enhancementName?: string;
+  issues?: string[];
 }
 
 const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
@@ -18,7 +21,10 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   rosterId,
   onRemove,
   onDuplicate,
-  dataTestId
+  dataTestId,
+  isWarlord,
+  enhancementName,
+  issues
 }) => {
   const navigate = useNavigate();
 
@@ -61,6 +67,9 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
       actions={actions}
       onClick={handleCardClick}
       dataTestId={dataTestId}
+      isWarlord={isWarlord}
+      enhancementName={enhancementName}
+      issues={issues}
     />
   );
 };

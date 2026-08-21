@@ -120,7 +120,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
           <DatasheetBrowserSkeleton />
         ) : datasheetLoading ? (
           <div
-            className="rounded-sm border border-border-subtle bg-muted p-3"
+            className="rounded-sm border border-border-subtle bg-surface-muted p-3"
             data-testid="datasheet-loading"
           >
             <div className="flex items-center justify-between text-sm text-subtle">
@@ -129,7 +129,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
                 {datasheetProgress.loaded}/{datasheetProgress.total || '.'}
               </span>
             </div>
-            <div className="mt-2 h-2 rounded-sm bg-muted">
+            <div className="mt-2 h-2 rounded-sm bg-surface-soft">
               <div
                 className="h-full rounded-sm bg-accent-500 transition-all"
                 style={{

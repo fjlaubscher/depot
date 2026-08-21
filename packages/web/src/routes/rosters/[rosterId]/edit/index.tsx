@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useMemo, type FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Plus, Pencil } from 'lucide-react';
 
@@ -17,6 +17,7 @@ import {
   RosterEmptyState
 } from '@/components/shared/roster';
 import { getRosterSubtitle } from '@depot/core/utils/roster';
+import { validateRoster } from '@depot/core/utils/roster-legality';
 import RosterIssues from '@/routes/rosters/_components/roster-issues';
 
 const RosterEdit: FC = () => {
@@ -25,6 +26,21 @@ const RosterEdit: FC = () => {
 
   const sortedUnits = [...roster.units].sort((a, b) =>
     a.datasheet.name.localeCompare(b.datasheet.name)
+  );
+
+  // Same unit badges as the view roster: warlord, enhancement, unit-scoped legality.
+  const issuesByUnit = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const issue of validateRoster(roster)) {
+      if (!issue.unitId) continue;
+      map.set(issue.unitId, [...(map.get(issue.unitId) ?? []), issue.message]);
+    }
+    return map;
+  }, [roster]);
+
+  const enhancementsByUnit = useMemo(
+    () => new Map(roster.enhancements.map((entry) => [entry.unitId, entry.enhancement.name])),
+    [roster.enhancements]
   );
 
   useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
@@ -114,6 +130,9 @@ const RosterEdit: FC = () => {
                     onRemove={removeUnit}
                     onDuplicate={duplicateUnit}
                     dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
+                    isWarlord={roster.warlordUnitId === unit.id}
+                    enhancementName={enhancementsByUnit.get(unit.id)}
+                    issues={issuesByUnit.get(unit.id)}
                   />
                 ))}
               </Grid>

@@ -65,9 +65,9 @@
   --info-surface: #e8f2fd;
   --info-line: #b3d4f5;
 
-  --shadow-e1: 0 1px 2px rgb(16 22 29 / 0.08);
-  --shadow-e2: 0 4px 12px rgb(16 22 29 / 0.12);
-  --shadow-e3: 0 16px 40px rgb(16 22 29 / 0.2);
+  --elevation-1: 0 1px 2px rgb(16 22 29 / 0.08);
+  --elevation-2: 0 4px 12px rgb(16 22 29 / 0.12);
+  --elevation-3: 0 16px 40px rgb(16 22 29 / 0.2);
 }
 
 .dark {
@@ -106,9 +106,9 @@
   --info-line: #1f3e5c;
 
   /* shadows die on near-black — surface + border carry depth, shadow is secondary */
-  --shadow-e1: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-e2: 0 4px 12px rgb(0 0 0 / 0.5);
-  --shadow-e3: 0 16px 40px rgb(0 0 0 / 0.6);
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elevation-2: 0 4px 12px rgb(0 0 0 / 0.5);
+  --elevation-3: 0 16px 40px rgb(0 0 0 / 0.6);
 }
 
 /* Expose the semantic tokens as Tailwind utilities. `inline` keeps them as
@@ -146,9 +146,9 @@
   --color-info-surface: var(--info-surface);
   --color-info-border: var(--info-line);
 
-  --shadow-e1: var(--shadow-e1);
-  --shadow-e2: var(--shadow-e2);
-  --shadow-e3: var(--shadow-e3);
+  --shadow-e1: var(--elevation-1);
+  --shadow-e2: var(--elevation-2);
+  --shadow-e3: var(--elevation-3);
 }
 
 body {
@@ -202,7 +202,8 @@ body {
 
 @utility input-base {
   @apply h-10 w-full bg-surface-muted border border-border-strong rounded-sm px-2.5 text-base text-foreground
-    placeholder:text-hint focus:outline-none focus:border-border-accent;
+    placeholder:text-hint focus:outline-none focus:border-border-accent
+    focus-visible:ring-2 focus-visible:ring-accent-600 dark:focus-visible:ring-accent-500;
 }
 
 @utility focus-ring-primary {

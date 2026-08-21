@@ -18,7 +18,7 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
   dataTestId
 }) => (
   <details
-    open={defaultExpanded}
+    defaultOpen={defaultExpanded}
     className={cx('group border border-border-subtle rounded-sm', className)}
     data-testid={dataTestId}
   >
