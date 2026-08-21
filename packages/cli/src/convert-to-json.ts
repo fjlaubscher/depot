@@ -1,7 +1,5 @@
 import { parse } from 'node-html-parser';
 
-const cleanCSV = (input: string) => input.replace(/^\uFEFF/, '').split('\r\n');
-
 const ATTRIBUTES_TO_REMOVE = ['style', 'width', 'height', 'cellspacing', 'cellpadding', 'border'];
 
 const stripHtml = (input: string) => {
@@ -35,13 +33,6 @@ const stripHtml = (input: string) => {
   );
 };
 
-const convertToCamelCase = (input: string) =>
-  input.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
-
-const getHeaders = (rows: string[]) => rows[0].split('|').map(convertToCamelCase);
-
-const isBlankRow = (row: string) => !row.replace(/\|/g, '').trim();
-
 const assembleRecords = (rows: string[]): string[] => {
   const expected = rows[0].split('|').length;
   const assembled: string[] = [];
@@ -49,7 +40,7 @@ const assembleRecords = (rows: string[]): string[] => {
 
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    if (!buffer && isBlankRow(row)) {
+    if (!buffer && !row.replace(/\|/g, '').trim()) {
       continue;
     }
 
@@ -64,8 +55,12 @@ const assembleRecords = (rows: string[]): string[] => {
 };
 
 const convertToJSON = (input: string) => {
-  const rows = cleanCSV(input);
-  const headers = getHeaders(rows);
+  const rows = input.replace(/^\uFEFF/, '').split('\r\n');
+  const headers = rows[0]
+    .split('|')
+    .map((header) =>
+      header.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase())
+    );
   const result: Record<string, string>[] = [];
 
   for (const record of assembleRecords(rows)) {

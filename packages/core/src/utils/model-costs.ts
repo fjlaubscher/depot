@@ -1,4 +1,5 @@
 import type { ModelCost } from '../types/depot.js';
+import type { DatasheetModelCost } from '../types/wahapedia.js';
 
 const NUMERIC_COST = /^\d+$/;
 
@@ -44,16 +45,19 @@ export const getCostBracketRange = (section?: string): [number, number] => {
   return [ordinals[0], cleaned.includes('+') ? Infinity : ordinals[ordinals.length - 1]];
 };
 
+/** Whether the Nth copy of a datasheet falls inside a cost bracket header. */
+export const inCostBracket = (ordinal: number, section?: string): boolean => {
+  const [min, max] = getCostBracketRange(section);
+  return ordinal >= min && ordinal <= max;
+};
+
 /**
  * Selectable cost rows that apply to the Nth copy of a datasheet (default: the first).
  * Falls back to every selectable row when no bracket covers that ordinal.
  */
 export const modelCostsForOrdinal = <T extends ModelCost>(costs: T[], ordinal = 1): T[] => {
   const selectable = selectableModelCosts(costs);
-  const matching = selectable.filter((cost) => {
-    const [min, max] = getCostBracketRange(cost.section);
-    return ordinal >= min && ordinal <= max;
-  });
+  const matching = selectable.filter((cost) => inCostBracket(ordinal, cost.section));
   return matching.length > 0 ? matching : selectable;
 };
 
@@ -74,40 +78,22 @@ export interface ModelCostGroup<T extends ModelCost = ModelCost> {
 }
 
 /** Selectable costs grouped by cost bracket, in source order. */
-export const groupModelCostsBySection = <T extends ModelCost>(costs: T[]): ModelCostGroup<T>[] => {
-  const groups: ModelCostGroup<T>[] = [];
-  for (const cost of selectableModelCosts(costs)) {
-    const section = cost.section ? formatCostSection(cost.section) : '';
-    const group = groups.find((entry) => entry.section === section);
-    if (group) {
-      group.costs.push(cost);
-    } else {
-      groups.push({ section, costs: [cost] });
-    }
-  }
-  return groups;
-};
-
-type RawModelCost = {
-  datasheetId: string;
-  line: string;
-  description: string;
-  cost: string;
-};
+export const groupModelCostsBySection = <T extends ModelCost>(costs: T[]): ModelCostGroup<T>[] =>
+  [
+    ...Map.groupBy(selectableModelCosts(costs), (cost) =>
+      cost.section ? formatCostSection(cost.section) : ''
+    )
+  ].map(([section, costs]) => ({ section, costs }));
 
 const collapseDuplicateCosts = (costs: ModelCost[]): ModelCost[] => {
   const seen = new Set<string>();
   return costs.filter((cost) => {
     const key = `${cost.description}\0${cost.cost}\0${cost.section ?? ''}`;
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
+    return !seen.has(key) && seen.add(key);
   });
 };
 
-const normalizeDatasheetCosts = (rows: RawModelCost[]): ModelCost[] => {
+const normalizeDatasheetCosts = (rows: DatasheetModelCost[]): ModelCost[] => {
   let section: string | undefined;
   const costs: ModelCost[] = [];
 
@@ -136,13 +122,5 @@ const normalizeDatasheetCosts = (rows: RawModelCost[]): ModelCost[] => {
  * Drop empty-cost header rows, stamp the preceding header onto real cost rows as
  * `section`, and collapse exact (description, cost, section) duplicates.
  */
-export const normalizeModelCosts = (rows: RawModelCost[]): ModelCost[] => {
-  const byDatasheet = new Map<string, RawModelCost[]>();
-  for (const row of rows) {
-    const group = byDatasheet.get(row.datasheetId) ?? [];
-    group.push(row);
-    byDatasheet.set(row.datasheetId, group);
-  }
-
-  return Array.from(byDatasheet.values()).flatMap(normalizeDatasheetCosts);
-};
+export const normalizeModelCosts = (rows: DatasheetModelCost[]): ModelCost[] =>
+  [...Map.groupBy(rows, (row) => row.datasheetId).values()].flatMap(normalizeDatasheetCosts);

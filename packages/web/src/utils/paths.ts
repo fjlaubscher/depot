@@ -1,14 +1,3 @@
-import {
-  normalizeBasePath as getAppBasePathCore,
-  getRouterBasePath as getRouterBasePathCore,
-  getViteBasePath as getViteBasePathCore,
-  getDataPath,
-  getDataUrl as getDataUrlCore,
-  getImageUrl as getImageUrlCore,
-  getFactionManifestPath,
-  getDatasheetPath
-} from '@depot/core/utils/paths';
-
 const readConfiguredBasePath = (): string => {
   const fromImportMeta =
     typeof import.meta !== 'undefined'
@@ -20,22 +9,30 @@ const readConfiguredBasePath = (): string => {
   return fromImportMeta ?? fromProcess ?? '';
 };
 
-export const getAppBasePath = (basePath?: string): string =>
-  getAppBasePathCore(basePath ?? readConfiguredBasePath());
+/** `/depot/` → `/depot`, empty/undefined → `` (falls back to the configured base path). */
+export const getAppBasePath = (basePath?: string): string => {
+  const trimmed = (basePath ?? readConfiguredBasePath()).trim().replace(/^\/+|\/+$/g, '');
+  return trimmed ? `/${trimmed}` : '';
+};
 
 export const getRouterBasePath = (basePath?: string): string | undefined =>
-  getRouterBasePathCore(basePath ?? readConfiguredBasePath());
+  getAppBasePath(basePath) || undefined;
 
-export const getViteBasePath = (basePath?: string): string =>
-  getViteBasePathCore(basePath ?? readConfiguredBasePath());
+export const getViteBasePath = (basePath?: string): string => `${getAppBasePath(basePath)}/`;
+
+export const getDataPath = (path: string): string => `/data/${path.replace(/^\/*(data\/)?/, '')}`;
 
 export const getDataUrl = (path: string, basePath?: string): string =>
-  getDataUrlCore(path, basePath ?? readConfiguredBasePath());
+  `${getAppBasePath(basePath)}${getDataPath(path)}`;
 
 export const getImageUrl = (path: string, basePath?: string): string =>
-  getImageUrlCore(path, basePath ?? readConfiguredBasePath());
+  `${getAppBasePath(basePath)}/images/${path}`;
 
-export { getDataPath, getFactionManifestPath, getDatasheetPath };
+export const getFactionManifestPath = (slug: string): string =>
+  getDataPath(`factions/${slug}/faction.json`);
+
+export const getDatasheetPath = (factionSlug: string, datasheetId: string): string =>
+  getDataPath(`factions/${factionSlug}/datasheets/${datasheetId}.json`);
 
 export const buildAbsoluteUrl = (path: string = '/'): string => {
   const normalizedBasePath = getAppBasePath();

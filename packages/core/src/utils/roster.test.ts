@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Ability, ModelCost, Roster, RosterUnit, Wargear } from '../types/depot.js';
-import { calculateTotalPoints, createRosterDuplicate, generateRosterShareText } from './roster.js';
+import {
+  calculateTotalPoints,
+  createRosterDuplicate,
+  generateRosterShareText,
+  remapRosterIds
+} from './roster.js';
 
 const createModelCost = (overrides: Partial<ModelCost> = {}): ModelCost => ({
   datasheetId: overrides.datasheetId ?? 'ds-1',
@@ -225,5 +230,21 @@ describe('roster utils', () => {
     expect(duplicated.units[0].id).not.toBe('unit-abc');
     expect(duplicated.warlordUnitId).toBe(duplicated.units[0].id);
     expect(duplicated.name).toBe('Strike Force (Copy)');
+  });
+
+  it('remaps roster, unit, enhancement and warlord ids together', () => {
+    const roster = createRoster({
+      units: [createRosterUnit({ id: 'unit-abc' })],
+      warlordUnitId: 'unit-abc'
+    });
+
+    const remapped = remapRosterIds(roster);
+    const unitId = remapped.units[0].id;
+
+    expect(remapped.id).not.toBe(roster.id);
+    expect(unitId).not.toBe('unit-abc');
+    expect(remapped.enhancements[0].unitId).toBe(unitId);
+    expect(remapped.warlordUnitId).toBe(unitId);
+    expect(roster.units[0].id).toBe('unit-abc');
   });
 });

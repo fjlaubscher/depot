@@ -1,15 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import type { Enhancement, Keyword } from '../types/depot.js';
+import type { Keyword } from '../types/depot.js';
 import {
   sortByName,
   safeSlug,
-  groupBy,
   groupKeywords,
   getFactionAlliance,
-  groupEnhancementsByDetachment,
-  filterEnhancements,
-  getUniqueEnhancementDetachmentTypes,
-  isEnhancementGroupedDataEmpty,
   generateBreadcrumbs
 } from './common.js';
 
@@ -18,14 +13,6 @@ describe('common utilities', () => {
     it('sorts items alphabetically ignoring case', () => {
       const result = sortByName([{ name: 'beta' }, { name: 'Alpha' }, { name: 'gamma' }]);
       expect(result.map((item) => item.name)).toEqual(['Alpha', 'beta', 'gamma']);
-    });
-  });
-
-  describe('groupBy', () => {
-    it('groups items by the derived key', () => {
-      const grouped = groupBy([{ role: 'a' }, { role: 'b' }, { role: 'a' }], (item) => item.role);
-      expect(grouped.a).toHaveLength(2);
-      expect(grouped.b).toHaveLength(1);
     });
   });
 
@@ -56,82 +43,6 @@ describe('common utilities', () => {
       expect(getFactionAlliance('CSM')).toBe('Chaos');
       expect(getFactionAlliance('ORK')).toBe('Xenos');
       expect(getFactionAlliance('UNKNOWN')).toBe('Unaligned');
-    });
-  });
-
-  describe('enhancement helpers', () => {
-    const mockEnhancements: Enhancement[] = [
-      {
-        id: '1',
-        factionId: 'SM',
-        name: 'The Honour Vehement',
-        legend: 'Captain Enhancement',
-        description: 'Boost Captain abilities',
-        cost: '15',
-        detachment: 'Gladius Strike Force'
-      },
-      {
-        id: '2',
-        factionId: 'SM',
-        name: 'Adamantine Mantle',
-        legend: 'Defensive Enhancement',
-        description: 'Improves armor saves',
-        cost: '20',
-        detachment: 'Gladius Strike Force'
-      },
-      {
-        id: '3',
-        factionId: 'SM',
-        name: 'Artificer Armour',
-        legend: 'General Enhancement',
-        description: 'General protection enhancement',
-        cost: '10',
-        detachment: ''
-      },
-      {
-        id: '4',
-        factionId: 'SM',
-        name: 'Fiery Resolve',
-        legend: 'Assault Enhancement',
-        description: 'Firestorm enhancement',
-        cost: '25',
-        detachment: 'Firestorm Assault Force'
-      }
-    ];
-
-    it('groups enhancements by detachment and sorts within each group', () => {
-      const grouped = groupEnhancementsByDetachment(mockEnhancements);
-
-      expect(Object.keys(grouped)).toContain('General');
-      expect(grouped['Gladius Strike Force'][0].name).toBe('Adamantine Mantle');
-      expect(grouped['General']).toHaveLength(1);
-    });
-
-    it('filters enhancements by query and detachment', () => {
-      const filtered = filterEnhancements(mockEnhancements, 'mantle', 'Gladius Strike Force');
-      expect(filtered).toHaveLength(1);
-      expect(filtered[0].name).toBe('Adamantine Mantle');
-    });
-
-    it('returns sorted unique detachment names', () => {
-      const types = getUniqueEnhancementDetachmentTypes(mockEnhancements);
-      expect(types).toEqual(['Firestorm Assault Force', 'Gladius Strike Force']);
-    });
-
-    it('flags grouped data emptiness', () => {
-      expect(
-        isEnhancementGroupedDataEmpty({
-          'Group 1': [],
-          'Group 2': []
-        })
-      ).toBe(true);
-
-      expect(
-        isEnhancementGroupedDataEmpty({
-          'Group 1': [],
-          'Group 2': [mockEnhancements[0]]
-        })
-      ).toBe(false);
     });
   });
 

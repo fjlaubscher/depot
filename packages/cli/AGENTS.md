@@ -20,7 +20,6 @@ Fetches Wahapedia CSV exports and converts them into the JSON payloads the PWA c
    - Forge World / Legends flags are derived from source names inline in `buildDatasheet` (`src/generate-data.ts`).
 
 ## Output
-- `dist/json/` — individual converted CSV files
 - `dist/data/` — faction payloads for the web app
 - `dist/data/index.json` — navigation index
 - `dist/source_data/` — cached raw CSV pulls

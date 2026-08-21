@@ -83,7 +83,6 @@ pnpm refresh-data                  # force a re-download + regenerate
 
 The CLI writes to:
 
-- `packages/cli/dist/json/` – raw converted CSV files
 - `packages/cli/dist/data/` – faction payloads + navigation index
 
 `scripts/copy-data.mjs` copies `dist/data/` into `packages/web/public/data/` (run automatically by `pnpm start` / `pnpm build`).
@@ -153,7 +152,7 @@ pnpm --filter @depot/web generate-pwa-assets
 
 1. CLI fetches CSV files from Wahapedia URLs defined in `packages/cli/src/config/supplements.ts`.
 2. CSV data is converted into typed JSON using `@depot/core` types (`wahapedia.*` raw, `depot.*` processed).
-3. Output is written to `packages/cli/dist/json/` and `packages/cli/dist/data/` (including `index.json` navigation).
+3. Output is written to `packages/cli/dist/data/` (including `index.json` navigation).
 4. `scripts/copy-data.mjs` copies `dist/data/` to `packages/web/public/data/`.
 5. The web app reads from `public/data/`, normalizes into `depot.*` shapes with `@depot/core/utils/*`, and caches results in IndexedDB for offline use.
 
