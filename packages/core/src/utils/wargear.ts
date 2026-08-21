@@ -216,7 +216,7 @@ export function normalizeDatasheetWargear(datasheet: Datasheet): Datasheet {
 
 export function normalizeSelectedWargear(
   selection: Wargear[] = [],
-  availableWargear: Wargear[]
+  availableWargear: Wargear[] = []
 ): Wargear[] {
   if (selection.length === 0 || availableWargear.length === 0) {
     return [];

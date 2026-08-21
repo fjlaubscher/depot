@@ -22,11 +22,8 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
     className={cx('group border border-subtle rounded-lg', className)}
     data-testid={dataTestId}
   >
-    {/* role="button" keeps the a11y tree (and tests) identical to the old <button aria-expanded>. */}
-    <summary
-      role="button"
-      className="flex items-center justify-between p-4 list-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer [&::-webkit-details-marker]:hidden"
-    >
+    {/* No role override: native <summary> is what exposes expanded/collapsed to assistive tech. */}
+    <summary className="flex items-center justify-between p-4 list-none hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer [&::-webkit-details-marker]:hidden">
       <h3 className="text-lg font-semibold text-foreground">{title}</h3>
       <ChevronDown
         size={20}

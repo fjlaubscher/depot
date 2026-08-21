@@ -1,5 +1,5 @@
 import type { depot } from '@depot/core';
-import { getFactionAlliance, sortByName } from '@depot/core/utils/common';
+import { getFactionAlliance, groupBy, sortByName } from '@depot/core/utils/common';
 
 export const filterFactionsByQuery = (
   factions: depot.Index[] | null,
@@ -34,11 +34,9 @@ export const filterFactionsBySettings = (
 
 /** Alliance -> factions sorted by name; alliances alphabetical with Unaligned last. */
 export const groupFactionsByAlliance = (factions: depot.Index[]): Record<string, depot.Index[]> => {
-  const grouped = Object.groupBy(factions, (faction) =>
-    getFactionAlliance(faction.id).toLowerCase()
-  );
-  const keys = Object.keys(grouped).sort((a, b) =>
+  const grouped = groupBy(factions, (faction) => getFactionAlliance(faction.id).toLowerCase());
+  const keys = [...grouped.keys()].sort((a, b) =>
     a === 'unaligned' ? 1 : b === 'unaligned' ? -1 : a.localeCompare(b)
   );
-  return Object.fromEntries(keys.map((key) => [key, sortByName(grouped[key] ?? [])]));
+  return Object.fromEntries(keys.map((key) => [key, sortByName(grouped.get(key) ?? [])]));
 };

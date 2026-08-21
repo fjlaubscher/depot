@@ -28,10 +28,11 @@ export const remapRosterIds = (roster: Roster): Roster => {
     ...roster,
     id: crypto.randomUUID(),
     units: roster.units.map((unit) => ({ ...unit, id: unitIds.get(unit.id)! })),
-    enhancements: roster.enhancements.map((entry) => ({
-      ...entry,
-      unitId: unitIds.get(entry.unitId) ?? entry.unitId
-    })),
+    // Drop enhancements whose unit is missing — imports are untrusted files.
+    enhancements: roster.enhancements.flatMap((entry) => {
+      const unitId = unitIds.get(entry.unitId);
+      return unitId ? [{ ...entry, unitId }] : [];
+    }),
     warlordUnitId: roster.warlordUnitId ? (unitIds.get(roster.warlordUnitId) ?? null) : null
   };
 };

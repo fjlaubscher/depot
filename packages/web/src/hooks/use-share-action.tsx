@@ -49,15 +49,23 @@ export const useShareAction = ({
       useNativeShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
     const copyFallback = async () => {
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+        showToast({ type: 'error', title: 'Error', message: unavailableMessage });
+        return;
+      }
+      try {
         await navigator.clipboard.writeText(text ?? resolvedUrl);
         showToast({
           type: 'success',
           title: text ? 'Copied' : 'Link copied',
           message: copySuccessMessage
         });
-      } else {
-        showToast({ type: 'error', title: 'Error', message: unavailableMessage });
+      } catch {
+        showToast({
+          type: 'error',
+          title: 'Failed to copy',
+          message: 'Could not copy to the clipboard.'
+        });
       }
     };
 

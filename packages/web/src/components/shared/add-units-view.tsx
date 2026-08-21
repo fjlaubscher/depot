@@ -11,6 +11,7 @@ import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
 import { useSettingsContext } from '@/contexts/settings/context';
+import { groupBy } from '@depot/core/utils/common';
 
 interface AddUnitsViewProps {
   factionSlug?: string;
@@ -63,10 +64,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
   const aggregatedSelection = useMemo<SelectionGroup[]>(
     () =>
       Array.from(
-        Map.groupBy(
-          selectedUnits,
-          (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`
-        ).values(),
+        groupBy(selectedUnits, (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`).values(),
         (group) => ({
           count: group.length,
           datasheet: group[0].datasheet,

@@ -250,4 +250,17 @@ describe('roster utils', () => {
     expect(remapped.warlordUnitId).toBe(unitId);
     expect(roster.units[0].id).toBe('unit-abc');
   });
+
+  it('drops enhancements whose unit is missing', () => {
+    const roster = createRoster({ units: [createRosterUnit({ id: 'unit-abc' })] });
+    roster.enhancements = [
+      { ...roster.enhancements[0], unitId: 'unit-abc' },
+      { ...roster.enhancements[0], unitId: 'unit-gone' }
+    ];
+
+    const remapped = remapRosterIds(roster);
+
+    expect(remapped.enhancements).toHaveLength(1);
+    expect(remapped.enhancements[0].unitId).toBe(remapped.units[0].id);
+  });
 });

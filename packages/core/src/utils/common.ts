@@ -49,3 +49,21 @@ export const generateBreadcrumbs = (pathname: string): BreadcrumbItem[] => {
     };
   });
 };
+
+/**
+ * `Map.groupBy` without the Baseline 2024-03 requirement — bundlers transpile syntax, never
+ * built-in methods, and this ships to an offline PWA that still runs on iOS 17.0-17.3.
+ */
+export const groupBy = <T, K>(items: Iterable<T>, key: (item: T) => K): Map<K, T[]> => {
+  const groups = new Map<K, T[]>();
+  for (const item of items) {
+    const k = key(item);
+    const group = groups.get(k);
+    if (group) {
+      group.push(item);
+    } else {
+      groups.set(k, [item]);
+    }
+  }
+  return groups;
+};

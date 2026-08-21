@@ -1,4 +1,5 @@
 import type { Datasheet, DatasheetSummary } from '../types/depot.js';
+import { groupBy } from './common.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
 
@@ -61,7 +62,7 @@ export const deriveSupplementMetadata = (datasheets: DatasheetListItem[]): Suppl
     return { hasSupplements, hasCodexDatasheets, options: [] };
   }
 
-  const bySupplement = Map.groupBy(datasheets, getSupplementKey);
+  const bySupplement = groupBy(datasheets, getSupplementKey);
   const supplementEntries = [...bySupplement]
     .filter(([, sheets]) => sheets.some(isSupplementEntry))
     .map(([key, sheets]) => {

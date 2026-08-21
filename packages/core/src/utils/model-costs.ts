@@ -1,5 +1,6 @@
 import type { ModelCost } from '../types/depot.js';
 import type { DatasheetModelCost } from '../types/wahapedia.js';
+import { groupBy } from './common.js';
 
 const NUMERIC_COST = /^\d+$/;
 
@@ -80,7 +81,7 @@ export interface ModelCostGroup<T extends ModelCost = ModelCost> {
 /** Selectable costs grouped by cost bracket, in source order. */
 export const groupModelCostsBySection = <T extends ModelCost>(costs: T[]): ModelCostGroup<T>[] =>
   [
-    ...Map.groupBy(selectableModelCosts(costs), (cost) =>
+    ...groupBy(selectableModelCosts(costs), (cost) =>
       cost.section ? formatCostSection(cost.section) : ''
     )
   ].map(([section, costs]) => ({ section, costs }));
@@ -123,4 +124,4 @@ const normalizeDatasheetCosts = (rows: DatasheetModelCost[]): ModelCost[] => {
  * `section`, and collapse exact (description, cost, section) duplicates.
  */
 export const normalizeModelCosts = (rows: DatasheetModelCost[]): ModelCost[] =>
-  [...Map.groupBy(rows, (row) => row.datasheetId).values()].flatMap(normalizeDatasheetCosts);
+  [...groupBy(rows, (row) => row.datasheetId).values()].flatMap(normalizeDatasheetCosts);

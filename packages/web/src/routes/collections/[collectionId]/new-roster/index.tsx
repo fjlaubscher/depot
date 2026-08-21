@@ -12,6 +12,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/components/shared/selection-summary';
 import type { SelectionGroup } from '@/components/shared/selection-summary';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import { groupBy } from '@depot/core/utils/common';
 import CollectionSelectionCard from './_components/collection-selection-card';
 import { useSettingsContext } from '@/contexts/settings/context';
 import CreateRosterSheet from '@/routes/rosters/_components/create-roster-sheet';
@@ -65,10 +66,7 @@ const CollectionNewRoster: React.FC = () => {
   const aggregatedSelection = useMemo<SelectionGroup[]>(
     () =>
       Array.from(
-        Map.groupBy(
-          selectedUnits,
-          (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`
-        ).values(),
+        groupBy(selectedUnits, (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`).values(),
         (group) => ({
           count: group.length,
           datasheet: group[0].datasheet,
