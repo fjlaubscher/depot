@@ -4,8 +4,8 @@ import type { depot } from '@depot/core';
 
 import useFaction from '@/hooks/use-faction';
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useRoster } from '@/contexts/roster/context';
+import { useToast } from '@/contexts/toast/context';
 import { formatRebindSummaryMessage, rebindRosterUnits } from '@/utils/refresh-user-data';
 import { COLLECTION_LABELS } from '@/utils/collection';
 

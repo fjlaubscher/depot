@@ -4,6 +4,7 @@ import {
   matchDatasheetSummary,
   rebindCollectionUnit,
   rebindRosterUnit,
+  summarizeRebindStatuses,
   unitDatasheetIdentity,
   type RebindCollectionResult,
   type RebindStatus
@@ -25,9 +26,11 @@ export interface RefreshRosterParams {
   getFactionManifest: GetFactionManifest;
 }
 
+export type RebindSummary = Record<RebindStatus, number>;
+
 export type RefreshRosterResult = {
   roster: depot.Roster;
-  summary: { ok: number; partial: number; missing: number };
+  summary: RebindSummary;
 };
 
 export interface RefreshCollectionParams {
@@ -36,15 +39,6 @@ export interface RefreshCollectionParams {
   getDatasheet: GetDatasheet;
   getFactionManifest?: GetFactionManifest;
 }
-
-const emptySummary = () => ({ ok: 0, partial: 0, missing: 0 });
-
-const addStatus = (
-  summary: { ok: number; partial: number; missing: number },
-  status: RebindStatus
-) => {
-  summary[status] += 1;
-};
 
 /**
  * Resolve a datasheet for a stored unit: id → slug → name (via faction manifest).
@@ -88,21 +82,6 @@ export const resolveDatasheetForUnit = async (
   return getDatasheet(slug, summary.id || summary.slug);
 };
 
-export const refreshRosterData = async ({
-  roster,
-  currentDataVersion,
-  getDatasheet,
-  getFactionManifest
-}: RefreshRosterParams): Promise<depot.Roster> => {
-  const result = await refreshRosterDataWithReport({
-    roster,
-    currentDataVersion,
-    getDatasheet,
-    getFactionManifest
-  });
-  return result.roster;
-};
-
 /** Rebind roster units onto the current catalog (id → slug → name). */
 export const rebindRosterUnits = async (
   units: depot.RosterUnit[],
@@ -110,23 +89,25 @@ export const rebindRosterUnits = async (
   getDatasheet: GetDatasheet,
   getFactionManifest?: GetFactionManifest,
   manifestCache = new Map<string, depot.FactionManifest | null>()
-): Promise<{ units: depot.RosterUnit[]; summary: RefreshRosterResult['summary'] }> => {
-  const summary = emptySummary();
-  const rebound = await Promise.all(
-    units.map(async (unit) => {
-      const datasheet = await resolveDatasheetForUnit(
+): Promise<{ units: depot.RosterUnit[]; summary: RebindSummary }> => {
+  const results = await Promise.all(
+    units.map(async (unit) =>
+      rebindRosterUnit(
         unit,
-        factionSlug,
-        getDatasheet,
-        getFactionManifest,
-        manifestCache
-      );
-      const result = rebindRosterUnit(unit, datasheet);
-      addStatus(summary, result.status);
-      return result.unit;
-    })
+        await resolveDatasheetForUnit(
+          unit,
+          factionSlug,
+          getDatasheet,
+          getFactionManifest,
+          manifestCache
+        )
+      )
+    )
   );
-  return { units: rebound, summary };
+  return {
+    units: results.map((result) => result.unit),
+    summary: summarizeRebindStatuses(results.map((result) => result.status))
+  };
 };
 
 export const refreshRosterDataWithReport = async ({
@@ -175,21 +156,6 @@ export const refreshRosterDataWithReport = async ({
   };
 };
 
-export const refreshCollectionData = async ({
-  collection,
-  currentDataVersion,
-  getDatasheet,
-  getFactionManifest
-}: RefreshCollectionParams): Promise<depot.Collection> => {
-  const result = await refreshCollectionDataWithReport({
-    collection,
-    currentDataVersion,
-    getDatasheet,
-    getFactionManifest
-  });
-  return result.collection;
-};
-
 export const refreshCollectionDataWithReport = async ({
   collection,
   currentDataVersion,
@@ -219,11 +185,7 @@ export const refreshCollectionDataWithReport = async ({
   return applyCollectionRebind(collection, itemResults, currentDataVersion);
 };
 
-export const formatRebindSummaryMessage = (summary: {
-  ok: number;
-  partial: number;
-  missing: number;
-}): string | null => {
+export const formatRebindSummaryMessage = (summary: RebindSummary): string | null => {
   const { partial, missing } = summary;
   if (partial === 0 && missing === 0) return null;
 

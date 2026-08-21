@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
+import { useRoster } from '@/contexts/roster/context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import useFaction from '@/hooks/use-faction';
 
 import AppLayout from '@/components/layout';

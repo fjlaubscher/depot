@@ -208,10 +208,7 @@ describe('FactionsProvider', () => {
     });
 
     expect(mockOfflineStorage.getFactionIndex).toHaveBeenCalled();
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringMatching(/^\/data\/index\.json\?t=\d+$/),
-      expect.anything()
-    );
+    expect(global.fetch).toHaveBeenCalledWith('/data/index.json', expect.anything());
     expect(mockOfflineStorage.setFactionIndex).not.toHaveBeenCalled();
   });
 
@@ -228,10 +225,7 @@ describe('FactionsProvider', () => {
       expect(screen.getByTestId('faction-count')).toHaveTextContent('2');
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringMatching(/^\/data\/index\.json\?t=\d+$/),
-      expect.anything()
-    );
+    expect(global.fetch).toHaveBeenCalledWith('/data/index.json', expect.anything());
     expect(mockOfflineStorage.setFactionIndex).toHaveBeenCalledWith(mockFactionIndex);
   });
 
@@ -313,7 +307,7 @@ describe('FactionsProvider', () => {
     });
   });
 
-  it('refetches cached manifest without a version when current version is known', async () => {
+  it('refetches cached manifest when its version differs from the current one', async () => {
     mockOfflineStorage.getFactionManifest.mockResolvedValue(mockManifest);
     mockOfflineStorage.getFactionIndex.mockResolvedValue(mockFactionIndex);
 
@@ -345,9 +339,7 @@ describe('FactionsProvider', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /^\/data\/factions\/test-faction\/faction\.json\?v=2025-11-29T02%3A05%3A23$/
-        ),
+        '/data/factions/test-faction/faction.json',
         expect.anything()
       );
       expect(mockOfflineStorage.setFactionManifest).toHaveBeenCalledWith(

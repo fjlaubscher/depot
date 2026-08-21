@@ -11,7 +11,7 @@ import useFaction from '@/hooks/use-faction';
 import useFactionDatasheets from '@/hooks/use-faction-datasheets';
 import { useRosterUnitSelection } from '@/hooks/use-roster-unit-selection';
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 
 interface AddUnitsViewProps {
   factionSlug?: string;

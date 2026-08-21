@@ -6,7 +6,7 @@ import { Sheet, Field, SelectField, Button } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { offlineStorage } from '@/data/offline-storage';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import { COLLECTION_LABELS } from '@/utils/collection';
 
 interface Props {

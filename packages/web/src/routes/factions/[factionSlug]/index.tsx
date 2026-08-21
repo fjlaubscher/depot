@@ -10,9 +10,9 @@ import { BackButton } from '@/components/shared';
 // Hooks
 import useFaction from '@/hooks/use-faction';
 import useBookmarks from '@/hooks/use-bookmarks';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 
 // Utils
 import { getFactionAlliance } from '@depot/core/utils/common';

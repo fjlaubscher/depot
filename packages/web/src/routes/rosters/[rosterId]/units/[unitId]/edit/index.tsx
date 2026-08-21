@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useRoster } from '@/contexts/roster/context';
+import { useToast } from '@/contexts/toast/context';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 
 import AppLayout from '@/components/layout';

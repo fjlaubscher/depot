@@ -53,7 +53,7 @@ span.hi_custom {
   }
 }
 
-[data-scroll-highlight='true'] {
+:target {
   animation: scroll-highlight 1.2s ease-out;
 }
 

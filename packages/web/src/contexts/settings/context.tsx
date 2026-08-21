@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { DEFAULT_SETTINGS, mergeSettingsWithDefaults } from '@/constants/settings';
@@ -49,6 +49,14 @@ export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
       {children}
     </SettingsContext.Provider>
   );
+};
+
+export const useSettingsContext = (): SettingsContextType => {
+  const context = useContext(SettingsContext);
+  if (!context) {
+    throw new Error('useSettingsContext must be used within a SettingsProvider');
+  }
+  return context;
 };
 
 export default SettingsContext;

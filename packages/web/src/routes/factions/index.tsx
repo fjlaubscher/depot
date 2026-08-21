@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 // Context hooks
 import { useFactionsContext } from '@/contexts/factions/context';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 
 // UI Components
 import AppLayout from '@/components/layout';

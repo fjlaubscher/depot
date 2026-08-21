@@ -14,7 +14,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import { downloadFile } from '@/utils/file';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import { CURRENT_GAME_EDITION, type ExportedCollection } from '@/types/export';
 import { safeSlug } from '@depot/core/utils/common';
 import { useFactionsContext } from '@/contexts/factions/context';

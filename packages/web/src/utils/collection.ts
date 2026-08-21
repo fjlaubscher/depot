@@ -27,32 +27,30 @@ export const COLLECTION_STATE_BLURBS: Record<depot.CollectionUnitState, string> 
   'parade-ready': 'Mostly "Parade Ready" — showtime (or start a new box).'
 };
 
+/** Most common unit state; ties go to the later state in COLLECTION_UNIT_STATES. */
+const dominantState = (
+  stateCounts: Record<depot.CollectionUnitState, number>
+): depot.CollectionUnitState =>
+  COLLECTION_UNIT_STATES.reduce((prev, curr) =>
+    (stateCounts[curr] ?? 0) >= (stateCounts[prev] ?? 0) ? curr : prev
+  );
+
 export const getCollectionChartCopy = (
   collection: depot.Collection,
   points: number
 ): { heading: string; subheading?: string; totalUnits: number } => {
   const totalUnits = collection.items.length;
   const stateCounts = getCollectionStateCounts(collection.items);
-  const dominantState =
-    totalUnits > 0
-      ? COLLECTION_UNIT_STATES.reduce((prev, curr) =>
-          (stateCounts[curr] ?? 0) >= (stateCounts[prev] ?? 0) ? curr : prev
-        )
-      : undefined;
 
   const heading =
     totalUnits > 0 ? `${totalUnits} unit${totalUnits === 1 ? '' : 's'}` : 'No units yet';
 
   const subheading =
-    totalUnits > 0 && dominantState
-      ? COLLECTION_STATE_BLURBS[dominantState]
+    totalUnits > 0
+      ? COLLECTION_STATE_BLURBS[dominantState(stateCounts)]
       : 'Add units to see how your kits are progressing.';
 
-  return {
-    heading,
-    subheading,
-    totalUnits
-  };
+  return { heading, subheading, totalUnits };
 };
 
 export const getCollectionsSnapshotCopy = (
@@ -68,12 +66,7 @@ export const getCollectionsSnapshotCopy = (
   const items = collections.flatMap((c) => c.items ?? []);
   const stateCounts = getCollectionStateCounts(items);
   const totalUnits = items.length;
-  const dominantState =
-    totalUnits > 0
-      ? COLLECTION_UNIT_STATES.reduce((prev, curr) =>
-          (stateCounts[curr] ?? 0) > (stateCounts[prev] ?? 0) ? curr : prev
-        )
-      : undefined;
+  const dominant = totalUnits > 0 ? dominantState(stateCounts) : undefined;
 
   const heading =
     totalUnits > 0
@@ -82,10 +75,9 @@ export const getCollectionsSnapshotCopy = (
         }`
       : 'Start your collection';
 
-  const subheading =
-    totalUnits > 0 && dominantState
-      ? COLLECTION_STATE_BLURBS[dominantState]
-      : 'Add a collection to see how your kits are progressing.';
+  const subheading = dominant
+    ? COLLECTION_STATE_BLURBS[dominant]
+    : 'Add a collection to see how your kits are progressing.';
 
-  return { heading, subheading, items, stateCounts, totalUnits, dominantState };
+  return { heading, subheading, items, stateCounts, totalUnits, dominantState: dominant };
 };

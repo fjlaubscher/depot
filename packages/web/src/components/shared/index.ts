@@ -6,7 +6,6 @@ export { ErrorBoundary } from './error-boundary';
 export { default as AbilitySheet } from './ability-sheet';
 export * from './datasheet';
 export * from './roster';
-export { default as WargearRow } from './wargear-row';
 export { default as WargearSelection } from './wargear-selection';
 export { default as WargearTable } from './wargear-table';
 

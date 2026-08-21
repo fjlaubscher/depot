@@ -2,8 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { useState } from 'react';
 import type { depot } from '@depot/core';
-import { SettingsProvider } from './context';
-import { useSettingsContext } from './use-settings-context';
+import { SettingsProvider, useSettingsContext } from './context';
 import { DEFAULT_SETTINGS } from '@/constants/settings';
 
 const mockOfflineStorage = vi.hoisted(() => ({

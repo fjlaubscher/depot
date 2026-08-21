@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { RosterProvider } from './context';
-import { useRoster } from './use-roster-context';
+import { RosterProvider, useRoster } from './context';
 import { createMockRoster } from '@/test/mock-data';
 
 // Mock offline storage using vi.hoisted for proper scoping
@@ -20,7 +19,7 @@ vi.mock('../../data/offline-storage', () => ({
   offlineStorage: mockOfflineStorage
 }));
 
-vi.mock('@/contexts/toast/use-toast-context', () => ({
+vi.mock('@/contexts/toast/context', () => ({
   useToast: () => ({
     state: { toasts: [] },
     showToast: mockToastContext.showToast,

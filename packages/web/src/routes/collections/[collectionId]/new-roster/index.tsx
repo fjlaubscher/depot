@@ -14,7 +14,7 @@ import type { SelectionGroup } from '@/components/shared/selection-summary';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { COLLECTION_LABELS } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 import CreateRosterSheet from '@/routes/rosters/_components/create-roster-sheet';
 
 type CollectionDatasheetListItem = depot.Datasheet & {

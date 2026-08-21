@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import { Loader, Alert } from '@/components/ui';
 import AddUnitsView from '@/components/shared/add-units-view';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useToast } from '@/contexts/toast/context';
 import useCollection from '@/hooks/use-collection';
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
 import { useDocumentTitle } from '@/hooks/use-document-title';

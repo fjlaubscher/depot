@@ -1,7 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 
 interface EnhancementSelectionProps {
   enhancements: depot.Enhancement[];

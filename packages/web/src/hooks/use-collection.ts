@@ -5,7 +5,7 @@ import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import useAsync from './use-async';
 
 export const useCollection = (collectionId?: string) => {
-  const { data, setData, loading, error, refresh } = useAsync(
+  const { data, setData, loading, error } = useAsync(
     async () => (collectionId ? offlineStorage.getCollection(collectionId) : null),
     [collectionId]
   );
@@ -23,20 +23,7 @@ export const useCollection = (collectionId?: string) => {
     [setData]
   );
 
-  const remove = useCallback(async () => {
-    if (!collectionId) return;
-    await offlineStorage.deleteCollection(collectionId);
-  }, [collectionId]);
-
-  return {
-    collection: data ?? null,
-    setCollection: setData,
-    loading,
-    error,
-    refresh,
-    save,
-    remove
-  };
+  return { collection: data ?? null, loading, error, save };
 };
 
 export default useCollection;

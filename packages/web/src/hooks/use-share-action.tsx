@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 import { Share2 } from 'lucide-react';
 import type { Action } from '@/components/ui/action-group';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useSettingsContext } from '@/contexts/settings/context';
+import { useToast } from '@/contexts/toast/context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 
 interface ShareActionOptions {

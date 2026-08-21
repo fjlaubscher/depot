@@ -6,7 +6,6 @@ import {
   DEFAULT_TAB_INACTIVE_CLASS,
   getSupplementStyles
 } from '@/utils/supplement-styles';
-import ScrollableTabRow from './scrollable-tab-row';
 
 export interface SupplementTab {
   value: string;
@@ -32,54 +31,54 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
   }
 
   return (
-    <ScrollableTabRow
-      className={className}
-      label="Supplements"
-      testId="supplement-tabs"
-      containerProps={{
-        role: 'tablist',
-        'aria-label': 'Datasheet supplements'
-      }}
+    <div
+      role="tablist"
+      aria-label="Datasheet supplements"
+      data-testid="supplement-tabs"
+      className={classNames('flex flex-col gap-2', className)}
     >
-      {tabs.map((tab) => {
-        const isActive = tab.value === activeValue;
-        const tabId = `datasheet-supplement-${tab.value}`;
-        const isNeutral = tab.value === 'all' || tab.value === CODEX_SLUG;
-        const styles = getSupplementStyles(isNeutral ? null : tab.value);
+      <span className="text-sm font-medium text-secondary">Supplements</span>
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {tabs.map((tab) => {
+          const isActive = tab.value === activeValue;
+          const tabId = `datasheet-supplement-${tab.value}`;
+          const isNeutral = tab.value === 'all' || tab.value === CODEX_SLUG;
+          const styles = getSupplementStyles(isNeutral ? null : tab.value);
 
-        const activeClass = styles.tabActiveClass || DEFAULT_TAB_ACTIVE_CLASS;
-        const inactiveClass = styles.tabInactiveClass || DEFAULT_TAB_INACTIVE_CLASS;
+          const activeClass = styles.tabActiveClass || DEFAULT_TAB_ACTIVE_CLASS;
+          const inactiveClass = styles.tabInactiveClass || DEFAULT_TAB_INACTIVE_CLASS;
 
-        return (
-          <button
-            key={tabId}
-            id={tabId}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls="datasheet-results"
-            onClick={() => onChange(tab.value)}
-            data-testid={`supplement-tab-${tab.value}`}
-            data-supplement-key={isNeutral ? undefined : tab.value}
-            className={classNames(
-              'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
-              isActive ? activeClass : inactiveClass
-            )}
-          >
-            <span>{tab.label}</span>
-            <span
+          return (
+            <button
+              key={tabId}
+              id={tabId}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls="datasheet-results"
+              onClick={() => onChange(tab.value)}
+              data-testid={`supplement-tab-${tab.value}`}
+              data-supplement-key={isNeutral ? undefined : tab.value}
               className={classNames(
-                'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
-                isActive
-                  ? 'bg-white text-primary-600 dark:text-primary-500'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
+                isActive ? activeClass : inactiveClass
               )}
             >
-              {tab.count}
-            </span>
-          </button>
-        );
-      })}
-    </ScrollableTabRow>
+              <span>{tab.label}</span>
+              <span
+                className={classNames(
+                  'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
+                  isActive
+                    ? 'bg-white text-primary-600 dark:text-primary-500'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                )}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

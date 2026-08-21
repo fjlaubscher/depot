@@ -24,8 +24,8 @@ import { DetachmentMeta } from '../../_components/faction-detachments';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import useBookmarks from '@/hooks/use-bookmarks';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useSettingsContext } from '@/contexts/settings/context';
+import { useToast } from '@/contexts/toast/context';
 import { useShareAction } from '@/hooks/use-share-action';
 
 // utils

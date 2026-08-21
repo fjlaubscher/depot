@@ -3,14 +3,14 @@ import type { FC, ReactNode } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
-import { useRoster } from '@/contexts/roster/use-roster-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
+import { useRoster } from '@/contexts/roster/context';
+import { useToast } from '@/contexts/toast/context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
 import { downloadFile } from '@/utils/file';
 import { safeSlug } from '@depot/core/utils/common';
 import { CURRENT_GAME_EDITION, type ExportedRoster } from '@/types/export';
 import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
-import { useSettingsContext } from '@/contexts/settings/use-settings-context';
+import { useSettingsContext } from '@/contexts/settings/context';
 import { useFactionsContext } from '@/contexts/factions/context';
 
 import AppLayout from '@/components/layout';
