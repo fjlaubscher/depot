@@ -15,10 +15,7 @@ const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
     return separateWargearByType(wargear);
   }, [wargear]);
 
-  const hasOptions = useMemo(
-    () => (options.length > 0 ? options[0].description !== 'None' : false),
-    [options]
-  );
+  const hasOptions = options.length > 0 && options[0].description !== 'None';
   const hasWargear = wargear.length > 0;
 
   if (!hasWargear && !hasOptions) {

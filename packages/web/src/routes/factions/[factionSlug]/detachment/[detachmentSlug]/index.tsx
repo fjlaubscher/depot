@@ -1,7 +1,5 @@
 import type { FC } from 'react';
-import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Bookmark, BookmarkCheck } from 'lucide-react';
 
 // components
 import AppLayout from '@/components/layout';
@@ -23,14 +21,13 @@ import { DetachmentMeta } from '../../_components/faction-detachments';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
-import useBookmarks from '@/hooks/use-bookmarks';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
-import { useToast } from '@/contexts/toast/use-toast-context';
 import { useShareAction } from '@/hooks/use-share-action';
+import { useBookmarkAction } from '@/hooks/use-bookmark-action';
 
 // utils
 import { buildAbsoluteUrl } from '@/utils/paths';
-import { createDetachmentBookmark, detachmentBookmarkId } from '@/utils/bookmarks';
+import { createDetachmentBookmark } from '@/utils/bookmarks';
 import { formatDetachmentOptionLabel, matchDetachment } from '@depot/core/utils/detachments';
 
 const Section: FC<{ title: string; testId: string; children: React.ReactNode }> = ({
@@ -51,38 +48,14 @@ const DetachmentPage: FC = () => {
   }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
-  const { showToast } = useToast();
-  const { isBookmarked, toggleBookmark } = useBookmarks();
 
   const detachment = faction
     ? matchDetachment({ slug: detachmentSlug }, faction.detachments)
     : undefined;
 
-  const bookmarked =
-    faction && detachment
-      ? isBookmarked(detachmentBookmarkId(faction.slug, detachment.slug))
-      : false;
-
-  const handleToggleBookmark = useCallback(async () => {
-    if (!faction || !detachment) return;
-    try {
-      const next = await toggleBookmark(createDetachmentBookmark(faction, detachment));
-      showToast({
-        type: 'success',
-        title: next ? 'Bookmarked' : 'Bookmark removed',
-        message: next
-          ? `${detachment.name} pinned to your desk.`
-          : `${detachment.name} removed from bookmarks.`
-      });
-    } catch (err) {
-      console.error('Failed to toggle detachment bookmark', err);
-      showToast({
-        type: 'error',
-        title: 'Bookmark failed',
-        message: 'Could not update bookmarks.'
-      });
-    }
-  }, [detachment, faction, showToast, toggleBookmark]);
+  const bookmarkAction = useBookmarkAction(
+    faction && detachment ? createDetachmentBookmark(faction, detachment) : undefined
+  );
 
   const shareAction = useShareAction({
     title: detachment?.name,
@@ -168,15 +141,7 @@ const DetachmentPage: FC = () => {
           title={detachment.name}
           subtitle={formatDetachmentOptionLabel(detachment)}
           actions={[
-            {
-              icon: bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />,
-              onClick: () => {
-                void handleToggleBookmark();
-              },
-              ariaLabel: bookmarked ? 'Remove bookmark' : 'Bookmark detachment',
-              variant: bookmarked ? 'primary' : 'ghost',
-              'data-testid': 'bookmark-detachment-button'
-            },
+            bookmarkAction,
             {
               icon: shareAction.icon,
               onClick: () => shareAction.onClick(),

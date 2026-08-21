@@ -5,14 +5,9 @@ import FactionGrid from './faction-grid';
 interface AllianceSectionProps {
   alliance: string;
   factions: depot.Index[];
-  loading?: boolean;
 }
 
-const AllianceSection: React.FC<AllianceSectionProps> = ({
-  alliance,
-  factions,
-  loading = false
-}) => {
+const AllianceSection: React.FC<AllianceSectionProps> = ({ alliance, factions }) => {
   return (
     <section className="flex flex-col gap-4">
       <header className="flex flex-wrap items-center justify-between gap-2">
@@ -21,7 +16,7 @@ const AllianceSection: React.FC<AllianceSectionProps> = ({
           {factions.length} {factions.length === 1 ? 'faction' : 'factions'}
         </span>
       </header>
-      <FactionGrid factions={factions} loading={loading} />
+      <FactionGrid factions={factions} />
     </section>
   );
 };

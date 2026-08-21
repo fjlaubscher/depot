@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import Tag from '@/components/ui/tag';
 import { LinkCard } from '@/components/ui';
 import type { DatasheetListItem } from '@depot/core/utils/datasheets';
@@ -19,50 +19,10 @@ const DatasheetListItemCard: FC<DatasheetListItemCardProps> = ({
   datasheet,
   supplementMetadataHasSupplements = false
 }) => {
-  const tags: ReactNode[] = [];
-
-  if (datasheet.isSupport) {
-    tags.push(
-      <Tag key="support" size="sm" variant="secondary">
-        Support
-      </Tag>
-    );
-  }
-
-  if (supplementMetadataHasSupplements && isSupplementEntry(datasheet)) {
-    const supplementKey = getSupplementKey(datasheet);
-    const supplementStyles = getSupplementStyles(supplementKey);
-    const label = datasheet.supplementLabel
-      ? datasheet.supplementLabel
-      : buildSupplementLabel(datasheet.supplementSlug ?? CODEX_SLUG, datasheet.supplementName);
-    tags.push(
-      <Tag
-        key="supplement"
-        size="sm"
-        variant="default"
-        className={supplementStyles.tagClass}
-        data-supplement-key={supplementKey}
-      >
-        {label}
-      </Tag>
-    );
-  }
-
-  if (datasheet.isLegends) {
-    tags.push(
-      <Tag key="legends" size="sm" variant="warning">
-        Warhammer Legends
-      </Tag>
-    );
-  }
-
-  if (datasheet.isForgeWorld) {
-    tags.push(
-      <Tag key="forgeWorld" size="sm" variant="secondary">
-        Forge World
-      </Tag>
-    );
-  }
+  const showSupplement = supplementMetadataHasSupplements && isSupplementEntry(datasheet);
+  const supplementKey = getSupplementKey(datasheet);
+  const hasTags =
+    datasheet.isSupport || showSupplement || datasheet.isLegends || datasheet.isForgeWorld;
 
   return (
     <LinkCard to={`/faction/${datasheet.factionSlug}/datasheet/${datasheet.slug}`} showArrow>
@@ -70,8 +30,38 @@ const DatasheetListItemCard: FC<DatasheetListItemCardProps> = ({
         <span className="font-medium text-foreground transition-colors duration-200 group-hover/link:text-accent">
           {datasheet.name}
         </span>
-        {tags.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm text-subtle">{tags}</div>
+        {hasTags ? (
+          <div className="flex flex-wrap items-center gap-2 text-sm text-subtle">
+            {datasheet.isSupport ? (
+              <Tag size="sm" variant="secondary">
+                Support
+              </Tag>
+            ) : null}
+            {showSupplement ? (
+              <Tag
+                size="sm"
+                variant="default"
+                className={getSupplementStyles(supplementKey).tagClass}
+                data-supplement-key={supplementKey}
+              >
+                {datasheet.supplementLabel ||
+                  buildSupplementLabel(
+                    datasheet.supplementSlug ?? CODEX_SLUG,
+                    datasheet.supplementName
+                  )}
+              </Tag>
+            ) : null}
+            {datasheet.isLegends ? (
+              <Tag size="sm" variant="warning">
+                Warhammer Legends
+              </Tag>
+            ) : null}
+            {datasheet.isForgeWorld ? (
+              <Tag size="sm" variant="secondary">
+                Forge World
+              </Tag>
+            ) : null}
+          </div>
         ) : null}
       </div>
     </LinkCard>

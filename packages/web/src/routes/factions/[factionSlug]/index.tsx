@@ -1,76 +1,45 @@
-import React, { useMemo, useCallback } from 'react';
+import React from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Bookmark, BookmarkCheck, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
 import { PageHeader, Tabs, ErrorState, Breadcrumbs } from '@/components/ui';
-import { BackButton } from '@/components/shared';
+import { BackButton, DatasheetBrowser } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
-import useBookmarks from '@/hooks/use-bookmarks';
 import { useSettingsContext } from '@/contexts/settings/use-settings-context';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
-import { useToast } from '@/contexts/toast/use-toast-context';
 
 // Utils
 import { getFactionAlliance } from '@depot/core/utils/common';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
-import { createFactionBookmark, factionBookmarkId } from '@/utils/bookmarks';
+import { useBookmarkAction } from '@/hooks/use-bookmark-action';
+import { createFactionBookmark } from '@/utils/bookmarks';
 
 // Components
 import Skeleton from './_components/skeleton';
-import FactionDatasheets from './_components/faction-datasheets';
 import FactionDetachments from './_components/faction-detachments';
 
 const Faction: React.FC = () => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
-  const { showToast } = useToast();
-  const { isBookmarked, toggleBookmark } = useBookmarks();
   const [searchParams, setSearchParams] = useSearchParams();
   // Tab lives in the URL so back-nav from a detachment page lands on the right tab.
   const activeTab = searchParams.get('tab') === 'detachments' ? 1 : 0;
   const setActiveTab = (index: number) =>
     setSearchParams(index === 1 ? { tab: 'detachments' } : {}, { replace: true });
 
-  const showLegends = settings.showLegends ?? false;
-  const showForgeWorld = settings.showForgeWorld ?? false;
-
-  const datasheetFilters = useMemo(
-    () => ({
-      showLegends,
-      showForgeWorld
-    }),
-    [showLegends, showForgeWorld]
-  );
+  const datasheetFilters = {
+    showLegends: settings.showLegends ?? false,
+    showForgeWorld: settings.showForgeWorld ?? false
+  };
 
   const alliance = faction ? getFactionAlliance(faction.id) : '';
-  const bookmarked = faction ? isBookmarked(factionBookmarkId(faction.slug)) : false;
-
-  const handleToggleBookmark = useCallback(async () => {
-    if (!faction) return;
-    try {
-      const next = await toggleBookmark(createFactionBookmark(faction));
-      showToast({
-        type: 'success',
-        title: next ? 'Bookmarked' : 'Bookmark removed',
-        message: next
-          ? `${faction.name} pinned to your desk.`
-          : `${faction.name} removed from bookmarks.`
-      });
-    } catch (err) {
-      console.error('Failed to toggle faction bookmark', err);
-      showToast({
-        type: 'error',
-        title: 'Bookmark failed',
-        message: 'Could not update bookmarks.'
-      });
-    }
-  }, [faction, showToast, toggleBookmark]);
+  const bookmarkAction = useBookmarkAction(faction ? createFactionBookmark(faction) : undefined);
 
   const shareAction = useShareAction({
     title: faction?.name,
@@ -102,20 +71,6 @@ const Faction: React.FC = () => {
     return <Skeleton />;
   }
 
-  if (!faction) {
-    return (
-      <AppLayout title="Not Found">
-        <ErrorState
-          title="Faction not found"
-          message="The faction you're looking for doesn't exist or may have been removed."
-          showRetry={false}
-          homeUrl="/"
-          data-testid="faction-not-found"
-        />
-      </AppLayout>
-    );
-  }
-
   // Main Content
   const pageTitle = `${faction.name} - Faction Overview`;
 
@@ -143,15 +98,7 @@ const Faction: React.FC = () => {
           title={faction.name}
           subtitle={alliance}
           actions={[
-            {
-              icon: bookmarked ? <BookmarkCheck size={16} /> : <Bookmark size={16} />,
-              onClick: () => {
-                void handleToggleBookmark();
-              },
-              ariaLabel: bookmarked ? 'Remove bookmark' : 'Bookmark faction',
-              variant: bookmarked ? 'primary' : 'ghost',
-              'data-testid': 'bookmark-faction-button'
-            },
+            bookmarkAction,
             {
               icon: shareAction.icon ?? <Share2 size={16} />,
               onClick: () => shareAction.onClick(),
@@ -167,7 +114,13 @@ const Faction: React.FC = () => {
           onChange={setActiveTab}
           tabTestIdPrefix="faction-tab"
         >
-          <FactionDatasheets datasheets={faction.datasheets} filters={datasheetFilters} />
+          <DatasheetBrowser
+            datasheets={faction.datasheets}
+            searchPlaceholder="Search datasheets by name..."
+            emptyStateMessage="No datasheets found matching your search criteria."
+            showItemCount={false}
+            filters={datasheetFilters}
+          />
           <FactionDetachments factionSlug={faction.slug} detachments={faction.detachments} />
         </Tabs>
       </div>

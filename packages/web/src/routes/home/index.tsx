@@ -8,11 +8,11 @@ import useRosters from '@/hooks/use-rosters';
 import useCollections from '@/hooks/use-collections';
 import useBookmarks from '@/hooks/use-bookmarks';
 import { takeRecent } from '@/utils/recent';
+import { calculateCollectionPoints } from '@depot/core/utils/collection';
 
 import Hero from './_components/hero';
 import SectionHeader from './_components/section-header';
-import RosterPreviewCard from './_components/roster-preview-card';
-import CollectionPreviewCard from './_components/collection-preview-card';
+import PreviewCard from './_components/preview-card';
 import BookmarkCard from './_components/bookmark-card';
 
 const PREVIEW_LIMIT = 3;
@@ -63,7 +63,18 @@ const Home: React.FC = () => {
               data-testid="collection-previews"
             >
               {recentCollections.map((collection) => (
-                <CollectionPreviewCard key={collection.id} collection={collection} />
+                <PreviewCard
+                  key={collection.id}
+                  to={`/collections/${collection.id}`}
+                  title={collection.name}
+                  subtitle={
+                    <span className="capitalize">
+                      {collection.faction?.name || collection.factionSlug || collection.factionId}
+                    </span>
+                  }
+                  badge={`${calculateCollectionPoints(collection)} pts`}
+                  testId="collection-preview-card"
+                />
               ))}
             </div>
           </section>
@@ -83,7 +94,14 @@ const Home: React.FC = () => {
               data-testid="roster-previews"
             >
               {recentRosters.map((roster) => (
-                <RosterPreviewCard key={roster.id} roster={roster} />
+                <PreviewCard
+                  key={roster.id}
+                  to={`/rosters/${roster.id}`}
+                  title={roster.name}
+                  subtitle={roster.faction?.name ?? roster.factionSlug ?? roster.factionId}
+                  badge={`${roster.points.current}/${roster.points.max}`}
+                  testId="roster-preview-card"
+                />
               ))}
             </div>
           </section>

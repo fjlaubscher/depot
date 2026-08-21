@@ -1,9 +1,5 @@
 import type { depot } from '@depot/core';
-import { getFactionAlliance } from '@depot/core/utils/common';
-
-export interface GroupedFactions {
-  [key: string]: depot.Index[];
-}
+import { getFactionAlliance, groupBy, sortByName } from '@depot/core/utils/common';
 
 export const filterFactionsByQuery = (
   factions: depot.Index[] | null,
@@ -36,32 +32,11 @@ export const filterFactionsBySettings = (
   });
 };
 
-export const groupFactionsByAlliance = (factions: depot.Index[]): GroupedFactions => {
-  const grouped = factions.reduce((acc, faction) => {
-    const allianceKey = getFactionAlliance(faction.id).toLowerCase();
-    const allianceFactions = acc[allianceKey] || [];
-
-    return {
-      ...acc,
-      [allianceKey]: [...allianceFactions, faction].sort((a, b) => a.name.localeCompare(b.name))
-    };
-  }, {} as GroupedFactions);
-
-  // Sort the alliance keys to ensure Unaligned comes last
-  const sortedGrouped: GroupedFactions = {};
-  const sortedKeys = Object.keys(grouped).sort((a, b) => {
-    if (a.toLowerCase() === 'unaligned') return 1;
-    if (b.toLowerCase() === 'unaligned') return -1;
-    return a.toLowerCase().localeCompare(b.toLowerCase());
-  });
-
-  sortedKeys.forEach((key) => {
-    sortedGrouped[key] = grouped[key];
-  });
-
-  return sortedGrouped;
-};
-
-export const createTabLabels = (): string[] => {
-  return ['All Factions'];
+/** Alliance -> factions sorted by name; alliances alphabetical with Unaligned last. */
+export const groupFactionsByAlliance = (factions: depot.Index[]): Record<string, depot.Index[]> => {
+  const grouped = groupBy(factions, (faction) => getFactionAlliance(faction.id).toLowerCase());
+  const keys = Object.keys(grouped).sort((a, b) =>
+    a === 'unaligned' ? 1 : b === 'unaligned' ? -1 : a.localeCompare(b)
+  );
+  return Object.fromEntries(keys.map((key) => [key, sortByName(grouped[key])]));
 };
