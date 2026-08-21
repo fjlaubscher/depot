@@ -1,8 +1,6 @@
 import React from 'react';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
-import { ToggleSwitch } from '@/components/ui';
-import EnhancementCard from '@/components/shared/enhancement-card';
 
 interface EnhancementSelectionProps {
   enhancements: depot.Enhancement[];
@@ -10,6 +8,31 @@ interface EnhancementSelectionProps {
   onEnhancementChange: (enhancementIds: string[]) => void;
 }
 
+const Radio: React.FC<{ checked: boolean }> = ({ checked }) => (
+  <span
+    aria-hidden
+    className={cx(
+      'mt-0.5 size-4 flex-none rounded-full',
+      checked
+        ? 'border-[5px] border-accent-600 dark:border-accent-500'
+        : 'border-[1.5px] border-border-strong'
+    )}
+  />
+);
+
+const rowClasses = (selected: boolean) =>
+  cx(
+    'flex w-full cursor-pointer items-start gap-2.5 rounded-sm border px-3 py-2.5 text-left transition-colors focus-ring-primary',
+    selected
+      ? 'border-border-accent bg-surface-accent'
+      : 'border-border-subtle bg-surface-card hover:border-border-accent'
+  );
+
+/**
+ * Core rules 25.04: a unit may hold at most one enhancement, so this is a
+ * radio group with an explicit "none" rather than a row of toggles — the
+ * indicator costs almost nothing on a full-width row.
+ */
 const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
   enhancements,
   selectedEnhancements,
@@ -23,42 +46,68 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4" data-testid="enhancement-selection">
-      <div className="text-sm text-muted">Select one enhancement from your detachments.</div>
+  const [selectedId] = selectedEnhancements;
 
-      <div className="flex flex-col gap-3">
-        {enhancements.map((enhancement) => {
-          const selected = selectedEnhancements.includes(enhancement.id);
-          return (
-            <div
-              key={enhancement.id}
-              className="flex items-start gap-4"
-              data-testid={`enhancement-option-${enhancement.id}`}
-            >
-              <div
-                className={cx(
-                  'flex min-w-0 flex-1 flex-col gap-1 rounded-sm',
-                  selected && 'ring-2 ring-accent-500'
-                )}
-              >
-                <EnhancementCard enhancement={enhancement} />
-                {enhancement.detachment ? (
-                  <span className="text-xs text-subtle">Detachment: {enhancement.detachment}</span>
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Enhancement"
+      className="flex flex-col gap-1"
+      data-testid="enhancement-selection"
+    >
+      <button
+        type="button"
+        role="radio"
+        aria-checked={!selectedId}
+        onClick={() => onEnhancementChange([])}
+        className={cx(rowClasses(!selectedId), 'items-center')}
+        data-testid="enhancement-option-none"
+      >
+        <Radio checked={!selectedId} />
+        <span className="text-[13px] font-bold text-foreground">No enhancement</span>
+      </button>
+
+      {enhancements.map((enhancement) => {
+        const selected = enhancement.id === selectedId;
+
+        return (
+          <button
+            key={enhancement.id}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => onEnhancementChange(selected ? [] : [enhancement.id])}
+            className={rowClasses(selected)}
+            data-testid={`enhancement-option-${enhancement.id}`}
+          >
+            <Radio checked={selected} />
+
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="flex items-baseline gap-2">
+                <span className="min-w-0 flex-1 text-[13px] leading-tight font-bold text-foreground">
+                  {enhancement.name}
+                </span>
+                {enhancement.cost ? (
+                  <span className="flex-none font-mono text-[11px] font-bold text-accent">
+                    +{enhancement.cost}
+                  </span>
                 ) : null}
-              </div>
-              <ToggleSwitch
-                label=""
-                ariaLabel={`Select ${enhancement.name}`}
-                enabled={selected}
-                // Core rules 25.04: no unit can have more than one enhancement, so selecting replaces.
-                onChange={() => onEnhancementChange(selected ? [] : [enhancement.id])}
-                size="sm"
+              </span>
+
+              {enhancement.detachment ? (
+                <span className="font-mono text-[9.5px] font-medium uppercase text-subtle">
+                  {enhancement.detachment}
+                </span>
+              ) : null}
+
+              <span
+                className="text-[11.5px] leading-snug text-muted"
+                dangerouslySetInnerHTML={{ __html: enhancement.description }}
               />
-            </div>
-          );
-        })}
-      </div>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };

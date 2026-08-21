@@ -7,7 +7,7 @@ import { useRoster } from '@/contexts/roster/context';
 import { useToast } from '@/contexts/toast/context';
 
 import AppLayout from '@/components/layout';
-import { Card, ErrorState, PageHeaderSkeleton, SkeletonCard } from '@/components/ui';
+import { ErrorState, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import UnitEditShell from '@/components/shared/unit-edit/unit-edit-shell';
 import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-shell';
 import EnhancementSelection from './_components/enhancement-selection';
@@ -111,36 +111,26 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
       afterGrid={
         <>
           {character || eligibleEnhancements.length > 0 ? (
-            <Card data-testid="enhancement-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
-                <p className="text-sm text-muted">
-                  {character
-                    ? 'Select one enhancement for this character'
-                    : 'Select one Upgrade for this unit'}
-                </p>
-                <EnhancementSelection
-                  enhancements={eligibleEnhancements}
-                  selectedEnhancements={selectedEnhancements}
-                  onEnhancementChange={setSelectedEnhancements}
-                />
-              </div>
-            </Card>
+            <section className="flex flex-col gap-1.5" data-testid="enhancement-section">
+              <SectionHeader title={character ? 'Enhancement' : 'Upgrade'} />
+              <EnhancementSelection
+                enhancements={eligibleEnhancements}
+                selectedEnhancements={selectedEnhancements}
+                onEnhancementChange={setSelectedEnhancements}
+              />
+            </section>
           ) : null}
 
           {character ? (
-            <Card data-testid="warlord-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
-                <p className="text-sm text-muted">Nominate this character as your warlord</p>
-                <WarlordSelection
-                  unit={unit}
-                  roster={roster}
-                  isWarlord={isWarlord}
-                  onWarlordChange={setIsWarlord}
-                />
-              </div>
-            </Card>
+            <section className="flex flex-col gap-1.5" data-testid="warlord-section">
+              <SectionHeader title="Warlord" />
+              <WarlordSelection
+                unit={unit}
+                roster={roster}
+                isWarlord={isWarlord}
+                onWarlordChange={setIsWarlord}
+              />
+            </section>
           ) : null}
         </>
       }
