@@ -32,7 +32,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
   }));
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-subtle bg-white/5 p-4 shadow-sm dark:bg-gray-800/80 md:p-6 md:gap-6">
+    <div className="flex flex-col gap-4 rounded-sm border border-border-subtle bg-surface-card p-4 shadow-e1 md:p-6 md:gap-6">
       {(heading || subheading) && (
         <div className="flex flex-col items-center gap-1 text-center">
           {heading ? <div className="text-sm font-semibold text-foreground">{heading}</div> : null}
@@ -52,7 +52,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
               </span>
               <div className="h-8 flex-1">
                 <div
-                  className="h-full rounded-r-lg"
+                  className="h-full rounded-r-sm"
                   style={{ width: `${entry.percent}%`, backgroundColor: entry.color }}
                 />
               </div>

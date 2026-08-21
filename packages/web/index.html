@@ -50,11 +50,24 @@
     />
     <meta name="twitter:image:alt" content="depot app icon" />
 
+    <!-- Theme: applied before first paint to avoid a light flash in a dim room -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('depot-theme') || 'system';
+          var dark =
+            t === 'dark' ||
+            (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Atkinson+Hyperlegible+Mono:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
 

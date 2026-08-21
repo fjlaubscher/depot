@@ -29,12 +29,12 @@ const Breadcrumbs: FC<BreadcrumbsProps> = ({ items, className = '' }) => {
       </Link>
 
       {items.map((item, index) => (
-        <Fragment key={item.path}>
+        <Fragment key={`${index}-${item.path}`}>
           <ChevronRight size={12} className="mx-2 text-hint" />
           {index === items.length - 1 ? (
-            <span className="text-foreground font-medium">{item.label}</span>
+            <span className="type-label text-foreground">{item.label}</span>
           ) : (
-            <Link to={item.path} className="text-subtle hover:text-foreground transition-colors">
+            <Link to={item.path} className="type-label hover:text-foreground transition-colors">
               {item.label}
             </Link>
           )}

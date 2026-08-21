@@ -21,7 +21,7 @@ const BackButton: React.FC<BackButtonProps> = ({
     <div className={className}>
       <Link
         to={to}
-        className="inline-flex items-center gap-2 text-subtle hover:text-foreground border border-subtle rounded-md px-2 py-1 transition-colors text-sm"
+        className="inline-flex items-center gap-2 text-subtle hover:text-foreground border border-border-subtle rounded-sm px-2 py-1 transition-colors text-sm"
         aria-label={ariaLabel || `Back to ${label}`}
         data-testid={testId}
       >

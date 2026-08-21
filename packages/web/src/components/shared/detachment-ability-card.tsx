@@ -9,11 +9,11 @@ interface DetachmentAbilityCardProps {
 
 const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }) => {
   return (
-    <Card className="p-4 space-y-2 h-full">
+    <Card className="p-4 space-y-2 h-full border-l-2 border-l-border-accent">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-semibold text-foreground text-sm leading-tight">{ability.name}</h3>
+        <h3 className="font-bold text-foreground text-base leading-tight">{ability.name}</h3>
         {ability.detachment && (
-          <Tag variant="secondary" size="sm">
+          <Tag variant="default" size="sm" className="type-label uppercase">
             {ability.detachment}
           </Tag>
         )}

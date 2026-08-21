@@ -26,22 +26,29 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
 
   return (
     <div className="flex flex-col gap-2 sm:gap-4" data-testid="datasheet-profile">
-      {/* Model Stats Rows */}
+      {/* Stat block stays full width — it reads best uninterrupted */}
       {datasheet.models.map((model) => (
         <ModelStatsRow key={model.line} model={model} />
       ))}
 
-      <DatasheetHero datasheet={datasheet} />
+      {/* Desktop splits the body: wargear tables left, rules and keywords pinned right */}
+      <div className="flex flex-col gap-2 sm:gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <div className="flex min-w-0 flex-col gap-2 sm:gap-4">
+          <DatasheetWargear datasheet={datasheet} />
+        </div>
 
-      <DatasheetAbilities
-        title="Abilities"
-        abilities={mergedAbilities}
-        dataTestId="datasheet-abilities"
-      />
+        <div className="flex min-w-0 flex-col gap-2 sm:gap-4 lg:sticky lg:top-4">
+          <DatasheetHero datasheet={datasheet} />
 
-      <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+          <DatasheetAbilities
+            title="Abilities"
+            abilities={mergedAbilities}
+            dataTestId="datasheet-abilities"
+          />
 
-      <DatasheetWargear datasheet={datasheet} />
+          <DatasheetLeaderRules datasheet={datasheet} factionDatasheets={factionDatasheets} />
+        </div>
+      </div>
     </div>
   );
 };

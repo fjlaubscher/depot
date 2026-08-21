@@ -140,7 +140,7 @@ const RosterView: FC = () => {
 
   const detachments = getRosterDetachments(roster);
   const tabs = [
-    { label: 'Units', panel: <UnitsTab key="units" units={roster.units} /> },
+    { label: 'Units', panel: <UnitsTab key="units" roster={roster} /> },
     ...detachments.map((detachment) => ({
       label: detachments.length === 1 ? 'Detachment' : detachment.name,
       panel: (
@@ -228,7 +228,7 @@ const RosterView: FC = () => {
       {isRosterStale ? (
         <Alert variant="warning" title="Roster uses older data" className="gap-2">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-secondary">
+            <span className="text-sm text-muted">
               Refresh to pull the latest Wahapedia data into this roster.
             </span>
             <Button

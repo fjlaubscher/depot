@@ -25,7 +25,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
 
   return (
     <div className="flex flex-col gap-4" data-testid="warlord-selection">
-      <div className="flex items-center justify-between p-3 bg-gray-50/50 dark:bg-gray-700/30 border border-gray-200/50 dark:border-gray-600/30 rounded hover:bg-gray-100/80 dark:hover:bg-gray-600/40 transition-colors">
+      <div className="flex items-center justify-between min-h-11 p-3 bg-surface-muted border border-border-subtle rounded-sm hover:bg-surface-soft transition-colors">
         <div className="flex flex-col gap-2">
           <h5 className="font-medium text-foreground">Nominate as Warlord</h5>
           <p className="text-sm text-muted">
@@ -33,7 +33,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
           </p>
 
           {currentWarlord && currentWarlord.id !== unit.id && (
-            <div className="text-sm text-warning">
+            <div className="text-sm text-warning-fg">
               ⚠️ Current warlord: {currentWarlord.datasheet.name}. Nominating this character will
               remove their warlord designation.
             </div>

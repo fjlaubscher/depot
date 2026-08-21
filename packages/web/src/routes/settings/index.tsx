@@ -1,9 +1,9 @@
 import type { depot } from '@depot/core';
-import { Users, ClipboardList, Database } from 'lucide-react';
+import { Users, ClipboardList, Database, Palette } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Button, Loader, PageHeader } from '@/components/ui';
+import { Button, Loader, PageHeader, SelectField } from '@/components/ui';
 
 // Components
 import SettingsCard from './_components/settings-card';
@@ -19,7 +19,10 @@ const Settings = () => {
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
 
-  const handleSettingsChange = async (field: keyof depot.Settings, value: boolean) => {
+  const handleSettingsChange = async (
+    field: keyof depot.Settings,
+    value: depot.Settings[keyof depot.Settings]
+  ) => {
     try {
       await updateSettings({ ...settings, [field]: value });
     } catch (error) {
@@ -55,6 +58,26 @@ const Settings = () => {
         />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {/* Appearance Card */}
+          <SettingsCard
+            icon={<Palette size={20} />}
+            title="Appearance"
+            description="Choose a theme, or follow your device setting"
+          >
+            <SelectField
+              label="Theme"
+              name="theme"
+              data-testid="theme"
+              value={settings.theme ?? 'system'}
+              onChange={(event) => handleSettingsChange('theme', event.target.value as depot.Theme)}
+              options={[
+                { label: 'System', value: 'system' },
+                { label: 'Light', value: 'light' },
+                { label: 'Dark', value: 'dark' }
+              ]}
+            />
+          </SettingsCard>
+
           {/* Faction Preferences Card */}
           <SettingsCard
             icon={<Users size={20} />}
@@ -129,9 +152,9 @@ const Settings = () => {
                       {offlineFactions.map((f) => (
                         <div
                           key={`faction-${f.id}`}
-                          className="flex items-center gap-2 text-sm text-body surface-soft rounded"
+                          className="flex items-center gap-2 text-sm text-body bg-surface-soft rounded-sm"
                         >
-                          <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0" />
+                          <div className="w-2 h-2 bg-accent-500 rounded-full flex-shrink-0" />
                           <span className="truncate">{f.name}</span>
                           <span className="text-xs text-subtle ml-auto flex-shrink-0">
                             {f.cachedDatasheets === 0

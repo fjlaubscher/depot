@@ -5,7 +5,7 @@ type SupplementStyle = {
 };
 
 export const DEFAULT_TAB_ACTIVE_CLASS =
-  'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500';
+  'bg-accent-600 text-white border-accent-600 dark:bg-accent-500 dark:border-accent-500';
 export const DEFAULT_TAB_INACTIVE_CLASS =
   'border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white';
 

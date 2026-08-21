@@ -32,7 +32,7 @@ const ErrorState: FC<ErrorStateProps> = ({
       {...props}
     >
       <div className="flex flex-col gap-4 w-full max-w-lg">
-        <AlertTriangle size={48} className="text-red-500 mx-auto sm:w-16 sm:h-16" />
+        <AlertTriangle size={48} className="text-danger-fg mx-auto sm:w-16 sm:h-16" />
         <div className="flex flex-col gap-3">
           <h2 className="text-xl sm:text-2xl font-bold text-foreground px-2">{title}</h2>
           <p className="text-muted text-sm sm:text-base leading-relaxed px-2">{message}</p>
@@ -42,7 +42,7 @@ const ErrorState: FC<ErrorStateProps> = ({
             <summary className="cursor-pointer text-sm text-subtle hover:text-foreground mb-2 text-center transition-colors">
               Show technical details
             </summary>
-            <pre className="p-3 bg-gray-100 dark:bg-gray-800 rounded text-xs text-danger overflow-auto max-h-32 sm:max-h-40 w-full">
+            <pre className="p-3 bg-danger-surface border border-danger-border rounded-sm font-mono text-xs text-danger-fg overflow-auto max-h-32 sm:max-h-40 w-full">
               {stackTrace}
             </pre>
           </details>

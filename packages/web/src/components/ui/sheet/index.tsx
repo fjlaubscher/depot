@@ -32,7 +32,7 @@ const Sheet: FC<SheetProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-subtle p-4">
+        <div className="flex items-start justify-between gap-4 border-b border-border-subtle p-4">
           <div className="flex flex-col gap-2">
             <h2 id={titleId} className="text-lg font-semibold text-foreground">
               {title}

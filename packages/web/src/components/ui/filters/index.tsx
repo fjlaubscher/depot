@@ -16,7 +16,7 @@ const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className, cl
       <button
         onClick={onClear}
         data-testid={clearTestId}
-        className="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 font-medium text-sm whitespace-nowrap self-start sm:self-center"
+        className="text-accent hover:text-accent-500 font-medium text-sm whitespace-nowrap self-start sm:self-center"
       >
         Clear
       </button>

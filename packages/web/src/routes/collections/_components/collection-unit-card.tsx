@@ -46,7 +46,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
         aria-label="Duplicate unit"
         variant="ghost"
         size="sm"
-        className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        className="text-info-fg hover:bg-info-surface"
       >
         <Copy size={16} />
       </IconButton>
@@ -58,7 +58,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
         aria-label="Remove unit from collection"
         variant="ghost"
         size="sm"
-        className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+        className="text-danger-fg hover:bg-danger-surface"
       >
         <Trash2 size={16} />
       </IconButton>

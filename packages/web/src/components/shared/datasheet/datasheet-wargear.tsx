@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { CollapsibleSection, Card } from '@/components/ui';
+import useMediaQuery from '@/hooks/use-media-query';
 import WargearTable from '@/components/shared/wargear-table';
 import { separateWargearByType } from '@depot/core/utils/wargear';
 
@@ -10,6 +11,8 @@ interface DatasheetWargearProps {
 
 const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
   const { wargear, options } = datasheet;
+  // Desktop puts wargear in its own column — leaving it collapsed would strand it empty.
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const { rangedWargear, meleeWargear, mixedWargear } = useMemo(() => {
     return separateWargearByType(wargear);
@@ -23,7 +26,7 @@ const DatasheetWargear: React.FC<DatasheetWargearProps> = ({ datasheet }) => {
   }
 
   return (
-    <CollapsibleSection title="Wargear & Options" defaultExpanded={false} className="w-full">
+    <CollapsibleSection title="Wargear & Options" defaultExpanded={isDesktop} className="w-full">
       <div className="flex flex-col gap-4">
         {/* Unit Options */}
         {hasOptions && (

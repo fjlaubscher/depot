@@ -36,9 +36,7 @@ const QuantityStepper: FC<QuantityStepperProps> = ({
       >
         <Minus size={iconSize} />
       </IconButton>
-      <span className="min-w-[2rem] text-center text-sm font-medium text-gray-900 dark:text-gray-100">
-        {value}
-      </span>
+      <span className="min-w-[2rem] text-center type-stat text-base">{value}</span>
       <IconButton size={size} variant="ghost" aria-label={increaseLabel} onClick={onIncrease}>
         <Plus size={iconSize} />
       </IconButton>

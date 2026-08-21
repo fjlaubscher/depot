@@ -28,7 +28,7 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
   const selectedWargear = unit.selectedWargear ?? [];
 
   return (
-    <div className="surface-muted p-4">
+    <div className="bg-surface-muted p-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2" data-testid="roster-unit-profile">
           {datasheet.models.map((model) => (
@@ -56,7 +56,7 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
               to={`/faction/${unit.datasheet.factionSlug}/datasheet/${
                 unit.datasheetSlug ?? unit.datasheet.slug
               }`}
-              className="inline-flex items-center text-sm text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              className="inline-flex items-center text-sm text-accent transition-colors hover:text-accent-500"
             >
               View Full Datasheet →
             </Link>

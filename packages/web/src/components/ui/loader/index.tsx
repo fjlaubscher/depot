@@ -14,9 +14,9 @@ const Loader: FC<LoaderProps> = ({ size = 'md', color = 'primary', className }) 
   };
 
   const colorClasses = {
-    primary: 'border-primary-600 border-t-transparent',
-    secondary: 'border-gray-400 border-t-transparent',
-    white: 'border-white border-t-transparent'
+    primary: 'border-border-subtle border-t-accent',
+    secondary: 'border-border-subtle border-t-accent',
+    white: 'border-accent-ink border-t-transparent'
   };
 
   return (

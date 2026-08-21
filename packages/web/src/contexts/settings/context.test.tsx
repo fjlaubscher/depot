@@ -68,6 +68,41 @@ describe('SettingsProvider', () => {
     );
   });
 
+  it.each([
+    ['dark', true],
+    ['light', false]
+  ] as const)(
+    'applies the %s theme as a root class and mirrors it to localStorage',
+    async (theme, expectDark) => {
+      mockOfflineStorage.getSettings.mockResolvedValue({ ...mockSettings, theme });
+      render(
+        <SettingsProvider>
+          <TestComponent />
+        </SettingsProvider>
+      );
+      await waitFor(() => {
+        expect(document.documentElement.classList.contains('dark')).toBe(expectDark);
+        expect(localStorage.getItem('depot-theme')).toBe(theme);
+      });
+    }
+  );
+
+  it('follows the OS when the theme is system', async () => {
+    vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
+    } as unknown as MediaQueryList);
+
+    mockOfflineStorage.getSettings.mockResolvedValue({ ...mockSettings, theme: 'system' });
+    render(
+      <SettingsProvider>
+        <TestComponent />
+      </SettingsProvider>
+    );
+    await waitFor(() => expect(document.documentElement.classList.contains('dark')).toBe(true));
+  });
+
   it('loads settings from IndexedDB and merges with defaults', async () => {
     mockOfflineStorage.getSettings.mockResolvedValue(mockSettings);
 

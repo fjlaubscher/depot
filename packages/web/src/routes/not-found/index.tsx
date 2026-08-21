@@ -16,7 +16,7 @@ const NotFound: React.FC = () => {
           <div className="space-y-6">
             {/* Large 404 Display */}
             <div className="space-y-2">
-              <div className="text-6xl font-bold text-gray-300 dark:text-gray-600">404</div>
+              <div className="font-mono text-6xl font-bold text-hint">404</div>
               <Search size={64} className="mx-auto text-hint" data-testid="not-found-icon" />
             </div>
 

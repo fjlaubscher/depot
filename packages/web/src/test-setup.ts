@@ -17,6 +17,18 @@ HTMLDialogElement.prototype.close ??= function () {
   this.dispatchEvent(new Event('close'));
 };
 
+// jsdom does not implement matchMedia (theme + responsive hooks depend on it).
+window.matchMedia ??= ((query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  dispatchEvent: vi.fn()
+})) as unknown as typeof window.matchMedia;
+
 // Mock IndexedDB globally for all tests
 const mockIDBDatabase = {
   transaction: vi.fn().mockReturnValue({

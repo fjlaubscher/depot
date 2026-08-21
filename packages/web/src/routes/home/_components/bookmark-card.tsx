@@ -16,11 +16,11 @@ const BookmarkCard: FC<BookmarkCardProps> = ({ bookmark }) => {
   return (
     <Link
       to={bookmarkPath(bookmark)}
-      className="inline-flex max-w-full items-center gap-2 rounded-lg surface-card border border-subtle px-3 py-2 text-decoration-none transition hover:border-primary-500"
+      className="inline-flex max-w-full items-center gap-2 rounded-sm surface-card border border-border-subtle px-3 py-2 text-decoration-none transition hover:border-accent-500"
       data-testid="bookmark-card"
       data-bookmark-id={bookmark.id}
     >
-      <Icon className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" aria-hidden />
+      <Icon className="h-4 w-4 shrink-0 text-accent" aria-hidden />
       <span className="truncate text-sm font-medium text-foreground">{bookmark.name}</span>
       <span className="truncate text-xs text-muted">
         {isFaction ? 'Faction' : (bookmark.factionName ?? bookmark.factionSlug)}

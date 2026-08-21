@@ -12,10 +12,10 @@ const WargearRow = ({ weapon, selected, onToggle }: WargearRowProps) => (
     type="button"
     onClick={() => onToggle(weapon, !selected)}
     className={cx(
-      'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface',
+      'inline-flex cursor-pointer items-center gap-2 rounded-sm border px-3 min-h-11 text-sm font-bold transition focus-ring-primary',
       selected
-        ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'
-        : 'border-subtle bg-surface text-foreground hover:border-primary-300 hover:bg-primary-50/50 dark:hover:border-primary-700 dark:hover:bg-primary-900/20'
+        ? 'border-border-accent bg-surface-accent text-accent shadow-e1'
+        : 'border-border-subtle bg-surface-card text-foreground hover:border-border-accent hover:bg-surface-accent'
     )}
     aria-pressed={selected}
     data-testid={`wargear-pill-${weapon.id}`}

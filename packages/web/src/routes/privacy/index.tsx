@@ -45,7 +45,7 @@ const PrivacyPolicy = () => (
         <p className="text-sm text-body">
           Crash reports are powered by{' '}
           <a
-            className="underline text-primary-500"
+            className="underline text-accent-500"
             href="https://sentry.io"
             target="_blank"
             rel="noopener noreferrer"
@@ -93,10 +93,7 @@ const PrivacyPolicy = () => (
           When depot's data practices change, the effective date below will be updated and the
           change will be mentioned in release notes. For questions, takedown requests, or privacy
           concerns, email{' '}
-          <a
-            className="text-primary-600 dark:text-primary-400 underline"
-            href="mailto:francoisjlaubscher@gmail.com"
-          >
+          <a className="text-accent underline" href="mailto:francoisjlaubscher@gmail.com">
             francoisjlaubscher@gmail.com
           </a>
           .

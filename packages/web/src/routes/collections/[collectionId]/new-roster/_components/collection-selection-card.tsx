@@ -22,11 +22,7 @@ const CollectionSelectionCard: FC<CollectionSelectionCardProps> = ({
       onClick={() => onToggle(unit.id)}
       showWargearSummary
       dataTestId={`collection-selection-${unit.id}`}
-      className={
-        selected
-          ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200 dark:border-primary-700 dark:bg-primary-900/30 dark:ring-primary-800'
-          : undefined
-      }
+      className={selected ? 'border-border-accent bg-surface-accent' : undefined}
       actions={
         // Click bubbles to the card's onClick, which toggles.
         <Button size="sm" variant={selected ? 'secondary' : 'accent'}>

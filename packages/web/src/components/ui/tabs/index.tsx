@@ -39,7 +39,7 @@ const Tabs: FC<TabsProps> = ({
 
   return (
     <div className={cx('w-full flex flex-col gap-4', className)} {...props}>
-      <div className="border-b border-subtle">
+      <div className="border-b border-border-subtle">
         <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
           {validTabs.map((tab, index) => (
             <button
@@ -49,8 +49,8 @@ const Tabs: FC<TabsProps> = ({
               className={cx(
                 'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex-shrink-0 cursor-pointer',
                 activeTab === index
-                  ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
-                  : 'border-transparent text-subtle hover:text-foreground hover:border-subtle'
+                  ? 'border-border-accent text-accent'
+                  : 'border-transparent text-subtle hover:text-foreground hover:border-border-subtle'
               )}
               aria-current={activeTab === index ? 'page' : undefined}
             >

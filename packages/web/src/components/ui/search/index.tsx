@@ -20,10 +20,7 @@ const Search: FC<SearchProps> = ({
 }) => (
   <Field className={className}>
     {label && (
-      <label
-        htmlFor="search"
-        className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-      >
+      <label htmlFor="search" className="block text-sm font-medium text-body">
         {label}
       </label>
     )}
@@ -35,7 +32,7 @@ const Search: FC<SearchProps> = ({
       value={value}
       onChange={(e) => onChange(e.currentTarget.value)}
       data-testid={testId}
-      className="block w-full max-w-2xl px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 sm:text-base"
+      className="input-base max-w-2xl focus-ring-primary"
     />
   </Field>
 );

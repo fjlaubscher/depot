@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
-import { Tag, TagGroup } from '@/components/ui';
 import { parseWargearKeywords } from '@depot/core/utils/wargear';
 
 interface WargearTableProps {
@@ -22,6 +21,11 @@ interface TableRow {
   keywords: string[];
 }
 
+// Fixed mono columns so the numbers align down the table and never wrap at
+// 375px — only the weapon name is allowed to reflow. Widths come from the
+// token sheet's weapon-grid spec.
+const STAT_COLUMNS = [36, 24, 26, 22, 26, 24];
+
 const buildProfileLabel = (weapon: depot.Wargear, profile: depot.WargearProfile): string => {
   if (weapon.profiles.length === 1) {
     return weapon.name;
@@ -39,10 +43,6 @@ const buildProfileLabel = (weapon: depot.Wargear, profile: depot.WargearProfile)
 };
 
 const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => {
-  if (wargear.length === 0) {
-    return null;
-  }
-
   const rows = useMemo<TableRow[]>(
     () =>
       wargear.flatMap((weapon) =>
@@ -68,80 +68,66 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
     [wargear]
   );
 
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs table-fixed">
-          <thead>
-            <tr className="border-b border-subtle">
-              <th className="text-left py-1 font-semibold text-primary-600 dark:text-primary-400 w-2/5 md:w-3/5">
-                {title}
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                Range
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                A
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                {type === 'Ranged' ? 'BS' : type === 'Melee' ? 'WS' : 'BS/WS'}
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                S
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                AP
-              </th>
-              <th className="text-center py-1 font-semibold text-primary-600 dark:text-primary-400">
-                D
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => {
-              const hasKeywords = row.keywords.length > 0;
-              const statCellClasses = `${hasKeywords ? 'pt-1' : 'py-2'} text-gray-700 dark:text-white`;
+  if (wargear.length === 0) {
+    return null;
+  }
 
-              return (
-                <React.Fragment key={row.key}>
-                  <tr
-                    className={
-                      !hasKeywords ? 'border-b border-gray-100 dark:border-gray-800' : undefined
-                    }
-                  >
-                    <td className={cx(statCellClasses, 'capitalize')}>{row.name}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.range}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.attacks}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.skill}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.strength}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.ap}</td>
-                    <td className={cx(statCellClasses, 'text-center')}>{row.damage}</td>
-                  </tr>
-                  {hasKeywords ? (
-                    <tr className="pb-2 border-b border-subtle">
-                      <td colSpan={7} className="py-1">
-                        <TagGroup spacing="sm">
-                          {row.keywords.map((keyword, keywordIndex) => (
-                            <Tag
-                              key={`${row.key}-kw-${keywordIndex}`}
-                              variant="default"
-                              size="sm"
-                              className="capitalize"
-                            >
-                              {keyword.toLowerCase()}
-                            </Tag>
-                          ))}
-                        </TagGroup>
-                      </td>
-                    </tr>
-                  ) : null}
-                </React.Fragment>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  const skillLabel = type === 'Ranged' ? 'BS' : type === 'Melee' ? 'WS' : 'BS/WS';
+  const headers = ['Range', 'A', skillLabel, 'S', 'AP', 'D'];
+
+  return (
+    <table className="w-full table-fixed border-collapse">
+      <colgroup>
+        <col />
+        {STAT_COLUMNS.map((width, index) => (
+          <col key={`col-${index}`} style={{ width }} />
+        ))}
+      </colgroup>
+      <thead>
+        <tr className="border-b border-border-subtle">
+          <th className="type-section py-1 pr-2 text-left">{title}</th>
+          {headers.map((header) => (
+            <th key={header} className="type-section py-1 text-center">
+              {header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.key} className="border-b border-border-subtle align-top">
+            <td className="py-1.5 pr-2">
+              <div className="text-xs font-bold capitalize text-foreground">{row.name}</div>
+              {row.keywords.length > 0 ? (
+                <div className="mt-1 flex flex-wrap gap-0.5">
+                  {row.keywords.map((keyword, keywordIndex) => (
+                    <span
+                      key={`${row.key}-kw-${keywordIndex}`}
+                      className="tag-keyword border-border-accent bg-surface-accent text-accent"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </td>
+            {[row.range, row.attacks, row.skill, row.strength, row.ap, row.damage].map(
+              (value, index) => (
+                <td
+                  key={`${row.key}-stat-${index}`}
+                  className={cx(
+                    'py-1.5 text-center font-mono text-xs font-bold tabular-nums',
+                    'whitespace-nowrap text-foreground'
+                  )}
+                >
+                  {value}
+                </td>
+              )
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

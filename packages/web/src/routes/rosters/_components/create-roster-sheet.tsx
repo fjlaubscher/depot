@@ -135,7 +135,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
           }}
           required
         />
-        {errors.name ? <p className="text-sm text-danger">{errors.name}</p> : null}
+        {errors.name ? <p className="text-sm text-danger-fg">{errors.name}</p> : null}
       </Field>
 
       {factionsLoading ? (

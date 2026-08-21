@@ -15,35 +15,35 @@ const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
   const typeConfig = {
     success: {
       icon: <Check size={16} />,
-      bgColor: 'surface-success',
-      borderColor: 'border-success',
-      iconColor: 'text-success',
-      titleColor: 'text-success-strong',
-      messageColor: 'text-success'
+      bgColor: 'bg-success-surface',
+      borderColor: 'border-success-border',
+      iconColor: 'text-success-fg',
+      titleColor: 'text-success-fg',
+      messageColor: 'text-success-fg'
     },
     error: {
       icon: <AlertCircle size={16} />,
-      bgColor: 'surface-danger',
-      borderColor: 'border-danger',
-      iconColor: 'text-danger',
-      titleColor: 'text-danger-strong',
-      messageColor: 'text-danger'
+      bgColor: 'bg-danger-surface',
+      borderColor: 'border-danger-border',
+      iconColor: 'text-danger-fg',
+      titleColor: 'text-danger-fg',
+      messageColor: 'text-danger-fg'
     },
     warning: {
       icon: <AlertTriangle size={16} />,
-      bgColor: 'surface-warning',
-      borderColor: 'border-warning',
-      iconColor: 'text-warning',
-      titleColor: 'text-warning-strong',
-      messageColor: 'text-warning'
+      bgColor: 'bg-warning-surface',
+      borderColor: 'border-warning-border',
+      iconColor: 'text-warning-fg',
+      titleColor: 'text-warning-fg',
+      messageColor: 'text-warning-fg'
     },
     info: {
       icon: <Info size={16} />,
-      bgColor: 'surface-info',
-      borderColor: 'border-info',
-      iconColor: 'text-info',
-      titleColor: 'text-info-strong',
-      messageColor: 'text-info'
+      bgColor: 'bg-info-surface',
+      borderColor: 'border-info-border',
+      iconColor: 'text-info-fg',
+      titleColor: 'text-info-fg',
+      messageColor: 'text-info-fg'
     }
   };
 
@@ -52,7 +52,7 @@ const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
   return (
     <div
       className={cx(
-        'w-80 shadow-lg rounded-lg pointer-events-auto border',
+        'w-80 shadow-lg rounded-sm pointer-events-auto border',
         config.bgColor,
         config.borderColor
       )}

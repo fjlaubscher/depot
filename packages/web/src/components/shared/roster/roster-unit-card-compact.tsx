@@ -16,6 +16,10 @@ interface RosterUnitCardCompactProps {
   dataTestId?: string;
   showWargearSummary?: boolean;
   className?: string;
+  isWarlord?: boolean;
+  enhancementName?: string;
+  /** Legality problems attributed to this unit; renders the illegal treatment. */
+  issues?: string[];
 }
 
 const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
@@ -27,7 +31,10 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   state,
   dataTestId,
   showWargearSummary = true,
-  className
+  className,
+  isWarlord = false,
+  enhancementName,
+  issues = []
 }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
   const wargearToDisplay = unit.selectedWargear.slice(0, 3);
@@ -41,7 +48,12 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
     <Card
       id={id}
       padding="sm"
-      className={cx('relative flex h-full flex-col gap-2', onClick && 'cursor-pointer', className)}
+      className={cx(
+        'relative flex h-full flex-col gap-2',
+        onClick && 'cursor-pointer',
+        issues.length > 0 && 'border-l-2 border-l-danger-fg',
+        className
+      )}
       onClick={onClick}
       data-testid={dataTestId}
       data-state={state}
@@ -58,11 +70,44 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
           ) : null}
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
-          <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
-            {unitPoints} pts
-          </Tag>
+          <span className="type-stat whitespace-nowrap" data-testid="unit-points">
+            {unitPoints}
+          </span>
+          <span className="type-label">pts</span>
         </div>
       </Card.Header>
+
+      {isWarlord || enhancementName || issues.length > 0 ? (
+        <TagGroup spacing="sm" className="gap-1">
+          {isWarlord ? (
+            <Tag
+              size="sm"
+              className="border-transparent bg-accent-600 text-accent-ink dark:bg-accent-500"
+              data-testid="unit-warlord-tag"
+            >
+              Warlord
+            </Tag>
+          ) : null}
+          {enhancementName ? (
+            <Tag variant="primary" size="sm" data-testid="unit-enhancement-tag">
+              {enhancementName}
+            </Tag>
+          ) : null}
+          {issues.length > 0 ? (
+            <Tag variant="danger" size="sm" data-testid="unit-illegal-tag">
+              Illegal
+            </Tag>
+          ) : null}
+        </TagGroup>
+      ) : null}
+
+      {issues.length > 0 ? (
+        <ul className="flex flex-col gap-0.5 text-xs text-danger-fg" data-testid="unit-issues">
+          {issues.map((issue, index) => (
+            <li key={`unit-issue-${index}`}>{issue}</li>
+          ))}
+        </ul>
+      ) : null}
 
       {showWargearSummary && unit.selectedWargear.length > 0 ? (
         <Card.Content className="pt-0">

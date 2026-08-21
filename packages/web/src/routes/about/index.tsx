@@ -9,7 +9,7 @@ const About = () => (
         subtitle="An offline-first roster companion built for hobby tinkering"
       />
 
-      <blockquote className="rounded-md border border-primary-500/40 bg-gray-50 p-4 text-sm italic text-gray-800 dark:border-primary-400/40 dark:bg-gray-900/40 dark:text-gray-200">
+      <blockquote className="rounded-sm border-l-2 border-border-accent bg-surface-muted p-4 text-sm italic text-body">
         I'm Francois — a passionate software engineer, lifelong hobbyist, and believer in free,
         privacy-respecting apps. My first proper army came out of a Catachan Jungle Fighters Battle
         Force back in 4th edition, and I've been tinkering with tools for the grimdark ever since.
@@ -42,7 +42,7 @@ const About = () => (
             href="https://github.com/fjlaubscher/depot/issues/new/choose"
             target="_blank"
             rel="noreferrer"
-            className="text-primary-600 dark:text-primary-400 underline"
+            className="text-accent underline"
           >
             Create an issue or feature request
           </a>
@@ -50,7 +50,7 @@ const About = () => (
             href="https://github.com/fjlaubscher/depot"
             target="_blank"
             rel="noreferrer"
-            className="text-primary-600 dark:text-primary-400 underline"
+            className="text-accent underline"
           >
             View the GitHub repository
           </a>
@@ -58,7 +58,7 @@ const About = () => (
             href="https://x.com/fjlaubscher"
             target="_blank"
             rel="noreferrer"
-            className="text-primary-600 dark:text-primary-400 underline"
+            className="text-accent underline"
           >
             Say hi on X (@fjlaubscher)
           </a>
@@ -83,10 +83,7 @@ const About = () => (
         </p>
         <p className="text-sm text-body">
           If you hold rights to any material referenced in depot and have concerns, email{' '}
-          <a
-            className="text-primary-600 dark:text-primary-400 underline"
-            href="mailto:francoisjlaubscher@gmail.com"
-          >
+          <a className="text-accent underline" href="mailto:francoisjlaubscher@gmail.com">
             francoisjlaubscher@gmail.com
           </a>
           , and I'll respond quickly.

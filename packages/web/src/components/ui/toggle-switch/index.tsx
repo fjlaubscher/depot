@@ -25,10 +25,10 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
   testId
 }) => (
   <label className="flex items-center gap-2">
-    <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>
+    <span className="text-sm font-medium text-foreground">{label}</span>
     <span
       className={cx(
-        'relative inline-flex flex-shrink-0 rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out dark:bg-gray-700 has-[:checked]:bg-primary-600 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-500 has-[:focus-visible]:ring-offset-2',
+        'relative inline-flex flex-shrink-0 rounded-full border-2 border-transparent bg-surface-soft transition-colors duration-200 ease-in-out has-[:checked]:bg-accent-600 dark:has-[:checked]:bg-accent-500 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent-600 dark:has-[:focus-visible]:outline-accent-500',
         sizeClasses[size].track
       )}
     >
@@ -45,7 +45,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
       <span
         aria-hidden="true"
         className={cx(
-          'pointer-events-none inline-block translate-x-0 transform rounded-full bg-white shadow transition duration-200 ease-in-out',
+          'pointer-events-none inline-block translate-x-0 transform rounded-full bg-surface-card shadow-e1 transition duration-200 ease-in-out',
           sizeClasses[size].knob
         )}
       />

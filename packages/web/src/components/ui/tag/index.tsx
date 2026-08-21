@@ -7,15 +7,16 @@ interface TagProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, children, ...props }) => {
-  const baseClasses = 'inline-flex items-center font-medium rounded transition-colors duration-200';
+  const baseClasses =
+    'inline-flex items-center font-medium rounded-xs border transition-colors duration-200';
 
   const variantClasses = {
-    default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-    primary: 'bg-primary-100 text-primary-600 dark:bg-primary-700 dark:text-white',
-    secondary: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    success: 'surface-success-strong text-success-strong',
-    warning: 'surface-warning-strong text-warning-strong',
-    danger: 'surface-danger-strong text-danger-strong'
+    default: 'bg-surface-soft text-body border-border-strong',
+    primary: 'bg-surface-accent text-accent border-border-accent',
+    secondary: 'bg-info-surface text-info-fg border-info-border',
+    success: 'bg-success-surface text-success-fg border-success-border',
+    warning: 'bg-warning-surface text-warning-fg border-warning-border',
+    danger: 'bg-danger-surface text-danger-fg border-danger-border'
   };
 
   const sizeClasses = {

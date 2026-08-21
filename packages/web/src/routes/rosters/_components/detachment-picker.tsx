@@ -42,7 +42,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
       <div className="flex items-center justify-between">
         <span className="block text-sm font-medium text-body">Detachments</span>
         <span
-          className={`text-sm font-semibold ${overCap ? 'text-danger' : 'text-foreground'}`}
+          className={`text-sm font-semibold ${overCap ? 'text-danger-fg' : 'text-foreground'}`}
           data-testid="detachment-dp-total"
         >
           {dpSpent} / {dpCap} DP
@@ -54,8 +54,8 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
           return (
             <div
               key={detachment.slug}
-              className={`flex items-center justify-between gap-2 rounded border px-3 py-2 ${
-                enabled ? 'surface-info border-info' : 'border-gray-200 dark:border-gray-700'
+              className={`flex items-center justify-between gap-2 rounded-sm border px-3 py-2 ${
+                enabled ? 'bg-info-surface border-info-border' : 'border-border-subtle'
               }`}
               data-testid={`detachment-option-${detachment.slug}`}
             >
@@ -84,7 +84,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
           );
         })}
       </div>
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
+      {error ? <p className="text-sm text-danger-fg">{error}</p> : null}
     </Field>
   );
 };

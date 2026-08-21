@@ -20,20 +20,22 @@ const SectionHeader: FC<SectionHeaderProps> = ({
   viewAllTestId
 }) => {
   return (
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex min-w-0 items-center gap-2">
-        {Icon ? <Icon size={18} className="shrink-0 text-muted" aria-hidden /> : null}
-        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-        {typeof count === 'number' ? (
-          <span className="text-sm tabular-nums text-muted" data-testid="section-count">
-            {count}
-          </span>
-        ) : null}
-      </div>
+    <div className="flex items-center gap-2">
+      {Icon ? <Icon size={14} className="shrink-0 text-accent" aria-hidden /> : null}
+      <h2 className="type-section shrink-0">
+        <span aria-hidden="true">// </span>
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-border-subtle" />
+      {typeof count === 'number' ? (
+        <span className="type-label" data-testid="section-count">
+          {count}
+        </span>
+      ) : null}
       {viewAllTo ? (
         <Link
           to={viewAllTo}
-          className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400"
+          className="type-label text-accent hover:underline"
           data-testid={viewAllTestId}
         >
           {viewAllLabel}

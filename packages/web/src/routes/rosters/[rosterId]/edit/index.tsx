@@ -61,7 +61,6 @@ const RosterEdit: FC = () => {
       <PageHeader
         title={roster.name}
         subtitle={getRosterSubtitle(roster)}
-        stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/details`),
@@ -69,59 +68,70 @@ const RosterEdit: FC = () => {
         }}
       />
 
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/rosters/${roster.id}/add-units`)}
-            className="flex items-center gap-2"
-            data-testid="add-units-button"
-          >
-            <Plus size={16} />
-            Add Units
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/rosters/${roster.id}`)}
-            className="flex items-center gap-2"
-            data-testid="view-roster-button"
-          >
-            <Eye size={16} />
-            View Roster
-          </Button>
+      {/* Desktop splits list from budget: the points bar stays put while the list scrolls */}
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+        <aside className="order-first flex flex-col gap-4 lg:order-last lg:sticky lg:top-4">
+          <div className="surface-card p-3">
+            <RosterHeader roster={roster} />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="default"
+              onClick={() => navigate(`/rosters/${roster.id}/add-units`)}
+              className="flex-1"
+              data-testid="add-units-button"
+            >
+              <Plus size={16} />
+              Add Units
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => navigate(`/rosters/${roster.id}`)}
+              className="flex-1"
+              data-testid="view-roster-button"
+            >
+              <Eye size={16} />
+              View Roster
+            </Button>
+          </div>
+
+          <RosterIssues roster={roster} />
+        </aside>
+
+        <div className="min-w-0">
+          {roster.units.length > 0 ? (
+            <RosterSection
+              title={`Units (${sortedUnits.length})`}
+              data-testid="roster-units-section"
+            >
+              <Grid cols={2}>
+                {sortedUnits.map((unit) => (
+                  <RosterUnitCardEdit
+                    key={unit.id}
+                    unit={unit}
+                    rosterId={roster.id}
+                    onRemove={removeUnit}
+                    onDuplicate={duplicateUnit}
+                    dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
+                  />
+                ))}
+              </Grid>
+            </RosterSection>
+          ) : (
+            <RosterEmptyState
+              title="No units in this roster"
+              dataTestId="empty-roster-state"
+              action={{
+                label: 'Add units',
+                onClick: () => navigate(`/rosters/${roster.id}/add-units`),
+                icon: <Plus size={14} />,
+                testId: 'empty-roster-add-units'
+              }}
+            />
+          )}
         </div>
       </div>
-
-      <RosterIssues roster={roster} />
-
-      {/* Units List */}
-      {roster.units.length > 0 ? (
-        <RosterSection title={`Units (${sortedUnits.length})`} data-testid="roster-units-section">
-          <Grid cols={3}>
-            {sortedUnits.map((unit) => (
-              <RosterUnitCardEdit
-                key={unit.id}
-                unit={unit}
-                rosterId={roster.id}
-                onRemove={removeUnit}
-                onDuplicate={duplicateUnit}
-                dataTestId={`roster-unit-card-${unit.datasheet.slug}`}
-              />
-            ))}
-          </Grid>
-        </RosterSection>
-      ) : (
-        <RosterEmptyState
-          title="No units in this roster"
-          dataTestId="empty-roster-state"
-          action={{
-            label: 'Add units',
-            onClick: () => navigate(`/rosters/${roster.id}/add-units`),
-            icon: <Plus size={14} />,
-            testId: 'empty-roster-add-units'
-          }}
-        />
-      )}
     </div>
   );
 };

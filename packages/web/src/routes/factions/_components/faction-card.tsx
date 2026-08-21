@@ -40,7 +40,7 @@ const FactionCard: React.FC<FactionCardProps> = ({ faction }) => {
               View datasheets, detachments, and rules.
             </Card.Description>
           </div>
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full surface-soft text-muted transition-colors duration-200 group-hover:surface-accent group-hover:text-accent-strong">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-soft text-muted transition-colors duration-200 group-hover:bg-surface-accent group-hover:text-accent">
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
           </span>
         </Card.Header>
