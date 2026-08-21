@@ -1,4 +1,4 @@
-import type { FC, MouseEvent } from 'react';
+import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
 import { Button } from '@/components/ui';
@@ -15,23 +15,9 @@ const CollectionSelectionCard: FC<CollectionSelectionCardProps> = ({
   selected,
   onToggle
 }) => {
-  const rosterUnit: depot.RosterUnit = {
-    id: unit.id,
-    datasheet: unit.datasheet,
-    modelCost: unit.modelCost,
-    selectedWargear: unit.selectedWargear,
-    selectedWargearAbilities: unit.selectedWargearAbilities,
-    datasheetSlug: unit.datasheetSlug ?? unit.datasheet.slug
-  };
-
-  const handleToggle = (event?: MouseEvent) => {
-    event?.stopPropagation();
-    onToggle(unit.id);
-  };
-
   return (
     <RosterUnitCardCompact
-      unit={rosterUnit}
+      unit={unit}
       state={unit.state}
       onClick={() => onToggle(unit.id)}
       showWargearSummary
@@ -42,7 +28,8 @@ const CollectionSelectionCard: FC<CollectionSelectionCardProps> = ({
           : undefined
       }
       actions={
-        <Button size="sm" variant={selected ? 'secondary' : 'accent'} onClick={handleToggle}>
+        // Click bubbles to the card's onClick, which toggles.
+        <Button size="sm" variant={selected ? 'secondary' : 'accent'}>
           {selected ? 'Selected' : 'Add'}
         </Button>
       }

@@ -1,5 +1,5 @@
-import { Fragment, useMemo, useState } from 'react';
-import type { FC, ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import type { FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -12,15 +12,16 @@ import { CURRENT_GAME_EDITION, type ExportedRoster } from '@/types/export';
 import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
 import { useSettingsContext } from '@/contexts/settings/context';
 import { useFactionsContext } from '@/contexts/factions/context';
+import { useShareAction } from '@/hooks/use-share-action';
 
 import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
 import { BackButton, RosterHeader } from '@/components/shared';
 import { generateRosterShareText } from '@/utils/roster';
 import {
-  getRosterDetachmentNames,
   getRosterDetachments,
-  getRosterFactionName
+  getRosterFactionName,
+  getRosterSubtitle
 } from '@depot/core/utils/roster';
 import RosterIssues from '@/routes/rosters/_components/roster-issues';
 import UnitsTab from './_components/units-tab';
@@ -70,11 +71,7 @@ const RosterView: FC = () => {
   };
 
   const shareText = useMemo(
-    () =>
-      generateRosterShareText(roster, factionName, {
-        includeWargear: includeWargearOnExport,
-        includeWargearAbilities: includeWargearOnExport
-      }),
+    () => generateRosterShareText(roster, factionName, { includeWargear: includeWargearOnExport }),
     [factionName, includeWargearOnExport, roster]
   );
 
@@ -123,31 +120,15 @@ const RosterView: FC = () => {
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast({ title: 'Roster copied to clipboard', type: 'success' });
-    } catch (err) {
-      showToast({ title: 'Failed to copy', type: 'error' });
-    }
-  };
-
-  const handleShareRoster = async () => {
-    if (canUseNativeShare) {
-      try {
-        await navigator.share({
-          title: roster.name,
-          text: shareText
-        });
-        showToast({ title: 'Roster shared', type: 'success' });
-        return;
-      } catch {
-        // fall through to copy
-      }
-    }
-
-    await copyToClipboard(shareText);
-  };
+  const shareAction = useShareAction({
+    title: roster.name,
+    text: shareText,
+    icon: canUseNativeShare ? <Share2 size={16} /> : <Copy size={16} />,
+    ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
+    testId: 'share-roster-button',
+    copySuccessMessage: 'Roster copied to clipboard.',
+    shareSuccessMessage: 'Roster shared.'
+  });
 
   const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
   useDocumentTitle(pageTitle);
@@ -158,39 +139,36 @@ const RosterView: FC = () => {
   }
 
   const detachments = getRosterDetachments(roster);
-  const detachmentNames = getRosterDetachmentNames(roster);
-  const subtitle =
-    factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
-
-  const tabLabels: string[] = ['Units'];
-  const tabPanels: ReactNode[] = [<UnitsTab key="units" units={roster.units} />];
-
-  detachments.forEach((detachment) => {
-    tabLabels.push(detachments.length === 1 ? 'Detachment' : detachment.name);
-    tabPanels.push(
-      <DetachmentTab
-        key={`detachment-${detachment.id}`}
-        detachment={detachment}
-        factionSlug={roster.factionSlug}
-        rosterEnhancements={roster.enhancements.filter((entry) =>
-          detachment.enhancements.some((candidate) => candidate.id === entry.enhancement.id)
-        )}
-        units={roster.units}
-      />
-    );
-  });
-
-  tabLabels.push('Stratagems');
-  tabPanels.push(
-    <StratagemsTab
-      key="stratagems"
-      coreStratagems={coreStratagems}
-      detachmentStratagems={detachments.flatMap((detachment) => detachment.stratagems)}
-      units={roster.units}
-      loadingCore={loadingCoreStratagems}
-      coreError={coreStratagemsError}
-    />
-  );
+  const tabs = [
+    { label: 'Units', panel: <UnitsTab key="units" units={roster.units} /> },
+    ...detachments.map((detachment) => ({
+      label: detachments.length === 1 ? 'Detachment' : detachment.name,
+      panel: (
+        <DetachmentTab
+          key={`detachment-${detachment.id}`}
+          detachment={detachment}
+          factionSlug={roster.factionSlug}
+          rosterEnhancements={roster.enhancements.filter((entry) =>
+            detachment.enhancements.some((candidate) => candidate.id === entry.enhancement.id)
+          )}
+          units={roster.units}
+        />
+      )
+    })),
+    {
+      label: 'Stratagems',
+      panel: (
+        <StratagemsTab
+          key="stratagems"
+          coreStratagems={coreStratagems}
+          detachmentStratagems={detachments.flatMap((detachment) => detachment.stratagems)}
+          units={roster.units}
+          loadingCore={loadingCoreStratagems}
+          coreError={coreStratagemsError}
+        />
+      )
+    }
+  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -209,12 +187,12 @@ const RosterView: FC = () => {
       {/* Header */}
       <PageHeader
         title={roster.name}
-        subtitle={subtitle}
+        subtitle={getRosterSubtitle(roster)}
         stats={<RosterHeader roster={roster} />}
         action={{
-          icon: canUseNativeShare ? <Share2 size={16} /> : <Copy size={16} />,
-          onClick: () => void handleShareRoster(),
-          ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
+          icon: shareAction.icon,
+          onClick: () => shareAction.onClick(),
+          ariaLabel: shareAction.ariaLabel,
           testId: 'share-roster-button'
         }}
       />
@@ -270,10 +248,8 @@ const RosterView: FC = () => {
       <RosterIssues roster={roster} />
 
       {/* Units, Detachment & Stratagems */}
-      <Tabs tabs={tabLabels} data-testid="roster-tabs">
-        {tabPanels.map((panel, index) => (
-          <Fragment key={`roster-tab-panel-${index}`}>{panel}</Fragment>
-        ))}
+      <Tabs tabs={tabs.map((tab) => tab.label)} data-testid="roster-tabs">
+        {tabs.map((tab) => tab.panel)}
       </Tabs>
     </div>
   );

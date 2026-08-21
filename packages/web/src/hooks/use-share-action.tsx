@@ -9,6 +9,8 @@ import { buildAbsoluteUrl } from '@/utils/paths';
 interface ShareActionOptions {
   title?: string;
   url?: string;
+  /** Share/copy this text instead of a URL. */
+  text?: string;
   ariaLabel?: string;
   testId?: string;
   icon?: ReactNode;
@@ -23,6 +25,7 @@ interface ShareActionOptions {
 export const useShareAction = ({
   title,
   url,
+  text,
   ariaLabel = 'Share link',
   testId,
   icon,
@@ -47,8 +50,12 @@ export const useShareAction = ({
 
     const copyFallback = async () => {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(resolvedUrl);
-        showToast({ type: 'success', title: 'Link copied', message: copySuccessMessage });
+        await navigator.clipboard.writeText(text ?? resolvedUrl);
+        showToast({
+          type: 'success',
+          title: text ? 'Copied' : 'Link copied',
+          message: copySuccessMessage
+        });
       } else {
         showToast({ type: 'error', title: 'Error', message: unavailableMessage });
       }
@@ -56,7 +63,9 @@ export const useShareAction = ({
 
     if (canUseNativeShare) {
       try {
-        await navigator.share({ title: resolvedTitle, url: resolvedUrl });
+        await navigator.share(
+          text ? { title: resolvedTitle, text } : { title: resolvedTitle, url: resolvedUrl }
+        );
         showToast({ type: 'success', title: 'Shared', message: shareSuccessMessage });
         return;
       } catch {
@@ -71,6 +80,7 @@ export const useShareAction = ({
     resolvedUrl,
     shareSuccessMessage,
     showToast,
+    text,
     unavailableMessage,
     useNativeShare
   ]);

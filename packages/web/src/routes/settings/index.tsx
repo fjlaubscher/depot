@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import type { depot } from '@depot/core';
 import { Users, ClipboardList, Database } from 'lucide-react';
 
@@ -20,20 +19,16 @@ const Settings = () => {
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
 
-  const handleSettingsChange = useCallback(
-    async (field: keyof depot.Settings, value: boolean) => {
-      const newSettings = { ...settings, [field]: value };
-      try {
-        await updateSettings(newSettings);
-      } catch (error) {
-        console.error('Failed to update settings:', error);
-        showToast({ type: 'error', title: 'Error', message: 'Failed to save settings.' });
-      }
-    },
-    [settings, updateSettings, showToast]
-  );
+  const handleSettingsChange = async (field: keyof depot.Settings, value: boolean) => {
+    try {
+      await updateSettings({ ...settings, [field]: value });
+    } catch (error) {
+      console.error('Failed to update settings:', error);
+      showToast({ type: 'error', title: 'Error', message: 'Failed to save settings.' });
+    }
+  };
 
-  const handleReset = useCallback(async () => {
+  const handleReset = async () => {
     try {
       await clearOfflineData();
       showToast({
@@ -49,7 +44,7 @@ const Settings = () => {
         message: 'Failed to clear the offline cache.'
       });
     }
-  }, [clearOfflineData, showToast]);
+  };
 
   return (
     <AppLayout title="Settings & Preferences">

@@ -56,9 +56,15 @@ export const getRosterFactionName = (roster: Roster): string => {
   return slug ? toTitleCase(slug) || slug : '';
 };
 
+/** "Faction • Detachment A, Detachment B" (or just the faction when no detachments). */
+export const getRosterSubtitle = (roster: Roster): string => {
+  const factionName = getRosterFactionName(roster);
+  const detachmentNames = getRosterDetachmentNames(roster);
+  return factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
+};
+
 export interface GenerateRosterShareTextOptions {
   includeWargear?: boolean;
-  includeWargearAbilities?: boolean;
 }
 
 export const generateRosterShareText = (
@@ -67,7 +73,6 @@ export const generateRosterShareText = (
   options: GenerateRosterShareTextOptions = {}
 ): string => {
   const includeWargear = options.includeWargear ?? false;
-  const includeWargearAbilities = options.includeWargearAbilities ?? includeWargear;
   const lines: string[] = [];
 
   lines.push(`*${roster.name}*`);
@@ -99,7 +104,7 @@ export const generateRosterShareText = (
       });
     }
 
-    if (includeWargearAbilities && unit.selectedWargearAbilities?.length) {
+    if (includeWargear && unit.selectedWargearAbilities?.length) {
       unit.selectedWargearAbilities.forEach((ability) => {
         lines.push(`  - [Wargear Ability] ${ability.name}`);
       });

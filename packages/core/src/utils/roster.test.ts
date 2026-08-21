@@ -4,6 +4,7 @@ import {
   calculateTotalPoints,
   createRosterDuplicate,
   generateRosterShareText,
+  getRosterSubtitle,
   remapRosterIds
 } from './roster.js';
 
@@ -142,6 +143,11 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
 });
 
 describe('roster utils', () => {
+  it('builds the roster subtitle from faction and detachment names', () => {
+    expect(getRosterSubtitle(createRoster())).toBe('Test • Gladius Task Force');
+    expect(getRosterSubtitle(createRoster({ detachments: [] }))).toBe('Test');
+  });
+
   it('calculates total roster points from units and enhancements', () => {
     const roster = createRoster({
       units: [createRosterUnit({ modelCost: createModelCost({ cost: '110' }) })],
@@ -175,10 +181,7 @@ describe('roster utils', () => {
       ]
     });
 
-    const text = generateRosterShareText(roster, 'Space Marines', {
-      includeWargear: true,
-      includeWargearAbilities: true
-    });
+    const text = generateRosterShareText(roster, 'Space Marines', { includeWargear: true });
 
     expect(text).toContain('*Faction:* Space Marines');
     expect(text).toContain('*Detachment:* Gladius Task Force · 2 DP · Take and Hold');

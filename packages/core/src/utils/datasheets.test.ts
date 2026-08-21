@@ -7,6 +7,7 @@ import {
   filterDatasheetsBySettings,
   filterDatasheetsBySupplement,
   getSupplementKey,
+  isCharacter,
   isSupplementEntry,
   normalizeSupplementValue,
   shouldResetSupplementSelection,
@@ -54,6 +55,12 @@ const makeDatasheet = (
 });
 
 describe('datasheet utils', () => {
+  it('detects the Character keyword case-insensitively', () => {
+    const keyword = (value: string) => ({ keyword: value }) as depot.Keyword;
+    expect(isCharacter({ keywords: [keyword('Infantry'), keyword('CHARACTER')] })).toBe(true);
+    expect(isCharacter({ keywords: [keyword('Infantry')] })).toBe(false);
+  });
+
   describe('filterDatasheetsBySettings', () => {
     it('filters legends and forge world entries', () => {
       const datasheets = [

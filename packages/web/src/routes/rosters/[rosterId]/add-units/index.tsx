@@ -11,7 +11,7 @@ import AppLayout from '@/components/layout';
 import { Loader } from '@/components/ui';
 import { RosterHeader } from '@/components/shared';
 import AddUnitsView from '@/components/shared/add-units-view';
-import { getRosterDetachmentNames } from '@depot/core/utils/roster';
+import { getRosterSubtitle } from '@depot/core/utils/roster';
 
 const AddRosterUnitsView: FC = () => {
   const { state: roster, addUnit } = useRoster();
@@ -25,13 +25,6 @@ const AddRosterUnitsView: FC = () => {
   if (!roster.id) {
     return <Loader />;
   }
-
-  const factionName = roster.faction?.name;
-  const detachmentNames = getRosterDetachmentNames(roster);
-  const subtitle =
-    factionName && detachmentNames
-      ? `${factionName} • ${detachmentNames}`
-      : factionName || roster.factionSlug;
 
   const handleAddSelectedUnits = (selectedUnits: SelectedUnit[]) => {
     selectedUnits.forEach(({ datasheet, modelCost }) => {
@@ -62,7 +55,7 @@ const AddRosterUnitsView: FC = () => {
         { label: 'Add Units', path: `/rosters/${roster.id}/add-units` }
       ]}
       title={roster.name}
-      subtitle={subtitle}
+      subtitle={getRosterSubtitle(roster)}
       headerStats={<RosterHeader roster={roster} />}
       onConfirm={handleAddSelectedUnits}
     />

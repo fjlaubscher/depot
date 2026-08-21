@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames';
+import { useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 
 import { RosterSection, StratagemCard } from '@/components/shared';
+import PillTabs from '@/components/shared/pill-tabs';
 import { Alert, Loader } from '@/components/ui';
 
 interface StratagemsTabProps {
@@ -11,12 +11,6 @@ interface StratagemsTabProps {
   units: depot.RosterUnit[];
   loadingCore: boolean;
   coreError: string | null;
-}
-
-interface CategoryTab {
-  value: string;
-  label: string;
-  count: number;
 }
 
 const CORE_CATEGORY_ORDER = ['Core', 'Boarding Actions', 'Challenger'];
@@ -44,7 +38,7 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
   loadingCore,
   coreError
 }) => {
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const availabilityMap = useMemo(() => {
     const map = new Map<string, Set<string>>();
@@ -64,7 +58,7 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
     return map;
   }, [units]);
 
-  const categoryTabs = useMemo<CategoryTab[]>(() => {
+  const categoryTabs = useMemo(() => {
     if (!coreStratagems || coreStratagems.length === 0) {
       return [{ value: 'All', label: 'All', count: 0 }];
     }
@@ -91,16 +85,9 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
     return [{ value: 'All', label: 'All', count: coreStratagems.length }, ...tabs];
   }, [coreStratagems]);
 
-  useEffect(() => {
-    if (activeCategory === 'All') {
-      return;
-    }
-
-    const hasActiveCategory = categoryTabs.some((tab) => tab.value === activeCategory);
-    if (!hasActiveCategory) {
-      setActiveCategory('All');
-    }
-  }, [activeCategory, categoryTabs]);
+  const activeCategory = categoryTabs.some((tab) => tab.value === selectedCategory)
+    ? selectedCategory
+    : 'All';
 
   const filteredCoreStratagems = useMemo(() => {
     if (!coreStratagems || activeCategory === 'All') {
@@ -144,35 +131,12 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
       <RosterSection title="Core Stratagems" data-testid="core-stratagems-section">
         <div className="flex flex-col gap-3">
           {categoryTabs.length > 1 ? (
-            <div className="flex flex-wrap gap-2" role="tablist" aria-label="Core stratagem types">
-              {categoryTabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeCategory === tab.value}
-                  className={classNames(
-                    'flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition-colors',
-                    activeCategory === tab.value
-                      ? 'bg-primary-600 text-white border-primary-600'
-                      : 'border-subtle text-subtle hover:text-foreground'
-                  )}
-                  onClick={() => setActiveCategory(tab.value)}
-                >
-                  <span>{tab.label}</span>
-                  <span
-                    className={classNames(
-                      'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs',
-                      activeCategory === tab.value
-                        ? 'bg-white text-primary-600'
-                        : 'bg-gray-100 text-body dark:bg-gray-800 dark:text-gray-300'
-                    )}
-                  >
-                    {tab.count}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <PillTabs
+              tabs={categoryTabs}
+              active={activeCategory}
+              onChange={setSelectedCategory}
+              ariaLabel="Core stratagem types"
+            />
           ) : null}
 
           {loadingCore ? (

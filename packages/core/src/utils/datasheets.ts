@@ -31,6 +31,9 @@ export const filterDatasheetsBySettings = <T extends DatasheetListItem>(
       )
     : datasheets;
 
+export const isCharacter = (datasheet: Pick<Datasheet, 'keywords'>): boolean =>
+  datasheet.keywords.some((entry) => entry.keyword.toLowerCase().includes('character'));
+
 export const CODEX_SLUG = 'codex';
 
 export const toTitleCase = (slug: string) =>

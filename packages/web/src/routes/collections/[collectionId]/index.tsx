@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, ClipboardPlus, Download, RefreshCw } from 'lucide-react';
 import type { depot } from '@depot/core';
-import classNames from 'classnames';
 
 import AppLayout from '@/components/layout';
 import { BackButton } from '@/components/shared';
+import PillTabs from '@/components/shared/pill-tabs';
 import { PageHeader, Loader, Breadcrumbs, Button, Alert } from '@/components/ui';
-import { RosterSection, RosterEmptyState, RosterUnitList } from '@/components/shared/roster';
+import { RosterSection, RosterEmptyState } from '@/components/shared/roster';
 import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -27,11 +27,7 @@ import {
   calculateCollectionPoints,
   getCollectionStateCounts
 } from '@depot/core/utils/collection';
-import {
-  COLLECTION_STATE_META,
-  COLLECTION_LABELS,
-  getCollectionChartCopy
-} from '@/utils/collection';
+import { COLLECTION_STATE_META, getCollectionChartCopy } from '@/utils/collection';
 import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
 
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
@@ -41,13 +37,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const { collection, loading, error, save } = useCollection(collectionId);
   const { getDatasheet, getFactionManifest, dataVersion } = useFactionsContext();
   const { showToast } = useToast();
-  const labels = COLLECTION_LABELS;
   const [refreshing, setRefreshing] = useState(false);
-  const {
-    selection: persistedStateFilter,
-    setSelection: setPersistedStateFilter,
-    clearSelection: clearPersistedStateFilter
-  } = usePersistedTagSelection<depot.CollectionUnitState | 'all'>(
+  const { selection: activeStateFilter, setSelection: setStateFilter } = usePersistedTagSelection<
+    depot.CollectionUnitState | 'all'
+  >(
     COLLECTION_STATE_FILTER_KEY,
     'all',
     (value) => value === 'all' || COLLECTION_UNIT_STATES.includes(value)
@@ -62,9 +55,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     () =>
       collection
         ? [
-            { state: 'all' as const, label: 'All', count: collection.items.length },
+            { value: 'all' as const, label: 'All', count: collection.items.length },
             ...COLLECTION_UNIT_STATES.map((state) => ({
-              state,
+              value: state,
               label: COLLECTION_STATE_META[state].label,
               count: stateCounts[state]
             }))
@@ -73,27 +66,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     [collection, stateCounts]
   );
 
-  const activeStateFilter = useMemo(() => {
-    if (!persistedStateFilter || persistedStateFilter === 'all') {
-      return 'all';
-    }
-
-    if (COLLECTION_UNIT_STATES.includes(persistedStateFilter)) {
-      return persistedStateFilter;
-    }
-
-    return 'all';
-  }, [persistedStateFilter]);
-
-  useEffect(() => {
-    if (persistedStateFilter !== activeStateFilter) {
-      if (activeStateFilter === 'all') {
-        clearPersistedStateFilter();
-      } else {
-        setPersistedStateFilter(activeStateFilter);
-      }
-    }
-  }, [activeStateFilter, clearPersistedStateFilter, persistedStateFilter, setPersistedStateFilter]);
   const points = useMemo(
     () => (collection ? calculateCollectionPoints(collection) : 0),
     [collection]
@@ -101,15 +73,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const currentDataVersion = dataVersion ?? null;
   const isStale =
     !!currentDataVersion && collection ? collection.dataVersion !== currentDataVersion : false;
-
-  const toRosterUnit = (item: depot.CollectionUnit): depot.RosterUnit => ({
-    id: item.id,
-    datasheet: item.datasheet,
-    modelCost: item.modelCost,
-    selectedWargear: item.selectedWargear,
-    selectedWargearAbilities: item.selectedWargearAbilities,
-    datasheetSlug: item.datasheetSlug
-  });
 
   const filteredItems = useMemo(() => {
     if (!collection) {
@@ -122,11 +85,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
     return collection.items.filter((item) => item.state === activeStateFilter);
   }, [activeStateFilter, collection]);
-
-  const filteredRosterUnits = useMemo(
-    () => filteredItems.map((item) => toRosterUnit(item)),
-    [filteredItems]
-  );
 
   const handleRefreshCollectionData = async () => {
     if (refreshing || !collection) return;
@@ -152,7 +110,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       const rebindNote = formatRebindSummaryMessage(result.summary);
       showToast({
         type: rebindNote ? 'warning' : 'success',
-        title: `${labels.singularTitle} updated`,
+        title: 'Collection updated',
         message: rebindNote
           ? `Refreshed with the latest data. ${rebindNote}`
           : 'Refreshed with the latest Wahapedia data.'
@@ -181,35 +139,11 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const handleDuplicate = async (unit: depot.RosterUnit) => {
     if (!collection) return;
     const source = collection.items.find((item) => item.id === unit.id);
-    const duplicated: depot.CollectionUnit = source
-      ? { ...source, id: crypto.randomUUID() }
-      : {
-          id: crypto.randomUUID(),
-          datasheet: unit.datasheet,
-          modelCost: unit.modelCost,
-          selectedWargear: unit.selectedWargear,
-          selectedWargearAbilities: unit.selectedWargearAbilities,
-          datasheetSlug: unit.datasheetSlug,
-          state: 'sprue'
-        };
-
-    const updated = {
+    if (!source) return;
+    await save({
       ...collection,
-      items: [...collection.items, duplicated]
-    };
-    await save(updated);
-  };
-
-  const handleAddUnits = () => {
-    if (collection) {
-      navigate(`/collections/${collection.id}/add-units`);
-    }
-  };
-
-  const handleCreateRoster = () => {
-    if (collection) {
-      navigate(`/collections/${collection.id}/new-roster`);
-    }
+      items: [...collection.items, { ...source, id: crypto.randomUUID() }]
+    });
   };
 
   const handleExportCollection = async () => {
@@ -227,14 +161,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       `collection-${safeSlug(collection.name)}-${collection.id}.json`,
       JSON.stringify(payload, null, 2)
     );
-    showToast({ type: 'success', title: `${labels.singularTitle} exported` });
+    showToast({ type: 'success', title: 'Collection exported' });
   };
 
   const totalUnits = collection?.items.length ?? 0;
   const hasUnits = totalUnits > 0;
-  const pageTitle = collection
-    ? `${collection.name} - ${labels.singularTitle} Tracker`
-    : `${labels.singularTitle} Overview`;
+  const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
   useDocumentTitle(pageTitle);
   useScrollToHash({ enabled: Boolean(collection) });
   const { heading: collectionHeading, subheading: collectionSubheading } = collection
@@ -246,8 +178,8 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       <div className="flex flex-col gap-4">
         <BackButton
           to="/collections"
-          label={labels.pluralTitle}
-          ariaLabel={`Back to ${labels.pluralTitle}`}
+          label="Collections"
+          ariaLabel="Back to Collections"
           className="md:hidden"
         />
         <Loader />
@@ -260,12 +192,12 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       <div className="flex flex-col gap-4">
         <BackButton
           to="/collections"
-          label={labels.pluralTitle}
-          ariaLabel={`Back to ${labels.pluralTitle}`}
+          label="Collections"
+          ariaLabel="Back to Collections"
           className="md:hidden"
         />
-        <Alert variant="error" title={`Unable to load ${labels.singular}`}>
-          {error || `${labels.singularTitle} not found`}
+        <Alert variant="error" title="Unable to load collection">
+          {error || 'Collection not found'}
         </Alert>
       </div>
     );
@@ -278,15 +210,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     <div className="flex flex-col gap-4">
       <BackButton
         to="/collections"
-        label={labels.pluralTitle}
-        ariaLabel={`Back to ${labels.pluralTitle}`}
+        label="Collections"
+        ariaLabel="Back to Collections"
         className="md:hidden"
       />
 
       <div className="hidden md:block">
         <Breadcrumbs
           items={[
-            { label: labels.pluralTitle, path: '/collections' },
+            { label: 'Collections', path: '/collections' },
             { label: collection.name, path: `/collections/${collection.id}` }
           ]}
         />
@@ -297,7 +229,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         subtitle={subtitle}
         action={{
           icon: <Plus size={16} />,
-          onClick: handleAddUnits,
+          onClick: () => navigate(`/collections/${collection.id}/add-units`),
           ariaLabel: 'Add units',
           testId: 'add-collection-units-button'
         }}
@@ -306,7 +238,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       {hasUnits ? (
         <div className="flex flex-wrap gap-2">
           <Button
-            onClick={handleCreateRoster}
+            onClick={() => navigate(`/collections/${collection.id}/new-roster`)}
             variant="secondary"
             className="flex items-center gap-2"
             data-testid="create-roster-from-collection-button"
@@ -327,7 +259,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       ) : null}
 
       {isStale ? (
-        <Alert variant="warning" title={`${labels.singularTitle} uses older data`}>
+        <Alert variant="warning" title="Collection uses older data">
           <div className="flex flex-col gap-2">
             <span className="text-sm text-secondary">
               Refresh to pull the latest Wahapedia data for these units.
@@ -361,63 +293,36 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         data-testid="collection-units-section"
         className="gap-4"
         belowContent={
-          <div className="flex flex-wrap items-center gap-2">
-            {stateFilters.map((filter) => {
-              const isActive = filter.state === activeStateFilter;
-
-              return (
-                <button
-                  key={`collection-state-${filter.state}`}
-                  type="button"
-                  className={classNames(
-                    'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
-                      : 'border-subtle text-secondary hover:text-foreground hover:border-border'
-                  )}
-                  onClick={() => setPersistedStateFilter(filter.state)}
-                  data-testid={`collection-state-filter-${filter.state}`}
-                >
-                  <span>{filter.label}</span>
-                  <span
-                    className={classNames(
-                      'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
-                      isActive
-                        ? 'bg-white text-primary-600 dark:text-primary-500'
-                        : 'bg-soft text-muted'
-                    )}
-                  >
-                    {filter.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <PillTabs
+            tabs={stateFilters}
+            active={activeStateFilter}
+            onChange={setStateFilter}
+            ariaLabel="Filter units by build state"
+            testIdPrefix="collection-state-filter"
+          />
         }
       >
-        {filteredRosterUnits.length > 0 ? (
-          <RosterUnitList
-            units={filteredRosterUnits}
-            dataTestId="collection-unit-cards"
-            renderUnit={(unit) => (
+        {filteredItems.length > 0 ? (
+          <div className="flex flex-col gap-4" data-testid="collection-unit-cards">
+            {filteredItems.map((item) => (
               <CollectionUnitCard
-                key={unit.id}
-                unit={unit}
+                key={item.id}
+                unit={item}
                 collectionId={collection.id}
                 onRemove={handleRemove}
                 onDuplicate={handleDuplicate}
-                state={collection.items.find((item) => item.id === unit.id)?.state}
+                state={item.state}
                 dataTestId="collection-unit-card"
               />
-            )}
-          />
+            ))}
+          </div>
         ) : (
           <RosterEmptyState
-            title={`No units in this ${labels.singular}`}
+            title="No units in this collection"
             dataTestId="empty-collection-state"
             action={{
               label: 'Add units',
-              onClick: handleAddUnits,
+              onClick: () => navigate(`/collections/${collection.id}/add-units`),
               icon: <Plus size={14} />,
               testId: 'empty-collection-add-units'
             }}
@@ -430,10 +335,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const labels = COLLECTION_LABELS;
 
   return (
-    <AppLayout title={`${labels.singularTitle} Overview`}>
+    <AppLayout title="Collection Overview">
       <CollectionPageContent collectionId={collectionId} />
     </AppLayout>
   );

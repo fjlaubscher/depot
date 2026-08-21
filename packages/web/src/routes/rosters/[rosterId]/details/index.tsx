@@ -12,7 +12,7 @@ import AppLayout from '@/components/layout';
 import { PageHeader, Loader, Breadcrumbs, Button, Card, Field, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import { BackButton, RosterHeader } from '@/components/shared';
-import { getRosterDetachments, getRosterDetachmentNames } from '@depot/core/utils/roster';
+import { getRosterDetachments, getRosterSubtitle } from '@depot/core/utils/roster';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 import DetachmentPicker from '@/routes/rosters/_components/detachment-picker';
 
@@ -49,52 +49,13 @@ const RosterDetailsContent: FC = () => {
     return <Loader />;
   }
 
-  const handleViewRoster = () => {
-    navigate(`/rosters/${roster.id}`);
-  };
+  const detachments = factionDetachments.filter((item) => selectedDetachments.includes(item.slug));
+  const saveDisabled =
+    !name.trim() || detachments.length === 0 || maxPoints <= 0 || factionLoading || !!factionError;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    if (!name.trim()) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Please enter a roster name.'
-      });
-      return;
-    }
-
-    if (selectedDetachments.length === 0) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Please select at least one detachment.'
-      });
-      return;
-    }
-
-    if (maxPoints <= 0) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Max points must be greater than 0.'
-      });
-      return;
-    }
-
-    const detachments = factionDetachments.filter((item) =>
-      selectedDetachments.includes(item.slug)
-    );
-
-    if (detachments.length === 0) {
-      showToast({
-        type: 'error',
-        title: 'Validation Error',
-        message: 'Selected detachments could not be found.'
-      });
-      return;
-    }
+    if (saveDisabled) return;
 
     updateRosterDetails({
       name: name.trim(),
@@ -111,18 +72,6 @@ const RosterDetailsContent: FC = () => {
     navigate(`/rosters/${roster.id}/edit`);
   };
 
-  const detachmentNames = getRosterDetachmentNames(roster);
-  const subtitle = detachmentNames
-    ? `${roster.faction?.name ?? ''} • ${detachmentNames}`.trim()
-    : (roster.faction?.name ?? '');
-
-  const saveDisabled =
-    !name.trim() ||
-    selectedDetachments.length === 0 ||
-    maxPoints <= 0 ||
-    factionLoading ||
-    !!factionError;
-
   return (
     <div className="flex flex-col gap-4">
       <BackButton to="/rosters" label="Rosters" ariaLabel="Back to Rosters" className="md:hidden" />
@@ -138,7 +87,7 @@ const RosterDetailsContent: FC = () => {
 
       <PageHeader
         title={roster.name}
-        subtitle={subtitle}
+        subtitle={getRosterSubtitle(roster)}
         stats={<RosterHeader roster={roster} />}
         action={{
           icon: <Save size={16} />,
@@ -208,7 +157,7 @@ const RosterDetailsContent: FC = () => {
       <Button
         type="button"
         variant="secondary"
-        onClick={handleViewRoster}
+        onClick={() => navigate(`/rosters/${roster.id}`)}
         className="flex items-center justify-center gap-2"
         data-testid="cancel-roster-details"
       >

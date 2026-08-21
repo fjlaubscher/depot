@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
-import { BackButton, DatasheetBrowser, DatasheetBrowserSkeleton } from '@/components/shared';
+import { BackButton, DatasheetBrowser } from '@/components/shared';
 import { Alert, Breadcrumbs, Loader, PageHeader } from '@/components/ui';
 import { RosterEmptyState } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
@@ -12,7 +12,6 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import SelectionSummary from '@/components/shared/selection-summary';
 import type { SelectionGroup } from '@/components/shared/selection-summary';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
-import { COLLECTION_LABELS } from '@/utils/collection';
 import CollectionSelectionCard from './_components/collection-selection-card';
 import { useSettingsContext } from '@/contexts/settings/context';
 import CreateRosterSheet from '@/routes/rosters/_components/create-roster-sheet';
@@ -26,7 +25,6 @@ const CollectionNewRoster: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
   const { settings } = useSettingsContext();
-  const labels = COLLECTION_LABELS;
   const { collection, loading, error } = useCollection(collectionId);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
@@ -34,7 +32,7 @@ const CollectionNewRoster: React.FC = () => {
 
   const pageTitle = collection
     ? `${collection.name} - Build Roster`
-    : `Build Roster from ${labels.singularTitle}`;
+    : 'Build Roster from Collection';
   useDocumentTitle(pageTitle);
 
   useEffect(() => {
@@ -60,38 +58,25 @@ const CollectionNewRoster: React.FC = () => {
   );
 
   const selectedRosterUnits: depot.RosterUnit[] = useMemo(
-    () =>
-      selectedUnits.map((item) => ({
-        id: crypto.randomUUID(),
-        datasheet: item.datasheet,
-        modelCost: item.modelCost,
-        selectedWargear: item.selectedWargear,
-        selectedWargearAbilities: item.selectedWargearAbilities,
-        datasheetSlug: item.datasheetSlug ?? item.datasheet.slug
-      })),
+    () => selectedUnits.map((item) => ({ ...item, id: crypto.randomUUID() })),
     [selectedUnits]
   );
 
-  const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
-    const groups = new Map<string, SelectionGroup>();
-
-    selectedUnits.forEach((unit) => {
-      const key = `${unit.datasheet.id}-${unit.modelCost.line}`;
-      const existing = groups.get(key);
-
-      if (existing) {
-        existing.count += 1;
-      } else {
-        groups.set(key, {
-          count: 1,
-          datasheet: unit.datasheet,
-          modelCost: unit.modelCost
-        });
-      }
-    });
-
-    return Array.from(groups.values());
-  }, [selectedUnits]);
+  const aggregatedSelection = useMemo<SelectionGroup[]>(
+    () =>
+      Array.from(
+        Map.groupBy(
+          selectedUnits,
+          (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`
+        ).values(),
+        (group) => ({
+          count: group.length,
+          datasheet: group[0].datasheet,
+          modelCost: group[0].modelCost
+        })
+      ),
+    [selectedUnits]
+  );
 
   const totalSelectedPoints = useMemo(
     () =>
@@ -114,73 +99,36 @@ const CollectionNewRoster: React.FC = () => {
     [settings.showLegends, settings.showForgeWorld]
   );
 
-  const toggleSelect = useCallback((id: string) => {
+  const toggleSelect = (id: string) =>
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (!next.delete(id)) next.add(id);
       return next;
     });
-  }, []);
 
-  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
+  /** Select the next unselected matching unit (+1) or deselect the last selected one (-1). */
+  const adjust = (datasheet: depot.Datasheet, modelCost: depot.ModelCost, delta: 1 | -1) =>
+    setSelectedIds((prev) => {
+      const candidates = (collection?.items ?? []).filter(
+        (item) =>
+          prev.has(item.id) === delta < 0 &&
+          item.datasheet.id === datasheet.id &&
+          item.modelCost.line === modelCost.line &&
+          item.modelCost.description === modelCost.description
+      );
+      const target = delta > 0 ? candidates[0] : candidates.at(-1);
+      if (!target) return prev;
+      const next = new Set(prev);
+      if (delta > 0) next.add(target.id);
+      else next.delete(target.id);
+      return next;
+    });
 
-  const incrementSelection = useCallback(
-    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      if (!collection) return;
-
-      setSelectedIds((prev) => {
-        const available = collection.items.find(
-          (item) =>
-            !prev.has(item.id) &&
-            item.datasheet.id === datasheet.id &&
-            item.modelCost.line === modelCost.line &&
-            item.modelCost.description === modelCost.description
-        );
-
-        if (!available) return prev;
-
-        const next = new Set(prev);
-        next.add(available.id);
-        return next;
-      });
-    },
-    [collection]
-  );
-
-  const decrementSelection = useCallback(
-    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      if (!collection) return;
-
-      setSelectedIds((prev) => {
-        const matching = collection.items
-          .filter(
-            (item) =>
-              prev.has(item.id) &&
-              item.datasheet.id === datasheet.id &&
-              item.modelCost.line === modelCost.line &&
-              item.modelCost.description === modelCost.description
-          )
-          .map((item) => item.id);
-
-        if (matching.length === 0) return prev;
-
-        const next = new Set(prev);
-        next.delete(matching[matching.length - 1]);
-        return next;
-      });
-    },
-    [collection]
-  );
-
-  const handleCreateRoster = useCallback(() => {
+  const handleCreateRoster = () => {
     if (!collection || selectedRosterUnits.length === 0) return;
     setIsSummaryOpen(false);
     setIsCreateOpen(true);
-  }, [collection, selectedRosterUnits]);
+  };
 
   const subtitle = collection
     ? `${collection.items.length} units - ${
@@ -201,8 +149,8 @@ const CollectionNewRoster: React.FC = () => {
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle}>
-        <Alert variant="error" title={`Unable to load ${labels.singular}`}>
-          {error || `${labels.singularTitle} not found`}
+        <Alert variant="error" title="Unable to load collection">
+          {error || 'Collection not found'}
         </Alert>
       </AppLayout>
     );
@@ -213,25 +161,25 @@ const CollectionNewRoster: React.FC = () => {
       <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
         <BackButton
           to={`/collections/${collection.id}`}
-          label={`Back to ${labels.singularTitle}`}
+          label="Back to Collection"
           className="md:hidden"
         />
 
         <div className="hidden md:block">
           <Breadcrumbs
             items={[
-              { label: labels.pluralTitle, path: '/collections' },
+              { label: 'Collections', path: '/collections' },
               { label: collection.name, path: `/collections/${collection.id}` },
               { label: 'Select units', path: `/collections/${collection.id}/new-roster` }
             ]}
           />
         </div>
 
-        <PageHeader title={`Build roster from ${labels.singular}`} subtitle={subtitle} />
+        <PageHeader title="Build roster from collection" subtitle={subtitle} />
 
         {collection.items.length === 0 ? (
           <RosterEmptyState
-            title={`No units in this ${labels.singular}`}
+            title="No units in this collection"
             dataTestId="empty-collection-state"
             action={{
               label: 'Add units',
@@ -241,33 +189,29 @@ const CollectionNewRoster: React.FC = () => {
           />
         ) : (
           <div className="flex flex-col gap-4">
-            {collectionDatasheets.length === 0 ? (
-              <DatasheetBrowserSkeleton />
-            ) : (
-              <DatasheetBrowser<CollectionDatasheetListItem>
-                datasheets={collectionDatasheets}
-                searchPlaceholder={`Search ${labels.singular} units...`}
-                emptyStateMessage="No units match your filters."
-                filters={datasheetFilters}
-                showItemCount={false}
-                renderDatasheet={(datasheet) => (
-                  <CollectionSelectionCard
-                    unit={datasheet.unit}
-                    selected={selectedIds.has(datasheet.collectionUnitId)}
-                    onToggle={toggleSelect}
-                  />
-                )}
-              />
-            )}
+            <DatasheetBrowser<CollectionDatasheetListItem>
+              datasheets={collectionDatasheets}
+              searchPlaceholder="Search collection units..."
+              emptyStateMessage="No units match your filters."
+              filters={datasheetFilters}
+              showItemCount={false}
+              renderDatasheet={(datasheet) => (
+                <CollectionSelectionCard
+                  unit={datasheet.unit}
+                  selected={selectedIds.has(datasheet.collectionUnitId)}
+                  onToggle={toggleSelect}
+                />
+              )}
+            />
 
             <SelectionSummary
               groups={aggregatedSelection}
               selectedUnitsCount={selectedUnits.length}
               totalPoints={totalSelectedPoints}
-              onClear={clearSelection}
+              onClear={() => setSelectedIds(new Set())}
               onConfirm={handleCreateRoster}
-              onIncrement={incrementSelection}
-              onDecrement={decrementSelection}
+              onIncrement={(datasheet, modelCost) => adjust(datasheet, modelCost, 1)}
+              onDecrement={(datasheet, modelCost) => adjust(datasheet, modelCost, -1)}
               isOpen={isSummaryOpen}
               onOpenChange={setIsSummaryOpen}
             />

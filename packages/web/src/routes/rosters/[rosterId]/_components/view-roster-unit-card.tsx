@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import type { depot } from '@depot/core';
-import { RosterUnitCardCompact } from '@/components/shared/roster';
-import UnitDetails from './unit-details';
+import { RosterUnitCardCompact, RosterUnitProfilePanel } from '@/components/shared/roster';
 
 interface ViewRosterUnitCardProps {
   unit: depot.RosterUnit;
@@ -31,7 +30,7 @@ const ViewRosterUnitCard: React.FC<ViewRosterUnitCardProps> = ({ unit }) => {
             event.stopPropagation();
           }}
         >
-          <UnitDetails unit={unit} />
+          <RosterUnitProfilePanel unit={unit} showViewDatasheetLink />
         </div>
       ) : null}
     </RosterUnitCardCompact>
