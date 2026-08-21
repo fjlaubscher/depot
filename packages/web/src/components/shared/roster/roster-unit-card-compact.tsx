@@ -79,7 +79,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
                 role="img"
                 aria-label="Warlord"
                 title="Warlord"
-                className="shrink-0 text-accent"
+                className="mr-1 shrink-0 text-accent"
                 data-testid="unit-warlord-tag"
               >
                 <Crown size={14} aria-hidden />
