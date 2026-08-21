@@ -1,10 +1,5 @@
-export interface SupplementInfo {
-  slug: string;
-  name: string;
-}
-
 // Source IDs are globally unique across factions.
-const supplements: Record<string, SupplementInfo> = {
+export const supplements: Record<string, { slug: string; name: string }> = {
   '000000139': { slug: 'codex', name: 'Codex' },
   '000000362': { slug: 'codex', name: 'Codex' },
   '000000356': { slug: 'codex', name: 'Codex (Legends)' },
@@ -18,6 +13,3 @@ const supplements: Record<string, SupplementInfo> = {
   '000000035': { slug: 'deathwatch', name: 'Deathwatch' },
   '000000363': { slug: 'imperial-agents-legends', name: 'Imperial Agents (Legends)' }
 };
-
-export const getSupplementInfo = (sourceId: string): SupplementInfo | undefined =>
-  supplements[sourceId];

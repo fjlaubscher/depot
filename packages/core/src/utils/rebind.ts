@@ -56,27 +56,15 @@ export function matchDatasheetIdentity<T extends { id: string; slug: string; nam
   identity: { id?: string; slug?: string; name?: string },
   candidates: T[]
 ): T | null {
-  if (candidates.length === 0) return null;
-
   const id = identity.id?.trim();
-  if (id) {
-    const byId = candidates.find((entry) => entry.id === id);
-    if (byId) return byId;
-  }
-
   const slug = identity.slug?.trim();
-  if (slug) {
-    const bySlug = candidates.find((entry) => entry.slug === slug);
-    if (bySlug) return bySlug;
-  }
-
   const name = normalizeKey(identity.name);
-  if (name) {
-    const byName = candidates.find((entry) => normalizeKey(entry.name) === name);
-    if (byName) return byName;
-  }
-
-  return null;
+  return (
+    (id && candidates.find((entry) => entry.id === id)) ||
+    (slug && candidates.find((entry) => entry.slug === slug)) ||
+    (name && candidates.find((entry) => normalizeKey(entry.name) === name)) ||
+    null
+  );
 }
 
 /**
@@ -98,58 +86,31 @@ export function rebindModelCost(
   modelCost: ModelCost,
   available: ModelCost[]
 ): { modelCost: ModelCost; matched: boolean } {
-  if (available.length === 0) {
-    return { modelCost, matched: false };
-  }
-
-  const byLine = available.find((entry) => entry.line === modelCost.line);
-  if (byLine) {
-    return { modelCost: byLine, matched: true };
-  }
-
   const description = normalizeKey(modelCost.description);
-  if (description) {
-    const byDescription = available.find(
-      (entry) => normalizeKey(entry.description) === description
-    );
-    if (byDescription) {
-      return { modelCost: byDescription, matched: true };
-    }
-  }
-
+  const hit =
+    available.find((entry) => entry.line === modelCost.line) ??
+    (description
+      ? available.find((entry) => normalizeKey(entry.description) === description)
+      : undefined);
   // Fall back to first cost option so points stay catalog-native when possible.
-  return { modelCost: available[0], matched: false };
+  return hit
+    ? { modelCost: hit, matched: true }
+    : { modelCost: available[0] ?? modelCost, matched: false };
 }
 
 export function rebindSelectedWargear(
   selection: Wargear[] = [],
   available: Wargear[]
 ): { wargear: Wargear[]; dropped: string[] } {
-  if (selection.length === 0 || available.length === 0) {
-    return {
-      wargear: [],
-      dropped: selection.map((weapon) => weapon.name).filter(Boolean)
-    };
-  }
-
   const byId = new Map(available.map((weapon) => [weapon.id, weapon]));
   const byName = new Map(available.map((weapon) => [normalizeKey(weapon.name), weapon]));
-  const matched: Wargear[] = [];
-  const dropped: string[] = [];
-  const seen = new Set<string>();
-
-  for (const weapon of selection) {
-    const hit = byId.get(weapon.id) ?? byName.get(normalizeKey(weapon.name));
-    if (!hit) {
-      if (weapon.name) dropped.push(weapon.name);
-      continue;
-    }
-    if (seen.has(hit.id)) continue;
-    seen.add(hit.id);
-    matched.push(hit);
-  }
-
-  return { wargear: matched, dropped };
+  const hits = selection.map(
+    (weapon) => byId.get(weapon.id) ?? byName.get(normalizeKey(weapon.name))
+  );
+  return {
+    wargear: [...new Set(hits.filter((hit) => hit !== undefined))],
+    dropped: selection.filter((weapon, i) => !hits[i] && weapon.name).map((weapon) => weapon.name)
+  };
 }
 
 /**
@@ -210,44 +171,10 @@ export function rebindUnitSelections(
   };
 }
 
-export function rebindCollectionUnit(
-  item: CollectionUnit,
+function rebindUnit<T extends CollectionUnit | RosterUnit>(
+  unit: T,
   datasheet: Datasheet | null
-): RebindCollectionUnitResult {
-  if (!datasheet) {
-    const identity = unitDatasheetIdentity(item);
-    return {
-      item,
-      status: 'missing',
-      issues: [
-        {
-          kind: 'datasheet-missing',
-          key: identity.id || identity.slug || identity.name || 'unknown',
-          name: item.datasheet.name || identity.slug || identity.id || 'Unknown unit'
-        }
-      ]
-    };
-  }
-
-  const rebound = rebindUnitSelections(item, datasheet);
-  return {
-    item: {
-      ...item,
-      datasheet,
-      datasheetSlug: datasheet.slug,
-      modelCost: rebound.modelCost,
-      selectedWargear: rebound.selectedWargear,
-      selectedWargearAbilities: rebound.selectedWargearAbilities
-    },
-    status: rebound.status,
-    issues: rebound.issues
-  };
-}
-
-export function rebindRosterUnit(
-  unit: RosterUnit,
-  datasheet: Datasheet | null
-): RebindRosterUnitResult {
+): { unit: T; status: RebindStatus; issues: RebindIssue[] } {
   if (!datasheet) {
     const identity = unitDatasheetIdentity(unit);
     return {
@@ -263,33 +190,43 @@ export function rebindRosterUnit(
     };
   }
 
-  const rebound = rebindUnitSelections(unit, datasheet);
+  const { modelCost, selectedWargear, selectedWargearAbilities, status, issues } =
+    rebindUnitSelections(unit, datasheet);
   return {
     unit: {
       ...unit,
       datasheet,
       datasheetSlug: datasheet.slug,
-      modelCost: rebound.modelCost,
-      selectedWargear: rebound.selectedWargear,
-      selectedWargearAbilities: rebound.selectedWargearAbilities
+      modelCost,
+      selectedWargear,
+      selectedWargearAbilities
     },
-    status: rebound.status,
-    issues: rebound.issues
+    status,
+    issues
   };
 }
+
+export function rebindCollectionUnit(
+  item: CollectionUnit,
+  datasheet: Datasheet | null
+): RebindCollectionUnitResult {
+  const { unit, ...rest } = rebindUnit(item, datasheet);
+  return { item: unit, ...rest };
+}
+
+export const rebindRosterUnit: (
+  unit: RosterUnit,
+  datasheet: Datasheet | null
+) => RebindRosterUnitResult = rebindUnit;
 
 export function summarizeRebindStatuses(statuses: RebindStatus[]): {
   ok: number;
   partial: number;
   missing: number;
 } {
-  return statuses.reduce(
-    (acc, status) => {
-      acc[status] += 1;
-      return acc;
-    },
-    { ok: 0, partial: 0, missing: 0 }
-  );
+  const summary = { ok: 0, partial: 0, missing: 0 };
+  statuses.forEach((status) => summary[status]++);
+  return summary;
 }
 
 /**

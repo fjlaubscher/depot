@@ -1,5 +1,5 @@
 import type { Datasheet, Detachment, Enhancement, Roster, RosterUnit } from '../types/depot.js';
-import { getCostBracketRange } from './model-costs.js';
+import { inCostBracket } from './model-costs.js';
 import { getRosterDetachments } from './roster.js';
 
 /** Core rules 25.03 battle-size table. */
@@ -39,11 +39,6 @@ export const getRosterDpSpent = (
     0
   );
 
-const inBracket = (ordinal: number, section?: string): boolean => {
-  const [min, max] = getCostBracketRange(section);
-  return ordinal >= min && ordinal <= max;
-};
-
 /**
  * Repeat-cost brackets: the Nth copy of a datasheet must pay the bracket covering N.
  * Swaps each unit onto the same-size row of the right bracket; leaves it alone if none exists.
@@ -53,11 +48,12 @@ export const enforceCostBrackets = (units: RosterUnit[]): RosterUnit[] => {
   return units.map((unit) => {
     const ordinal = (seen.get(unit.datasheet.id) ?? 0) + 1;
     seen.set(unit.datasheet.id, ordinal);
-    if (inBracket(ordinal, unit.modelCost.section)) {
+    if (inCostBracket(ordinal, unit.modelCost.section)) {
       return unit;
     }
     const replacement = unit.datasheet.modelCosts.find(
-      (cost) => cost.description === unit.modelCost.description && inBracket(ordinal, cost.section)
+      (cost) =>
+        cost.description === unit.modelCost.description && inCostBracket(ordinal, cost.section)
     );
     return replacement ? { ...unit, modelCost: replacement } : unit;
   });
@@ -170,7 +166,7 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
   for (const unit of units) {
     const ordinal = (ordinals.get(unit.datasheet.id) ?? 0) + 1;
     ordinals.set(unit.datasheet.id, ordinal);
-    if (!inBracket(ordinal, unit.modelCost.section)) {
+    if (!inCostBracket(ordinal, unit.modelCost.section)) {
       issues.push({
         code: 'bracket',
         unitId: unit.id,

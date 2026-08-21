@@ -1,16 +1,11 @@
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
-import type { depot } from '@depot/core';
+import { join } from 'path';
+import type { depot, wahapedia } from '@depot/core';
 
 import convertToJSON from './convert-to-json.js';
 import generateData from './generate-data.js';
 
-// Types only; runtime from core is used for slug utils in generate-data
-
-const PKG_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const DIST_DIR = join(PKG_ROOT, 'dist');
-const JSON_DIR = join(DIST_DIR, 'json');
+const DIST_DIR = import.meta.dirname;
 const DATA_DIR = join(DIST_DIR, 'data');
 const FACTIONS_DIR = join(DATA_DIR, 'factions');
 const SOURCE_DATA_DIR = join(DIST_DIR, 'source_data');
@@ -18,42 +13,35 @@ const LOG_PREFIX = '[@depot/cli]';
 
 const log = (message: string) => console.log(`${LOG_PREFIX} ${message}`);
 
-const getCSVFileName = (input: string) => input.toLowerCase().replace(/_/g, '-');
-
-const getFileName = (input: string) => getCSVFileName(input).replace('.csv', '.json');
-
-const WAHAPEDIA_CSV_FILES = [
-  'Factions.csv',
-  'Source.csv',
-  'Datasheets.csv',
-  'Datasheets_abilities.csv',
-  'Datasheets_keywords.csv',
-  'Datasheets_models.csv',
-  'Datasheets_options.csv',
-  'Datasheets_wargear.csv',
-  'Datasheets_unit_composition.csv',
-  'Datasheets_models_cost.csv',
-  'Datasheets_stratagems.csv',
-  'Datasheets_enhancements.csv',
-  'Datasheets_detachment_abilities.csv',
-  'Datasheets_leader.csv',
-  'Stratagems.csv',
-  'Abilities.csv',
-  'Enhancements.csv',
-  'Detachment_abilities.csv',
-  'Detachments.csv',
-  'Detachments_chapter_dp.csv',
-  'Last_update.csv'
-];
+const WAHAPEDIA_CSV_FILES: Record<keyof Omit<wahapedia.Data, 'lastUpdate'>, string> = {
+  factions: 'Factions.csv',
+  sources: 'Source.csv',
+  datasheets: 'Datasheets.csv',
+  datasheetAbilities: 'Datasheets_abilities.csv',
+  datasheetKeywords: 'Datasheets_keywords.csv',
+  datasheetModels: 'Datasheets_models.csv',
+  datasheetOptions: 'Datasheets_options.csv',
+  datasheetWargear: 'Datasheets_wargear.csv',
+  datasheetUnitComposition: 'Datasheets_unit_composition.csv',
+  datasheetModelCosts: 'Datasheets_models_cost.csv',
+  datasheetStratagems: 'Datasheets_stratagems.csv',
+  datasheetEnhancements: 'Datasheets_enhancements.csv',
+  datasheetDetachmentAbilities: 'Datasheets_detachment_abilities.csv',
+  datasheetLeaders: 'Datasheets_leader.csv',
+  stratagems: 'Stratagems.csv',
+  abilities: 'Abilities.csv',
+  enhancements: 'Enhancements.csv',
+  detachmentAbilities: 'Detachment_abilities.csv',
+  detachments: 'Detachments.csv',
+  detachmentChapterDp: 'Detachments_chapter_dp.csv'
+};
+const LAST_UPDATE_CSV = 'Last_update.csv';
 
 const WAHAPEDIA_BASE_URL = 'https://wahapedia.ru/wh40k11ed/';
-
-const fetchCSV = (url: string) => fetch(url).then((response) => response.text());
 
 const forceDownload = process.argv.includes('--force-download');
 
 const init = async () => {
-  rmSync(JSON_DIR, { recursive: true, force: true });
   rmSync(DATA_DIR, { recursive: true, force: true });
 
   const sourceDataExists = existsSync(SOURCE_DATA_DIR);
@@ -65,49 +53,41 @@ const init = async () => {
   }
 
   log('Creating directories');
-  mkdirSync(JSON_DIR, { recursive: true });
   mkdirSync(SOURCE_DATA_DIR, { recursive: true });
 
-  const fileNames = WAHAPEDIA_CSV_FILES.map(getFileName);
-  const csvFileNames = WAHAPEDIA_CSV_FILES.map(getCSVFileName);
-  let results: string[];
-
-  if (shouldDownload) {
-    log('Fetching CSV data from Wahapedia (wh40k11ed)');
-    const requests = WAHAPEDIA_CSV_FILES.map((fileName) =>
-      fetchCSV(`${WAHAPEDIA_BASE_URL}${fileName}`)
-    );
-    results = await Promise.all(requests);
-
-    log('Saving raw CSV files for debugging');
-    for (let i = 0; i < results.length; i++) {
-      const csvPath = join(SOURCE_DATA_DIR, csvFileNames[i]);
-      log(`Saving ${csvPath}`);
-      writeFileSync(csvPath, results[i]);
-    }
-  } else {
-    log('Using existing source data files');
-    results = csvFileNames.map((fileName) => {
-      const csvPath = join(SOURCE_DATA_DIR, fileName);
-      log(`Reading ${csvPath}`);
-      return readFileSync(csvPath, 'utf-8');
-    });
-  }
+  log(
+    shouldDownload
+      ? 'Fetching CSV data from Wahapedia (wh40k11ed)'
+      : 'Using existing source data files'
+  );
+  // Raw CSVs are kept in source_data so reruns work offline and for debugging.
+  const loadTable = async (fileName: string) => {
+    const csvPath = join(SOURCE_DATA_DIR, fileName.toLowerCase().replace(/_/g, '-'));
+    const csv = shouldDownload
+      ? await fetch(`${WAHAPEDIA_BASE_URL}${fileName}`).then((response) => response.text())
+      : readFileSync(csvPath, 'utf-8');
+    if (shouldDownload) writeFileSync(csvPath, csv);
+    return convertToJSON(csv);
+  };
 
   log('Parsing data from CSV');
-  for (let i = 0; i < results.length; i++) {
-    const parsedData = convertToJSON(results[i]);
-    const jsonPath = join(JSON_DIR, fileNames[i]);
-    log(`Creating ${jsonPath}`);
-    writeFileSync(jsonPath, JSON.stringify(parsedData));
-  }
+  const tables = Object.fromEntries(
+    await Promise.all(
+      Object.entries(WAHAPEDIA_CSV_FILES).map(
+        async ([key, fileName]): Promise<[string, unknown[]]> => [key, await loadTable(fileName)]
+      )
+    )
+  ) as Omit<wahapedia.Data, 'lastUpdate'>;
+  const data: wahapedia.Data = {
+    ...tables,
+    lastUpdate: (await loadTable(LAST_UPDATE_CSV))[0]?.lastUpdate ?? null
+  };
 
   log('Generating faction files');
-  mkdirSync(DATA_DIR, { recursive: true });
   mkdirSync(FACTIONS_DIR, { recursive: true });
 
   const index: depot.Index[] = [];
-  const { factions, coreStratagems, dataVersion } = generateData();
+  const { factions, coreStratagems, dataVersion } = generateData(data);
 
   factions.forEach((faction) => {
     const factionDir = join(FACTIONS_DIR, faction.slug);
@@ -145,7 +125,7 @@ const init = async () => {
       link: faction.link,
       datasheets: manifestDatasheets,
       detachments: faction.detachments,
-      dataVersion: dataVersion ?? undefined,
+      dataVersion,
       datasheetCount: manifestDatasheets.length,
       detachmentCount: faction.detachments.length
     };
@@ -160,15 +140,8 @@ const init = async () => {
       writeFileSync(datasheetPath, JSON.stringify(datasheet));
     });
 
-    index.push({
-      id: faction.id,
-      slug: faction.slug,
-      name: faction.name,
-      path: `/data/factions/${faction.slug}/faction.json`,
-      dataVersion: dataVersion ?? undefined,
-      datasheetCount: manifestDatasheets.length,
-      detachmentCount: faction.detachments.length
-    });
+    const { link, datasheets, detachments, ...summary } = manifest;
+    index.push({ ...summary, path: `/data/factions/${faction.slug}/faction.json` });
   });
 
   log('Generating index file');

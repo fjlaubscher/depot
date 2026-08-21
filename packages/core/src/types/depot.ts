@@ -1,3 +1,5 @@
+import type * as wahapedia from './wahapedia.js';
+
 export interface Ability {
   id: string;
   name: string;
@@ -8,35 +10,9 @@ export interface Ability {
   parameter?: string;
 }
 
-export interface Keyword {
-  datasheetId: string;
-  keyword: string;
-  model: string;
-  isFactionKeyword: string;
-}
-
-export interface Model {
-  datasheetId: string;
-  line: string;
-  name: string;
-  m: string;
-  t: string;
-  sv: string;
-  invSv: string;
-  invSvDescr: string;
-  w: string;
-  ld: string;
-  oc: string;
-  baseSize: string;
-  baseSizeDescr: string;
-}
-
-export interface DatasheetOption {
-  datasheetId: string;
-  line: string;
-  button: string;
-  description: string;
-}
+export type Keyword = wahapedia.DatasheetKeyword;
+export type Model = wahapedia.DatasheetModel;
+export type DatasheetOption = wahapedia.DatasheetOption;
 
 export interface DatasheetLeaderReference {
   id: string;
@@ -82,11 +58,7 @@ export interface Wargear {
   profiles: WargearProfile[];
 }
 
-export interface UnitComposition {
-  datasheetId: string;
-  line: string;
-  description: string;
-}
+export type UnitComposition = wahapedia.DatasheetUnitComposition;
 
 export interface ModelCost {
   datasheetId: string;

@@ -1,5 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { buildAbsoluteUrl } from './paths';
+import {
+  buildAbsoluteUrl,
+  getAppBasePath,
+  getDataPath,
+  getDataUrl,
+  getDatasheetPath,
+  getFactionManifestPath,
+  getRouterBasePath,
+  getViteBasePath
+} from './paths';
 
 const originalWindow = globalThis.window;
 const originalProcessBasePath = process.env.VITE_APP_BASE_PATH;
@@ -59,5 +68,33 @@ describe('buildAbsoluteUrl', () => {
   it('returns relative path when window is unavailable', () => {
     globalThis.window = undefined as unknown as Window & typeof globalThis;
     expect(buildAbsoluteUrl('/faction')).toBe('/faction');
+  });
+});
+
+describe('path helpers', () => {
+  it('returns defaults when no base path is configured', () => {
+    expect(getAppBasePath('')).toBe('');
+    expect(getDataPath('index.json')).toBe('/data/index.json');
+    expect(getDataPath('/data/index.json')).toBe('/data/index.json');
+    expect(getDataPath('//units.json')).toBe('/data/units.json');
+    expect(getRouterBasePath('')).toBeUndefined();
+    expect(getViteBasePath('')).toBe('/');
+    expect(getDataUrl('units.json', '')).toBe('/data/units.json');
+  });
+
+  it('normalizes the provided base path', () => {
+    expect(getAppBasePath('/depot/')).toBe('/depot');
+    expect(getRouterBasePath('/depot/')).toBe('/depot');
+    expect(getViteBasePath('/depot/')).toBe('/depot/');
+    expect(getDataUrl('/data/units.json', '/depot/')).toBe('/depot/data/units.json');
+  });
+
+  it('builds nested faction and datasheet paths', () => {
+    expect(getFactionManifestPath('space-marines')).toBe(
+      '/data/factions/space-marines/faction.json'
+    );
+    expect(getDatasheetPath('space-marines', '123')).toBe(
+      '/data/factions/space-marines/datasheets/123.json'
+    );
   });
 });

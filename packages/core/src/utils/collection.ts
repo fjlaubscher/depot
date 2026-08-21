@@ -7,9 +7,6 @@ import type {
 } from '../types/depot.js';
 import { getDefaultWargearSelection } from './wargear.js';
 
-// Available in Node >= 18 and all modern browsers; not declared by the ES2022 TS lib.
-declare const crypto: { randomUUID: () => string };
-
 export const COLLECTION_UNIT_STATES: CollectionUnitState[] = [
   'sprue',
   'built',

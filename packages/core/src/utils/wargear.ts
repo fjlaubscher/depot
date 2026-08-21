@@ -4,41 +4,17 @@ import type { DatasheetWargear } from '../types/wahapedia.js';
 
 const PROFILE_SEPARATOR = ' - ';
 
-interface SplitNameResult {
-  baseName: string;
-  profileName?: string;
-}
-
-const splitWargearName = (name: string): SplitNameResult => {
+/** `Bolt rifle - frag` → ['Bolt rifle', 'frag']; anything without a two-sided separator is a bare name. */
+const splitWargearName = (name: string): [baseName: string, profileName?: string] => {
   const trimmed = name?.trim() ?? '';
-
-  if (!trimmed) {
-    return { baseName: '' };
-  }
-
   const index = trimmed.indexOf(PROFILE_SEPARATOR);
-  if (index > -1) {
-    const base = trimmed.slice(0, index).trim();
-    const profile = trimmed.slice(index + PROFILE_SEPARATOR.length).trim();
-
-    if (base && profile) {
-      return {
-        baseName: base,
-        profileName: profile
-      };
-    }
-  }
-
-  return { baseName: trimmed };
+  const base = index > -1 ? trimmed.slice(0, index).trim() : '';
+  const profile = index > -1 ? trimmed.slice(index + PROFILE_SEPARATOR.length).trim() : '';
+  return base && profile ? [base, profile] : [trimmed];
 };
 
-const getLineValue = (value: string | undefined, fallback: number) => {
-  if (value && value.trim().length > 0) {
-    return value;
-  }
-
-  return `${fallback}`;
-};
+const getLineValue = (value: string | undefined, fallback: number) =>
+  value?.trim() ? value : `${fallback}`;
 
 /**
  * Groups Wahapedia wargear profiles (which are often flattened) into structured weapons with profiles.
@@ -55,7 +31,7 @@ export const groupWargearProfiles = (entries: DatasheetWargear[]): Wargear[] => 
   let currentGroup: Wargear | null = null;
 
   entries.forEach((entry, index) => {
-    const { baseName, profileName } = splitWargearName(entry.name);
+    const [baseName, profileName] = splitWargearName(entry.name);
     const normalizedBaseName = baseName || entry.name || `Wargear ${index + 1}`;
 
     const lineInWargear = parseInt(entry.lineInWargear || '1', 10);
@@ -112,16 +88,9 @@ export const groupWargearProfiles = (entries: DatasheetWargear[]): Wargear[] => 
 };
 
 const addNameMapping = (map: Map<string, Set<string>>, name: string | undefined, id: string) => {
-  if (!name) {
-    return;
-  }
-
-  const key = name.toLowerCase();
-  const existing = map.get(key);
-  if (existing) {
-    existing.add(id);
-  } else {
-    map.set(key, new Set([id]));
+  if (name) {
+    const key = name.toLowerCase();
+    map.set(key, (map.get(key) ?? new Set()).add(id));
   }
 };
 
@@ -136,12 +105,10 @@ const normaliseLoadoutItem = (text: string) =>
  * Splits a comma-separated string of weapon keywords and trims whitespace.
  */
 export function parseWargearKeywords(description?: string): string[] {
-  if (!description) return [];
-
-  return description
+  return (description ?? '')
     .split(',')
     .map((keyword) => keyword.trim())
-    .filter((keyword) => keyword.length > 0);
+    .filter(Boolean);
 }
 
 /**
@@ -152,25 +119,11 @@ export function separateWargearByType(wargear: Wargear[]): {
   meleeWargear: Wargear[];
   mixedWargear: Wargear[];
 } {
-  const ranged: Wargear[] = [];
-  const melee: Wargear[] = [];
-  const mixed: Wargear[] = [];
-
-  wargear.forEach((weapon) => {
-    switch (weapon.type) {
-      case 'Ranged':
-        ranged.push(weapon);
-        break;
-      case 'Melee':
-        melee.push(weapon);
-        break;
-      default:
-        mixed.push(weapon);
-        break;
-    }
-  });
-
-  return { rangedWargear: ranged, meleeWargear: melee, mixedWargear: mixed };
+  return {
+    rangedWargear: wargear.filter((weapon) => weapon.type === 'Ranged'),
+    meleeWargear: wargear.filter((weapon) => weapon.type === 'Melee'),
+    mixedWargear: wargear.filter((weapon) => weapon.type !== 'Ranged' && weapon.type !== 'Melee')
+  };
 }
 
 /**
@@ -227,15 +180,7 @@ export function parseLoadoutWargear(loadout: string, wargear: Wargear[]): string
 }
 
 export function getDefaultWargearSelection(datasheet: Datasheet): Wargear[] {
-  if (!datasheet.loadout || datasheet.wargear.length === 0) {
-    return [];
-  }
-
   const loadoutMatches = new Set(parseLoadoutWargear(datasheet.loadout, datasheet.wargear));
-  if (loadoutMatches.size === 0) {
-    return [];
-  }
-
   return datasheet.wargear.filter((weapon) => loadoutMatches.has(weapon.id));
 }
 

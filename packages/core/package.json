@@ -41,11 +41,6 @@
       "import": "./dist/utils/common.js",
       "default": "./dist/utils/common.js"
     },
-    "./utils/paths": {
-      "types": "./dist/utils/paths.d.ts",
-      "import": "./dist/utils/paths.js",
-      "default": "./dist/utils/paths.js"
-    },
     "./utils/datasheets": {
       "types": "./dist/utils/datasheets.d.ts",
       "import": "./dist/utils/datasheets.js",
