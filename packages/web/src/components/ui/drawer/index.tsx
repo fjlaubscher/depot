@@ -12,7 +12,7 @@ interface DrawerProps {
   'data-testid'?: string;
 }
 
-/** Native modal `<dialog>`: Escape, focus trap and backdrop come for free. */
+/** Native modal `<dialog>`: Escape, focus trap and backdrop come for free. Exit has no animation (ponytail). */
 const Drawer: FC<DrawerProps> = ({
   isOpen,
   onClose,
@@ -23,14 +23,14 @@ const Drawer: FC<DrawerProps> = ({
 }) => {
   const ref = useRef<HTMLDialogElement>(null);
 
+  // Mounted only while open so children (forms) reset on reopen, as before.
   useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    if (isOpen && !dialog.open) dialog.showModal();
-    else if (!isOpen && dialog.open) dialog.close();
+    if (isOpen) ref.current?.showModal();
   }, [isOpen]);
 
   const isBottom = position === 'bottom';
+
+  if (!isOpen) return null;
 
   return (
     <dialog
