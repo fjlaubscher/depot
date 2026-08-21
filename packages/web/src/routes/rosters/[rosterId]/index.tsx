@@ -15,8 +15,8 @@ import { useFactionsContext } from '@/contexts/factions/context';
 import { useShareAction } from '@/hooks/use-share-action';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button, Tabs, Alert } from '@/components/ui';
-import { BackButton, RosterHeader } from '@/components/shared';
+import { Loader, Button, Tabs, Alert } from '@/components/ui';
+import { RosterHeader } from '@/components/shared';
 import { generateRosterShareText } from '@/utils/roster';
 import {
   getRosterDetachments,
@@ -27,7 +27,6 @@ import RosterIssues from '@/routes/rosters/_components/roster-issues';
 import UnitsTab from './_components/units-tab';
 import DetachmentTab from './_components/detachment-overview';
 import StratagemsTab from './_components/stratagems-tab';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 const RosterView: FC = () => {
@@ -131,11 +130,14 @@ const RosterView: FC = () => {
   });
 
   const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
-  useDocumentTitle(pageTitle);
   useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
-    return <Loader />;
+    return (
+      <AppLayout title="Roster Overview" back={{ to: '/rosters', label: 'Rosters' }}>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   const detachments = getRosterDetachments(roster);
@@ -171,87 +173,69 @@ const RosterView: FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <BackButton to="/rosters" label="Rosters" className="md:hidden" />
-
-      {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block">
-        <Breadcrumbs
-          items={[
-            { label: 'Rosters', path: '/rosters' },
-            { label: roster.name, path: `/rosters/${roster.id}` }
-          ]}
-        />
-      </div>
-
-      {/* Header */}
-      <PageHeader
-        title={roster.name}
-        subtitle={getRosterSubtitle(roster)}
-        stats={<RosterHeader roster={roster} />}
-        action={{
+    <AppLayout
+      title={pageTitle}
+      back={{ to: '/rosters', label: 'Rosters' }}
+      heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
+      actions={[
+        {
+          icon: <Pencil size={16} />,
+          onClick: () => navigate(`/rosters/${roster.id}/edit`),
+          ariaLabel: 'Edit roster units',
+          'data-testid': 'manage-units-button'
+        },
+        {
           icon: shareAction.icon,
           onClick: () => shareAction.onClick(),
-          ariaLabel: shareAction.ariaLabel,
-          testId: 'share-roster-button'
-        }}
-      />
-
-      {/* Actions */}
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => navigate(`/rosters/${roster.id}/edit`)}
-            className="flex items-center gap-2"
-            data-testid="manage-units-button"
-          >
-            <Pencil size={16} />
-            Edit
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleExportJson}
-            className="flex items-center gap-2"
-            data-testid="export-button"
-          >
-            <Download size={16} />
-            Export
-          </Button>
+          ariaLabel: shareAction.ariaLabel ?? 'Share roster',
+          'data-testid': 'share-roster-button'
+        }
+      ]}
+      footer={
+        <Button
+          variant="secondary"
+          fullWidth
+          onClick={handleExportJson}
+          data-testid="export-button"
+        >
+          <Download size={16} />
+          Export JSON
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        <div className="surface-card p-3">
+          <RosterHeader roster={roster} />
         </div>
-        <p className="text-xs text-subtle">
-          Export downloads a JSON you can import on another device. Sharing still follows your
-          Settings preferences (wargear visibility, sharing method).
-        </p>
+
+        {isRosterStale ? (
+          <Alert variant="warning" title="Roster uses older data" className="gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-muted">
+                Refresh to pull the latest Wahapedia data into this roster.
+              </span>
+              <Button
+                variant="secondary"
+                onClick={() => void handleRefreshRosterData()}
+                disabled={refreshingRoster}
+                data-testid="refresh-roster-data"
+                className="inline-flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                {refreshingRoster ? 'Refreshing…' : 'Refresh with latest data'}
+              </Button>
+            </div>
+          </Alert>
+        ) : null}
+
+        <RosterIssues roster={roster} />
+
+        {/* Units, Detachment & Stratagems */}
+        <Tabs tabs={tabs.map((tab) => tab.label)} data-testid="roster-tabs">
+          {tabs.map((tab) => tab.panel)}
+        </Tabs>
       </div>
-
-      {isRosterStale ? (
-        <Alert variant="warning" title="Roster uses older data" className="gap-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-muted">
-              Refresh to pull the latest Wahapedia data into this roster.
-            </span>
-            <Button
-              variant="secondary"
-              onClick={() => void handleRefreshRosterData()}
-              disabled={refreshingRoster}
-              data-testid="refresh-roster-data"
-              className="inline-flex items-center gap-2"
-            >
-              <RefreshCw className="h-4 w-4" />
-              {refreshingRoster ? 'Refreshing…' : 'Refresh with latest data'}
-            </Button>
-          </div>
-        </Alert>
-      ) : null}
-
-      <RosterIssues roster={roster} />
-
-      {/* Units, Detachment & Stratagems */}
-      <Tabs tabs={tabs.map((tab) => tab.label)} data-testid="roster-tabs">
-        {tabs.map((tab) => tab.panel)}
-      </Tabs>
-    </div>
+    </AppLayout>
   );
 };
 
@@ -259,11 +243,9 @@ const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Roster Overview">
-      <RosterProvider rosterId={rosterId}>
-        <RosterView />
-      </RosterProvider>
-    </AppLayout>
+    <RosterProvider rosterId={rosterId}>
+      <RosterView />
+    </RosterProvider>
   );
 };
 

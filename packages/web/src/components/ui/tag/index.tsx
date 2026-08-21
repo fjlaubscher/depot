@@ -6,18 +6,19 @@ interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   size?: 'sm' | 'md';
 }
 
+/** Shared so anything tinted by the same status (pills, chips) matches the tag. */
+export const TAG_VARIANT_CLASSES: Record<NonNullable<TagProps['variant']>, string> = {
+  default: 'bg-surface-soft text-body border-border-strong',
+  primary: 'bg-surface-accent text-accent border-border-accent',
+  secondary: 'bg-info-surface text-info-fg border-info-border',
+  success: 'bg-success-surface text-success-fg border-success-border',
+  warning: 'bg-warning-surface text-warning-fg border-warning-border',
+  danger: 'bg-danger-surface text-danger-fg border-danger-border'
+};
+
 const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, children, ...props }) => {
   const baseClasses =
     'inline-flex items-center font-medium rounded-xs border transition-colors duration-200';
-
-  const variantClasses = {
-    default: 'bg-surface-soft text-body border-border-strong',
-    primary: 'bg-surface-accent text-accent border-border-accent',
-    secondary: 'bg-info-surface text-info-fg border-info-border',
-    success: 'bg-success-surface text-success-fg border-success-border',
-    warning: 'bg-warning-surface text-warning-fg border-warning-border',
-    danger: 'bg-danger-surface text-danger-fg border-danger-border'
-  };
 
   const sizeClasses = {
     sm: 'px-2 py-0.5 text-xs',
@@ -26,7 +27,7 @@ const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, childr
 
   return (
     <span
-      className={cx(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={cx(baseClasses, TAG_VARIANT_CLASSES[variant], sizeClasses[size], className)}
       {...props}
     >
       {children}

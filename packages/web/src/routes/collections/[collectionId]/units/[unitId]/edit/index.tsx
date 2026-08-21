@@ -4,7 +4,6 @@ import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
 import {
-  PageHeader,
   Card,
   Alert,
   ErrorState,
@@ -18,7 +17,6 @@ import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-
 import { COLLECTION_UNIT_STATES } from '@depot/core/utils/collection';
 import { COLLECTION_STATE_META } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const stateOptions = COLLECTION_UNIT_STATES.map((value) => ({
   value,
@@ -64,20 +62,10 @@ const CollectionUnitEditForm: React.FC<{
       unit={unit}
       testId="edit-collection-unit-form"
       backTo={`/collections/${collection.id}${unitHash}`}
-      backLabel="Back to Collection"
-      breadcrumbs={[
-        { label: 'Collections', path: '/collections' },
-        { label: collection.name, path: `/collections/${collection.id}${unitHash}` },
-        {
-          label: unit.datasheet.name,
-          path: `/collections/${collection.id}/units/${unit.id}/edit`
-        }
-      ]}
-      breadcrumbsTestId="edit-collection-unit-breadcrumbs"
-      title="Edit Collection Unit"
-      subtitle={unit.datasheet.name}
-      headerTestId="edit-collection-unit-header"
-      saveButtonTestId="save-collection-unit-button"
+      documentTitle={`${unit.datasheet.name} - Edit Collection Unit`}
+      backLabel={collection.name}
+      title={unit.datasheet.name}
+      subtitle={`Loadout · ${collection.name}`}
       beforeModelCost={
         <Card data-testid="unit-state-section">
           <div className="flex flex-col gap-3">
@@ -111,49 +99,45 @@ const CollectionUnitEditView: React.FC = () => {
   const { collection, loading, error, save } = useCollection(collectionId);
   const unit = collection?.items.find((item) => item.id === unitId);
 
-  useDocumentTitle(
-    collection ? `${collection.name} - Edit Collection Unit` : 'Edit Collection Unit'
-  );
+  const back = { to: `/collections/${collectionId}`, label: 'Collection' };
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4" data-testid="edit-collection-unit-loading">
-        <PageHeaderSkeleton />
-        <SkeletonCard />
-        <SkeletonCard />
-      </div>
+      <AppLayout title="Edit Collection Unit" back={back}>
+        <div className="flex flex-col gap-4" data-testid="edit-collection-unit-loading">
+          <PageHeaderSkeleton />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </AppLayout>
     );
   }
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title="Unable to load collection">
-        {error || 'Collection not found'}
-      </Alert>
+      <AppLayout title="Edit Collection Unit" back={back}>
+        <Alert variant="error" title="Unable to load collection">
+          {error || 'Collection not found'}
+        </Alert>
+      </AppLayout>
     );
   }
 
   if (!unit) {
     return (
-      <div className="flex flex-col gap-4" data-testid="edit-collection-unit-not-found">
-        <PageHeader title="Edit Collection Unit" />
+      <AppLayout title="Edit Collection Unit" back={back}>
         <ErrorState
           title="Unit Not Found"
           message="The unit you're trying to edit could not be found."
           showRetry={false}
           homeUrl={`/collections/${collectionId}`}
+          data-testid="edit-collection-unit-not-found"
         />
-      </div>
+      </AppLayout>
     );
   }
 
   return <CollectionUnitEditForm key={unit.id} collection={collection} unit={unit} save={save} />;
 };
 
-const CollectionUnitEditPage: React.FC = () => (
-  <AppLayout title="Edit Collection Unit">
-    <CollectionUnitEditView />
-  </AppLayout>
-);
-
-export default CollectionUnitEditPage;
+export default CollectionUnitEditView;

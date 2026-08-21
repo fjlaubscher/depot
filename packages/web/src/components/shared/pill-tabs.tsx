@@ -4,6 +4,8 @@ export interface PillTab<T extends string> {
   value: T;
   label: string;
   count: number;
+  /** Tint applied only while this tab is selected, e.g. a build-state colour. */
+  activeClassName?: string;
 }
 
 interface PillTabsProps<T extends string> {
@@ -39,7 +41,7 @@ const PillTabs = <T extends string>({
           className={cx(
             'flex items-center gap-2 rounded-sm border px-3 min-h-11 text-sm font-medium transition-colors',
             isActive
-              ? 'bg-surface-soft text-foreground border-border-strong'
+              ? (tab.activeClassName ?? 'bg-surface-soft text-foreground border-border-strong')
               : 'border-transparent text-muted hover:text-foreground'
           )}
           onClick={() => onChange(tab.value)}
@@ -49,7 +51,11 @@ const PillTabs = <T extends string>({
           <span
             className={cx(
               'inline-flex items-center justify-center font-mono text-xs font-bold',
-              isActive ? 'text-accent' : 'text-subtle'
+              isActive && tab.activeClassName
+                ? 'text-current'
+                : isActive
+                  ? 'text-accent'
+                  : 'text-subtle'
             )}
           >
             {tab.count}

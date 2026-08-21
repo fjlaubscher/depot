@@ -1,13 +1,14 @@
 import AppLayout from '@/components/layout';
-import { PageHeader } from '@/components/ui';
 
 const About = () => (
   <AppLayout title="About depot">
     <div className="flex flex-col gap-2">
-      <PageHeader
-        title="About depot"
-        subtitle="An offline-first roster companion built for hobby tinkering"
-      />
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">About depot</h1>
+        <p className="mt-0.5 text-sm text-muted">
+          An offline-first roster companion built for hobby tinkering
+        </p>
+      </div>
 
       <blockquote className="rounded-sm border-l-2 border-border-accent bg-surface-muted p-4 text-sm italic text-body">
         I'm Francois — a passionate software engineer, lifelong hobbyist, and believer in free,

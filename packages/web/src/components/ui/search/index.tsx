@@ -20,7 +20,7 @@ const Search: FC<SearchProps> = ({
 }) => (
   <Field className={className}>
     {label && (
-      <label htmlFor="search" className="block text-sm font-medium text-body">
+      <label htmlFor="search" className="sr-only">
         {label}
       </label>
     )}
@@ -32,7 +32,7 @@ const Search: FC<SearchProps> = ({
       value={value}
       onChange={(e) => onChange(e.currentTarget.value)}
       data-testid={testId}
-      className="input-base max-w-2xl focus-ring-primary"
+      className="input-base focus-ring-primary"
     />
   </Field>
 );

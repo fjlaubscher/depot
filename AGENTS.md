@@ -16,12 +16,14 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - `pnpm dev` - start web dev server only (requires data already in `packages/web/public/data`)
 - `pnpm --filter @depot/cli start` - generate fresh data (downloads + converts)
 - `pnpm refresh-data` - regenerate data and force a re-download
+- `pnpm regen-data` - regenerate data from the cached CSVs in `packages/cli/dist/source_data` (no network)
 - `pnpm build` - production build: build packages, regenerate data, copy assets
 - `pnpm format` / `pnpm lint` / `pnpm typecheck` / `pnpm test` - quality gates (run before commits)
 - `pnpm clean` - clean all package outputs
 
 ## Data + Build Flow
-1. CLI fetches CSV from Wahapedia URLs at `https://wahapedia.ru/wh40k11ed/{File}.csv`.
+1. CLI fetches CSV from Wahapedia URLs at `https://wahapedia.ru/wh40k11ed/{File}.csv`, or reuses
+   `packages/cli/dist/source_data` when every CSV is already cached there (so reruns work offline).
 2. CSV is converted to JSON using `@depot/core` types.
 3. Output lands in `packages/cli/dist/data/`.
 4. `scripts/copy-data.mjs` copies `dist/data/` into `packages/web/public/data/`.

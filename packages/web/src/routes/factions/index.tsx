@@ -6,7 +6,7 @@ import { useSettingsContext } from '@/contexts/settings/context';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader, ErrorState, Filters, Search } from '@/components/ui';
+import { ErrorState, Filters, Search } from '@/components/ui';
 
 // Page components
 import Skeleton from './_components/skeleton';
@@ -66,10 +66,12 @@ const Factions: React.FC = () => {
   return (
     <AppLayout title="Browse Factions">
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="Factions"
-          subtitle={`Browse ${totalFactions} factions across ${totalAlliances} alliances`}
-        />
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Factions</h1>
+          <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
+            {totalFactions} factions · {totalAlliances} alliances
+          </p>
+        </div>
 
         <Filters
           showClear={!!query}
@@ -77,16 +79,17 @@ const Factions: React.FC = () => {
           clearTestId="faction-search-clear"
         >
           <Search
-            label="Search by name"
+            label="Search factions"
+            placeholder={`Search ${totalFactions} factions…`}
             value={query}
             onChange={setQuery}
             testId="faction-search"
-            className="w-full sm:max-w-3xl"
+            className="w-full"
           />
         </Filters>
 
         {hasResults ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {Object.keys(groupedFactions).map((allianceKey) => (
               <AllianceSection
                 key={`alliance-${allianceKey}`}

@@ -1,7 +1,12 @@
 import type { FC, ReactNode } from 'react';
 
+import { SectionHeader } from '@/components/ui';
+import { cx } from '@/utils/cx';
+
 interface RosterSectionProps {
   title: string;
+  /** Right-hand meta on the rule — e.g. `3 · 195 PTS`. */
+  count?: ReactNode;
   children: ReactNode;
   className?: string;
   'data-testid'?: string;
@@ -10,24 +15,17 @@ interface RosterSectionProps {
 
 const RosterSection: FC<RosterSectionProps> = ({
   title,
+  count,
   children,
-  className = '',
+  className,
   'data-testid': dataTestId,
   belowContent
-}) => {
-  return (
-    <div className={`flex flex-col gap-3 ${className}`} data-testid={dataTestId}>
-      <div className="flex items-center gap-2">
-        <h3 className="type-section shrink-0">
-          <span aria-hidden="true">// </span>
-          {title}
-        </h3>
-        <div className="h-px flex-1 bg-border-subtle" />
-      </div>
-      {belowContent ? <div className="flex flex-col gap-2">{belowContent}</div> : null}
-      <div className="flex flex-col gap-3">{children}</div>
-    </div>
-  );
-};
+}) => (
+  <div className={cx('flex flex-col gap-1.5', className)} data-testid={dataTestId}>
+    <SectionHeader title={title} count={count} />
+    {belowContent ? <div className="flex flex-col gap-2">{belowContent}</div> : null}
+    <div className="flex flex-col gap-1">{children}</div>
+  </div>
+);
 
 export default RosterSection;

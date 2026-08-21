@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { byUpdatedAtDesc, takeRecent } from './recent';
+import { byUpdatedAtDesc, relativeTime, takeRecent } from './recent';
 
 describe('recent sorting', () => {
   it('sorts by updatedAt descending and sinks missing timestamps', () => {
@@ -23,5 +23,21 @@ describe('recent sorting', () => {
     ];
 
     expect(takeRecent(items, 2).map((item) => item.id)).toEqual(['2', '3']);
+  });
+});
+
+describe('relativeTime', () => {
+  const now = Date.parse('2026-08-21T12:00:00.000Z');
+
+  it('formats the largest whole unit', () => {
+    expect(relativeTime('2026-08-21T11:59:30.000Z', now)).toBe('JUST NOW');
+    expect(relativeTime('2026-08-21T11:30:00.000Z', now)).toBe('30M AGO');
+    expect(relativeTime('2026-08-21T10:00:00.000Z', now)).toBe('2H AGO');
+    expect(relativeTime('2026-08-18T12:00:00.000Z', now)).toBe('3D AGO');
+  });
+
+  it('handles missing and future timestamps', () => {
+    expect(relativeTime(null, now)).toBe('NEVER');
+    expect(relativeTime('2026-09-01T00:00:00.000Z', now)).toBe('JUST NOW');
   });
 });

@@ -5,12 +5,31 @@ export interface StratagemTurnStyle {
   variant: CardBadgeVariant;
   /** Left rule on the card, so a long stratagem list scans by turn. */
   rule: string;
+  /** CP gutter colour. */
+  cp: string;
 }
 
-const YOUR_TURN: StratagemTurnStyle = { variant: 'success', rule: 'border-l-success-fg' };
-const OPPONENT_TURN: StratagemTurnStyle = { variant: 'danger', rule: 'border-l-danger-fg' };
-const EITHER_TURN: StratagemTurnStyle = { variant: 'info', rule: 'border-l-info-fg' };
-const UNKNOWN_TURN: StratagemTurnStyle = { variant: 'muted', rule: 'border-l-border-strong' };
+/* Red stays reserved for legality/over-points, so the opponent's turn reads blue. */
+const YOUR_TURN: StratagemTurnStyle = {
+  variant: 'accent',
+  rule: 'border-l-border-accent',
+  cp: 'text-accent'
+};
+const OPPONENT_TURN: StratagemTurnStyle = {
+  variant: 'info',
+  rule: 'border-l-info-fg',
+  cp: 'text-info-fg'
+};
+const EITHER_TURN: StratagemTurnStyle = {
+  variant: 'success',
+  rule: 'border-l-success-fg',
+  cp: 'text-success-fg'
+};
+const UNKNOWN_TURN: StratagemTurnStyle = {
+  variant: 'muted',
+  rule: 'border-l-border-strong',
+  cp: 'text-muted'
+};
 
 /**
  * Wahapedia turn values arrive as "Your turn", "Opponent's turn" or

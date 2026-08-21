@@ -44,33 +44,17 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
         </span>
         <span className="type-label">pts</span>
 
-        {isOver ? (
-          <span className="type-label text-danger-fg" data-testid="points-over">
-            +{current - max} over
-          </span>
-        ) : null}
-
-        <div className="ml-auto flex items-center gap-4">
-          {detachments.length > 0 ? (
-            <div className="flex items-baseline gap-1" data-testid="detachment-dp">
-              <span className="type-label">DP</span>
-              <span
-                className={cx(
-                  'font-mono text-sm font-bold',
-                  dpOver ? 'text-danger-fg' : 'text-foreground'
-                )}
-              >
-                {dpCap !== null ? `${dpSpent}/${dpCap}` : dpSpent}
-              </span>
-            </div>
-          ) : null}
-          <div className="flex items-baseline gap-1">
-            <span className="type-label">ENH</span>
-            <span className="font-mono text-sm font-bold text-foreground">
-              {roster.enhancements?.length ?? 0}
+        {hasCap ? (
+          isOver ? (
+            <span className="ml-auto type-label font-bold text-danger-fg" data-testid="points-over">
+              {current - max} PTS OVER
             </span>
-          </div>
-        </div>
+          ) : (
+            <span className="ml-auto type-label text-success-fg" data-testid="points-remaining">
+              {max - current} PTS LEFT
+            </span>
+          )
+        ) : null}
       </div>
 
       {hasCap ? (
@@ -96,6 +80,28 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
           />
         </div>
       ) : null}
+
+      <div className="flex items-baseline gap-4">
+        {detachments.length > 0 ? (
+          <div className="flex items-baseline gap-1" data-testid="detachment-dp">
+            <span className="type-label">DP</span>
+            <span
+              className={cx(
+                'font-mono text-sm font-bold',
+                dpOver ? 'text-danger-fg' : 'text-foreground'
+              )}
+            >
+              {dpCap !== null ? `${dpSpent}/${dpCap}` : dpSpent}
+            </span>
+          </div>
+        ) : null}
+        <div className="flex items-baseline gap-1">
+          <span className="type-label">ENH</span>
+          <span className="font-mono text-sm font-bold text-foreground">
+            {roster.enhancements?.length ?? 0}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

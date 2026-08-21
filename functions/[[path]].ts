@@ -116,7 +116,8 @@ const matchRoute = (pathname: string): RouteMatch | null => {
     };
   }
 
-  const factionMatch = pathname.match(/^\/faction\/([^/]+)\/?$/i);
+  // `/detachments` is a tab on the faction page, so it shares the faction card.
+  const factionMatch = pathname.match(/^\/faction\/([^/]+)(?:\/detachments)?\/?$/i);
   if (factionMatch) {
     return {
       type: 'faction',

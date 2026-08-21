@@ -1,13 +1,14 @@
 import type { depot } from '@depot/core';
-import { Users, ClipboardList, Database, Palette } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Button, Loader, PageHeader, SelectField } from '@/components/ui';
+import { Button, Loader, SectionHeader } from '@/components/ui';
 
 // Components
-import SettingsCard from './_components/settings-card';
+import DataVersion from '@/components/shared/data-version';
 import SettingToggleItem from './_components/setting-toggle-item';
+import StorageUsage from './_components/storage-usage';
+import ThemePicker from './_components/theme-picker';
 
 // Hooks and Context
 import { useSettingsContext } from '@/contexts/settings/context';
@@ -52,142 +53,104 @@ const Settings = () => {
   return (
     <AppLayout title="Settings & Preferences">
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="Settings"
-          subtitle="Configure your app preferences and manage offline data"
-        />
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Appearance Card */}
-          <SettingsCard
-            icon={<Palette size={20} />}
-            title="Appearance"
-            description="Choose a theme, or follow your device setting"
-          >
-            <SelectField
-              label="Theme"
-              name="theme"
-              data-testid="theme"
-              value={settings.theme ?? 'system'}
-              onChange={(event) => handleSettingsChange('theme', event.target.value as depot.Theme)}
-              options={[
-                { label: 'System', value: 'system' },
-                { label: 'Light', value: 'light' },
-                { label: 'Dark', value: 'dark' }
-              ]}
-            />
-          </SettingsCard>
+        <section className="flex flex-col gap-2">
+          <SectionHeader title="Appearance" />
+          <ThemePicker
+            value={settings.theme ?? 'system'}
+            onChange={(theme) => handleSettingsChange('theme', theme)}
+          />
+        </section>
 
-          {/* Faction Preferences Card */}
-          <SettingsCard
-            icon={<Users size={20} />}
-            title="Faction Preferences"
-            description="Customize how factions and datasheets are displayed"
-          >
-            <div className="flex flex-col gap-4">
-              <SettingToggleItem
-                title="Forge World Units"
-                description="Show Forge World datasheets and rules"
-                enabled={settings.showForgeWorld || false}
-                onChange={(value) => handleSettingsChange('showForgeWorld', value)}
-              />
-              <SettingToggleItem
-                title="Legends Units"
-                description="Show legacy Legends datasheets"
-                enabled={settings.showLegends || false}
-                onChange={(value) => handleSettingsChange('showLegends', value)}
-              />
-              <SettingToggleItem
-                title="Unaligned Factions"
-                description="Show factions without specific allegiances"
-                enabled={settings.showUnaligned ?? false}
-                onChange={(value) => handleSettingsChange('showUnaligned', value)}
-              />
-            </div>
-            <SettingToggleItem
-              title="Show Fluff Text"
-              description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
-              enabled={settings.showFluff ?? true}
-              onChange={(value) => handleSettingsChange('showFluff', value)}
-            />
-          </SettingsCard>
+        <section className="flex flex-col gap-2">
+          <SectionHeader title="Factions" />
+          <SettingToggleItem
+            title="Forge World Units"
+            description="Show Forge World datasheets and rules"
+            enabled={settings.showForgeWorld || false}
+            onChange={(value) => handleSettingsChange('showForgeWorld', value)}
+          />
+          <SettingToggleItem
+            title="Legends Units"
+            description="Show legacy Legends datasheets"
+            enabled={settings.showLegends || false}
+            onChange={(value) => handleSettingsChange('showLegends', value)}
+          />
+          <SettingToggleItem
+            title="Unaligned Factions"
+            description="Show factions without specific allegiances"
+            enabled={settings.showUnaligned ?? false}
+            onChange={(value) => handleSettingsChange('showUnaligned', value)}
+          />
+          <SettingToggleItem
+            title="Show Fluff Text"
+            description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
+            enabled={settings.showFluff ?? true}
+            onChange={(value) => handleSettingsChange('showFluff', value)}
+          />
+        </section>
 
-          {/* Roster Preferences Card */}
-          <SettingsCard
-            icon={<ClipboardList size={20} />}
-            title="Roster Preferences"
-            description="Control how rosters are exported or shared"
-          >
-            <div className="flex flex-col gap-4">
-              <SettingToggleItem
-                title="Include Wargear"
-                description="Add selected wargear when sharing rosters"
-                enabled={settings.includeWargearOnExport ?? true}
-                onChange={(value) => handleSettingsChange('includeWargearOnExport', value)}
-              />
-              <SettingToggleItem
-                title="Use Native Sharing"
-                description="Attempt to use the device share sheet when available; otherwise copy to clipboard"
-                enabled={settings.useNativeShare ?? true}
-                onChange={(value) => handleSettingsChange('useNativeShare', value)}
-              />
-            </div>
-          </SettingsCard>
+        <section className="flex flex-col gap-2">
+          <SectionHeader title="Sharing" />
+          <SettingToggleItem
+            title="Include Wargear"
+            description="Add selected wargear when sharing rosters"
+            enabled={settings.includeWargearOnExport ?? true}
+            onChange={(value) => handleSettingsChange('includeWargearOnExport', value)}
+          />
+          <SettingToggleItem
+            title="Use Native Sharing"
+            description="Attempt to use the device share sheet when available; otherwise copy to clipboard"
+            enabled={settings.useNativeShare ?? true}
+            onChange={(value) => handleSettingsChange('useNativeShare', value)}
+          />
+        </section>
 
-          {/* Offline Data Card */}
-          <SettingsCard
-            icon={<Database size={20} />}
-            title="Offline Data"
-            description="Faction packs and datasheets cached for offline use (rosters and collections are separate)"
-          >
+        <section className="flex flex-col gap-2">
+          <SectionHeader title="Offline data" />
+
+          <div className="surface-card flex flex-col gap-3 p-3">
+            <DataVersion />
+            <StorageUsage />
+
             {loading ? (
-              <div className="flex justify-center py-8">
+              <div className="flex justify-center py-6">
                 <Loader size="md" />
               </div>
+            ) : offlineFactions && offlineFactions.length > 0 ? (
+              <>
+                <div className="flex flex-col gap-1">
+                  {offlineFactions.map((f) => (
+                    <div
+                      key={`faction-${f.id}`}
+                      className="flex items-center gap-2 text-sm text-body"
+                    >
+                      <span className="size-1.5 shrink-0 rounded-full bg-accent-600 dark:bg-accent-500" />
+                      <span className="truncate">{f.name}</span>
+                      <span className="ml-auto shrink-0 font-mono text-[10px] font-medium uppercase text-subtle">
+                        {f.cachedDatasheets === 0
+                          ? 'faction only'
+                          : `${f.cachedDatasheets} datasheet${f.cachedDatasheets === 1 ? '' : 's'}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <Button variant="error" onClick={handleReset} size="sm" fullWidth>
+                  Clear offline cache
+                </Button>
+                <p className="text-xs text-subtle">
+                  Removes cached faction packs and datasheets. Rosters, collections, and bookmarks
+                  stay. Faction data is re-cached as you browse.
+                </p>
+              </>
             ) : (
-              <div className="flex flex-col gap-4">
-                {offlineFactions && offlineFactions.length > 0 ? (
-                  <>
-                    <div className="flex flex-col gap-1">
-                      {offlineFactions.map((f) => (
-                        <div
-                          key={`faction-${f.id}`}
-                          className="flex items-center gap-2 text-sm text-body bg-surface-soft rounded-sm"
-                        >
-                          <div className="w-2 h-2 bg-accent-500 rounded-full flex-shrink-0" />
-                          <span className="truncate">{f.name}</span>
-                          <span className="text-xs text-subtle ml-auto flex-shrink-0">
-                            {f.cachedDatasheets === 0
-                              ? 'Faction data only · no datasheets'
-                              : f.cachedDatasheets === 1
-                                ? '1 datasheet'
-                                : `${f.cachedDatasheets} datasheets`}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <Button variant="error" onClick={handleReset} size="sm" fullWidth>
-                        Clear offline cache
-                      </Button>
-                      <p className="text-xs text-subtle text-center">
-                        Removes cached faction packs and datasheets. Rosters, collections, and
-                        bookmarks stay.
-                      </p>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center py-6">
-                    <div className="text-sm text-subtle">No offline data cached</div>
-                    <div className="text-xs text-hint">
-                      Visit faction pages to cache data offline
-                    </div>
-                  </div>
-                )}
-              </div>
+              <p className="text-sm text-subtle">
+                Nothing cached yet — visit a faction page and it is stored for offline use.
+              </p>
             )}
-          </SettingsCard>
-        </div>
+          </div>
+        </section>
       </div>
     </AppLayout>
   );

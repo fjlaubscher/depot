@@ -4,14 +4,13 @@ import { Save } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useToast } from '@/contexts/toast/context';
 import useFaction from '@/hooks/use-faction';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button, Card, Field, Alert } from '@/components/ui';
+import { Loader, Button, Card, Field, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
-import { BackButton, RosterHeader } from '@/components/shared';
+import { RosterHeader } from '@/components/shared';
 import { getRosterDetachments, getRosterSubtitle } from '@depot/core/utils/roster';
 import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 import DetachmentPicker from '@/routes/rosters/_components/detachment-picker';
@@ -43,10 +42,13 @@ const RosterDetailsContent: FC = () => {
   const isLoading = !roster.id || (!faction && factionLoading);
 
   const pageTitle = roster.name ? `${roster.name} - Roster Details` : 'Roster Details';
-  useDocumentTitle(pageTitle);
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <AppLayout title={pageTitle} back={{ to: '/rosters', label: 'Rosters' }}>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   const detachments = factionDetachments.filter((item) => selectedDetachments.includes(item.slug));
@@ -73,97 +75,92 @@ const RosterDetailsContent: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <BackButton to="/rosters" label="Rosters" ariaLabel="Back to Rosters" className="md:hidden" />
-
-      <div className="hidden md:block">
-        <Breadcrumbs
-          items={[
-            { label: 'Rosters', path: '/rosters' },
-            { label: roster.name, path: `/rosters/${roster.id}` }
-          ]}
-        />
-      </div>
-
-      <PageHeader
-        title={roster.name}
-        subtitle={getRosterSubtitle(roster)}
-        stats={<RosterHeader roster={roster} />}
-        action={{
+    <AppLayout
+      title={pageTitle}
+      back={{ to: `/rosters/${roster.id}/edit`, label: roster.name }}
+      heading={{ title: 'Roster details', subtitle: getRosterSubtitle(roster) }}
+      actions={[
+        {
           icon: <Save size={16} />,
           onClick: () => formRef.current?.requestSubmit(),
           ariaLabel: 'Save roster details',
           disabled: saveDisabled
-        }}
-      />
+        }
+      ]}
+    >
+      <div className="flex flex-col gap-3">
+        <div className="surface-card p-3">
+          <RosterHeader roster={roster} />
+        </div>
 
-      <Card>
-        <form
-          ref={formRef}
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit}
-          data-testid="roster-details-form"
+        <Card>
+          <form
+            ref={formRef}
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit}
+            data-testid="roster-details-form"
+          >
+            <Field data-testid="roster-name-field">
+              <label htmlFor="roster-name" className="block text-sm font-medium text-body">
+                Roster Name
+              </label>
+              <input
+                id="roster-name"
+                type="text"
+                className="input-base"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Name your roster"
+              />
+            </Field>
+
+            {factionLoading ? (
+              <FieldSkeleton />
+            ) : factionError ? (
+              <Alert
+                variant="error"
+                title="Failed to load detachments"
+                data-testid="detachment-error"
+              >
+                {factionError}
+              </Alert>
+            ) : factionDetachments.length > 0 ? (
+              <DetachmentPicker
+                data-testid="detachment-select"
+                detachments={factionDetachments}
+                selectedSlugs={selectedDetachments}
+                maxPoints={maxPoints}
+                onChange={setSelectedDetachments}
+              />
+            ) : (
+              <Alert
+                variant="warning"
+                title="No detachments available"
+                data-testid="detachment-empty"
+              >
+                No detachments available for this faction.
+              </Alert>
+            )}
+
+            <MaxPointsField
+              value={maxPoints}
+              onChange={setMaxPoints}
+              data-testid="max-points-field"
+            />
+          </form>
+        </Card>
+
+        <Button
+          type="button"
+          variant="secondary"
+          fullWidth
+          onClick={() => navigate(`/rosters/${roster.id}`)}
+          data-testid="cancel-roster-details"
         >
-          <Field data-testid="roster-name-field">
-            <label htmlFor="roster-name" className="block text-sm font-medium text-body">
-              Roster Name
-            </label>
-            <input
-              id="roster-name"
-              type="text"
-              className="input-base"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Name your roster"
-            />
-          </Field>
-
-          {factionLoading ? (
-            <FieldSkeleton />
-          ) : factionError ? (
-            <Alert
-              variant="error"
-              title="Failed to load detachments"
-              data-testid="detachment-error"
-            >
-              {factionError}
-            </Alert>
-          ) : factionDetachments.length > 0 ? (
-            <DetachmentPicker
-              data-testid="detachment-select"
-              detachments={factionDetachments}
-              selectedSlugs={selectedDetachments}
-              maxPoints={maxPoints}
-              onChange={setSelectedDetachments}
-            />
-          ) : (
-            <Alert
-              variant="warning"
-              title="No detachments available"
-              data-testid="detachment-empty"
-            >
-              No detachments available for this faction.
-            </Alert>
-          )}
-
-          <MaxPointsField
-            value={maxPoints}
-            onChange={setMaxPoints}
-            data-testid="max-points-field"
-          />
-        </form>
-      </Card>
-
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={() => navigate(`/rosters/${roster.id}`)}
-        className="flex items-center justify-center gap-2"
-        data-testid="cancel-roster-details"
-      >
-        Cancel
-      </Button>
-    </div>
+          Cancel
+        </Button>
+      </div>
+    </AppLayout>
   );
 };
 
@@ -171,11 +168,9 @@ const RosterDetailsPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Roster Details">
-      <RosterProvider rosterId={rosterId}>
-        <RosterDetailsContent />
-      </RosterProvider>
-    </AppLayout>
+    <RosterProvider rosterId={rosterId}>
+      <RosterDetailsContent />
+    </RosterProvider>
   );
 };
 

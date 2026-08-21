@@ -12,7 +12,6 @@ import { sortByName } from '@depot/core/utils/common';
 import { Sheet, Field, SelectField, Button, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
 import MaxPointsField from './max-points-field';
-import DetachmentPicker from './detachment-picker';
 
 export interface RosterPrefill {
   name: string;
@@ -160,15 +159,20 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       {factionLoading ? (
         <FieldSkeleton />
       ) : factionSlug && factionDetachments.length > 0 ? (
-        <DetachmentPicker
+        <SelectField
           data-testid="detachment-field"
-          detachments={factionDetachments}
-          selectedSlugs={detachmentSlugs}
-          maxPoints={maxPoints}
-          onChange={(slugs) => {
-            setDetachmentSlugs(slugs);
+          label="Detachment"
+          options={sortByName(factionDetachments).map((detachment) => ({
+            value: detachment.slug,
+            label: detachment.name
+          }))}
+          value={detachmentSlugs[0] ?? ''}
+          onChange={(e) => {
+            setDetachmentSlugs(e.target.value ? [e.target.value] : []);
             setErrors((prev) => ({ ...prev, detachment: undefined }));
           }}
+          placeholder="Select a Detachment"
+          required
           error={errors.detachment}
         />
       ) : factionSlug ? (

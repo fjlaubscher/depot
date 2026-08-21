@@ -14,7 +14,12 @@ import {
   shouldResetSupplementSelection,
   sortDatasheetsBySupplementPreference
 } from '@depot/core/utils/datasheets';
-import { Filters, Grid, Search } from '@/components/ui';
+import {
+  BATTLEFIELD_ROLES,
+  BATTLEFIELD_ROLE_LABELS,
+  getListItemRole
+} from '@depot/core/utils/datasheets';
+import { Filters, Search, SectionHeader } from '@/components/ui';
 import useDebounce from '@/hooks/use-debounce';
 import DatasheetSupplementTabs from './datasheet-supplement-tabs';
 import DatasheetListItemCard from './datasheet-list-item-card';
@@ -158,14 +163,33 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       />
     ));
 
+  // Only the default row list groups by role; custom renderers (the add-units
+  // picker) are flat by design.
+  const roleSections = useMemo(() => {
+    if (renderDatasheet) return null;
+    // Manifests generated before `role` existed report everything as "other";
+    // stay flat rather than showing one meaningless section.
+    if (!visibleDatasheets.some((sheet) => getListItemRole(sheet) !== 'other')) return null;
+
+    const byRole = new Map<string, T[]>();
+    for (const sheet of visibleDatasheets) {
+      const role = getListItemRole(sheet);
+      byRole.set(role, [...(byRole.get(role) ?? []), sheet]);
+    }
+    return BATTLEFIELD_ROLES.filter((role) => byRole.has(role)).map((role) => ({
+      role,
+      sheets: byRole.get(role)!
+    }));
+  }, [renderDatasheet, visibleDatasheets]);
+
   const showClear = Boolean(query.trim()) || supplement.isFiltered;
   const emptyMessage = debouncedQuery
     ? 'No datasheets found matching your filters.'
     : emptyStateMessage;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {supplement.tabs.length > 0 ? (
           <DatasheetSupplementTabs
             tabs={supplement.tabs}
@@ -185,7 +209,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
             onChange={setQuery}
             placeholder={searchPlaceholder}
             testId="datasheet-search"
-            className="w-full sm:max-w-3xl"
+            className="w-full"
           />
         </Filters>
         {supplement.summary ? (
@@ -202,13 +226,26 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       </div>
 
       {visibleDatasheets.length > 0 ? (
-        <Grid cols={3} className="min-h-[200px]" aria-live="polite" id="datasheet-results">
-          {visibleDatasheets.map((datasheet) => (
-            <div key={datasheet.slug} id={datasheet.id}>
-              {renderItem(datasheet)}
-            </div>
-          ))}
-        </Grid>
+        <div className="flex flex-col gap-2" aria-live="polite" id="datasheet-results">
+          {roleSections
+            ? roleSections.map(({ role, sheets }) => (
+                <section key={role} className="flex flex-col gap-0.5">
+                  <SectionHeader title={BATTLEFIELD_ROLE_LABELS[role]} count={sheets.length} />
+                  <div className="divide-y divide-border-subtle">
+                    {sheets.map((datasheet) => (
+                      <div key={datasheet.slug} id={datasheet.id}>
+                        {renderItem(datasheet)}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))
+            : visibleDatasheets.map((datasheet) => (
+                <div key={datasheet.slug} id={datasheet.id}>
+                  {renderItem(datasheet)}
+                </div>
+              ))}
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center text-subtle">
           <p>{emptyMessage}</p>

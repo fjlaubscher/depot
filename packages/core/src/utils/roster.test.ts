@@ -184,7 +184,7 @@ describe('roster utils', () => {
     const text = generateRosterShareText(roster, 'Space Marines', { includeWargear: true });
 
     expect(text).toContain('*Faction:* Space Marines');
-    expect(text).toContain('*Detachment:* Gladius Task Force · 2 DP · Take and Hold');
+    expect(text).toContain('*Detachment:* Gladius Task Force');
     expect(text).toContain('- [Warlord] Captain - Captain (80 pts)');
     expect(text).not.toContain('*Leader*');
     expect(text).toContain('Power sword');

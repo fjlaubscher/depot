@@ -29,6 +29,7 @@ const AppRoutes = () => (
     <Route path="/about" element={<About />} />
     <Route path="/factions" element={<Factions />} />
     <Route path="/faction/:factionSlug" element={<Faction />} />
+    <Route path="/faction/:factionSlug/detachments" element={<Faction tab="detachments" />} />
     <Route path="/faction/:factionSlug/datasheet/:datasheetSlug" element={<Datasheet />} />
     <Route path="/faction/:factionSlug/detachment/:detachmentSlug" element={<Detachment />} />
     <Route path="/settings" element={<Settings />} />

@@ -3,8 +3,7 @@ import { useParams } from 'react-router-dom';
 
 // components
 import AppLayout from '@/components/layout';
-import { PageHeader, ErrorState, Breadcrumbs } from '@/components/ui';
-import { BackButton } from '@/components/shared';
+import { ErrorState } from '@/components/ui';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -82,46 +81,36 @@ const DatasheetPage: FC = () => {
 
   const pageTitle = `${datasheet.name} - ${faction.name}`;
   const backPath = `/faction/${faction.slug}#${datasheet.id}`;
+  // Codex sheets carry a literal "None" supplement label — nothing to show.
+  const supplement = datasheet.supplementLabel ?? datasheet.sourceName;
+  const eyebrowSuffix =
+    supplement && !/^(none|codex)$/i.test(supplement.trim()) ? supplement : undefined;
 
   return (
-    <AppLayout title={pageTitle}>
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to={backPath}
-          label={faction.name}
-          ariaLabel={`Back to ${faction.name}`}
-          className="md:hidden"
-        />
-
-        {/* Desktop Breadcrumbs */}
-        <div className="hidden md:block">
-          <Breadcrumbs
-            items={[
-              { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: backPath },
-              {
-                label: datasheet.name,
-                path: `/faction/${faction.slug}/datasheet/${datasheet.slug}`
-              }
-            ]}
-          />
+    <AppLayout
+      title={pageTitle}
+      back={{ to: backPath, label: faction.name }}
+      heading={{ title: datasheet.name, subtitle: 'Datasheet' }}
+      actions={[
+        bookmarkAction,
+        {
+          icon: shareAction.icon,
+          onClick: () => shareAction.onClick(),
+          ariaLabel: shareAction.ariaLabel ?? 'Share datasheet',
+          'data-testid': shareAction['data-testid']
+        }
+      ]}
+    >
+      <div className="flex flex-col gap-3">
+        <div data-testid="datasheet-header">
+          <p className="type-section">
+            {faction.name}
+            {eyebrowSuffix ? ` // ${eyebrowSuffix}` : ''}
+          </p>
+          <h1 className="mt-1.5 text-2xl leading-tight font-bold text-foreground">
+            {datasheet.name}
+          </h1>
         </div>
-
-        {/* Header */}
-        <PageHeader
-          title={datasheet.name}
-          subtitle={datasheet.sourceName}
-          actions={[
-            bookmarkAction,
-            {
-              icon: shareAction.icon,
-              onClick: () => shareAction.onClick(),
-              ariaLabel: shareAction.ariaLabel ?? 'Share datasheet',
-              'data-testid': shareAction['data-testid']
-            }
-          ]}
-          data-testid="datasheet-header"
-        />
 
         {settings?.showFluff && datasheet.legend?.trim() ? (
           <p className="text-sm text-muted font-medium italic">{datasheet.legend}</p>

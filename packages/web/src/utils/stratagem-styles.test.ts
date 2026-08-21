@@ -3,10 +3,10 @@ import { getStratagemTurnStyle } from './stratagem-styles';
 
 describe('getStratagemTurnStyle', () => {
   it.each([
-    ['Your turn', 'success'],
-    ['Opponent’s turn', 'danger'],
-    ['Either player’s turn', 'info'],
-    ["Opponent's turn", 'danger'],
+    ['Your turn', 'accent'],
+    ['Opponent’s turn', 'info'],
+    ['Either player’s turn', 'success'],
+    ["Opponent's turn", 'info'],
     [undefined, 'muted'],
     ['', 'muted']
   ])('maps %s to the %s variant', (turn, variant) => {
@@ -14,6 +14,6 @@ describe('getStratagemTurnStyle', () => {
   });
 
   it('prefers "either" over "your" when both words appear', () => {
-    expect(getStratagemTurnStyle('Either player’s turn').variant).toBe('info');
+    expect(getStratagemTurnStyle('Either player’s turn').variant).toBe('success');
   });
 });

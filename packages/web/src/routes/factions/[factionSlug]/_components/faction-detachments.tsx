@@ -29,7 +29,12 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
     () => [...new Set(detachments.map(dispositionOf).filter(Boolean))].sort(),
     [detachments]
   );
-  const { description: disposition, value, onChange, options } = useSelect(dispositions);
+  const {
+    description: disposition,
+    value,
+    onChange,
+    options
+  } = useSelect(dispositions, 'All force dispositions');
 
   const filtered = useMemo(() => {
     const needle = debouncedQuery.trim().toLowerCase();
@@ -60,8 +65,8 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
         }}
       >
         <Search
-          label="Search by name"
-          placeholder="Search detachments by name..."
+          label="Search detachments"
+          placeholder={`Search ${detachments.length} detachments…`}
           value={query}
           onChange={setQuery}
           testId="detachment-search"
@@ -69,7 +74,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
         <SelectField
           name="disposition"
           value={value}
-          label="Filter by force disposition"
+          aria-label="Filter by force disposition"
           onChange={(e) => onChange(Number(e.target.value))}
           options={options}
         />

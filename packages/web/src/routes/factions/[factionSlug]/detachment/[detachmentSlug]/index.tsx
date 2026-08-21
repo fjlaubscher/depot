@@ -3,20 +3,8 @@ import { useParams } from 'react-router-dom';
 
 // components
 import AppLayout from '@/components/layout';
-import {
-  PageHeader,
-  ErrorState,
-  Breadcrumbs,
-  Grid,
-  PageHeaderSkeleton,
-  SkeletonCard
-} from '@/components/ui';
-import {
-  BackButton,
-  DetachmentAbilityCard,
-  EnhancementCard,
-  StratagemCard
-} from '@/components/shared';
+import { ErrorState, Grid, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
+import { DetachmentAbilityCard, EnhancementCard, StratagemCard } from '@/components/shared';
 import { DetachmentMeta } from '../../_components/faction-detachments';
 
 // hooks
@@ -28,21 +16,16 @@ import { useBookmarkAction } from '@/hooks/use-bookmark-action';
 // utils
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { createDetachmentBookmark } from '@/utils/bookmarks';
-import { formatDetachmentOptionLabel, matchDetachment } from '@depot/core/utils/detachments';
+import { matchDetachment } from '@depot/core/utils/detachments';
 
-const Section: FC<{ title: string; testId: string; children: React.ReactNode }> = ({
-  title,
-  testId,
-  children
-}) => (
+const Section: FC<{
+  title: string;
+  testId: string;
+  count?: number;
+  children: React.ReactNode;
+}> = ({ title, testId, count, children }) => (
   <section className="flex flex-col gap-2" data-testid={testId}>
-    <div className="flex items-center gap-2">
-      <h2 className="type-section shrink-0">
-        <span aria-hidden="true">// </span>
-        {title}
-      </h2>
-      <div className="h-px flex-1 bg-border-subtle" />
-    </div>
+    <SectionHeader title={title} count={count} />
     {children}
   </section>
 );
@@ -110,54 +93,32 @@ const DetachmentPage: FC = () => {
           title="Detachment not found"
           message="The detachment you're looking for doesn't exist or may have been removed."
           showRetry={false}
-          homeUrl={factionSlug ? `/faction/${factionSlug}?tab=detachments` : '/'}
+          homeUrl={factionSlug ? `/faction/${factionSlug}/detachments` : '/'}
           data-testid="detachment-not-found"
         />
       </AppLayout>
     );
   }
 
-  const backPath = `/faction/${faction.slug}?tab=detachments`;
+  const backPath = `/faction/${faction.slug}/detachments`;
   const { abilities, enhancements, stratagems } = detachment;
 
   return (
-    <AppLayout title={`${detachment.name} - ${faction.name}`}>
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to={backPath}
-          label={faction.name}
-          ariaLabel={`Back to ${faction.name}`}
-          className="md:hidden"
-        />
-
-        <div className="hidden md:block">
-          <Breadcrumbs
-            items={[
-              { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: backPath },
-              {
-                label: detachment.name,
-                path: `/faction/${faction.slug}/detachment/${detachment.slug}`
-              }
-            ]}
-          />
-        </div>
-
-        <PageHeader
-          title={detachment.name}
-          subtitle={formatDetachmentOptionLabel(detachment)}
-          actions={[
-            bookmarkAction,
-            {
-              icon: shareAction.icon,
-              onClick: () => shareAction.onClick(),
-              ariaLabel: shareAction.ariaLabel ?? 'Share detachment',
-              'data-testid': shareAction['data-testid']
-            }
-          ]}
-          data-testid="detachment-header"
-        />
-
+    <AppLayout
+      title={`${detachment.name} - ${faction.name}`}
+      back={{ to: backPath, label: faction.name }}
+      heading={{ title: detachment.name, subtitle: `${faction.name} · Detachment` }}
+      actions={[
+        bookmarkAction,
+        {
+          icon: shareAction.icon,
+          onClick: () => shareAction.onClick(),
+          ariaLabel: shareAction.ariaLabel ?? 'Share detachment',
+          'data-testid': shareAction['data-testid']
+        }
+      ]}
+    >
+      <div className="flex flex-col gap-3">
         <DetachmentMeta detachment={detachment} />
 
         {settings?.showFluff && detachment.legend ? (
@@ -169,7 +130,11 @@ const DetachmentPage: FC = () => {
         ) : null}
 
         {abilities.length > 0 ? (
-          <Section title="Detachment Abilities" testId="detachment-abilities">
+          <Section
+            count={abilities.length}
+            title="Detachment Abilities"
+            testId="detachment-abilities"
+          >
             <Grid cols={2}>
               {abilities.map((ability) => (
                 <DetachmentAbilityCard key={ability.id} ability={ability} />
@@ -179,7 +144,11 @@ const DetachmentPage: FC = () => {
         ) : null}
 
         {enhancements.length > 0 ? (
-          <Section title="Enhancements" testId="detachment-enhancements">
+          <Section
+            count={enhancements.length}
+            title="Enhancements"
+            testId="detachment-enhancements"
+          >
             <Grid cols={2}>
               {enhancements.map((enhancement) => (
                 <EnhancementCard key={enhancement.id} enhancement={enhancement} />
@@ -189,7 +158,7 @@ const DetachmentPage: FC = () => {
         ) : null}
 
         {stratagems.length > 0 ? (
-          <Section title="Stratagems" testId="detachment-stratagems">
+          <Section count={stratagems.length} title="Stratagems" testId="detachment-stratagems">
             <Grid cols={2}>
               {stratagems.map((stratagem) => (
                 <StratagemCard key={stratagem.id} stratagem={stratagem} />

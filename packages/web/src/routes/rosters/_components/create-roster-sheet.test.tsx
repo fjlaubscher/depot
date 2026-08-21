@@ -134,7 +134,7 @@ describe('CreateRosterSheet', () => {
     expect(screen.queryByTestId('max-points-input')).not.toBeInTheDocument();
   });
 
-  it('lets you pick multiple detachments and tracks DP against the battle size', () => {
+  it('picks a detachment from the dropdown', () => {
     render(<CreateRoster />, { wrapper: TestWrapper });
 
     fireEvent.change(screen.getByTestId('faction-field-select'), {
@@ -142,10 +142,10 @@ describe('CreateRosterSheet', () => {
     });
 
     expect(screen.getByTestId('detachment-field')).toBeInTheDocument();
-    expect(screen.getByTestId('detachment-dp-total')).toHaveTextContent('0 / 3 DP');
 
-    fireEvent.click(screen.getByTestId(`detachment-toggle-${mockFaction.detachments[0].slug}`));
-    expect(screen.getByTestId('detachment-dp-total')).toHaveTextContent('2 / 3 DP');
+    const select = screen.getByLabelText('Detachment') as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: mockFaction.detachments[0].slug } });
+    expect(select.value).toBe(mockFaction.detachments[0].slug);
   });
 
   it('handles empty faction list gracefully', () => {

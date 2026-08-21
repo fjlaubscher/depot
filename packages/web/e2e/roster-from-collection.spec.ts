@@ -70,8 +70,9 @@ test.describe('Roster from Collection', () => {
 
     await expect(page.getByTestId('create-roster-sheet')).toBeVisible();
 
-    await page.getByTestId('detachment-field').waitFor({ state: 'visible', timeout: 20000 });
-    await page.locator('[data-testid^="detachment-toggle-"]').first().click();
+    const detachment = page.getByTestId('detachment-field');
+    await detachment.waitFor({ state: 'visible', timeout: 20000 });
+    await detachment.getByLabel('Detachment').selectOption({ index: 1 });
 
     await page.getByTestId('submit-button').click();
     await expect(page).toHaveURL(/\/rosters\/[a-z0-9-]+\/edit$/i);

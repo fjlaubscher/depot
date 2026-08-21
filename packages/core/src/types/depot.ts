@@ -137,6 +137,9 @@ export interface Datasheet {
   isLegends: boolean;
 }
 
+/** Grouping bucket for a datasheet; derived from its keywords. */
+export type BattlefieldRole = 'epic-hero' | 'character' | 'battleline' | 'other';
+
 export interface DatasheetSummary {
   id: string;
   slug: string;
@@ -145,6 +148,13 @@ export interface DatasheetSummary {
   factionSlug: string;
   dataVersion?: string;
   isSupport: boolean;
+  /**
+   * Precomputed so faction lists can group and price without loading every
+   * datasheet. Optional: manifests generated before these existed lack them.
+   */
+  role?: BattlefieldRole;
+  /** Cheapest cost, `+` suffixed when the sheet has more than one price. */
+  points?: string | null;
   path: string;
   supplementKey?: string;
   supplementSlug?: string;

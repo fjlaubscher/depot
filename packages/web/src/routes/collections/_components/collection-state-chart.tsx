@@ -7,68 +7,44 @@ import { COLLECTION_STATE_META } from '@/utils/collection';
 type CollectionStateChartProps = {
   items: depot.CollectionUnit[];
   heading?: string;
-  subheading?: string;
 };
 
-const STATE_COLORS: Record<depot.CollectionUnitState, string> = {
-  sprue: 'var(--color-red-500)',
-  built: 'var(--color-amber-400)',
-  'battle-ready': 'var(--color-emerald-500)',
-  'parade-ready': 'var(--color-purple-500)'
-};
-
-const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
-  items,
-  heading,
-  subheading
-}) => {
+const CollectionStateChart: React.FC<CollectionStateChartProps> = ({ items, heading }) => {
   const totals = getCollectionStateCounts(items);
   const totalUnits = items.length;
-  const chartData = COLLECTION_UNIT_STATES.map((state) => ({
-    key: state,
-    label: COLLECTION_STATE_META[state].label,
-    color: STATE_COLORS[state],
-    percent: totalUnits > 0 ? Math.round((totals[state] / totalUnits) * 100) : 0
-  }));
 
   return (
-    <div className="flex flex-col gap-4 rounded-sm border border-border-subtle bg-surface-card p-4 shadow-e1 md:p-6 md:gap-6">
-      {(heading || subheading) && (
-        <div className="flex flex-col items-center gap-1 text-center">
-          {heading ? <div className="text-sm font-semibold text-foreground">{heading}</div> : null}
-          {subheading ? <div className="text-xs text-subtle">{subheading}</div> : null}
-        </div>
-      )}
+    <div className="surface-card flex flex-col gap-2 p-3">
+      {heading ? (
+        <div className="text-[13.5px] leading-tight font-bold text-foreground">{heading}</div>
+      ) : null}
 
       {totalUnits > 0 ? (
-        <div className="flex h-64 w-full flex-col justify-around md:h-72">
-          {chartData.map((entry) => (
-            <div key={`bar-${entry.key}`} className="flex items-center gap-2">
-              <span
-                className="w-[70px] shrink-0 text-xs"
-                style={{ color: 'var(--color-gray-300)' }}
-              >
-                {entry.label}
-              </span>
-              <div className="h-8 flex-1">
-                <div
-                  className="h-full rounded-r-sm"
-                  style={{ width: `${entry.percent}%`, backgroundColor: entry.color }}
-                />
+        <div className="flex flex-col gap-1">
+          {COLLECTION_UNIT_STATES.map((state) => {
+            const { label, bar } = COLLECTION_STATE_META[state];
+            const percent = Math.round((totals[state] / totalUnits) * 100);
+
+            return (
+              <div key={`bar-${state}`} className="flex items-center gap-2">
+                <span className="w-[86px] shrink-0 font-mono text-[9.5px] font-medium uppercase text-muted">
+                  {label}
+                </span>
+                {/* The track keeps every row the same length, so an empty state still reads as zero. */}
+                <div className="h-2 flex-1 overflow-hidden rounded-xs bg-surface-soft">
+                  <div className={`h-full ${bar}`} style={{ width: `${percent}%` }} />
+                </div>
+                <span className="w-8 shrink-0 text-right font-mono text-[10px] font-bold text-body tabular-nums">
+                  {percent}%
+                </span>
               </div>
-              <span
-                className="w-10 shrink-0 text-right text-xs"
-                style={{ color: 'var(--color-gray-300)' }}
-              >
-                {entry.percent}%
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
-        <div className="flex h-48 items-center justify-center text-sm text-subtle">
+        <p className="py-4 text-center text-sm text-subtle">
           Add units to see a build-state breakdown.
-        </div>
+        </p>
       )}
     </div>
   );

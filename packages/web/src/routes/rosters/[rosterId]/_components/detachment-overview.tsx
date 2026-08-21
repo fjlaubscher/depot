@@ -5,7 +5,7 @@ import DetachmentAbilityCard from '@/components/shared/detachment-ability-card';
 import EnhancementCard from '@/components/shared/enhancement-card';
 import StratagemCard from '@/components/shared/stratagem-card';
 import { sortByName } from '@depot/core/utils/common';
-import { formatDetachmentOptionLabel } from '@depot/core/utils/detachments';
+import { DetachmentMeta } from '@/routes/factions/[factionSlug]/_components/faction-detachments';
 
 interface DetachmentTabProps {
   detachment: depot.Detachment;
@@ -49,12 +49,13 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
               className="hover:text-accent transition-colors"
               data-testid="detachment-link"
             >
-              {formatDetachmentOptionLabel(detachment)}
+              {detachment.name}
             </Link>
           ) : (
-            formatDetachmentOptionLabel(detachment)
+            detachment.name
           )}
         </h3>
+        <DetachmentMeta detachment={detachment} />
       </div>
       <section className="flex flex-col gap-2" data-testid="detachment-abilities-section">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-body">

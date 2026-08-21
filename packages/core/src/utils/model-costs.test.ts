@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import type { ModelCost } from '../types/depot.js';
 import {
   getCostBracketRange,
   modelCostsForOrdinal,
   formatCostSection,
   formatModelCostLabel,
+  formatModelCostOptions,
   groupModelCostsBySection,
   hasNumericCost,
   normalizeModelCosts,
-  selectableModelCosts
+  selectableModelCosts,
+  summarizeModelCosts
 } from './model-costs.js';
 
 const row = (
@@ -236,5 +239,61 @@ describe('getCostBracketRange', () => {
     expect(getCostBracketRange('YOUR UNIT COSTS')).toEqual([1, Infinity]);
     expect(getCostBracketRange(undefined)).toEqual([1, Infinity]);
     expect(getCostBracketRange('WARGEAR OPTIONS')).toEqual([1, Infinity]);
+  });
+});
+
+describe('summarizeModelCosts', () => {
+  const cost = (value: string): ModelCost => ({
+    datasheetId: 'd',
+    line: value,
+    description: '',
+    cost: value
+  });
+
+  it('returns the cheapest cost, marking sheets with more than one price', () => {
+    expect(summarizeModelCosts([cost('65')])).toBe('65');
+    expect(summarizeModelCosts([cost('130'), cost('65')])).toBe('65+');
+    // same price twice (e.g. repeated bracket) is still a single price
+    expect(summarizeModelCosts([cost('65'), cost('65')])).toBe('65');
+  });
+
+  it('ignores non-numeric costs and returns null when none remain', () => {
+    expect(summarizeModelCosts([cost('-'), cost('80')])).toBe('80');
+    expect(summarizeModelCosts([cost('-')])).toBeNull();
+    expect(summarizeModelCosts([])).toBeNull();
+  });
+});
+
+describe('formatModelCostOptions', () => {
+  const cost = (description: string, value: string, section?: string): ModelCost => ({
+    datasheetId: 'd',
+    line: value,
+    description,
+    cost: value,
+    section
+  });
+
+  it('drops the bracket when every option shares it', () => {
+    const options = formatModelCostOptions([
+      cost('5 models', '60', 'YOUR 1ST TO 2ND UNITS COST'),
+      cost('10 models', '120', 'YOUR 1ST TO 2ND UNITS COST')
+    ]);
+
+    expect(options.map((option) => option.label)).toEqual([
+      '5 models (60 pts)',
+      '10 models (120 pts)'
+    ]);
+  });
+
+  it('keeps the bracket when options disagree', () => {
+    const options = formatModelCostOptions([
+      cost('5 models', '60', 'YOUR 1ST TO 2ND UNITS COST'),
+      cost('5 models', '55', 'YOUR 3RD + UNIT COSTS')
+    ]);
+
+    expect(options.map((option) => option.label)).toEqual([
+      '5 models · 1st to 2nd units (60 pts)',
+      '5 models · 3rd+ unit (55 pts)'
+    ]);
   });
 });

@@ -1,9 +1,10 @@
 import type { FC, ReactNode } from 'react';
+import { Crown } from 'lucide-react';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
-import { Card, Tag, TagGroup } from '@/components/ui';
+import { Card, Tag } from '@/components/ui';
 import { COLLECTION_STATE_META } from '@/utils/collection';
-import { formatWargearDisplayName } from '@depot/core/utils/wargear';
+import { getWargearBaseName } from '@depot/core/utils/wargear';
 import { formatAbilityName } from '@depot/core/utils/abilities';
 
 interface RosterUnitCardCompactProps {
@@ -18,7 +19,7 @@ interface RosterUnitCardCompactProps {
   className?: string;
   isWarlord?: boolean;
   enhancementName?: string;
-  /** Legality problems attributed to this unit; renders the illegal treatment. */
+  /** Legality problems attributed to this unit; renders the invalid treatment. */
   issues?: string[];
 }
 
@@ -37,19 +38,31 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   issues = []
 }) => {
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
-  const wargearToDisplay = unit.selectedWargear.slice(0, 3);
-  const remainingWargearCount = unit.selectedWargear.length - wargearToDisplay.length;
-  const wargearAbilities = unit.selectedWargearAbilities ?? [];
-  const wargearAbilitiesToDisplay = wargearAbilities.slice(0, 3);
-  const remainingWargearAbilities = wargearAbilities.length - wargearAbilitiesToDisplay.length;
+
+  // A single model is the default, so saying so is noise. Anything else — a real
+  // count or an odd description like "per Dark lance" — still earns its place.
+  const modelCount = unit.modelCost.description?.trim();
+  const showModelCount = Boolean(modelCount) && !/^1 model$/i.test(modelCount!);
   const stateMeta = state ? COLLECTION_STATE_META[state] : null;
+
+  // One truncated line beats a wrap of chips — the loadout is a reminder, not a
+  // control. Base names only: listing every profile turns one weapon into
+  // "plasma pistol – standard · plasma pistol – supercharge" and buries the rest.
+  const loadout = [
+    ...new Set([
+      ...unit.selectedWargear.map((w) => getWargearBaseName(w.name).toLowerCase()),
+      ...(unit.selectedWargearAbilities ?? []).map((a) => formatAbilityName(a).toLowerCase())
+    ])
+  ].join(' · ');
 
   return (
     <Card
       id={id}
       padding="sm"
       className={cx(
-        'relative flex h-full flex-col gap-2',
+        // min-w-0 so a long loadout line truncates instead of stretching the
+        // grid track it sits in.
+        'relative flex h-full min-w-0 flex-col gap-1.5',
         onClick && 'cursor-pointer',
         issues.length > 0 && 'border-l-2 border-l-danger-fg',
         className
@@ -58,109 +71,97 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
       data-testid={dataTestId}
       data-state={state}
     >
-      <Card.Header className="items-start gap-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Card.Title as="h3" className="truncate text-sm font-semibold">
-            {unit.datasheet.name}
-          </Card.Title>
-          {unit.modelCost.description ? (
-            <Card.Subtitle as="span" className="truncate text-xs">
-              {unit.modelCost.description}
-            </Card.Subtitle>
-          ) : null}
-        </div>
-        <div className="flex flex-shrink-0 items-center gap-2">
-          <span className="type-stat whitespace-nowrap" data-testid="unit-points">
-            {unitPoints}
-          </span>
-          <span className="type-label">pts</span>
-        </div>
-      </Card.Header>
-
-      {isWarlord || enhancementName || issues.length > 0 ? (
-        <TagGroup spacing="sm" className="gap-1">
-          {isWarlord ? (
-            <Tag
-              size="sm"
-              className="border-transparent bg-accent-600 text-accent-ink dark:bg-accent-500"
-              data-testid="unit-warlord-tag"
-            >
-              Warlord
-            </Tag>
-          ) : null}
-          {enhancementName ? (
-            <Tag variant="primary" size="sm" data-testid="unit-enhancement-tag">
-              {enhancementName}
-            </Tag>
-          ) : null}
-          {issues.length > 0 ? (
-            <Tag variant="danger" size="sm" data-testid="unit-illegal-tag">
-              Illegal
-            </Tag>
-          ) : null}
-        </TagGroup>
-      ) : null}
-
-      {issues.length > 0 ? (
-        <ul className="flex flex-col gap-0.5 text-xs text-danger-fg" data-testid="unit-issues">
-          {issues.map((issue, index) => (
-            <li key={`unit-issue-${index}`}>{issue}</li>
-          ))}
-        </ul>
-      ) : null}
-
-      {showWargearSummary && unit.selectedWargear.length > 0 ? (
-        <Card.Content className="pt-0">
-          <TagGroup spacing="sm" className="gap-1">
-            {wargearToDisplay.map((wargear, index) => (
-              <Tag key={`compact-wargear-${index}`} size="sm" className="capitalize">
-                {formatWargearDisplayName(wargear).toLowerCase()}
-              </Tag>
-            ))}
-            {remainingWargearCount > 0 ? (
-              <Tag variant="default" size="sm">
-                +{remainingWargearCount} more
-              </Tag>
-            ) : null}
-          </TagGroup>
-        </Card.Content>
-      ) : null}
-
-      {showWargearSummary && wargearAbilities.length > 0 ? (
-        <Card.Content className="pt-0">
-          <TagGroup spacing="sm" className="gap-1">
-            {wargearAbilitiesToDisplay.map((ability, index) => (
-              <Tag
-                key={`compact-wargear-ability-${index}`}
-                size="sm"
-                variant="warning"
-                className="capitalize"
+      <div className="flex items-start gap-2.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex flex-wrap items-center gap-1">
+            {isWarlord ? (
+              <span
+                role="img"
+                aria-label="Warlord"
+                title="Warlord"
+                className="mr-1 shrink-0 text-accent"
+                data-testid="unit-warlord-tag"
               >
-                {formatAbilityName(ability).toLowerCase()}
-              </Tag>
-            ))}
-            {remainingWargearAbilities > 0 ? (
-              <Tag variant="default" size="sm">
-                +{remainingWargearAbilities} more
+                <Crown size={14} aria-hidden />
+              </span>
+            ) : null}
+            {unit.datasheet.isForgeWorld ? (
+              <Tag
+                variant="secondary"
+                size="sm"
+                className="mr-1"
+                data-testid="unit-forge-world-tag"
+              >
+                Forge World
               </Tag>
             ) : null}
-          </TagGroup>
-        </Card.Content>
-      ) : null}
+            {unit.datasheet.isLegends ? (
+              <Tag variant="warning" size="sm" className="mr-1" data-testid="unit-legends-tag">
+                Legends
+              </Tag>
+            ) : null}
+            <h3 className="text-[13.5px] leading-tight font-bold text-foreground">
+              {unit.datasheet.name}
+            </h3>
+            {showModelCount ? (
+              <span className="ml-1 font-mono text-[11px] font-medium text-muted">
+                {modelCount}
+              </span>
+            ) : null}
+            {issues.length > 0 ? (
+              <Tag variant="danger" size="sm" data-testid="unit-invalid-tag">
+                Invalid
+              </Tag>
+            ) : null}
+          </div>
+
+          {showWargearSummary && loadout ? (
+            <p className="truncate text-[11px] leading-snug text-muted" data-testid="unit-loadout">
+              {loadout}
+            </p>
+          ) : null}
+
+          {enhancementName ? (
+            <div className="mt-0.5">
+              <Tag variant="primary" size="sm" data-testid="unit-enhancement-tag">
+                {enhancementName}
+              </Tag>
+            </div>
+          ) : null}
+
+          {issues.length > 0 ? (
+            <ul
+              className="flex flex-col gap-0.5 text-[11px] text-danger-fg"
+              data-testid="unit-issues"
+            >
+              {issues.map((issue, index) => (
+                <li key={`unit-issue-${index}`}>{issue}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+
+        <span
+          className="shrink-0 font-mono text-[12.5px] leading-none font-bold text-foreground"
+          data-testid="unit-points"
+        >
+          {unitPoints}
+        </span>
+      </div>
 
       {children ? <Card.Content>{children}</Card.Content> : null}
 
       {stateMeta || actions ? (
-        <Card.Footer className="mt-auto flex items-center justify-between gap-2">
-          <div className="flex flex-1 items-center gap-2">
-            {stateMeta ? (
-              <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
-                {stateMeta.label}
-              </Tag>
-            ) : null}
-          </div>
+        <div className="mt-auto flex items-center justify-between gap-2">
+          {stateMeta ? (
+            <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
+              {stateMeta.label}
+            </Tag>
+          ) : (
+            <span />
+          )}
           {actions ? <div className="flex items-center gap-1">{actions}</div> : null}
-        </Card.Footer>
+        </div>
       ) : null}
     </Card>
   );

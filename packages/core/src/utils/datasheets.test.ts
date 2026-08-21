@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import type { depot } from '../types/depot.js';
 import {
   CODEX_SLUG,
+  getBattlefieldRole,
+  getListItemPoints,
+  getListItemRole,
   buildSupplementLabel,
   deriveSupplementMetadata,
   filterDatasheetsBySettings,
@@ -208,5 +211,58 @@ describe('datasheet utils', () => {
     it('does not flag reset when both arrays are empty', () => {
       expect(shouldResetSupplementSelection([], [])).toBe(false);
     });
+  });
+});
+
+describe('getBattlefieldRole', () => {
+  const sheet = (...keywords: string[]) => ({
+    keywords: keywords.map((keyword) => ({ keyword }) as never)
+  });
+
+  it('picks the most specific role', () => {
+    expect(getBattlefieldRole(sheet('Infantry', 'Character', 'Epic Hero'))).toBe('epic-hero');
+    expect(getBattlefieldRole(sheet('Infantry', 'Character'))).toBe('character');
+    expect(getBattlefieldRole(sheet('Infantry', 'Battleline'))).toBe('battleline');
+    expect(getBattlefieldRole(sheet('Vehicle'))).toBe('other');
+  });
+
+  it('is case insensitive and tolerates no keywords', () => {
+    expect(getBattlefieldRole(sheet('BATTLELINE'))).toBe('battleline');
+    expect(getBattlefieldRole(sheet())).toBe('other');
+  });
+});
+
+describe('list item role and points', () => {
+  const summary = {
+    id: 'a',
+    slug: 'a',
+    name: 'A',
+    factionId: 'f',
+    factionSlug: 'f',
+    isSupport: false,
+    path: '',
+    link: '',
+    isForgeWorld: false,
+    isLegends: false
+  } as depot.DatasheetSummary;
+
+  it('reads precomputed values off a summary', () => {
+    expect(getListItemRole({ ...summary, role: 'battleline' })).toBe('battleline');
+    expect(getListItemPoints({ ...summary, points: '65+' })).toBe('65+');
+  });
+
+  it('falls back when a summary predates the fields', () => {
+    expect(getListItemRole(summary)).toBe('other');
+    expect(getListItemPoints(summary)).toBeNull();
+  });
+
+  it('derives from the source data on a full datasheet', () => {
+    const datasheet = {
+      keywords: [{ keyword: 'Battleline' }],
+      modelCosts: [{ cost: '65' }, { cost: '130' }]
+    } as unknown as depot.Datasheet;
+
+    expect(getListItemRole(datasheet)).toBe('battleline');
+    expect(getListItemPoints(datasheet)).toBe('65+');
   });
 });

@@ -24,12 +24,9 @@ const gotoCreateRoster = async (page: Page) => {
 };
 
 const selectDetachmentByName = async (page: Page, name: string) => {
-  await page.getByTestId('detachment-field').waitFor({ state: 'visible' });
-  await page
-    .locator('[data-testid^="detachment-option-"]')
-    .filter({ hasText: name })
-    .getByRole('switch')
-    .click();
+  const detachment = page.getByTestId('detachment-field');
+  await detachment.waitFor({ state: 'visible' });
+  await detachment.getByLabel('Detachment').selectOption({ label: name });
 };
 
 const selectFactionAndDetachment = async (page: Page) => {
@@ -98,5 +95,5 @@ test('cancel returns to the roster list', async ({ page }) => {
 
   await page.getByTestId('cancel-button').click();
   await expect(page.getByTestId('create-roster-sheet')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'My Rosters' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Rosters', exact: true })).toBeVisible();
 });

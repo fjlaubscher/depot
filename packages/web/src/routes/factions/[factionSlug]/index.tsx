@@ -1,11 +1,11 @@
 import React from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { PageHeader, Tabs, ErrorState, Breadcrumbs } from '@/components/ui';
-import { BackButton, DatasheetBrowser } from '@/components/shared';
+import { ErrorState } from '@/components/ui';
+import { DatasheetBrowser, PillTabs } from '@/components/shared';
 
 // Hooks
 import useFaction from '@/hooks/use-faction';
@@ -23,15 +23,24 @@ import { createFactionBookmark } from '@/utils/bookmarks';
 import Skeleton from './_components/skeleton';
 import FactionDetachments from './_components/faction-detachments';
 
-const Faction: React.FC = () => {
+type FactionTab = 'datasheets' | 'detachments';
+
+const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
-  const [searchParams, setSearchParams] = useSearchParams();
-  // Tab lives in the URL so back-nav from a detachment page lands on the right tab.
-  const activeTab = searchParams.get('tab') === 'detachments' ? 1 : 0;
-  const setActiveTab = (index: number) =>
-    setSearchParams(index === 1 ? { tab: 'detachments' } : {}, { replace: true });
+  const navigate = useNavigate();
+  // The tab is its own route so it can be linked and shared, and so back-nav
+  // from a detachment page lands on the right tab. Replace rather than push —
+  // switching tabs is a view toggle, not a place in the user's history.
+  const showDetachments = tab === 'detachments';
+  const selectTab = (value: FactionTab) =>
+    navigate(
+      value === 'detachments' ? `/faction/${factionSlug}/detachments` : `/faction/${factionSlug}`,
+      {
+        replace: true
+      }
+    );
 
   const datasheetFilters = {
     showLegends: settings.showLegends ?? false,
@@ -75,45 +84,33 @@ const Faction: React.FC = () => {
   const pageTitle = `${faction.name} - Faction Overview`;
 
   return (
-    <AppLayout title={pageTitle}>
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to="/factions"
-          label="Factions"
-          ariaLabel="Back to Factions"
-          className="md:hidden"
-        />
-
-        {/* Desktop Breadcrumbs */}
-        <div className="hidden md:block">
-          <Breadcrumbs
-            items={[
-              { label: 'Factions', path: '/factions' },
-              { label: faction.name, path: `/faction/${faction.slug}` }
-            ]}
-          />
-        </div>
-
-        <PageHeader
-          title={faction.name}
-          subtitle={alliance}
-          actions={[
-            bookmarkAction,
-            {
-              icon: shareAction.icon ?? <Share2 size={16} />,
-              onClick: () => shareAction.onClick(),
-              ariaLabel: shareAction.ariaLabel ?? 'Share faction',
-              'data-testid': shareAction['data-testid']
-            }
+    <AppLayout
+      title={pageTitle}
+      back={{ to: '/factions', label: 'Factions' }}
+      heading={{ title: faction.name, subtitle: alliance }}
+      actions={[
+        bookmarkAction,
+        {
+          icon: shareAction.icon ?? <Share2 size={16} />,
+          onClick: () => shareAction.onClick(),
+          ariaLabel: shareAction.ariaLabel ?? 'Share faction',
+          'data-testid': shareAction['data-testid']
+        }
+      ]}
+    >
+      <div className="flex flex-col gap-2">
+        <PillTabs
+          ariaLabel="Faction sections"
+          testIdPrefix="faction-tab"
+          active={tab}
+          onChange={selectTab}
+          tabs={[
+            { value: 'datasheets', label: 'Datasheets', count: faction.datasheets.length },
+            { value: 'detachments', label: 'Detachments', count: faction.detachments.length }
           ]}
         />
 
-        <Tabs
-          tabs={['Datasheets', 'Detachments']}
-          active={activeTab}
-          onChange={setActiveTab}
-          tabTestIdPrefix="faction-tab"
-        >
+        {!showDetachments ? (
           <DatasheetBrowser
             datasheets={faction.datasheets}
             searchPlaceholder="Search datasheets by name..."
@@ -121,8 +118,9 @@ const Faction: React.FC = () => {
             showItemCount={false}
             filters={datasheetFilters}
           />
+        ) : (
           <FactionDetachments factionSlug={faction.slug} detachments={faction.detachments} />
-        </Tabs>
+        )}
       </div>
     </AppLayout>
   );

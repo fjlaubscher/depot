@@ -1,46 +1,33 @@
 import type { FC } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, Boxes, ClipboardList } from 'lucide-react';
 
 import { getImageUrl } from '@/utils/paths';
 
-const LINKS = [
-  { to: '/factions', label: 'Factions', icon: BookOpen },
-  { to: '/collections', label: 'Collections', icon: Boxes },
-  { to: '/rosters', label: 'Rosters', icon: ClipboardList }
-];
-
+/**
+ * Announcement banner, not a launcher — the bottom bar and rail already carry
+ * navigation, so repeating it here would just be a second nav.
+ */
 const Hero: FC = () => (
   <section
-    className="relative overflow-hidden rounded-sm border border-border-subtle shadow-e2"
+    className="relative overflow-hidden rounded-sm border border-border-subtle"
     data-testid="home-hero"
   >
     <img
       src={getImageUrl('depot-hero.jpg')}
       alt=""
-      className="absolute inset-0 h-full w-full object-cover"
+      className="absolute inset-0 size-full object-cover"
       loading="lazy"
     />
-    <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-accent-900/60" />
-    <div className="relative z-10 flex flex-col gap-4 p-6 sm:p-8">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-white sm:text-3xl">11th edition is here</h1>
-        <p className="text-sm text-white/80 sm:text-base">
-          Rules, collections and rosters — all offline.
-        </p>
-      </div>
-      <nav className="grid grid-cols-3 gap-2" aria-label="Get started" data-testid="hero-links">
-        {LINKS.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className="flex flex-col items-center gap-2 rounded-sm border border-white/15 bg-white/10 px-2 py-4 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 focus-ring-primary sm:flex-row sm:justify-center"
-          >
-            <Icon size={18} />
-            {label}
-          </Link>
-        ))}
-      </nav>
+    <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/75 to-accent-900/60" />
+
+    <div className="relative flex flex-col gap-1 p-4">
+      <p className="font-mono text-[10px] leading-none font-bold uppercase tracking-widest text-accent-300">
+        // Now in 11th edition
+      </p>
+      <h1 className="text-lg leading-tight font-bold text-white">depot has a new look</h1>
+      <p className="max-w-[46ch] text-[12.5px] leading-normal text-white/75">
+        Rebuilt for reading rules at the table — denser, faster, and still fully offline. Crusade
+        features are on the way.
+      </p>
     </div>
   </section>
 );

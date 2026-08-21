@@ -36,10 +36,8 @@ const ImportButton: FC<ImportButtonProps> = ({
         onClick={() => fileInputRef.current?.click()}
         data-testid={buttonTestId}
       >
-        <span className="inline-flex items-center gap-2">
-          <Upload size={16} />
-          {label}
-        </span>
+        <Upload size={16} />
+        {label}
       </Button>
       <input
         ref={fileInputRef}

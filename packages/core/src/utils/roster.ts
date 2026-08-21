@@ -1,6 +1,5 @@
 import type { Detachment, Roster } from '../types/depot.js';
 import { toTitleCase } from './datasheets.js';
-import { formatDetachmentOptionLabel } from './detachments.js';
 
 /** Selected detachments, falling back to the legacy single `detachment` field. */
 export const getRosterDetachments = (
@@ -85,7 +84,7 @@ export const generateRosterShareText = (
   const detachments = getRosterDetachments(roster);
   if (detachments.length > 0) {
     const label = detachments.length === 1 ? 'Detachment' : 'Detachments';
-    lines.push(`*${label}:* ${detachments.map(formatDetachmentOptionLabel).join('; ')}`);
+    lines.push(`*${label}:* ${detachments.map((detachment) => detachment.name).join('; ')}`);
   }
   lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
   lines.push('');

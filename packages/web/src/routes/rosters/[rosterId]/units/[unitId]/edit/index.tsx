@@ -5,10 +5,9 @@ import type { depot } from '@depot/core';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
 import { useToast } from '@/contexts/toast/context';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Card, ErrorState, PageHeaderSkeleton, SkeletonCard } from '@/components/ui';
+import { ErrorState, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import UnitEditShell from '@/components/shared/unit-edit/unit-edit-shell';
 import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-shell';
 import EnhancementSelection from './_components/enhancement-selection';
@@ -93,25 +92,18 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
     }
   };
 
-  const subtitle = factionName ? `${factionName} • ${unit.datasheet.name}` : unit.datasheet.name;
+  const subtitle = `Loadout · ${factionName || roster.name}`;
+  const documentTitle = `${unit.datasheet.name} - Edit Roster Unit`;
 
   return (
     <UnitEditShell
       unit={unit}
       testId="edit-unit-form"
       backTo={`/rosters/${roster.id}/edit${unitHash}`}
-      backLabel="Back to Roster"
-      breadcrumbs={[
-        { label: 'Rosters', path: '/rosters' },
-        { label: roster.name, path: `/rosters/${roster.id}/edit${unitHash}` },
-        { label: 'Edit', path: `/rosters/${roster.id}/edit${unitHash}` },
-        { label: unit.datasheet.name, path: `/rosters/${roster.id}/units/${unit.id}/edit` }
-      ]}
-      breadcrumbsTestId="edit-unit-breadcrumbs"
-      title="Edit Unit"
+      documentTitle={documentTitle}
+      backLabel={roster.name}
+      title={unit.datasheet.name}
       subtitle={subtitle}
-      headerTestId="edit-unit-header"
-      saveButtonTestId="save-unit-button"
       modelCosts={modelCostsForOrdinal(
         unit.datasheet.modelCosts,
         getUnitOrdinal(roster.units, unit.id)
@@ -119,36 +111,26 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
       afterGrid={
         <>
           {character || eligibleEnhancements.length > 0 ? (
-            <Card data-testid="enhancement-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
-                <p className="text-sm text-muted">
-                  {character
-                    ? 'Select one enhancement for this character'
-                    : 'Select one Upgrade for this unit'}
-                </p>
-                <EnhancementSelection
-                  enhancements={eligibleEnhancements}
-                  selectedEnhancements={selectedEnhancements}
-                  onEnhancementChange={setSelectedEnhancements}
-                />
-              </div>
-            </Card>
+            <section className="flex flex-col gap-1.5" data-testid="enhancement-section">
+              <SectionHeader title={character ? 'Enhancement' : 'Upgrade'} />
+              <EnhancementSelection
+                enhancements={eligibleEnhancements}
+                selectedEnhancements={selectedEnhancements}
+                onEnhancementChange={setSelectedEnhancements}
+              />
+            </section>
           ) : null}
 
           {character ? (
-            <Card data-testid="warlord-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
-                <p className="text-sm text-muted">Nominate this character as your warlord</p>
-                <WarlordSelection
-                  unit={unit}
-                  roster={roster}
-                  isWarlord={isWarlord}
-                  onWarlordChange={setIsWarlord}
-                />
-              </div>
-            </Card>
+            <section className="flex flex-col gap-1.5" data-testid="warlord-section">
+              <SectionHeader title="Warlord" />
+              <WarlordSelection
+                unit={unit}
+                roster={roster}
+                isWarlord={isWarlord}
+                onWarlordChange={setIsWarlord}
+              />
+            </section>
           ) : null}
         </>
       }
@@ -162,32 +144,37 @@ const EditRosterUnitView: React.FC = () => {
   const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
   const unit = roster.units.find((u) => u.id === unitId);
 
-  useDocumentTitle(unit ? `${unit.datasheet.name} - Edit Roster Unit` : 'Edit Roster Unit');
-
   // Loading state while roster loads
   if (!roster.id) {
     return (
-      <div className="flex flex-col gap-4" data-testid="edit-unit-loading">
-        <PageHeaderSkeleton />
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
-      </div>
+      <AppLayout
+        title="Edit Roster Unit"
+        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+      >
+        <div className="flex flex-col gap-4" data-testid="edit-unit-loading">
+          <PageHeaderSkeleton />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </AppLayout>
     );
   }
 
   // Error state if unit not found
   if (!unit) {
     return (
-      <div className="flex flex-col gap-4" data-testid="edit-unit-not-found">
-        <PageHeader title="Edit Unit" />
+      <AppLayout
+        title="Edit Roster Unit"
+        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+      >
         <ErrorState
           title="Unit Not Found"
           message="The unit you're trying to edit could not be found."
           showRetry={false}
           homeUrl={`/rosters/${rosterId}/edit`}
+          data-testid="edit-unit-not-found"
         />
-      </div>
+      </AppLayout>
     );
   }
 
@@ -198,11 +185,9 @@ const EditRosterUnitPage: React.FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Edit Roster Unit">
-      <RosterProvider rosterId={rosterId}>
-        <EditRosterUnitView />
-      </RosterProvider>
-    </AppLayout>
+    <RosterProvider rosterId={rosterId}>
+      <EditRosterUnitView />
+    </RosterProvider>
   );
 };
 
