@@ -3,13 +3,6 @@ import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/ut
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
-export const COLLECTION_LABELS = {
-  pluralTitle: 'Collections',
-  singularTitle: 'Collection',
-  singular: 'collection',
-  short: 'collection'
-} as const;
-
 export const COLLECTION_STATE_META: Record<
   depot.CollectionUnitState,
   { label: string; variant: TagVariant }

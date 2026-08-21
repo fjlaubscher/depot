@@ -1,6 +1,6 @@
 import type { FC, ReactNode, HTMLAttributes } from 'react';
 import { Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface AlertProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'info' | 'warning' | 'success' | 'error';
@@ -35,9 +35,9 @@ const Alert: FC<AlertProps> = ({ variant = 'info', title, children, className, .
   const Icon = icons[variant];
 
   return (
-    <div className={classNames(baseClasses, variantClasses[variant], className)} {...props}>
+    <div className={cx(baseClasses, variantClasses[variant], className)} {...props}>
       <div className="flex gap-2 items-center">
-        <Icon size={20} className={classNames('flex-shrink-0', iconClasses[variant])} />
+        <Icon size={20} className={cx('flex-shrink-0', iconClasses[variant])} />
         <h4 className="font-medium">{title}</h4>
       </div>
       <div>{children}</div>

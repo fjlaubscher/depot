@@ -13,9 +13,8 @@ Shared TypeScript types + lightweight utilities. This package is the single sour
 ## File Structure
 - `src/index.ts` - exports the `depot` + `wahapedia` type namespaces only
 - `src/types/depot.ts` / `src/types/wahapedia.ts` - processed + raw schemas
-- `src/utils/common/` - framework-agnostic helpers (array, strings, keywords, enhancements, faction mapping, breadcrumb builders) with colocated tests
-- `src/utils/{wargear,abilities,roster,roster-share,collection,datasheets,detachments,model-costs}.ts` - domain helpers consumed by CLI + web
-- `src/constants/` - reserved for future shared constants
+- `src/utils/common.ts` - framework-agnostic helpers (array, strings, keywords, enhancements, faction mapping, breadcrumb builders) with colocated tests
+- `src/utils/{wargear,abilities,roster,roster-legality,rebind,collection,datasheets,detachments,model-costs,slug}.ts` - domain helpers consumed by CLI + web
 
 ## Type Domains
 - `depot.*` — web-consumption shapes (factions, datasheets, stratagems, enhancements, settings, rosters)

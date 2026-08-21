@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface ToggleSwitchProps {
   label: string;
@@ -27,7 +27,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
   <label className="flex items-center gap-2">
     <span className="text-sm font-medium text-gray-900 dark:text-gray-300">{label}</span>
     <span
-      className={classNames(
+      className={cx(
         'relative inline-flex flex-shrink-0 rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out dark:bg-gray-700 has-[:checked]:bg-primary-600 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-500 has-[:focus-visible]:ring-offset-2',
         sizeClasses[size].track
       )}
@@ -44,7 +44,7 @@ const ToggleSwitch: FC<ToggleSwitchProps> = ({
       />
       <span
         aria-hidden="true"
-        className={classNames(
+        className={cx(
           'pointer-events-none inline-block translate-x-0 transform rounded-full bg-white shadow transition duration-200 ease-in-out',
           sizeClasses[size].knob
         )}

@@ -1,6 +1,6 @@
 import type { ElementType, HTMLAttributes } from 'react';
 import { forwardRef } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 export type CardPadding = 'none' | 'sm' | 'md';
 
@@ -22,7 +22,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={classNames(
+        className={cx(
           'surface-card shadow-sm transition-shadow duration-200',
           paddingClasses[padding],
           isInteractive &&
@@ -42,7 +42,7 @@ const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={classNames(
+      className={cx(
         'flex w-full flex-wrap items-start justify-between gap-2 border-b border-subtle pb-2',
         className
       )}
@@ -59,7 +59,7 @@ interface CardTitleProps extends HTMLAttributes<HTMLElement> {
 
 const CardTitle = ({ as: Component = 'h3', className, ...props }: CardTitleProps) => (
   <Component
-    className={classNames('text-sm font-semibold leading-tight text-foreground', className)}
+    className={cx('text-sm font-semibold leading-tight text-foreground', className)}
     {...props}
   />
 );
@@ -71,7 +71,7 @@ interface CardSubtitleProps extends HTMLAttributes<HTMLElement> {
 }
 
 const CardSubtitle = ({ as: Component = 'p', className, ...props }: CardSubtitleProps) => (
-  <Component className={classNames('text-sm text-secondary', className)} {...props} />
+  <Component className={cx('text-sm text-secondary', className)} {...props} />
 );
 
 CardSubtitle.displayName = 'Card.Subtitle';
@@ -81,14 +81,14 @@ interface CardDescriptionProps extends HTMLAttributes<HTMLElement> {
 }
 
 const CardDescription = ({ as: Component = 'p', className, ...props }: CardDescriptionProps) => (
-  <Component className={classNames('text-sm text-muted', className)} {...props} />
+  <Component className={cx('text-sm text-muted', className)} {...props} />
 );
 
 CardDescription.displayName = 'Card.Description';
 
 const CardLegend = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={classNames('text-sm italic text-muted', className)} {...props} />
+    <p ref={ref} className={cx('text-sm italic text-muted', className)} {...props} />
   )
 );
 
@@ -97,11 +97,7 @@ CardLegend.displayName = 'Card.Legend';
 interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
 
 const CardContent = forwardRef<HTMLDivElement, CardContentProps>(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={classNames('text-sm leading-relaxed text-body', className)}
-    {...props}
-  />
+  <div ref={ref} className={cx('text-sm leading-relaxed text-body', className)} {...props} />
 ));
 
 CardContent.displayName = 'Card.Content';
@@ -110,7 +106,7 @@ const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={classNames(
+      className={cx(
         'flex w-full items-center justify-start gap-2 border-t border-subtle pt-2',
         className
       )}
@@ -140,7 +136,7 @@ const CardBadge = forwardRef<HTMLSpanElement, CardBadgeProps>(
   ({ variant = 'accent', className, ...props }, ref) => (
     <span
       ref={ref}
-      className={classNames(
+      className={cx(
         'inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium',
         badgeVariantClasses[variant],
         className

@@ -1,5 +1,5 @@
 import type { FC, ReactNode, MouseEvent } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import IconButton from '../icon-button';
 
 export interface Action {
@@ -49,7 +49,7 @@ export const ActionGroup: FC<ActionGroupProps> = ({ actions, className, spacing 
   }
 
   return (
-    <div className={classNames('flex items-center', getSpacingClass(spacing), className)}>
+    <div className={cx('flex items-center', getSpacingClass(spacing), className)}>
       {actions.map((action, index) => (
         <IconButton
           key={index}
@@ -58,7 +58,7 @@ export const ActionGroup: FC<ActionGroupProps> = ({ actions, className, spacing 
           variant={getIconButtonVariant(action.variant)}
           size={action.size || 'sm'}
           disabled={action.disabled}
-          className={classNames(getVariantClasses(action.variant), action.className)}
+          className={cx(getVariantClasses(action.variant), action.className)}
           data-testid={action['data-testid']}
         >
           {action.icon}

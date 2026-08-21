@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
 import EnhancementCard from '@/components/shared/enhancement-card';
@@ -37,7 +37,7 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
               data-testid={`enhancement-option-${enhancement.id}`}
             >
               <div
-                className={classNames(
+                className={cx(
                   'flex min-w-0 flex-1 flex-col gap-1 rounded-lg',
                   selected && 'ring-2 ring-primary-500'
                 )}

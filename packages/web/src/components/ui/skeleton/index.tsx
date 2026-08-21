@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface SkeletonProps {
   className?: string;
@@ -21,11 +21,7 @@ export const Skeleton: FC<SkeletonProps> = ({
   variant = 'rectangular'
 }) => (
   <div
-    className={classNames(
-      'bg-gray-200 dark:bg-gray-700 animate-pulse',
-      variantClasses[variant],
-      className
-    )}
+    className={cx('bg-gray-200 dark:bg-gray-700 animate-pulse', variantClasses[variant], className)}
     style={{
       ...(width && { width: typeof width === 'number' ? `${width}px` : width }),
       ...(height && { height: typeof height === 'number' ? `${height}px` : height })
@@ -34,7 +30,7 @@ export const Skeleton: FC<SkeletonProps> = ({
 );
 
 export const SkeletonCard: FC<{ className?: string }> = ({ className }) => (
-  <div className={classNames('p-4 surface-card', className)}>
+  <div className={cx('p-4 surface-card', className)}>
     <div className="flex items-center justify-between">
       <Skeleton width="60%" height={20} />
       <Skeleton variant="circular" width={20} height={20} />
@@ -43,7 +39,7 @@ export const SkeletonCard: FC<{ className?: string }> = ({ className }) => (
 );
 
 export const PageHeaderSkeleton: FC<{ className?: string }> = ({ className }) => (
-  <div className={classNames('flex items-start justify-between gap-4', className)}>
+  <div className={cx('flex items-start justify-between gap-4', className)}>
     <div className="min-w-0 flex-1 flex flex-col gap-2">
       <Skeleton height={32} width="60%" />
       <Skeleton height={16} width="40%" />
@@ -55,7 +51,7 @@ export const PageHeaderSkeleton: FC<{ className?: string }> = ({ className }) =>
 );
 
 export const FieldSkeleton: FC<{ className?: string }> = ({ className }) => (
-  <div className={classNames('flex flex-col gap-2', className)} data-testid="field-skeleton">
+  <div className={cx('flex flex-col gap-2', className)} data-testid="field-skeleton">
     <Skeleton height={16} width="30%" />
     <Skeleton height={40} width="100%" variant="rounded" />
   </div>

@@ -42,7 +42,7 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 ## Shared Utilities
 - All cross-package helpers now live in `@depot/core/src/utils`. The main entry points are:
   - `utils/common` (slug safety, keyword grouping, faction alliances, array sorters, breadcrumb builders).
-  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/collection`, `utils/datasheets`, `utils/detachments`, `utils/model-costs`, and `utils/roster-share`.
+  - `utils/wargear`, `utils/abilities`, `utils/roster`, `utils/roster-legality`, `utils/rebind`, `utils/collection`, `utils/datasheets`, `utils/detachments`, `utils/model-costs`, and `utils/slug`.
 - Add Vitest coverage beside any new helper in core before wiring it into CLI/web.
 - `packages/web/src/utils` should only contain UI-specific wrappers (e.g., tag styles, absolute URL builders that read browser env). When moving a helper into core, delete the old web tests and recreate them beside the new shared file.
 

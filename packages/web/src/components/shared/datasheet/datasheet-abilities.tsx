@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 import { Tag, TagSection } from '@/components/ui';
 import AbilitySheet from '@/components/shared/ability-sheet';
@@ -59,7 +59,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
               key={ability.id || ability.name}
               type="button"
               onClick={(event) => handleOpen(event, ability)}
-              className={classNames(
+              className={cx(
                 'group inline-flex items-center rounded-full border border-transparent bg-white/80 px-0 py-0 text-left transition-all duration-150 dark:bg-gray-900/40 cursor-pointer',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900'
               )}

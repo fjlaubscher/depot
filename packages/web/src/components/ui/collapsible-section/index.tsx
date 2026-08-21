@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface CollapsibleSectionProps {
   title: string;
@@ -19,7 +19,7 @@ const CollapsibleSection: FC<CollapsibleSectionProps> = ({
 }) => (
   <details
     open={defaultExpanded}
-    className={classNames('group border border-subtle rounded-lg', className)}
+    className={cx('group border border-subtle rounded-lg', className)}
     data-testid={dataTestId}
   >
     {/* role="button" keeps the a11y tree (and tests) identical to the old <button aria-expanded>. */}

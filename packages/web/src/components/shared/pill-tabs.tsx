@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 export interface PillTab<T extends string> {
   value: T;
@@ -32,7 +32,7 @@ const PillTabs = <T extends string>({
           type="button"
           role="tab"
           aria-selected={isActive}
-          className={classNames(
+          className={cx(
             'flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
             isActive
               ? 'bg-primary-600 text-white border-primary-600 dark:bg-primary-500 dark:border-primary-500'
@@ -43,7 +43,7 @@ const PillTabs = <T extends string>({
         >
           <span>{tab.label}</span>
           <span
-            className={classNames(
+            className={cx(
               'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
               isActive ? 'bg-white text-primary-600 dark:text-primary-500' : 'bg-soft text-muted'
             )}

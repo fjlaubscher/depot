@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface FiltersProps {
   children: ReactNode;
@@ -10,12 +10,7 @@ interface FiltersProps {
 }
 
 const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className, clearTestId }) => (
-  <div
-    className={classNames(
-      'flex flex-col sm:flex-row sm:items-center justify-between gap-4',
-      className
-    )}
-  >
+  <div className={cx('flex flex-col sm:flex-row sm:items-center justify-between gap-4', className)}>
     <div className="flex-1 flex flex-col sm:flex-row gap-4">{children}</div>
     {showClear && (
       <button

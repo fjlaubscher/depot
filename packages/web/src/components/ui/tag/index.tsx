@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface TagProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
@@ -25,7 +25,7 @@ const Tag: FC<TagProps> = ({ variant = 'default', size = 'md', className, childr
 
   return (
     <span
-      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={cx(baseClasses, variantClasses[variant], sizeClasses[size], className)}
       {...props}
     >
       {children}
@@ -46,7 +46,7 @@ const TagGroup: FC<TagGroupProps> = ({ spacing = 'md', className, children, ...p
 
   return (
     <div
-      className={classNames('flex flex-wrap items-center', spacingClasses[spacing], className)}
+      className={cx('flex flex-wrap items-center', spacingClasses[spacing], className)}
       {...props}
     >
       {children}
@@ -69,7 +69,7 @@ const TagSection: FC<TagSectionProps> = ({
   ...props
 }) => {
   return (
-    <section className={classNames('flex flex-col gap-2', className)} {...props}>
+    <section className={cx('flex flex-col gap-2', className)} {...props}>
       <div className="flex flex-col">
         <span className="text-sm font-semibold text-foreground">{title}</span>
         {description ? <p className="text-xs text-subtle">{description}</p> : null}

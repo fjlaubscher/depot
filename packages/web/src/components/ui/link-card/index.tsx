@@ -1,7 +1,7 @@
 import type { AnchorHTMLAttributes, FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import Card from '../card';
 
 interface LinkCardProps extends Omit<
@@ -18,7 +18,7 @@ const LinkCard: FC<LinkCardProps> = ({ to, children, className, showArrow = fals
   return (
     <Link
       to={to}
-      className={classNames('group/link block h-full text-decoration-none', className)}
+      className={cx('group/link block h-full text-decoration-none', className)}
       data-testid="link-card"
       {...rest}
     >

@@ -6,8 +6,6 @@ import { StatCard, StatsRow } from '@/components/ui';
 
 interface ModelStatsRowProps {
   model: depot.Model;
-  /** Accepted for caller compatibility; both variants render identically. */
-  variant?: 'default' | 'compact';
 }
 
 const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {

@@ -1,5 +1,5 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'secondary' | 'accent' | 'error';
@@ -36,7 +36,7 @@ const Button: FC<ButtonProps> = ({
 
   return (
     <button
-      className={classNames(
+      className={cx(
         baseClasses,
         variantClasses[variant],
         sizeClasses[size],

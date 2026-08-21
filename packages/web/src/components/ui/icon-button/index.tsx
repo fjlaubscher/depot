@@ -1,5 +1,5 @@
 import type { FC, ButtonHTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'ghost';
@@ -30,7 +30,7 @@ const IconButton: FC<IconButtonProps> = ({
 
   return (
     <button
-      className={classNames(baseClasses, variantClasses[variant], sizeClasses[size], className)}
+      className={cx(baseClasses, variantClasses[variant], sizeClasses[size], className)}
       {...props}
     >
       {children}

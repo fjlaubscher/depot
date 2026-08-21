@@ -54,7 +54,7 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
             id="custom-max-points"
             type="number"
             min={1}
-            className="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-foreground"
+            className="input-base"
             value={value || ''}
             onChange={(event) => onChange(parseInt(event.target.value, 10) || 0)}
             placeholder="Enter points limit"

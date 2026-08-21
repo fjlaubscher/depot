@@ -36,9 +36,9 @@ Core stack:
 
 - React 19
 - React Router DOM 7
-- Vite 6
+- Vite 8
 - Tailwind CSS v4
-- TypeScript 5.9+
+- TypeScript 7+
 
 See `AGENTS.md` files (root and per-package) for deeper guidance.
 

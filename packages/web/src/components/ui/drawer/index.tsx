@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -40,7 +40,7 @@ const Drawer: FC<DrawerProps> = ({
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose?.();
       }}
-      className={classNames(
+      className={cx(
         'fixed m-0 border-0 bg-transparent p-0 text-inherit transition-all transition-discrete duration-200 ease-out',
         'backdrop:bg-black/40 backdrop:opacity-0 open:backdrop:opacity-100 backdrop:transition-all backdrop:transition-discrete backdrop:duration-200 starting:open:backdrop:opacity-0',
         isBottom
@@ -49,7 +49,7 @@ const Drawer: FC<DrawerProps> = ({
       )}
     >
       <div
-        className={classNames(
+        className={cx(
           isBottom
             ? 'flex w-full max-h-[85vh] flex-col rounded-t-3xl surface-base shadow-xl'
             : 'h-full max-h-full',

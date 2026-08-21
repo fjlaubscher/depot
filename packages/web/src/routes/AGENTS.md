@@ -7,8 +7,11 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
 - `/factions` -> `factions`
 - `/faction/:factionSlug` -> `factions/[factionSlug]`
 - `/faction/:factionSlug/datasheet/:datasheetSlug` -> `factions/[factionSlug]/datasheet/[datasheetSlug]`
+- `/faction/:factionSlug/detachment/:detachmentSlug` -> `factions/[factionSlug]/detachment/[detachmentSlug]`
+- `/collections`, `/collections/:collectionId`, `/collections/:collectionId/{add-units,new-roster,units/:unitId/edit}` -> `collections/...`
 - `/rosters` -> `rosters`
 - `/rosters/:rosterId` -> `rosters/[rosterId]`
+- `/rosters/:rosterId/details` -> `rosters/[rosterId]/details`
 - `/rosters/:rosterId/edit` -> `rosters/[rosterId]/edit`
 - `/rosters/:rosterId/add-units` -> `rosters/[rosterId]/add-units`
 - `/rosters/:rosterId/units/:unitId/edit` -> `rosters/[rosterId]/units/[unitId]/edit`
@@ -19,7 +22,7 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
 - `route-name/index.test.tsx` - route-level tests
 - `route-name/_components/` - route-specific components
 - `route-name/_utils/` - route utilities (optional)
-- Nested routes follow folder nesting under `rosters/` for roster-specific flows
+- Nested routes follow folder nesting under `rosters/` and `collections/`
 
 ## Implementation Notes
 - Keep the main route component focused on orchestration; push display/logic into `_components/`.
@@ -29,7 +32,7 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
  - For roster + collections unit views, prefer composing shared roster components (`RosterUnitCardCompact`, `RosterUnitProfilePanel`; lists are a plain `flex flex-col gap-4` div) rather than duplicating layout/expansion logic in route-level `_components`.
 
 ## State & Data Patterns
-- Context integration: `useSettings`, `useFactionIndex`/`useFactionData`, `useToastContext`, `useRoster`.
+- Context integration: `useSettingsContext`, `useFactionsContext`, `useToast`, `useRoster`.
 - Loading states use skeletons mirroring the final layout; errors provide recovery actions; empty states should be meaningful.
 - Memoize heavy filtering/grouping and debounce search inputs (300ms search, ~100ms filters) to keep routes responsive.
 

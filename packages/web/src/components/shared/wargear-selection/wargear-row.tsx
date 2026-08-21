@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 
 interface WargearRowProps {
@@ -11,7 +11,7 @@ const WargearRow = ({ weapon, selected, onToggle }: WargearRowProps) => (
   <button
     type="button"
     onClick={() => onToggle(weapon, !selected)}
-    className={classNames(
+    className={cx(
       'inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface',
       selected
         ? 'border-primary-500 bg-primary-50 text-primary-900 shadow-sm dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-50'

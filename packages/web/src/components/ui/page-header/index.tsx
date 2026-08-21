@@ -1,5 +1,5 @@
 import type { FC, ReactNode, HTMLAttributes } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import IconButton from '../icon-button';
 import ActionGroup from '../action-group';
 import type { Action } from '../action-group';
@@ -61,7 +61,7 @@ const PageHeader: FC<PageHeaderProps> = ({
 
   return (
     <div
-      className={classNames('flex flex-col', className)}
+      className={cx('flex flex-col', className)}
       data-testid={dataTestId || 'page-header'}
       {...props}
     >

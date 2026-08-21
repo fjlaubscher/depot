@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 import { CODEX_SLUG } from '@depot/core/utils/datasheets';
 import {
   DEFAULT_TAB_ACTIVE_CLASS,
@@ -35,7 +35,7 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
       role="tablist"
       aria-label="Datasheet supplements"
       data-testid="supplement-tabs"
-      className={classNames('flex flex-col gap-2', className)}
+      className={cx('flex flex-col gap-2', className)}
     >
       <span className="text-sm font-medium text-secondary">Supplements</span>
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -58,14 +58,14 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
               onClick={() => onChange(tab.value)}
               data-testid={`supplement-tab-${tab.value}`}
               data-supplement-key={isNeutral ? undefined : tab.value}
-              className={classNames(
+              className={cx(
                 'flex cursor-pointer items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors',
                 isActive ? activeClass : inactiveClass
               )}
             >
               <span>{tab.label}</span>
               <span
-                className={classNames(
+                className={cx(
                   'inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold',
                   isActive
                     ? 'bg-white text-primary-600 dark:text-primary-500'

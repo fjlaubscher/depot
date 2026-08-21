@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import classNames from 'classnames';
+import { cx } from '@/utils/cx';
 
 interface LoaderProps {
   size?: 'sm' | 'md';
@@ -22,12 +22,7 @@ const Loader: FC<LoaderProps> = ({ size = 'md', color = 'primary', className }) 
   return (
     <div
       data-testid="loader"
-      className={classNames(
-        'rounded-full animate-spin',
-        sizeClasses[size],
-        colorClasses[color],
-        className
-      )}
+      className={cx('rounded-full animate-spin', sizeClasses[size], colorClasses[color], className)}
     />
   );
 };
