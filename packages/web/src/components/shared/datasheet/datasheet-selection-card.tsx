@@ -4,7 +4,7 @@ import type { depot } from '@depot/core';
 
 import { Card, Tag, SelectField, Button } from '@/components/ui';
 import { groupKeywords } from '@depot/core/utils/common';
-import { formatModelCostLabel, modelCostsForOrdinal } from '@depot/core/utils/model-costs';
+import { formatModelCostOptions, modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 import { getSupplementStyles } from '@/utils/supplement-styles';
 
 interface DatasheetSelectionCardProps {
@@ -24,10 +24,9 @@ export const DatasheetSelectionCard: FC<DatasheetSelectionCardProps> = ({
     availableModelCosts[0]?.line ?? null
   );
 
-  const modelCostOptions = availableModelCosts.map((cost) => ({
-    label: formatModelCostLabel(cost, datasheet.name),
-    value: cost.line
-  }));
+  const modelCostOptions = formatModelCostOptions(availableModelCosts, datasheet.name).map(
+    ({ cost, label }) => ({ label, value: cost.line })
+  );
 
   const selectedModelCost =
     availableModelCosts.find((cost) => cost.line === selectedCostLine) ??

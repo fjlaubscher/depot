@@ -138,3 +138,20 @@ export const summarizeModelCosts = (costs: ModelCost[]): string | null => {
   const cheapest = Math.min(...values);
   return new Set(values).size > 1 ? `${cheapest}+` : `${cheapest}`;
 };
+
+/**
+ * Labels a set of cost options, dropping the bracket ("1st to 2nd units") when
+ * every option shares it — callers filter by ordinal first, so it is usually
+ * the same on every row and only adds noise.
+ */
+export const formatModelCostOptions = <T extends ModelCost>(
+  costs: T[],
+  fallbackName?: string
+): { cost: T; label: string }[] => {
+  const showSection = new Set(costs.map((cost) => cost.section ?? '')).size > 1;
+
+  return costs.map((cost) => ({
+    cost,
+    label: formatModelCostLabel(showSection ? cost : { ...cost, section: undefined }, fallbackName)
+  }));
+};

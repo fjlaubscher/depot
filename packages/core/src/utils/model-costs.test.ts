@@ -5,6 +5,7 @@ import {
   modelCostsForOrdinal,
   formatCostSection,
   formatModelCostLabel,
+  formatModelCostOptions,
   groupModelCostsBySection,
   hasNumericCost,
   normalizeModelCosts,
@@ -260,5 +261,39 @@ describe('summarizeModelCosts', () => {
     expect(summarizeModelCosts([cost('-'), cost('80')])).toBe('80');
     expect(summarizeModelCosts([cost('-')])).toBeNull();
     expect(summarizeModelCosts([])).toBeNull();
+  });
+});
+
+describe('formatModelCostOptions', () => {
+  const cost = (description: string, value: string, section?: string): ModelCost => ({
+    datasheetId: 'd',
+    line: value,
+    description,
+    cost: value,
+    section
+  });
+
+  it('drops the bracket when every option shares it', () => {
+    const options = formatModelCostOptions([
+      cost('5 models', '60', 'YOUR 1ST TO 2ND UNITS COST'),
+      cost('10 models', '120', 'YOUR 1ST TO 2ND UNITS COST')
+    ]);
+
+    expect(options.map((option) => option.label)).toEqual([
+      '5 models (60 pts)',
+      '10 models (120 pts)'
+    ]);
+  });
+
+  it('keeps the bracket when options disagree', () => {
+    const options = formatModelCostOptions([
+      cost('5 models', '60', 'YOUR 1ST TO 2ND UNITS COST'),
+      cost('5 models', '55', 'YOUR 3RD + UNIT COSTS')
+    ]);
+
+    expect(options.map((option) => option.label)).toEqual([
+      '5 models · 1st to 2nd units (60 pts)',
+      '5 models · 3rd+ unit (55 pts)'
+    ]);
   });
 });

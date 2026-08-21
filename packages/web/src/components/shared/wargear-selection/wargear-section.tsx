@@ -19,10 +19,13 @@ const WargearSection: React.FC<WargearSectionProps> = ({
 
   return (
     <div
-      className="flex flex-col gap-2"
-      data-testid={`${title.toLowerCase().replace(/\s+/g, '-')}-section`}
+      className="flex flex-col gap-1.5"
+      data-testid={`${title.toLowerCase().replace(/\s+/g, '-')}-wargear-section`}
     >
-      <h4 className="text-base font-semibold text-foreground">{title}</h4>
+      {/* Subordinate to the `// WARGEAR` rule above it, so it stays a quiet label. */}
+      <h4 className="font-mono text-[9.5px] font-medium uppercase tracking-wide text-subtle">
+        {title}
+      </h4>
       <div className="flex flex-wrap gap-2">
         {wargear.map((weapon) => (
           <WargearRow

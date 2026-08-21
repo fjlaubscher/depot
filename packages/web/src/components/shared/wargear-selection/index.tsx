@@ -27,22 +27,22 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-4" data-testid="wargear-table">
+    <div className="flex flex-col gap-2.5" data-testid="wargear-table">
       <WargearSection
         wargear={rangedWargear}
-        title="Ranged Wargear"
+        title="Ranged"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={mixedWargear}
-        title="Mixed Wargear"
+        title="Mixed"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={meleeWargear}
-        title="Melee Wargear"
+        title="Melee"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
