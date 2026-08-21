@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { ArrowLeft, Home, Users, Settings, ClipboardList, Boxes, WifiOff } from 'lucide-react';
 
 import Logo from '@/components/logo';
+import DataVersion from '@/components/shared/data-version';
 import ActionGroup from '@/components/ui/action-group';
 import type { Action } from '@/components/ui/action-group';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -58,32 +59,36 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
         <div className="px-2.5 pb-3.5">
           <Brand />
         </div>
-        {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              cx(
-                'flex items-center gap-2.5 h-10 px-2.5 text-[13px] font-bold border-l-2 transition-colors',
-                isActive
-                  ? 'border-border-accent bg-surface-accent text-accent'
-                  : 'border-transparent text-muted hover:text-foreground'
-              )
-            }
-          >
-            <Icon size={14} />
-            {label}
-          </NavLink>
-        ))}
+        <nav aria-label="Primary" className="flex flex-col gap-0.5">
+          {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                cx(
+                  'flex items-center gap-2.5 h-10 px-2.5 text-[13px] font-bold border-l-2 transition-colors',
+                  isActive
+                    ? 'border-border-accent bg-surface-accent text-accent'
+                    : 'border-transparent text-muted hover:text-foreground'
+                )
+              }
+            >
+              <Icon size={14} />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
+
         <div className="mt-auto flex flex-col gap-1 px-2.5 pt-4">
-          <span className="type-label text-hint">DATA {dataVersion ?? 'UNKNOWN'}</span>
           <Link to="/about" className="link-subtle text-xs">
             About
           </Link>
           <Link to="/privacy" className="link-subtle text-xs">
             Privacy
           </Link>
+          {/* The source note is the quietest thing here, so it sits last. */}
+          <DataVersion className="pt-1" />
         </div>
       </aside>
 

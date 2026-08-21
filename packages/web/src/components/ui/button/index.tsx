@@ -28,17 +28,18 @@ const SIZES: Record<Size, string> = {
   md: 'h-11 px-3.5 text-[13px]'
 };
 
-/** For links that need to look like buttons — `<Link className={buttonClasses()}>`. */
-export const buttonClasses = ({
+const Button: FC<ButtonProps> = ({
   variant = 'default',
   size = 'md',
   fullWidth = false,
-  className
-}: { variant?: Variant; size?: Size; fullWidth?: boolean; className?: string } = {}) =>
-  cx(BASE, VARIANTS[variant], SIZES[size], fullWidth && 'w-full', className);
-
-const Button: FC<ButtonProps> = ({ variant, size, fullWidth, className, children, ...props }) => (
-  <button className={buttonClasses({ variant, size, fullWidth, className })} {...props}>
+  className,
+  children,
+  ...props
+}) => (
+  <button
+    className={cx(BASE, VARIANTS[variant], SIZES[size], fullWidth && 'w-full', className)}
+    {...props}
+  >
     {children}
   </button>
 );

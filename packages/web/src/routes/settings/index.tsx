@@ -5,6 +5,7 @@ import AppLayout from '@/components/layout';
 import { Button, Loader, SectionHeader } from '@/components/ui';
 
 // Components
+import DataVersion from '@/components/shared/data-version';
 import SettingToggleItem from './_components/setting-toggle-item';
 import StorageUsage from './_components/storage-usage';
 import ThemePicker from './_components/theme-picker';
@@ -17,7 +18,7 @@ import { useToast } from '@/contexts/toast/context';
 const Settings = () => {
   const { showToast } = useToast();
   const { settings, updateSettings } = useSettingsContext();
-  const { offlineFactions, clearOfflineData, loading, dataVersion } = useFactionsContext();
+  const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
 
   const handleSettingsChange = async (
     field: keyof depot.Settings,
@@ -107,9 +108,10 @@ const Settings = () => {
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionHeader title="Offline data" count={dataVersion ?? undefined} />
+          <SectionHeader title="Offline data" />
 
           <div className="surface-card flex flex-col gap-3 p-3">
+            <DataVersion />
             <StorageUsage />
 
             {loading ? (

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import AppLayout from '@/components/layout';
 import Logo from '@/components/logo';
 import { Loader, SectionHeader } from '@/components/ui';
-import { useFactionsContext } from '@/contexts/factions/context';
+import DataVersion from '@/components/shared/data-version';
 import useRosters from '@/hooks/use-rosters';
 import useCollections from '@/hooks/use-collections';
 import useBookmarks from '@/hooks/use-bookmarks';
@@ -18,7 +18,6 @@ import CollectionRow from './_components/collection-row';
 const PREVIEW_LIMIT = 3;
 
 const Home: React.FC = () => {
-  const { dataVersion } = useFactionsContext();
   const { rosters, loading: rostersLoading } = useRosters();
   const { collections, loading: collectionsLoading } = useCollections();
   const { bookmarks, loading: bookmarksLoading } = useBookmarks();
@@ -36,10 +35,6 @@ const Home: React.FC = () => {
             <Logo />
           </span>
           <span className="text-[17px] leading-none font-bold text-foreground">depot</span>
-          <span className="ml-auto flex items-center gap-1.5 font-mono text-[10px] font-medium text-muted">
-            <span className="size-1.5 rounded-full bg-success-fg" aria-hidden />
-            {dataVersion ?? 'no data'}
-          </span>
         </div>
 
         <Hero />
@@ -97,12 +92,7 @@ const Home: React.FC = () => {
           </section>
         ) : null}
 
-        <p
-          className="pt-2 text-center font-mono text-[9.5px] font-medium text-hint"
-          data-testid="data-version"
-        >
-          DATA {dataVersion ?? 'UNKNOWN'}
-        </p>
+        <DataVersion className="pt-2 text-center lg:hidden" data-testid="data-version" />
       </div>
     </AppLayout>
   );

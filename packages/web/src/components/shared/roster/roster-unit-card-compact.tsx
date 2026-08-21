@@ -74,6 +74,17 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
       <div className="flex items-start gap-2.5">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className="flex flex-wrap items-center gap-1">
+            {isWarlord ? (
+              <span
+                role="img"
+                aria-label="Warlord"
+                title="Warlord"
+                className="shrink-0 text-accent"
+                data-testid="unit-warlord-tag"
+              >
+                <Crown size={14} aria-hidden />
+              </span>
+            ) : null}
             {unit.datasheet.isForgeWorld ? (
               <Tag
                 variant="secondary"
@@ -97,22 +108,6 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
                 {modelCount}
               </span>
             ) : null}
-            {isWarlord ? (
-              <span
-                role="img"
-                aria-label="Warlord"
-                title="Warlord"
-                className="shrink-0 text-accent"
-                data-testid="unit-warlord-tag"
-              >
-                <Crown size={14} aria-hidden />
-              </span>
-            ) : null}
-            {enhancementName ? (
-              <Tag variant="primary" size="sm" data-testid="unit-enhancement-tag">
-                {enhancementName}
-              </Tag>
-            ) : null}
             {issues.length > 0 ? (
               <Tag variant="danger" size="sm" data-testid="unit-invalid-tag">
                 Invalid
@@ -124,6 +119,14 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
             <p className="truncate text-[11px] leading-snug text-muted" data-testid="unit-loadout">
               {loadout}
             </p>
+          ) : null}
+
+          {enhancementName ? (
+            <div className="mt-0.5">
+              <Tag variant="primary" size="sm" data-testid="unit-enhancement-tag">
+                {enhancementName}
+              </Tag>
+            </div>
           ) : null}
 
           {issues.length > 0 ? (

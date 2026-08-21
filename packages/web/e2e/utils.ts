@@ -22,8 +22,9 @@ export const selectFactionAndDetachment = async (
   factionLabel: string = DEFAULT_FACTION
 ) => {
   await page.getByLabel('Faction').selectOption({ label: factionLabel });
-  await page.getByTestId('detachment-field').waitFor({ state: 'visible' });
-  await page.locator('[data-testid^="detachment-toggle-"]').first().click();
+  const detachment = page.getByTestId('detachment-field');
+  await detachment.waitFor({ state: 'visible' });
+  await detachment.getByLabel('Detachment').selectOption({ index: 1 });
 };
 
 export const createRoster = async (page: Page, options?: { factionLabel?: string }) => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { depot } from '@depot/core';
 
 import { TestWrapper } from '@/test/test-utils';
@@ -84,25 +84,18 @@ describe('Home', () => {
     mockFactionsContext.dataVersion = '2024.10.01';
   });
 
-  it('renders hero, hero links and footer when there is no local data', () => {
+  it('renders the hero and footer when there is no local data', () => {
     render(
       <TestWrapper>
         <Home />
       </TestWrapper>
     );
 
-    expect(screen.getByTestId('home-hero')).toHaveTextContent('Muster your forces');
-    const links = within(screen.getByTestId('hero-links'));
-    expect(links.getByRole('link', { name: /Factions/ })).toHaveAttribute('href', '/factions');
-    expect(links.getByRole('link', { name: /Collections/ })).toHaveAttribute(
-      'href',
-      '/collections'
-    );
-    expect(links.getByRole('link', { name: /Rosters/ })).toHaveAttribute('href', '/rosters');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot has a new look');
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
-    expect(screen.getByText(/DATA 2024.10.01/i)).toBeInTheDocument();
+    expect(screen.getByTestId('data-version')).toHaveTextContent('Wahapedia data · 2024.10.01');
   });
 
   it('previews bookmarks and recent rosters when present', () => {

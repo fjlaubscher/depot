@@ -1,7 +1,7 @@
 // Core UI Components built with Tailwind CSS
 export { default as ActionGroup } from './action-group';
 export { default as Alert } from './alert';
-export { default as Button, buttonClasses } from './button';
+export { default as Button } from './button';
 export { default as Card } from './card';
 export { default as CollapsibleSection } from './collapsible-section';
 export { default as Drawer } from './drawer';
