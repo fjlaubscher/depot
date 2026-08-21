@@ -1,6 +1,7 @@
 import React from 'react';
 import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
+import { isCharacter } from '@depot/core/utils/datasheets';
 
 interface WarlordSelectionProps {
   unit: depot.RosterUnit;
@@ -16,11 +17,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
   onWarlordChange
 }) => {
   // Check if there are other characters in the roster that could be warlords
-  const otherCharacters = roster.units.filter(
-    (u) =>
-      u.id !== unit.id &&
-      u.datasheet.keywords.some((k) => k.keyword.toLowerCase().includes('character'))
-  );
+  const otherCharacters = roster.units.filter((u) => u.id !== unit.id && isCharacter(u.datasheet));
 
   const currentWarlord = roster.warlordUnitId
     ? roster.units.find((u) => u.id === roster.warlordUnitId)
@@ -37,7 +34,8 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
 
           {currentWarlord && currentWarlord.id !== unit.id && (
             <div className="text-sm text-warning">
-              ⚠️ Current warlord: {currentWarlord.datasheet.name}
+              ⚠️ Current warlord: {currentWarlord.datasheet.name}. Nominating this character will
+              remove their warlord designation.
             </div>
           )}
 
@@ -50,29 +48,6 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
 
         <ToggleSwitch label="" enabled={isWarlord} onChange={onWarlordChange} size="sm" />
       </div>
-
-      {isWarlord && (
-        <div className="flex flex-col gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-          <h5 className="font-medium text-purple-900 dark:text-purple-200 flex items-center gap-2">
-            👑 Warlord Benefits
-          </h5>
-          <ul className="text-sm text-purple-800 dark:text-purple-300 space-y-1 list-disc pl-6">
-            <li>May have special deployment or strategic abilities</li>
-            <li>Target for certain enemy abilities and victory conditions</li>
-          </ul>
-        </div>
-      )}
-
-      {/* Warning about changing warlord */}
-      {isWarlord && currentWarlord && currentWarlord.id !== unit.id && (
-        <div className="flex flex-col gap-2 p-3 surface-warning border-warning rounded-lg">
-          <h5 className="font-medium text-warning-strong">⚠️ Warlord Change</h5>
-          <p className="text-sm text-warning">
-            Nominating this character as warlord will remove the warlord designation from{' '}
-            {currentWarlord.datasheet.name}.
-          </p>
-        </div>
-      )}
     </div>
   );
 };

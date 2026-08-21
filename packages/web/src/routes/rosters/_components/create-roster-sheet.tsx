@@ -7,7 +7,7 @@ import { useFactionsContext } from '@/contexts/factions/context';
 import { useRoster } from '@/contexts/roster/context';
 import { useToast } from '@/contexts/toast/context';
 import { formatRebindSummaryMessage, rebindRosterUnits } from '@/utils/refresh-user-data';
-import { COLLECTION_LABELS } from '@/utils/collection';
+import { sortByName } from '@depot/core/utils/common';
 
 import { Sheet, Field, SelectField, Button, Alert } from '@/components/ui';
 import { FieldSkeleton } from '@/components/ui/skeleton';
@@ -55,10 +55,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
     0
   );
 
-  const factionOptions =
-    factions
-      ?.map((f) => ({ value: f.slug, label: f.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)) || [];
+  const factionOptions = sortByName(factions ?? []).map((f) => ({ value: f.slug, label: f.name }));
 
   // Reset detachments when faction changes
   useEffect(() => {
@@ -117,9 +114,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       className="flex flex-col gap-4"
     >
       {prefillUnits.length > 0 ? (
-        <Alert
-          title={`Prefilling with ${prefillUnits.length} units from your ${COLLECTION_LABELS.singular}.`}
-        >
+        <Alert title={`Prefilling with ${prefillUnits.length} units from your collection.`}>
           Total of {prefillTotal} points
         </Alert>
       ) : null}

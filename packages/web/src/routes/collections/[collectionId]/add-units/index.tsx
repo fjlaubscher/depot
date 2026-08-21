@@ -12,19 +12,15 @@ import {
   calculateCollectionPoints,
   createCollectionUnitFromDatasheet
 } from '@depot/core/utils/collection';
-import { COLLECTION_LABELS } from '@/utils/collection';
 
 const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const labels = COLLECTION_LABELS;
   const { collection, loading, error, save } = useCollection(collectionId);
 
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
 
-  const pageTitle = collection
-    ? `${collection.name} - Add Units`
-    : `Add Units to ${labels.singularTitle}`;
+  const pageTitle = collection ? `${collection.name} - Add Units` : 'Add Units to Collection';
   useDocumentTitle(pageTitle);
 
   if (loading) {
@@ -33,8 +29,8 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title={`Unable to load ${labels.singular}`}>
-        {error || `${labels.singularTitle} not found`}
+      <Alert variant="error" title="Unable to load collection">
+        {error || 'Collection not found'}
       </Alert>
     );
   }
@@ -71,7 +67,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       showToast({
         type: 'error',
         title: 'Error',
-        message: `Could not add units to this ${labels.singular}.`
+        message: 'Could not add units to this collection.'
       });
     }
   };
@@ -80,9 +76,9 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     <AddUnitsView
       factionSlug={factionSlug}
       backTo={`/collections/${collection.id}`}
-      backLabel={`Back to ${labels.singularTitle}`}
+      backLabel="Back to Collection"
       breadcrumbs={[
-        { label: labels.pluralTitle, path: '/collections' },
+        { label: 'Collections', path: '/collections' },
         { label: collection.name, path: `/collections/${collection.id}` },
         { label: 'Add Units', path: `/collections/${collection.id}/add-units` }
       ]}
@@ -95,10 +91,9 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 
 const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
-  const labels = COLLECTION_LABELS;
 
   return (
-    <AppLayout title={`Add Units to ${labels.singularTitle}`}>
+    <AppLayout title="Add Units to Collection">
       <AddCollectionUnitsView collectionId={collectionId} />
     </AppLayout>
   );

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { depot } from '@depot/core';
 
 import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/utils/collection';
@@ -6,17 +6,8 @@ import { COLLECTION_STATE_META } from '@/utils/collection';
 
 type CollectionStateChartProps = {
   items: depot.CollectionUnit[];
-  className?: string;
   heading?: string;
   subheading?: string;
-};
-
-type ChartDatum = {
-  key: depot.CollectionUnitState;
-  label: string;
-  value: number;
-  color: string;
-  percent: number;
 };
 
 const STATE_COLORS: Record<depot.CollectionUnitState, string> = {
@@ -28,33 +19,20 @@ const STATE_COLORS: Record<depot.CollectionUnitState, string> = {
 
 const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
   items,
-  className,
   heading,
   subheading
 }) => {
-  const totals = useMemo(() => getCollectionStateCounts(items), [items]);
+  const totals = getCollectionStateCounts(items);
   const totalUnits = items.length;
-
-  const chartData = useMemo<ChartDatum[]>(() => {
-    return COLLECTION_UNIT_STATES.map((state) => {
-      const value = totals[state] ?? 0;
-      const percent = totalUnits > 0 ? Math.round((value / totalUnits) * 100) : 0;
-      return {
-        key: state,
-        label: COLLECTION_STATE_META[state].label,
-        value,
-        color: STATE_COLORS[state],
-        percent
-      };
-    });
-  }, [totals, totalUnits]);
-
-  const hasData = totalUnits > 0 && chartData.some((d) => d.value > 0);
+  const chartData = COLLECTION_UNIT_STATES.map((state) => ({
+    key: state,
+    label: COLLECTION_STATE_META[state].label,
+    color: STATE_COLORS[state],
+    percent: totalUnits > 0 ? Math.round((totals[state] / totalUnits) * 100) : 0
+  }));
 
   return (
-    <div
-      className={`flex flex-col gap-4 rounded-xl border border-subtle bg-white/5 p-4 shadow-sm dark:bg-gray-800/80 md:p-6 md:gap-6 ${className ?? ''}`}
-    >
+    <div className="flex flex-col gap-4 rounded-xl border border-subtle bg-white/5 p-4 shadow-sm dark:bg-gray-800/80 md:p-6 md:gap-6">
       {(heading || subheading) && (
         <div className="flex flex-col items-center gap-1 text-center">
           {heading ? <div className="text-sm font-semibold text-foreground">{heading}</div> : null}
@@ -62,7 +40,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({
         </div>
       )}
 
-      {hasData ? (
+      {totalUnits > 0 ? (
         <div className="flex h-64 w-full flex-col justify-around md:h-72">
           {chartData.map((entry) => (
             <div key={`bar-${entry.key}`} className="flex items-center gap-2">

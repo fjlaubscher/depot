@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
@@ -7,22 +6,25 @@ import { useCollections } from '@/hooks/use-collections';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/context';
 import AppLayout from '@/components/layout';
-import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
+import { Alert, PageHeader, Loader, ErrorState, Tag } from '@/components/ui';
+import LibraryCard from '@/components/shared/library-card';
 import { RosterEmptyState } from '@/components/shared/roster';
 import { offlineStorage } from '@/data/offline-storage';
-import { calculateCollectionPoints } from '@depot/core/utils/collection';
-import { getCollectionsSnapshotCopy } from '@/utils/collection';
+import {
+  COLLECTION_UNIT_STATES,
+  calculateCollectionPoints,
+  getCollectionStateCounts
+} from '@depot/core/utils/collection';
+import { COLLECTION_STATE_META, getCollectionsSnapshotCopy } from '@/utils/collection';
 import {
   formatCollectionImportToast,
   importCollectionsFromFiles
 } from '@/utils/import-collections';
 import ImportButton from '@/components/shared/import-button';
-import CollectionCard from './_components/collection-card';
 import CollectionStateChart from './_components/collection-state-chart';
 import CreateCollectionSheet from './_components/create-collection-sheet';
 
 const CollectionsPage: React.FC = () => {
-  const navigate = useNavigate();
   const { collections, loading, error, refresh } = useCollections();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
   const { showToast } = useToast();
@@ -34,7 +36,6 @@ const CollectionsPage: React.FC = () => {
   );
 
   const [createOpen, setCreateOpen] = useState(false);
-  const handleCreate = () => setCreateOpen(true);
 
   const handleDelete = async (collectionId: string) => {
     try {
@@ -117,7 +118,7 @@ const CollectionsPage: React.FC = () => {
           subtitle="Track your kits, set their state, and prep them for roster building."
           action={{
             icon: <Plus size={16} />,
-            onClick: handleCreate,
+            onClick: () => setCreateOpen(true),
             ariaLabel: 'Create collection',
             testId: 'create-collection-button'
           }}
@@ -153,7 +154,11 @@ const CollectionsPage: React.FC = () => {
           <RosterEmptyState
             title="No collections yet"
             dataTestId="empty-collections"
-            action={{ label: 'Create collection', onClick: handleCreate, icon: <Plus size={14} /> }}
+            action={{
+              label: 'Create collection',
+              onClick: () => setCreateOpen(true),
+              icon: <Plus size={14} />
+            }}
           />
         ) : (
           <div className="flex flex-col gap-4">
@@ -169,14 +174,41 @@ const CollectionsPage: React.FC = () => {
               data-testid="collections-grid"
               className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
             >
-              {collections.map((collection) => (
-                <CollectionCard
-                  key={collection.id}
-                  collection={collection}
-                  onDelete={handleDelete}
-                  onDuplicate={handleDuplicate}
-                />
-              ))}
+              {collections.map((collection) => {
+                const stateCounts = getCollectionStateCounts(collection.items);
+                return (
+                  <LibraryCard
+                    key={collection.id}
+                    name={collection.name}
+                    subtitle={
+                      collection.faction?.name || collection.factionSlug || collection.factionId
+                    }
+                    points={`${calculateCollectionPoints(collection)} pts`}
+                    unitCount={collection.items.length}
+                    tags={
+                      <div className="flex flex-wrap items-center gap-1">
+                        {COLLECTION_UNIT_STATES.filter((state) => stateCounts[state]).map(
+                          (state) => (
+                            <Tag
+                              key={state}
+                              size="sm"
+                              variant={COLLECTION_STATE_META[state].variant}
+                            >
+                              {COLLECTION_STATE_META[state].label}: {stateCounts[state]}
+                            </Tag>
+                          )
+                        )}
+                      </div>
+                    }
+                    viewPath={`/collections/${collection.id}`}
+                    editPath={`/collections/${collection.id}`}
+                    noun="collection"
+                    onDelete={() => handleDelete(collection.id)}
+                    onDuplicate={() => handleDuplicate(collection)}
+                    data-testid={`collection-card-${collection.id}`}
+                  />
+                );
+              })}
             </div>
           </div>
         )}

@@ -25,22 +25,15 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
   const sortedAbilities = useMemo(() => sortByName(abilities), [abilities]);
   const sortedStratagems = useMemo(() => sortByName(stratagems), [stratagems]);
 
-  const unitLookup = useMemo(() => {
-    return units.reduce<Record<string, depot.RosterUnit>>((acc, unit) => {
-      acc[unit.id] = unit;
-      return acc;
-    }, {});
-  }, [units]);
-
   const selectedEnhancements = useMemo(() => {
     return rosterEnhancements
       .map(({ enhancement, unitId }) => ({
         enhancement,
         unitId,
-        unitName: unitLookup[unitId]?.datasheet.name ?? ''
+        unitName: units.find((unit) => unit.id === unitId)?.datasheet.name ?? ''
       }))
       .sort((a, b) => a.enhancement.name.localeCompare(b.enhancement.name));
-  }, [rosterEnhancements, unitLookup]);
+  }, [rosterEnhancements, units]);
 
   const renderEmpty = (label: string) => (
     <p className="text-sm text-subtle">No {label} available for this detachment.</p>

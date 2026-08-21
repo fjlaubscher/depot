@@ -9,12 +9,13 @@ import { offlineStorage } from '@/data/offline-storage';
 import { readJsonFile } from '@/utils/file';
 import { isExportedRoster } from '@/types/export';
 import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
+import { getRosterDetachments, remapRosterIds } from '@depot/core/utils/roster';
 
 import AppLayout from '@/components/layout';
-import { Alert, PageHeader, Loader, ErrorState } from '@/components/ui';
+import { Alert, PageHeader, Loader, ErrorState, Tag } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
+import LibraryCard from '@/components/shared/library-card';
 import { RosterEmptyState } from '@/components/shared/roster';
-import { RosterCard } from './_components/roster-card';
 import CreateRosterSheet from './_components/create-roster-sheet';
 
 const Rosters: React.FC = () => {
@@ -27,7 +28,6 @@ const Rosters: React.FC = () => {
   );
 
   const [createOpen, setCreateOpen] = useState(false);
-  const handleCreate = () => setCreateOpen(true);
 
   const handleDeleteRoster = async (rosterId: string) => {
     try {
@@ -63,38 +63,6 @@ const Rosters: React.FC = () => {
         message: 'Could not duplicate the roster. Please try again.'
       });
     }
-  };
-
-  const remapRosterIds = (roster: depot.Roster): depot.Roster => {
-    const unitIdMap = new Map<string, string>();
-    const units = roster.units.map((unit) => {
-      const newId = crypto.randomUUID();
-      unitIdMap.set(unit.id, newId);
-      return { ...unit, id: newId };
-    });
-
-    const enhancements = roster.enhancements
-      .map((enhancement) => {
-        const newUnitId = unitIdMap.get(enhancement.unitId);
-        if (!newUnitId) {
-          console.warn('Skipping enhancement with missing unit during import', enhancement.unitId);
-          return null;
-        }
-        return { ...enhancement, unitId: newUnitId };
-      })
-      .filter((value): value is NonNullable<typeof value> => Boolean(value));
-
-    const warlordUnitId = roster.warlordUnitId
-      ? (unitIdMap.get(roster.warlordUnitId) ?? null)
-      : null;
-
-    return {
-      ...roster,
-      id: crypto.randomUUID(),
-      units,
-      enhancements,
-      warlordUnitId
-    };
   };
 
   const handleImportRosterFiles = async (files: File[]) => {
@@ -150,7 +118,7 @@ const Rosters: React.FC = () => {
           subtitle="Manage your army rosters"
           action={{
             icon: <Plus size={16} />,
-            onClick: handleCreate,
+            onClick: () => setCreateOpen(true),
             ariaLabel: 'Create new roster'
           }}
         />
@@ -184,21 +152,49 @@ const Rosters: React.FC = () => {
           <RosterEmptyState
             title="No rosters yet"
             dataTestId="empty-rosters"
-            action={{ label: 'Create roster', onClick: handleCreate, icon: <Plus size={14} /> }}
+            action={{
+              label: 'Create roster',
+              onClick: () => setCreateOpen(true),
+              icon: <Plus size={14} />
+            }}
           />
         ) : (
           <div
             data-testid="rosters-grid"
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
-            {rosters.map((roster) => (
-              <RosterCard
-                key={roster.id}
-                roster={roster}
-                onDelete={handleDeleteRoster}
-                onDuplicate={handleDuplicateRoster}
-              />
-            ))}
+            {rosters.map((roster) => {
+              const detachments = getRosterDetachments(roster);
+              return (
+                <LibraryCard
+                  key={roster.id}
+                  name={roster.name}
+                  subtitle={roster.faction?.name}
+                  points={`${roster.points.current} / ${roster.points.max} pts`}
+                  unitCount={roster.units.length}
+                  tags={
+                    detachments.length > 0
+                      ? detachments.map((detachment) => (
+                          <Tag
+                            key={detachment.id}
+                            size="sm"
+                            variant="secondary"
+                            className="uppercase tracking-wide"
+                          >
+                            {detachment.name}
+                          </Tag>
+                        ))
+                      : undefined
+                  }
+                  viewPath={`/rosters/${roster.id}`}
+                  editPath={`/rosters/${roster.id}/details`}
+                  noun="roster"
+                  onDelete={() => handleDeleteRoster(roster.id)}
+                  onDuplicate={() => handleDuplicateRoster(roster)}
+                  data-testid="roster-card"
+                />
+              );
+            })}
           </div>
         )}
       </div>

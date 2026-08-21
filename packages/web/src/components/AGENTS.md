@@ -42,9 +42,8 @@ interface ComponentProps {
 
 ## Roster Components
 - `RosterUnitCardCompact` is the visual source of truth for roster/collection unit cards (header, points, wargear summary, footer state tag). Prefer composing it rather than duplicating layouts.
-- `RosterUnitProfile` renders the detailed unit profile (stats, composition, abilities, selected wargear) and is shared between roster view and collections.
-- `RosterUnitProfilePanel` wraps `RosterUnitProfile` with the dark/surface-muted panel treatment used for expanded cards; reuse this for any “expanded unit details” view instead of hand-rolling borders/padding.
-- `RosterUnitList` provides the standard single-column unit list layout (`flex flex-col gap-4`) and is used by both roster units and collections. New unit lists should lean on this to keep spacing consistent.
+- `RosterUnitProfilePanel` renders the detailed unit profile (stats, composition, abilities, selected wargear) in the surface-muted panel treatment used for expanded cards; shared between roster view and collections.
+- `LibraryCard` (`shared/library-card.tsx`) is the grid card for the roster and collection libraries; `PillTabs` (`shared/pill-tabs.tsx`) is the rounded filter-pill row with counts.
 
 ## Rich Text / Wahapedia HTML
 - Use the `.ability-rich-text` wrapper for any Wahapedia-derived HTML (detachment abilities, modal ability text, doctrine tables) so tables, headings, fluff text, and keyword spans are styled consistently in light and dark mode.

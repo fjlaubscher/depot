@@ -1,37 +1,51 @@
 import React, { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { depot } from '@depot/core';
 import { Trash2, Pencil, Copy } from 'lucide-react';
 import { Card, ActionGroup, Tag } from '@/components/ui';
-import { getRosterDetachments } from '@depot/core/utils/roster';
 
-interface RosterCardProps {
-  roster: depot.Roster;
-  onDelete: (rosterId: string) => Promise<void>;
-  onDuplicate: (roster: depot.Roster) => Promise<void>;
+interface LibraryCardProps {
+  name: string;
+  subtitle?: string;
+  /** Points badge text, e.g. "120 / 2000 pts". */
+  points: string;
+  unitCount: number;
+  /** Optional tag row rendered between header and footer. */
+  tags?: ReactNode;
+  viewPath: string;
+  editPath: string;
+  /** "roster" | "collection" — used for aria labels, confirm copy and test ids. */
+  noun: string;
+  onDelete: () => Promise<void>;
+  onDuplicate: () => Promise<void>;
+  'data-testid'?: string;
 }
 
-export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDuplicate }) => {
+/** Grid card for the roster/collection libraries: name, faction, points, tags, unit count + actions. */
+const LibraryCard: React.FC<LibraryCardProps> = ({
+  name,
+  subtitle,
+  points,
+  unitCount,
+  tags,
+  viewPath,
+  editPath,
+  noun,
+  onDelete,
+  onDuplicate,
+  'data-testid': testId
+}) => {
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
 
-  const handleView = () => {
-    navigate(`/rosters/${roster.id}`);
-  };
-
-  const handleEdit = () => {
-    navigate(`/rosters/${roster.id}/details`);
-  };
-
   const handleDuplicate = async () => {
     if (isDuplicating) return;
-
     setIsDuplicating(true);
     try {
-      await onDuplicate(roster);
+      await onDuplicate();
     } catch (error) {
-      console.error('Failed to duplicate roster:', error);
+      console.error(`Failed to duplicate ${noun}:`, error);
     } finally {
       setIsDuplicating(false);
     }
@@ -39,21 +53,15 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
 
   const handleDelete = async () => {
     if (isDeleting) return;
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${roster.name}"? This action cannot be undone.`
-    );
-
-    if (confirmed) {
-      try {
-        setIsDeleting(true);
-        await onDelete(roster.id);
-      } catch (error) {
-        console.error('Failed to delete roster:', error);
-        // The error handling is done in the parent component
-      } finally {
-        setIsDeleting(false);
-      }
+    if (!window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`))
+      return;
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } catch (error) {
+      console.error(`Failed to delete ${noun}:`, error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -61,42 +69,33 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
     <Card
       interactive
       className="flex h-full cursor-pointer flex-col gap-4"
-      onClick={handleView}
-      data-testid="roster-card"
+      onClick={() => navigate(viewPath)}
+      data-testid={testId}
     >
       <Card.Header className="items-start gap-2">
         <div className="flex min-w-0 flex-1 flex-col">
           <Card.Title as="h3" className="truncate text-base font-semibold md:text-lg">
-            {roster.name}
+            {name}
           </Card.Title>
-          <Card.Subtitle as="span" className="truncate text-xs md:text-sm">
-            {roster.faction?.name}
+          <Card.Subtitle as="span" className="truncate text-xs capitalize md:text-sm">
+            {subtitle}
           </Card.Subtitle>
         </div>
         <Tag variant="primary" size="sm" className="rounded-md py-1 whitespace-nowrap">
-          {roster.points.current} / {roster.points.max} pts
+          {points}
         </Tag>
       </Card.Header>
 
-      {getRosterDetachments(roster).length > 0 ? (
+      {tags ? (
         <Card.Content className="flex flex-wrap items-center gap-2 text-xs text-subtle">
-          {getRosterDetachments(roster).map((detachment) => (
-            <Tag
-              key={detachment.id}
-              size="sm"
-              variant="secondary"
-              className="uppercase tracking-wide"
-            >
-              {detachment.name}
-            </Tag>
-          ))}
+          {tags}
         </Card.Content>
       ) : null}
 
       <Card.Footer className="mt-auto flex w-full items-center gap-2">
         <div className="flex flex-1 items-center">
           <Tag size="sm" variant="default">
-            {roster.units.length} {roster.units.length === 1 ? 'unit' : 'units'}
+            {unitCount} {unitCount === 1 ? 'unit' : 'units'}
           </Tag>
         </div>
         <ActionGroup
@@ -108,18 +107,18 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
                 event?.stopPropagation();
                 void handleDuplicate();
               },
-              ariaLabel: 'Duplicate roster',
+              ariaLabel: `Duplicate ${noun}`,
               variant: 'secondary',
               disabled: isDuplicating,
-              'data-testid': 'duplicate-roster-button'
+              'data-testid': `duplicate-${noun}-button`
             },
             {
               icon: <Pencil size={16} />,
               onClick: (event) => {
                 event?.stopPropagation();
-                handleEdit();
+                navigate(editPath);
               },
-              ariaLabel: 'Edit roster details',
+              ariaLabel: noun === 'roster' ? 'Edit roster details' : `Edit ${noun}`,
               variant: 'primary'
             },
             {
@@ -128,10 +127,10 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
                 event?.stopPropagation();
                 void handleDelete();
               },
-              ariaLabel: 'Delete roster',
+              ariaLabel: `Delete ${noun}`,
               variant: 'danger',
               disabled: isDeleting,
-              'data-testid': 'delete-roster-button'
+              'data-testid': `delete-${noun}-button`
             }
           ]}
         />
@@ -139,3 +138,5 @@ export const RosterCard: React.FC<RosterCardProps> = ({ roster, onDelete, onDupl
     </Card>
   );
 };
+
+export default LibraryCard;

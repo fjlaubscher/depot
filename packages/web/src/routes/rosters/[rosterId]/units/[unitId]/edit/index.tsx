@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
@@ -12,11 +13,13 @@ import UnitEditShell from '@/components/shared/unit-edit/unit-edit-shell';
 import type { UnitEditSelection } from '@/components/shared/unit-edit/unit-edit-shell';
 import EnhancementSelection from './_components/enhancement-selection';
 import WarlordSelection from './_components/warlord-selection';
+import { isCharacter } from '@depot/core/utils/datasheets';
 import { getRosterFactionName } from '@depot/core/utils/roster';
 import { getEligibleEnhancements, getUnitOrdinal } from '@depot/core/utils/roster-legality';
 import { modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 
-const EditRosterUnitView: React.FC = () => {
+/** Keyed by unit id by the caller, so state initialises once per unit. */
+const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
   const {
     state: roster,
     updateUnitWargear,
@@ -28,38 +31,138 @@ const EditRosterUnitView: React.FC = () => {
   } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
+  const unitId = unit.id;
+  const unitHash = `#unit-${unitId}`;
 
-  // Find the unit we're editing
-  const unit = roster.units.find((u) => u.id === unitId);
-  const unitHash = unit ? `#unit-${unit.id}` : '';
-
-  // Track which unit we've initialized to avoid resetting user selections
-  const initializedUnitRef = useRef<string | null>(null);
-
-  const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(() => {
-    return roster.enhancements.filter((e) => e.unitId === unitId).map((e) => e.enhancement.id);
-  });
+  const [selectedEnhancements, setSelectedEnhancements] = useState<string[]>(() =>
+    roster.enhancements.filter((e) => e.unitId === unitId).map((e) => e.enhancement.id)
+  );
   const [isWarlord, setIsWarlord] = useState(() => roster.warlordUnitId === unitId);
 
-  // Initialize enhancements/warlord only when switching to a new unit
-  useEffect(() => {
-    if (unit && unitId && initializedUnitRef.current !== unitId) {
-      const unitEnhancements = roster.enhancements
-        .filter((e) => e.unitId === unitId)
-        .map((e) => e.enhancement.id);
-      setSelectedEnhancements(unitEnhancements);
-      setIsWarlord(roster.warlordUnitId === unitId);
+  const factionName = getRosterFactionName(roster);
+  const character = isCharacter(unit.datasheet);
+  const eligibleEnhancements = getEligibleEnhancements(unit, roster);
 
-      initializedUnitRef.current = unitId;
+  const handleSave = ({
+    selectedWargear,
+    selectedWargearAbilities,
+    selectedModelCost
+  }: UnitEditSelection) => {
+    try {
+      // Update unit wargear
+      updateUnitWargear(unitId, selectedWargear);
+      updateUnitWargearAbilities(unitId, selectedWargearAbilities);
+
+      // Handle enhancements - first remove existing ones for this unit
+      const existingEnhancements = roster.enhancements.filter((e) => e.unitId === unitId);
+      existingEnhancements.forEach((e) => removeEnhancement(e.enhancement.id));
+
+      // Then apply new enhancements
+      selectedEnhancements.forEach((enhancementId) => {
+        const enhancement = eligibleEnhancements.find((e) => e.id === enhancementId);
+        if (enhancement) {
+          applyEnhancement(enhancement, unitId);
+        }
+      });
+
+      // Update model cost if changed
+      if (selectedModelCost && selectedModelCost !== unit.modelCost) {
+        updateUnitModelCost(unitId, selectedModelCost);
+      }
+
+      if (isWarlord) {
+        setWarlord(unitId);
+      } else if (roster.warlordUnitId === unitId) {
+        setWarlord(null);
+      }
+
+      showToast({
+        type: 'success',
+        title: 'Unit Updated',
+        message: 'Unit configuration has been saved successfully.'
+      });
+
+      navigate(`/rosters/${roster.id}/edit${unitHash}`);
+    } catch (error) {
+      console.error('Failed to save unit changes:', error);
+      showToast({
+        type: 'error',
+        title: 'Save Failed',
+        message: 'Failed to save unit changes. Please try again.'
+      });
     }
-  }, [unitId, unit, roster.enhancements, roster.warlordUnitId]);
+  };
 
-  const pageTitle = unit?.datasheet?.name
-    ? `${unit.datasheet.name} - Edit Roster Unit`
-    : 'Edit Roster Unit';
+  const subtitle = factionName ? `${factionName} • ${unit.datasheet.name}` : unit.datasheet.name;
 
-  useDocumentTitle(pageTitle);
+  return (
+    <UnitEditShell
+      unit={unit}
+      testId="edit-unit-form"
+      backTo={`/rosters/${roster.id}/edit${unitHash}`}
+      backLabel="Back to Roster"
+      breadcrumbs={[
+        { label: 'Rosters', path: '/rosters' },
+        { label: roster.name, path: `/rosters/${roster.id}/edit${unitHash}` },
+        { label: 'Edit', path: `/rosters/${roster.id}/edit${unitHash}` },
+        { label: unit.datasheet.name, path: `/rosters/${roster.id}/units/${unit.id}/edit` }
+      ]}
+      breadcrumbsTestId="edit-unit-breadcrumbs"
+      title="Edit Unit"
+      subtitle={subtitle}
+      headerTestId="edit-unit-header"
+      saveButtonTestId="save-unit-button"
+      modelCosts={modelCostsForOrdinal(
+        unit.datasheet.modelCosts,
+        getUnitOrdinal(roster.units, unit.id)
+      )}
+      afterGrid={
+        <>
+          {character || eligibleEnhancements.length > 0 ? (
+            <Card data-testid="enhancement-section">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
+                <p className="text-sm text-muted">
+                  {character
+                    ? 'Select one enhancement for this character'
+                    : 'Select one Upgrade for this unit'}
+                </p>
+                <EnhancementSelection
+                  enhancements={eligibleEnhancements}
+                  selectedEnhancements={selectedEnhancements}
+                  onEnhancementChange={setSelectedEnhancements}
+                />
+              </div>
+            </Card>
+          ) : null}
+
+          {character ? (
+            <Card data-testid="warlord-section">
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
+                <p className="text-sm text-muted">Nominate this character as your warlord</p>
+                <WarlordSelection
+                  unit={unit}
+                  roster={roster}
+                  isWarlord={isWarlord}
+                  onWarlordChange={setIsWarlord}
+                />
+              </div>
+            </Card>
+          ) : null}
+        </>
+      }
+      onSave={handleSave}
+    />
+  );
+};
+
+const EditRosterUnitView: React.FC = () => {
+  const { state: roster } = useRoster();
+  const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
+  const unit = roster.units.find((u) => u.id === unitId);
+
+  useDocumentTitle(unit ? `${unit.datasheet.name} - Edit Roster Unit` : 'Edit Roster Unit');
 
   // Loading state while roster loads
   if (!roster.id) {
@@ -88,143 +191,11 @@ const EditRosterUnitView: React.FC = () => {
     );
   }
 
-  const factionName = getRosterFactionName(roster);
-  const isCharacter = unit.datasheet.keywords.some((k) =>
-    k.keyword.toLowerCase().includes('character')
-  );
-  const eligibleEnhancements = getEligibleEnhancements(unit, roster);
-
-  const handleSave = ({
-    selectedWargear,
-    selectedWargearAbilities,
-    selectedModelCost
-  }: UnitEditSelection) => {
-    if (!unitId) return;
-
-    try {
-      // Update unit wargear
-      updateUnitWargear(unitId, selectedWargear);
-      updateUnitWargearAbilities(unitId, selectedWargearAbilities);
-
-      // Handle enhancements - first remove existing ones for this unit
-      const existingEnhancements = roster.enhancements.filter((e) => e.unitId === unitId);
-      existingEnhancements.forEach((e) => removeEnhancement(e.enhancement.id));
-
-      // Then apply new enhancements
-      selectedEnhancements.forEach((enhancementId) => {
-        const enhancement = eligibleEnhancements.find((e) => e.id === enhancementId);
-        if (enhancement) {
-          applyEnhancement(enhancement, unitId);
-        }
-      });
-
-      // Update model cost if changed
-      if (selectedModelCost && selectedModelCost !== unit?.modelCost) {
-        updateUnitModelCost(unitId, selectedModelCost);
-      }
-
-      if (isWarlord) {
-        setWarlord(unitId);
-      } else if (roster.warlordUnitId === unitId) {
-        setWarlord(null);
-      }
-
-      showToast({
-        type: 'success',
-        title: 'Unit Updated',
-        message: 'Unit configuration has been saved successfully.'
-      });
-
-      navigate(`/rosters/${rosterId}/edit${unitHash}`);
-    } catch (error) {
-      console.error('Failed to save unit changes:', error);
-      showToast({
-        type: 'error',
-        title: 'Save Failed',
-        message: 'Failed to save unit changes. Please try again.'
-      });
-    }
-  };
-
-  const subtitle = factionName ? `${factionName} • ${unit.datasheet.name}` : unit.datasheet.name;
-
-  return (
-    <UnitEditShell
-      unit={unit}
-      unitId={unitId}
-      testId="edit-unit-form"
-      backTo={`/rosters/${rosterId}/edit${unitHash}`}
-      backLabel="Back to Roster"
-      breadcrumbs={[
-        { label: 'Rosters', path: '/rosters' },
-        { label: roster.name, path: `/rosters/${roster.id}/edit${unitHash}` },
-        { label: 'Edit', path: `/rosters/${roster.id}/edit${unitHash}` },
-        { label: unit.datasheet.name, path: `/rosters/${roster.id}/units/${unit.id}/edit` }
-      ]}
-      breadcrumbsTestId="edit-unit-breadcrumbs"
-      title="Edit Unit"
-      subtitle={subtitle}
-      headerTestId="edit-unit-header"
-      saveButtonTestId="save-unit-button"
-      modelCosts={modelCostsForOrdinal(
-        unit.datasheet.modelCosts,
-        getUnitOrdinal(roster.units, unit.id)
-      )}
-      afterGrid={
-        <>
-          {isCharacter || eligibleEnhancements.length > 0 ? (
-            <Card data-testid="enhancement-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Enhancements</h3>
-                <p className="text-sm text-muted">
-                  {isCharacter
-                    ? 'Select one enhancement for this character'
-                    : 'Select one Upgrade for this unit'}
-                </p>
-                <EnhancementSelection
-                  enhancements={eligibleEnhancements}
-                  selectedEnhancements={selectedEnhancements}
-                  onEnhancementChange={setSelectedEnhancements}
-                />
-              </div>
-            </Card>
-          ) : null}
-
-          {isCharacter ? (
-            <Card data-testid="warlord-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Warlord</h3>
-                <p className="text-sm text-muted">Nominate this character as your warlord</p>
-                <WarlordSelection
-                  unit={unit}
-                  roster={roster}
-                  isWarlord={isWarlord}
-                  onWarlordChange={setIsWarlord}
-                />
-              </div>
-            </Card>
-          ) : null}
-        </>
-      }
-      onSave={handleSave}
-    />
-  );
+  return <EditRosterUnitForm key={unit.id} unit={unit} />;
 };
 
 const EditRosterUnitPage: React.FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
-
-  if (!rosterId) {
-    return (
-      <AppLayout title="Edit Roster Unit">
-        <ErrorState
-          title="Invalid Roster"
-          message="The roster ID provided is invalid."
-          data-testid="invalid-roster-error"
-        />
-      </AppLayout>
-    );
-  }
 
   return (
     <AppLayout title="Edit Roster Unit">

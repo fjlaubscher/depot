@@ -72,14 +72,6 @@ const WargearAbilitiesSelection: React.FC<WargearAbilitiesSelectionProps> = ({
     onChange([...selected, abilityWithId]);
   };
 
-  if (abilities.length === 0) {
-    return (
-      <div className="rounded border border-subtle bg-muted p-3 text-sm text-subtle">
-        No wargear-linked abilities available for this unit.
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-wrap gap-2">
       {abilityEntries.map((entry) => {

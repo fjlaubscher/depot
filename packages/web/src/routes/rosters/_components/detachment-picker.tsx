@@ -1,5 +1,6 @@
-import { useMemo, type FC } from 'react';
+import type { FC } from 'react';
 import type { depot } from '@depot/core';
+import { sortByName } from '@depot/core/utils/common';
 import { getBattleSize } from '@depot/core/utils/roster-legality';
 
 import { Field, Tag, ToggleSwitch } from '@/components/ui';
@@ -21,10 +22,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
   error,
   'data-testid': dataTestId
 }) => {
-  const sorted = useMemo(
-    () => [...detachments].sort((a, b) => a.name.localeCompare(b.name)),
-    [detachments]
-  );
+  const sorted = sortByName(detachments);
   const dpSpent = sorted
     .filter((detachment) => selectedSlugs.includes(detachment.slug))
     .reduce((total, detachment) => total + (parseInt(detachment.dp, 10) || 0), 0);

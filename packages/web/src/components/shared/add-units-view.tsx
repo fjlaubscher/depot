@@ -1,6 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { useMemo, useCallback, useEffect, useState } from 'react';
-import type { depot } from '@depot/core';
+import { useMemo, useEffect, useState } from 'react';
 
 import { PageHeader, Breadcrumbs, Alert } from '@/components/ui';
 import BackButton from './back-button';
@@ -61,39 +60,20 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
 
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
 
-  const aggregatedSelection = useMemo<SelectionGroup[]>(() => {
-    const groups = new Map<string, SelectionGroup>();
-
-    selectedUnits.forEach((unit) => {
-      const key = `${unit.datasheet.id}-${unit.modelCost.line}`;
-      const existing = groups.get(key);
-
-      if (existing) {
-        existing.count += 1;
-      } else {
-        groups.set(key, {
-          count: 1,
-          datasheet: unit.datasheet,
-          modelCost: unit.modelCost
-        });
-      }
-    });
-
-    return Array.from(groups.values());
-  }, [selectedUnits]);
-
-  const incrementUnit = useCallback(
-    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      addToSelection(datasheet, modelCost);
-    },
-    [addToSelection]
-  );
-
-  const decrementUnit = useCallback(
-    (datasheet: depot.Datasheet, modelCost: depot.ModelCost) => {
-      removeLatestUnit(datasheet, modelCost);
-    },
-    [removeLatestUnit]
+  const aggregatedSelection = useMemo<SelectionGroup[]>(
+    () =>
+      Array.from(
+        Map.groupBy(
+          selectedUnits,
+          (unit) => `${unit.datasheet.id}-${unit.modelCost.line}`
+        ).values(),
+        (group) => ({
+          count: group.length,
+          datasheet: group[0].datasheet,
+          modelCost: group[0].modelCost
+        })
+      ),
+    [selectedUnits]
   );
 
   const showLegends = settings.showLegends ?? false;
@@ -175,7 +155,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
             renderDatasheet={(datasheet) => (
               <DatasheetSelectionCard
                 datasheet={datasheet}
-                onAdd={incrementUnit}
+                onAdd={addToSelection}
                 getUnitCount={getUnitCount}
               />
             )}
@@ -188,8 +168,8 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
           totalPoints={totalSelectedPoints}
           onClear={clearSelection}
           onConfirm={() => void onConfirm(selectedUnits, clearSelection)}
-          onIncrement={incrementUnit}
-          onDecrement={decrementUnit}
+          onIncrement={addToSelection}
+          onDecrement={removeLatestUnit}
           isOpen={isSummaryOpen}
           onOpenChange={setIsSummaryOpen}
         />

@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
 import { RosterEmptyState, RosterSection } from '@/components/shared';
-import { RosterUnitList } from '@/components/shared/roster';
 import ViewRosterUnitCard from './view-roster-unit-card';
 
 interface UnitsTabProps {
@@ -21,10 +20,11 @@ const UnitsTab: React.FC<UnitsTabProps> = ({ units }) => {
   return (
     <div className="flex flex-col gap-4" data-testid="units-tab">
       <RosterSection title={`Units (${sortedUnits.length})`}>
-        <RosterUnitList
-          units={sortedUnits}
-          renderUnit={(unit) => <ViewRosterUnitCard key={unit.id} unit={unit} />}
-        />
+        <div className="flex flex-col gap-4">
+          {sortedUnits.map((unit) => (
+            <ViewRosterUnitCard key={unit.id} unit={unit} />
+          ))}
+        </div>
       </RosterSection>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import type { depot } from '@depot/core';
@@ -6,7 +6,7 @@ import type { depot } from '@depot/core';
 import { PageHeader, Breadcrumbs, Button, Card, Alert } from '@/components/ui';
 import BackButton from '@/components/shared/back-button';
 import { DatasheetComposition } from '@/components/shared/datasheet';
-import WargearSelectionContainer from './wargear-selection-container';
+import WargearSelection from '@/components/shared/wargear-selection';
 import ModelCostSelection from './model-cost-selection';
 import WargearAbilitiesSelection from './wargear-abilities-selection';
 import { parseLoadoutWargear } from '@depot/core/utils/wargear';
@@ -23,9 +23,8 @@ export interface UnitEditSelection {
 }
 
 interface UnitEditShellProps {
-  /** CollectionUnit is structurally assignable to RosterUnit, so both work here. */
+  /** CollectionUnit is structurally assignable to RosterUnit, so both work here. Key the shell by unit id so a new unit gets fresh state. */
   unit: depot.RosterUnit;
-  unitId?: string;
   testId: string;
   backTo: string;
   backLabel: string;
@@ -46,7 +45,6 @@ interface UnitEditShellProps {
 
 const UnitEditShell: React.FC<UnitEditShellProps> = ({
   unit,
-  unitId,
   testId,
   backTo,
   backLabel,
@@ -64,54 +62,37 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   const navigate = useNavigate();
   const availableModelCosts = modelCosts ?? modelCostsForOrdinal(unit.datasheet.modelCosts);
 
-  // Track which unit we've initialized to avoid resetting user selections
-  const initializedUnitRef = useRef<string | null>(null);
-
-  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>([]);
+  const [selectedWargear, setSelectedWargear] = useState<depot.Wargear[]>(() => {
+    if (unit.selectedWargear?.length) return unit.selectedWargear;
+    if (!unit.datasheet.loadout || unit.datasheet.wargear.length === 0) return [];
+    // Auto-select wargear based on loadout parsing
+    const matchedIds = parseLoadoutWargear(unit.datasheet.loadout, unit.datasheet.wargear);
+    return unit.datasheet.wargear.filter((w) => matchedIds.includes(w.id));
+  });
   const [selectedModelCost, setSelectedModelCost] = useState<depot.ModelCost | undefined>(
-    unit?.modelCost
+    unit.modelCost
   );
-  const [selectedWargearAbilities, setSelectedWargearAbilities] = useState<depot.Ability[]>([]);
+  const [selectedWargearAbilities, setSelectedWargearAbilities] = useState<depot.Ability[]>(() =>
+    normalizeSelectedWargearAbilities(unit.selectedWargearAbilities, unit.datasheet.abilities)
+  );
 
-  // Initialize wargear only when switching to a new unit
-  useEffect(() => {
-    if (unit && unitId && initializedUnitRef.current !== unitId) {
-      let wargearToSelect: depot.Wargear[] = [];
+  const toggleWargear = (wargear: depot.Wargear, selected: boolean) =>
+    setSelectedWargear((prev) =>
+      selected
+        ? prev.some((existing) => existing.id === wargear.id)
+          ? prev
+          : [...prev, wargear]
+        : prev.filter((existing) => existing.id !== wargear.id)
+    );
 
-      if (unit.selectedWargear && unit.selectedWargear.length > 0) {
-        // Use existing selections if they exist
-        wargearToSelect = unit.selectedWargear;
-      } else if (unit.datasheet.loadout && unit.datasheet.wargear.length > 0) {
-        // Auto-select wargear based on loadout parsing
-        const matchedIds = parseLoadoutWargear(unit.datasheet.loadout, unit.datasheet.wargear);
-        wargearToSelect = unit.datasheet.wargear.filter((w) => matchedIds.includes(w.id));
-      }
-
-      setSelectedWargear(wargearToSelect);
-      setSelectedModelCost(unit.modelCost);
-      setSelectedWargearAbilities(
-        normalizeSelectedWargearAbilities(unit.selectedWargearAbilities, unit.datasheet.abilities)
-      );
-
-      initializedUnitRef.current = unitId;
-    }
-  }, [unitId, unit]);
-
-  const shouldShowWargearOptions = useMemo(() => {
-    if (!unit?.datasheet.options) return false;
-    if (unit.datasheet.options.length === 0) return false;
-    if (
-      unit.datasheet.options.length === 1 &&
-      unit.datasheet.options[0].description.toLowerCase().trim() === 'none'
-    ) {
-      return false;
-    }
-    return true;
-  }, [unit?.datasheet.options]);
+  const options = unit.datasheet.options ?? [];
+  const shouldShowWargearOptions =
+    options.length > 0 &&
+    !(options.length === 1 && options[0].description.toLowerCase().trim() === 'none');
 
   const wargearAbilities = useMemo(
-    () => getWargearAbilities(unit?.datasheet.abilities ?? []),
-    [unit?.datasheet.abilities]
+    () => getWargearAbilities(unit.datasheet.abilities ?? []),
+    [unit.datasheet.abilities]
   );
 
   const handleSave = () =>
@@ -188,10 +169,10 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
             <div className="flex flex-col gap-4">
               <h3 className="text-lg font-semibold text-foreground">Wargear</h3>
               <p className="text-sm text-muted">Select wargear options for this unit</p>
-              <WargearSelectionContainer
-                unit={unit}
+              <WargearSelection
+                wargear={unit.datasheet.wargear}
                 selectedWargear={selectedWargear}
-                onWargearChange={setSelectedWargear}
+                onSelectionChange={toggleWargear}
               />
             </div>
           </Card>
