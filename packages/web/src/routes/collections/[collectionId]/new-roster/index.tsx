@@ -4,8 +4,8 @@ import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
-import { BackButton, DatasheetBrowser } from '@/components/shared';
-import { Alert, Breadcrumbs, Loader, PageHeader } from '@/components/ui';
+import { DatasheetBrowser } from '@/components/shared';
+import { Alert, Loader } from '@/components/ui';
 import { RosterEmptyState } from '@/components/shared/roster';
 import useCollection from '@/hooks/use-collection';
 import { useDocumentTitle } from '@/hooks/use-document-title';
@@ -155,26 +155,12 @@ const CollectionNewRoster: React.FC = () => {
   }
 
   return (
-    <AppLayout title={pageTitle}>
-      <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
-        <BackButton
-          to={`/collections/${collection.id}`}
-          label="Back to Collection"
-          className="md:hidden"
-        />
-
-        <div className="hidden md:block">
-          <Breadcrumbs
-            items={[
-              { label: 'Collections', path: '/collections' },
-              { label: collection.name, path: `/collections/${collection.id}` },
-              { label: 'Select units', path: `/collections/${collection.id}/new-roster` }
-            ]}
-          />
-        </div>
-
-        <PageHeader title="Build roster from collection" subtitle={subtitle} />
-
+    <AppLayout
+      title={pageTitle}
+      back={{ to: `/collections/${collection.id}`, label: collection.name }}
+      heading={{ title: 'Build roster', subtitle: `${collection.name} · ${subtitle}` }}
+    >
+      <div className={`flex flex-col gap-3${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
         {collection.items.length === 0 ? (
           <RosterEmptyState
             title="No units in this collection"

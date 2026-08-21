@@ -3,7 +3,6 @@ import { createSlugGenerator } from './slug.js';
 import {
   buildFactionDetachments,
   formatChapterDpLine,
-  formatDetachmentOptionLabel,
   matchDetachment,
   toDepotEnhancement
 } from './detachments.js';
@@ -187,25 +186,7 @@ describe('detachment helpers', () => {
     });
   });
 
-  it('formats picker labels and chapter DP lines', () => {
-    expect(
-      formatDetachmentOptionLabel({
-        name: 'Gladius Task Force',
-        type: '',
-        dp: '2',
-        forceDisposition: 'Take and Hold'
-      })
-    ).toBe('Gladius Task Force · 2 DP · Take and Hold');
-
-    expect(
-      formatDetachmentOptionLabel({
-        name: 'Shield of the Void',
-        type: 'Boarding Actions',
-        dp: '',
-        forceDisposition: ''
-      })
-    ).toBe('Shield of the Void · Boarding Actions');
-
+  it('formats chapter DP lines', () => {
     expect(
       formatChapterDpLine([
         { keyword: 'Black Templars', dp: '2' },

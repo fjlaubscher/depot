@@ -125,3 +125,16 @@ const normalizeDatasheetCosts = (rows: DatasheetModelCost[]): ModelCost[] => {
  */
 export const normalizeModelCosts = (rows: DatasheetModelCost[]): ModelCost[] =>
   [...groupBy(rows, (row) => row.datasheetId).values()].flatMap(normalizeDatasheetCosts);
+
+/**
+ * Display points for a list row: the cheapest numeric cost, suffixed with `+`
+ * when the datasheet offers more than one price (unit size or cost bracket).
+ * `null` when nothing on the sheet has a numeric cost.
+ */
+export const summarizeModelCosts = (costs: ModelCost[]): string | null => {
+  const values = selectableModelCosts(costs).map((cost) => parseInt(cost.cost, 10));
+  if (values.length === 0) return null;
+
+  const cheapest = Math.min(...values);
+  return new Set(values).size > 1 ? `${cheapest}+` : `${cheapest}`;
+};

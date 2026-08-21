@@ -5,7 +5,6 @@ import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
 import { useToast } from '@/contexts/toast/context';
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 
 import AppLayout from '@/components/layout';
 import { Loader } from '@/components/ui';
@@ -20,10 +19,13 @@ const AddRosterUnitsView: FC = () => {
   const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
 
   const pageTitle = roster.id ? `${roster.name} - Add Roster Units` : 'Add Roster Units';
-  useDocumentTitle(pageTitle);
 
   if (!roster.id) {
-    return <Loader />;
+    return (
+      <AppLayout title={pageTitle} back={{ to: '/rosters', label: 'Rosters' }}>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   const handleAddSelectedUnits = (selectedUnits: SelectedUnit[]) => {
@@ -46,16 +48,10 @@ const AddRosterUnitsView: FC = () => {
     <AddUnitsView
       factionSlug={rosterFactionSlug}
       backTo={`/rosters/${roster.id}/edit`}
-      backLabel="Back to Roster"
-      backAriaLabel="Back to Edit Roster"
-      breadcrumbs={[
-        { label: 'Rosters', path: '/rosters' },
-        { label: roster.name, path: `/rosters/${roster.id}` },
-        { label: 'Edit', path: `/rosters/${roster.id}/edit` },
-        { label: 'Add Units', path: `/rosters/${roster.id}/add-units` }
-      ]}
-      title={roster.name}
-      subtitle={getRosterSubtitle(roster)}
+      backLabel={roster.name}
+      documentTitle={pageTitle}
+      title="Add units"
+      subtitle={`${roster.name} · ${getRosterSubtitle(roster)}`}
       headerStats={<RosterHeader roster={roster} />}
       onConfirm={handleAddSelectedUnits}
     />
@@ -66,11 +62,9 @@ const AddRosterUnitsPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Add Units to Roster">
-      <RosterProvider rosterId={rosterId}>
-        <AddRosterUnitsView />
-      </RosterProvider>
-    </AppLayout>
+    <RosterProvider rosterId={rosterId}>
+      <AddRosterUnitsView />
+    </RosterProvider>
   );
 };
 

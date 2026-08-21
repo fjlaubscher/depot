@@ -7,7 +7,7 @@ import type { CachedFaction } from '@/types/offline';
 // Database configuration constants
 const DB_CONFIG = {
   NAME: 'depot-offline',
-  VERSION: 10 // Force cache destroy/rebuild after offline schema changes
+  VERSION: 11 // Force cache destroy/rebuild after offline schema changes
 } as const;
 
 const STORES = {

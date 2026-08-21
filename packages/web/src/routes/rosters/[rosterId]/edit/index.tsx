@@ -1,15 +1,14 @@
 import { useMemo, type FC } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Eye, Plus, Pencil } from 'lucide-react';
+import type { depot } from '@depot/core';
 
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 import AppLayout from '@/components/layout';
-import { PageHeader, Loader, Breadcrumbs, Button, Grid } from '@/components/ui';
-import { BackButton } from '@/components/shared';
+import { Button, Loader } from '@/components/ui';
 import {
   RosterHeader,
   RosterSection,
@@ -18,15 +17,37 @@ import {
 } from '@/components/shared/roster';
 import { getRosterSubtitle } from '@depot/core/utils/roster';
 import { validateRoster } from '@depot/core/utils/roster-legality';
+import {
+  BATTLEFIELD_ROLES,
+  BATTLEFIELD_ROLE_LABELS,
+  getBattlefieldRole
+} from '@depot/core/utils/datasheets';
 import RosterIssues from '@/routes/rosters/_components/roster-issues';
+
+const unitPoints = (unit: depot.RosterUnit) => parseInt(unit.modelCost.cost, 10) || 0;
 
 const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
-  const sortedUnits = [...roster.units].sort((a, b) =>
-    a.datasheet.name.localeCompare(b.datasheet.name)
-  );
+  /** Sections by battlefield role, mirroring how a list is written out. */
+  const sections = useMemo(() => {
+    const byRole = new Map<string, depot.RosterUnit[]>();
+    for (const unit of roster.units) {
+      const role = getBattlefieldRole(unit.datasheet);
+      byRole.set(role, [...(byRole.get(role) ?? []), unit]);
+    }
+    return BATTLEFIELD_ROLES.filter((role) => byRole.has(role)).map((role) => {
+      const units = [...byRole.get(role)!].sort((a, b) =>
+        a.datasheet.name.localeCompare(b.datasheet.name)
+      );
+      return {
+        role,
+        units,
+        points: units.reduce((total, unit) => total + unitPoints(unit), 0)
+      };
+    });
+  }, [roster.units]);
 
   // Same unit badges as the view roster: warlord, enhancement, unit-scoped legality.
   const issuesByUnit = useMemo(() => {
@@ -43,86 +64,63 @@ const RosterEdit: FC = () => {
     [roster.enhancements]
   );
 
-  useDocumentTitle(roster.id ? `${roster.name} - Manage Roster Units` : 'Manage Roster Units');
   useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
     return (
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to="/rosters"
-          label="Rosters"
-          ariaLabel="Back to Rosters"
-          className="md:hidden"
-        />
+      <AppLayout title="Manage Roster Units" back={{ to: '/rosters', label: 'Rosters' }}>
         <Loader />
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <BackButton to="/rosters" label="Rosters" ariaLabel="Back to Rosters" className="md:hidden" />
-
-      {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block">
-        <Breadcrumbs
-          items={[
-            { label: 'Rosters', path: '/rosters' },
-            { label: roster.name, path: `/rosters/${roster.id}` }
-          ]}
-        />
-      </div>
-
-      <PageHeader
-        title={roster.name}
-        subtitle={getRosterSubtitle(roster)}
-        action={{
+    <AppLayout
+      title={`${roster.name} - Manage Roster Units`}
+      back={{ to: '/rosters', label: 'Rosters' }}
+      heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
+      actions={[
+        {
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/details`),
           ariaLabel: 'Edit roster details'
-        }}
-      />
+        },
+        {
+          icon: <Eye size={16} />,
+          onClick: () => navigate(`/rosters/${roster.id}`),
+          ariaLabel: 'View roster',
+          'data-testid': 'view-roster-button'
+        }
+      ]}
+      footer={
+        <Button
+          fullWidth
+          onClick={() => navigate(`/rosters/${roster.id}/add-units`)}
+          data-testid="add-units-button"
+        >
+          <Plus size={16} />
+          Add units
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        {/* The budget bar is the thing you check between every edit — it stays at the top. */}
+        <div className="surface-card p-3 lg:sticky lg:top-0 lg:z-10">
+          <RosterHeader roster={roster} />
+        </div>
 
-      {/* Desktop splits list from budget: the points bar stays put while the list scrolls */}
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-        <aside className="order-first flex flex-col gap-4 lg:order-last lg:sticky lg:top-4">
-          <div className="surface-card p-3">
-            <RosterHeader roster={roster} />
-          </div>
+        <RosterIssues roster={roster} />
 
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="default"
-              onClick={() => navigate(`/rosters/${roster.id}/add-units`)}
-              className="flex-1"
-              data-testid="add-units-button"
-            >
-              <Plus size={16} />
-              Add Units
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => navigate(`/rosters/${roster.id}`)}
-              className="flex-1"
-              data-testid="view-roster-button"
-            >
-              <Eye size={16} />
-              View Roster
-            </Button>
-          </div>
-
-          <RosterIssues roster={roster} />
-        </aside>
-
-        <div className="min-w-0">
-          {roster.units.length > 0 ? (
+        {sections.length > 0 ? (
+          sections.map(({ role, units, points }) => (
             <RosterSection
-              title={`Units (${sortedUnits.length})`}
-              data-testid="roster-units-section"
+              key={role}
+              title={BATTLEFIELD_ROLE_LABELS[role]}
+              count={`${units.length} · ${points} PTS`}
+              data-testid={`roster-units-${role}`}
             >
-              <Grid cols={2}>
-                {sortedUnits.map((unit) => (
+              <div className="grid gap-1 lg:grid-cols-2">
+                {units.map((unit) => (
                   <RosterUnitCardEdit
                     key={unit.id}
                     unit={unit}
@@ -135,23 +133,23 @@ const RosterEdit: FC = () => {
                     issues={issuesByUnit.get(unit.id)}
                   />
                 ))}
-              </Grid>
+              </div>
             </RosterSection>
-          ) : (
-            <RosterEmptyState
-              title="No units in this roster"
-              dataTestId="empty-roster-state"
-              action={{
-                label: 'Add units',
-                onClick: () => navigate(`/rosters/${roster.id}/add-units`),
-                icon: <Plus size={14} />,
-                testId: 'empty-roster-add-units'
-              }}
-            />
-          )}
-        </div>
+          ))
+        ) : (
+          <RosterEmptyState
+            title="No units in this roster"
+            dataTestId="empty-roster-state"
+            action={{
+              label: 'Add units',
+              onClick: () => navigate(`/rosters/${roster.id}/add-units`),
+              icon: <Plus size={14} />,
+              testId: 'empty-roster-add-units'
+            }}
+          />
+        )}
       </div>
-    </div>
+    </AppLayout>
   );
 };
 
@@ -159,11 +157,9 @@ const RosterPage: FC = () => {
   const { rosterId } = useParams<{ rosterId: string }>();
 
   return (
-    <AppLayout title="Manage Roster Units">
-      <RosterProvider rosterId={rosterId}>
-        <RosterEdit />
-      </RosterProvider>
-    </AppLayout>
+    <RosterProvider rosterId={rosterId}>
+      <RosterEdit />
+    </RosterProvider>
   );
 };
 

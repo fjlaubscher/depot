@@ -34,8 +34,7 @@ describe('DetachmentPage', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByTestId('detachment-header')).toHaveTextContent('Gladius Task Force');
-    expect(screen.getByTestId('detachment-header')).toHaveTextContent('2 DP · Take and Hold');
+    expect(screen.getByRole('heading', { name: 'Gladius Task Force' })).toBeInTheDocument();
     expect(screen.getByTestId('detachment-meta')).toHaveTextContent('2 DP');
     expect(screen.getByTestId('detachment-chapter-dp')).toHaveTextContent('Black Templars 2 DP');
     expect(screen.getByTestId('detachment-abilities')).toHaveTextContent('Combat Doctrines');

@@ -1,8 +1,7 @@
 // Core UI Components built with Tailwind CSS
 export { default as ActionGroup } from './action-group';
 export { default as Alert } from './alert';
-export { default as Breadcrumbs } from './breadcrumbs';
-export { default as Button } from './button';
+export { default as Button, buttonClasses } from './button';
 export { default as Card } from './card';
 export { default as CollapsibleSection } from './collapsible-section';
 export { default as Drawer } from './drawer';
@@ -11,12 +10,11 @@ export { default as Field } from './field';
 export { default as Filters } from './filters';
 export { default as Grid } from './grid';
 export { default as IconButton } from './icon-button';
-export { default as Layout } from './layout';
 export { default as LinkCard } from './link-card';
 export { default as Loader } from './loader';
-export { default as PageHeader } from './page-header';
 export { default as QuantityStepper } from './quantity-stepper';
 export { default as Search } from './search';
+export { default as SectionHeader } from './section-header';
 export { default as SelectField } from './select-field';
 export { default as Sheet } from './sheet';
 export { Skeleton, SkeletonCard, PageHeaderSkeleton } from './skeleton';

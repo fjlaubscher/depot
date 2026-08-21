@@ -66,15 +66,6 @@ export const buildFactionDetachments = ({
   return sortByName(built);
 };
 
-export const formatDetachmentOptionLabel = (
-  detachment: Pick<Detachment, 'name' | 'type' | 'dp' | 'forceDisposition'>
-): string =>
-  detachment.type
-    ? `${detachment.name} · ${detachment.type}`
-    : [detachment.name, detachment.dp && `${detachment.dp} DP`, detachment.forceDisposition]
-        .filter(Boolean)
-        .join(' · ');
-
 export const formatChapterDpLine = (chapterDp: { keyword: string; dp: string }[]): string =>
   chapterDp.map((entry) => `${entry.keyword} ${entry.dp} DP`).join(', ');
 

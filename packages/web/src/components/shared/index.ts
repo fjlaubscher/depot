@@ -1,6 +1,6 @@
 // Navigation
-export { default as BackButton } from './back-button';
 export { ErrorBoundary } from './error-boundary';
+export { default as PillTabs } from './pill-tabs';
 
 // Data display
 export { default as AbilitySheet } from './ability-sheet';

@@ -1,53 +1,41 @@
 import { useNavigate } from 'react-router-dom';
-import { Home, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 // UI Components
 import AppLayout from '@/components/layout';
 import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <AppLayout title="Page Not Found">
-      <div className="flex flex-1 items-center justify-center p-4">
-        <Card className="max-w-md text-center">
-          <div className="space-y-6">
-            {/* Large 404 Display */}
-            <div className="space-y-2">
-              <div className="font-mono text-6xl font-bold text-hint">404</div>
-              <Search size={64} className="mx-auto text-hint" data-testid="not-found-icon" />
-            </div>
-
-            {/* Error Message */}
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-foreground" data-testid="page-heading">
-                Page Not Found
-              </h2>
-              <p className="text-muted">
-                The page you're looking for has been moved, deleted, or doesn't exist.
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-3">
-              <Button onClick={() => navigate('/')} className="w-full" data-testid="go-home-button">
-                <Home size={16} className="mr-2" />
-                Return to Home
-              </Button>
-
-              <Button
-                variant="secondary"
-                onClick={() => window.history.back()}
-                className="w-full"
-                data-testid="go-back-button"
-              >
-                Go Back
-              </Button>
-            </div>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="max-w-sm text-center">
+          <div className="font-mono text-[32px] leading-none font-bold text-hint">404</div>
+          <Search size={28} className="mx-auto mt-3 text-hint" data-testid="not-found-icon" />
+          <h1
+            className="mt-2.5 text-base leading-snug font-bold text-foreground"
+            data-testid="page-heading"
+          >
+            Page Not Found
+          </h1>
+          <p className="mt-1 text-[12.5px] leading-normal text-muted">
+            The page you're looking for has been moved, deleted, or doesn't exist.
+          </p>
+          <div className="mt-3.5 flex justify-center gap-1">
+            <Button variant="secondary" onClick={() => navigate('/')} data-testid="go-home-button">
+              Return home
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => window.history.back()}
+              data-testid="go-back-button"
+            >
+              Go back
+            </Button>
           </div>
-        </Card>
+        </div>
       </div>
     </AppLayout>
   );

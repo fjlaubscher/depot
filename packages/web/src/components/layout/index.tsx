@@ -1,67 +1,170 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Home, Users, Settings, ClipboardList, Boxes } from 'lucide-react';
+import { ArrowLeft, Home, Users, Settings, ClipboardList, Boxes, WifiOff } from 'lucide-react';
 
-import { useLayoutContext } from '@/contexts/layout/context';
+import Logo from '@/components/logo';
+import ActionGroup from '@/components/ui/action-group';
+import type { Action } from '@/components/ui/action-group';
+import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useFactionsContext } from '@/contexts/factions/context';
+import useOnlineStatus from '@/hooks/use-online-status';
+import useDataVersionToast from '@/hooks/use-data-version-toast';
 import { cx } from '@/utils/cx';
-
-import { Layout } from '../ui';
 
 const NAV_ITEMS = [
   { to: '/', icon: Home, label: 'Home', end: true },
-  { to: '/collections', icon: Boxes, label: 'Collections' },
   { to: '/factions', icon: Users, label: 'Factions' },
   { to: '/rosters', icon: ClipboardList, label: 'Rosters' },
+  { to: '/collections', icon: Boxes, label: 'Collections' },
   { to: '/settings', icon: Settings, label: 'Settings' }
 ];
 
+const Brand = () => (
+  <Link to="/" className="flex items-center gap-2 min-w-0">
+    <span className="grid place-items-center size-6 rounded-xs bg-accent-600 dark:bg-accent-500 text-white">
+      <Logo />
+    </span>
+    <span className="text-base font-bold text-foreground">depot</span>
+  </Link>
+);
+
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
+  /** Document title. */
   title: string;
+  /**
+   * Drill-in screens pass this and get a sticky back header instead of the
+   * bottom tab bar — the five root tabs keep the bar.
+   */
+  back?: { to: string; label: string };
+  heading?: { title: string; subtitle?: string };
+  /** Icon buttons pinned to the right of the back header. */
+  actions?: Action[];
+  /** Sticky bottom action bar (primary CTA + secondary). */
+  footer?: ReactNode;
 }
 
-const AppLayout = ({ children, title }: Props) => {
-  const { closeSidebar } = useLayoutContext();
-  const appVersion = import.meta.env.VITE_APP_VERSION?.trim() || 'dev';
+const AppLayout = ({ children, title, back, heading, actions, footer }: Props) => {
+  const { dataVersion } = useFactionsContext();
+  const online = useOnlineStatus();
 
-  const sidebar = (
-    <div className="space-y-4">
-      <div className="space-y-0.5">
+  useDocumentTitle(title);
+  useDataVersionToast(dataVersion);
+
+  return (
+    <div className="flex h-dvh bg-surface-base">
+      {/* Desktop nav rail */}
+      <aside className="hidden lg:flex w-[220px] flex-none flex-col gap-0.5 border-r border-border-subtle bg-surface-muted px-2 py-4">
+        <div className="px-2.5 pb-3.5">
+          <Brand />
+        </div>
         {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
-            onClick={closeSidebar}
             className={({ isActive }) =>
-              cx('sidebar-item', isActive && 'border-l-border-accent bg-surface-accent text-accent')
+              cx(
+                'flex items-center gap-2.5 h-10 px-2.5 text-[13px] font-bold border-l-2 transition-colors',
+                isActive
+                  ? 'border-border-accent bg-surface-accent text-accent'
+                  : 'border-transparent text-muted hover:text-foreground'
+              )
             }
           >
-            <Icon size={16} />
-            <span>{label}</span>
+            <Icon size={14} />
+            {label}
           </NavLink>
         ))}
-      </div>
+        <div className="mt-auto flex flex-col gap-1 px-2.5 pt-4">
+          <span className="type-label text-hint">DATA {dataVersion ?? 'UNKNOWN'}</span>
+          <Link to="/about" className="link-subtle text-xs">
+            About
+          </Link>
+          <Link to="/privacy" className="link-subtle text-xs">
+            Privacy
+          </Link>
+        </div>
+      </aside>
 
-      <div className="pt-4 border-t border-border-subtle text-xs text-subtle flex flex-col gap-2">
-        <span>
-          <span className="font-semibold text-muted">depot </span>
-          <span>v{appVersion}</span>
-        </span>
-        <Link to="/about" onClick={closeSidebar} className="link-subtle">
-          About
-        </Link>
-        <Link to="/privacy" onClick={closeSidebar} className="link-subtle">
-          Privacy Policy
-        </Link>
+      <div className="flex flex-1 flex-col min-w-0">
+        {!online && (
+          <div
+            className="flex flex-none items-center gap-2 border-b border-warning-border bg-warning-surface px-4 py-2"
+            data-testid="offline-banner"
+          >
+            <WifiOff size={14} className="shrink-0 text-warning-fg" />
+            <p className="text-xs leading-snug text-body">
+              <span className="font-bold text-warning-fg">Offline</span> — everything still works ·
+              data {dataVersion ?? 'unknown'}
+            </p>
+          </div>
+        )}
+
+        {back && (
+          <header className="flex flex-none items-center gap-0.5 h-[52px] px-1.5 border-b border-border-subtle bg-surface-base">
+            <Link
+              to={back.to}
+              aria-label={`Back to ${back.label}`}
+              title={`Back to ${back.label}`}
+              data-testid="mobile-back-button"
+              className="grid place-items-center size-11 flex-none text-body hover:text-foreground rounded-sm focus-ring-primary"
+            >
+              <ArrowLeft size={18} />
+            </Link>
+            {heading && (
+              <div className="min-w-0 flex-1" data-testid="page-header">
+                <h1 className="truncate text-[15px] leading-tight font-bold text-foreground">
+                  {heading.title}
+                </h1>
+                {heading.subtitle && (
+                  <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
+                    {heading.subtitle}
+                  </p>
+                )}
+              </div>
+            )}
+            {actions && actions.length > 0 && (
+              <ActionGroup actions={actions} spacing="tight" className="flex-none" />
+            )}
+          </header>
+        )}
+
+        <main id="app-content" className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[960px] px-4 py-4">{children}</div>
+        </main>
+
+        {footer && (
+          <div className="flex flex-none gap-1 border-t border-border-subtle bg-surface-muted px-4 pt-2.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))]">
+            {footer}
+          </div>
+        )}
+
+        {!back && (
+          <nav
+            aria-label="Primary"
+            className="flex flex-none border-t border-border-subtle bg-surface-muted pt-1.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] lg:hidden"
+          >
+            {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  cx(
+                    'flex flex-1 flex-col items-center justify-center gap-0.5 min-h-11 font-mono text-[9px] font-medium uppercase tracking-wide',
+                    isActive ? 'text-accent' : 'text-subtle'
+                  )
+                }
+              >
+                <Icon size={18} />
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
       </div>
     </div>
-  );
-
-  return (
-    <Layout title={title} sidebar={sidebar}>
-      {children}
-    </Layout>
   );
 };
 

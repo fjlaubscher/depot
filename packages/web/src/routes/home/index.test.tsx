@@ -91,7 +91,7 @@ describe('Home', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByTestId('home-hero')).toHaveTextContent('11th edition is here');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('Muster your forces');
     const links = within(screen.getByTestId('hero-links'));
     expect(links.getByRole('link', { name: /Factions/ })).toHaveAttribute('href', '/factions');
     expect(links.getByRole('link', { name: /Collections/ })).toHaveAttribute(
@@ -102,7 +102,7 @@ describe('Home', () => {
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
-    expect(screen.getByText(/Last updated: 2024.10.01/i)).toBeInTheDocument();
+    expect(screen.getByText(/DATA 2024.10.01/i)).toBeInTheDocument();
   });
 
   it('previews bookmarks and recent rosters when present', () => {

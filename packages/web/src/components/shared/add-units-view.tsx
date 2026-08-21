@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { useMemo, useEffect, useState } from 'react';
 
-import { PageHeader, Breadcrumbs, Alert } from '@/components/ui';
-import BackButton from './back-button';
+import AppLayout from '@/components/layout';
+import { Alert } from '@/components/ui';
 import { DatasheetBrowser, DatasheetSelectionCard, DatasheetBrowserSkeleton } from './datasheet';
 import SelectionSummary from './selection-summary';
 import type { SelectionGroup } from './selection-summary';
@@ -17,10 +17,10 @@ interface AddUnitsViewProps {
   factionSlug?: string;
   backTo: string;
   backLabel: string;
-  backAriaLabel?: string;
-  breadcrumbs: { label: string; path: string }[];
+  documentTitle: string;
   title: string;
   subtitle?: string;
+  /** Budget context pinned above the list — e.g. the roster points bar. */
   headerStats?: ReactNode;
   /** Noun used in the info alert copy, e.g. "roster" or "collection". */
   onConfirm: (selectedUnits: SelectedUnit[], clearSelection: () => void) => void | Promise<void>;
@@ -30,8 +30,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
   factionSlug,
   backTo,
   backLabel,
-  backAriaLabel,
-  breadcrumbs,
+  documentTitle,
   title,
   subtitle,
   headerStats,
@@ -94,85 +93,79 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
   );
 
   return (
-    <div className={`flex flex-col gap-4${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
-      <BackButton
-        to={backTo}
-        label={backLabel}
-        ariaLabel={backAriaLabel ?? backLabel}
-        className="md:hidden"
-      />
+    <AppLayout
+      title={documentTitle}
+      back={{ to: backTo, label: backLabel }}
+      heading={{ title, subtitle }}
+    >
+      <div className={`flex flex-col gap-3${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
+        {headerStats ? <div className="surface-card p-3">{headerStats}</div> : null}
 
-      {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block">
-        <Breadcrumbs items={breadcrumbs} />
-      </div>
+        {factionError || datasheetError ? (
+          <Alert variant="error" title="Unable to load datasheets">
+            {datasheetError || factionError}
+          </Alert>
+        ) : null}
 
-      <PageHeader title={title} subtitle={subtitle} stats={headerStats} />
-
-      {factionError || datasheetError ? (
-        <Alert variant="error" title="Unable to load datasheets">
-          {datasheetError || factionError}
-        </Alert>
-      ) : null}
-
-      <div className="flex flex-col gap-4">
-        {factionLoading ? (
-          <DatasheetBrowserSkeleton />
-        ) : datasheetLoading ? (
-          <div
-            className="rounded-sm border border-border-subtle bg-surface-muted p-3"
-            data-testid="datasheet-loading"
-          >
-            <div className="flex items-center justify-between text-sm text-subtle">
-              <span>Loading datasheets</span>
-              <span>
-                {datasheetProgress.loaded}/{datasheetProgress.total || '.'}
-              </span>
+        <div className="flex flex-col gap-4">
+          {factionLoading ? (
+            <DatasheetBrowserSkeleton />
+          ) : datasheetLoading ? (
+            <div
+              className="rounded-sm border border-border-subtle bg-surface-muted p-3"
+              data-testid="datasheet-loading"
+            >
+              <div className="flex items-center justify-between text-sm text-subtle">
+                <span>Loading datasheets</span>
+                <span>
+                  {datasheetProgress.loaded}/{datasheetProgress.total || '.'}
+                </span>
+              </div>
+              <div className="mt-2 h-2 rounded-sm bg-surface-soft">
+                <div
+                  className="h-full rounded-sm bg-accent-500 transition-all"
+                  style={{
+                    width:
+                      datasheetProgress.total > 0
+                        ? `${Math.min(
+                            100,
+                            (datasheetProgress.loaded / datasheetProgress.total) * 100
+                          )}%`
+                        : '10%'
+                  }}
+                />
+              </div>
             </div>
-            <div className="mt-2 h-2 rounded-sm bg-surface-soft">
-              <div
-                className="h-full rounded-sm bg-accent-500 transition-all"
-                style={{
-                  width:
-                    datasheetProgress.total > 0
-                      ? `${Math.min(
-                          100,
-                          (datasheetProgress.loaded / datasheetProgress.total) * 100
-                        )}%`
-                      : '10%'
-                }}
-              />
-            </div>
-          </div>
-        ) : (
-          <DatasheetBrowser
-            datasheets={factionDatasheets}
-            searchPlaceholder="Search by unit name..."
-            emptyStateMessage="No units available for this faction."
-            filters={datasheetFilters}
-            renderDatasheet={(datasheet) => (
-              <DatasheetSelectionCard
-                datasheet={datasheet}
-                onAdd={addToSelection}
-                getUnitCount={getUnitCount}
-              />
-            )}
+          ) : (
+            <DatasheetBrowser
+              datasheets={factionDatasheets}
+              searchPlaceholder="Search by unit name..."
+              emptyStateMessage="No units available for this faction."
+              filters={datasheetFilters}
+              renderDatasheet={(datasheet) => (
+                <DatasheetSelectionCard
+                  datasheet={datasheet}
+                  onAdd={addToSelection}
+                  getUnitCount={getUnitCount}
+                />
+              )}
+            />
+          )}
+
+          <SelectionSummary
+            groups={aggregatedSelection}
+            selectedUnitsCount={selectedUnits.length}
+            totalPoints={totalSelectedPoints}
+            onClear={clearSelection}
+            onConfirm={() => void onConfirm(selectedUnits, clearSelection)}
+            onIncrement={addToSelection}
+            onDecrement={removeLatestUnit}
+            isOpen={isSummaryOpen}
+            onOpenChange={setIsSummaryOpen}
           />
-        )}
-
-        <SelectionSummary
-          groups={aggregatedSelection}
-          selectedUnitsCount={selectedUnits.length}
-          totalPoints={totalSelectedPoints}
-          onClear={clearSelection}
-          onConfirm={() => void onConfirm(selectedUnits, clearSelection)}
-          onIncrement={addToSelection}
-          onDecrement={removeLatestUnit}
-          isOpen={isSummaryOpen}
-          onOpenChange={setIsSummaryOpen}
-        />
+        </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

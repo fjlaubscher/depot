@@ -4,13 +4,12 @@ import { Plus, ClipboardPlus, Download, RefreshCw } from 'lucide-react';
 import type { depot } from '@depot/core';
 
 import AppLayout from '@/components/layout';
-import { BackButton } from '@/components/shared';
 import PillTabs from '@/components/shared/pill-tabs';
-import { PageHeader, Loader, Breadcrumbs, Button, Alert } from '@/components/ui';
+import { Loader, Button, Alert } from '@/components/ui';
+import { TAG_VARIANT_CLASSES } from '@/components/ui/tag';
 import { RosterSection, RosterEmptyState } from '@/components/shared/roster';
 import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import { downloadFile } from '@/utils/file';
@@ -59,7 +58,9 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
             ...COLLECTION_UNIT_STATES.map((state) => ({
               value: state,
               label: COLLECTION_STATE_META[state].label,
-              count: stateCounts[state]
+              count: stateCounts[state],
+              // Selecting a state tints the pill with that state's colour.
+              activeClassName: TAG_VARIANT_CLASSES[COLLECTION_STATE_META[state].variant]
             }))
           ]
         : [],
@@ -167,39 +168,28 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const totalUnits = collection?.items.length ?? 0;
   const hasUnits = totalUnits > 0;
   const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
-  useDocumentTitle(pageTitle);
   useScrollToHash({ enabled: Boolean(collection) });
-  const { heading: collectionHeading, subheading: collectionSubheading } = collection
+  const { heading: collectionHeading } = collection
     ? getCollectionChartCopy(collection, points)
-    : { heading: undefined, subheading: undefined };
+    : { heading: undefined };
+
+  const back = { to: '/collections', label: 'Collections' };
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to="/collections"
-          label="Collections"
-          ariaLabel="Back to Collections"
-          className="md:hidden"
-        />
+      <AppLayout title={pageTitle} back={back}>
         <Loader />
-      </div>
+      </AppLayout>
     );
   }
 
   if (error || !collection) {
     return (
-      <div className="flex flex-col gap-4">
-        <BackButton
-          to="/collections"
-          label="Collections"
-          ariaLabel="Back to Collections"
-          className="md:hidden"
-        />
+      <AppLayout title={pageTitle} back={back}>
         <Alert variant="error" title="Unable to load collection">
           {error || 'Collection not found'}
         </Alert>
-      </div>
+      </AppLayout>
     );
   }
 
@@ -207,140 +197,117 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
 
   return (
-    <div className="flex flex-col gap-4">
-      <BackButton
-        to="/collections"
-        label="Collections"
-        ariaLabel="Back to Collections"
-        className="md:hidden"
-      />
-
-      <div className="hidden md:block">
-        <Breadcrumbs
-          items={[
-            { label: 'Collections', path: '/collections' },
-            { label: collection.name, path: `/collections/${collection.id}` }
-          ]}
-        />
-      </div>
-
-      <PageHeader
-        title={collection.name}
-        subtitle={subtitle}
-        action={{
-          icon: <Plus size={16} />,
-          onClick: () => navigate(`/collections/${collection.id}/add-units`),
-          ariaLabel: 'Add units',
-          testId: 'add-collection-units-button'
-        }}
-      />
-
-      {hasUnits ? (
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={() => navigate(`/collections/${collection.id}/new-roster`)}
-            variant="secondary"
-            className="flex items-center gap-2"
-            data-testid="create-roster-from-collection-button"
-          >
-            <ClipboardPlus size={16} />
-            Create Roster
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleExportCollection}
-            className="flex items-center gap-2"
-            data-testid="export-collection-button"
-          >
-            <Download size={16} />
-            Export
-          </Button>
-        </div>
-      ) : null}
-
-      {isStale ? (
-        <Alert variant="warning" title="Collection uses older data">
-          <div className="flex flex-col gap-2">
-            <span className="text-sm text-muted">
-              Refresh to pull the latest Wahapedia data for these units.
-            </span>
-            <div>
-              <Button
-                variant="secondary"
-                onClick={() => void handleRefreshCollectionData()}
-                disabled={refreshing}
-                data-testid="refresh-collection-data"
-                className="inline-flex items-center gap-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                {refreshing ? 'Refreshing…' : 'Refresh with latest data'}
-              </Button>
+    <AppLayout
+      title={pageTitle}
+      back={back}
+      heading={{ title: collection.name, subtitle }}
+      actions={
+        hasUnits
+          ? [
+              {
+                icon: <ClipboardPlus size={16} />,
+                onClick: () => navigate(`/collections/${collection.id}/new-roster`),
+                ariaLabel: 'Create roster from collection',
+                'data-testid': 'create-roster-from-collection-button'
+              },
+              {
+                icon: <Download size={16} />,
+                onClick: handleExportCollection,
+                ariaLabel: 'Export collection',
+                'data-testid': 'export-collection-button'
+              }
+            ]
+          : undefined
+      }
+      footer={
+        <Button
+          fullWidth
+          onClick={() => navigate(`/collections/${collection.id}/add-units`)}
+          data-testid="add-collection-units-button"
+        >
+          <Plus size={16} />
+          Add units
+        </Button>
+      }
+    >
+      <div className="flex flex-col gap-3">
+        {isStale ? (
+          <Alert variant="warning" title="Collection uses older data">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm text-muted">
+                Refresh to pull the latest Wahapedia data for these units.
+              </span>
+              <div>
+                <Button
+                  variant="secondary"
+                  onClick={() => void handleRefreshCollectionData()}
+                  disabled={refreshing}
+                  data-testid="refresh-collection-data"
+                  className="inline-flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  {refreshing ? 'Refreshing…' : 'Refresh with latest data'}
+                </Button>
+              </div>
             </div>
-          </div>
-        </Alert>
-      ) : null}
+          </Alert>
+        ) : null}
 
-      {hasUnits ? (
-        <CollectionStateChart
-          items={collection.items}
-          heading={collectionHeading}
-          subheading={collectionSubheading}
-        />
-      ) : null}
+        {hasUnits ? (
+          <CollectionStateChart items={collection.items} heading={collectionHeading} />
+        ) : null}
 
-      <RosterSection
-        title={`Units (${totalUnits})`}
-        data-testid="collection-units-section"
-        className="gap-4"
-        belowContent={
-          <PillTabs
-            tabs={stateFilters}
-            active={activeStateFilter}
-            onChange={setStateFilter}
-            ariaLabel="Filter units by build state"
-            testIdPrefix="collection-state-filter"
-          />
-        }
-      >
-        {filteredItems.length > 0 ? (
-          <div className="flex flex-col gap-4" data-testid="collection-unit-cards">
-            {filteredItems.map((item) => (
-              <CollectionUnitCard
-                key={item.id}
-                unit={item}
-                collectionId={collection.id}
-                onRemove={handleRemove}
-                onDuplicate={handleDuplicate}
-                state={item.state}
-                dataTestId="collection-unit-card"
-              />
-            ))}
-          </div>
-        ) : (
-          <RosterEmptyState
-            title="No units in this collection"
-            dataTestId="empty-collection-state"
-            action={{
-              label: 'Add units',
-              onClick: () => navigate(`/collections/${collection.id}/add-units`),
-              icon: <Plus size={14} />,
-              testId: 'empty-collection-add-units'
-            }}
-          />
-        )}
-      </RosterSection>
-    </div>
+        <RosterSection
+          title="Units"
+          count={totalUnits}
+          data-testid="collection-units-section"
+          className="gap-4"
+          belowContent={
+            <PillTabs
+              tabs={stateFilters}
+              active={activeStateFilter}
+              onChange={setStateFilter}
+              ariaLabel="Filter units by build state"
+              testIdPrefix="collection-state-filter"
+            />
+          }
+        >
+          {filteredItems.length > 0 ? (
+            <div className="flex flex-col gap-4" data-testid="collection-unit-cards">
+              {filteredItems.map((item) => (
+                <CollectionUnitCard
+                  key={item.id}
+                  unit={item}
+                  collectionId={collection.id}
+                  onRemove={handleRemove}
+                  onDuplicate={handleDuplicate}
+                  state={item.state}
+                  dataTestId="collection-unit-card"
+                />
+              ))}
+            </div>
+          ) : (
+            <RosterEmptyState
+              title="No units in this collection"
+              dataTestId="empty-collection-state"
+              action={{
+                label: 'Add units',
+                onClick: () => navigate(`/collections/${collection.id}/add-units`),
+                icon: <Plus size={14} />,
+                testId: 'empty-collection-add-units'
+              }}
+            />
+          )}
+        </RosterSection>
+      </div>
+    </AppLayout>
   );
 };
 
 const CollectionPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
 
-  return (
-    <AppLayout title="Collection Overview">
-      <CollectionPageContent collectionId={collectionId} />
-    </AppLayout>
-  );
+  return <CollectionPageContent collectionId={collectionId} />;
 };
 
 export default CollectionPage;

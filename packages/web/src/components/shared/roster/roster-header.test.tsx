@@ -10,7 +10,7 @@ describe('RosterHeader', () => {
     render(<RosterHeader roster={points(1045, 1000)} />);
 
     expect(screen.getByTestId('points-display')).toHaveTextContent('1045/1000');
-    expect(screen.getByTestId('points-over')).toHaveTextContent('+45 over');
+    expect(screen.getByTestId('points-over')).toHaveTextContent('45 PTS OVER');
     // bar never exceeds 100% even though the list does
     expect(screen.getByTestId('points-bar').firstElementChild).toHaveStyle({ width: '100%' });
   });

@@ -1,19 +1,19 @@
 import React, { useMemo } from 'react';
-import { Bookmark, Boxes, ClipboardList } from 'lucide-react';
 
 import AppLayout from '@/components/layout';
-import { Loader } from '@/components/ui';
+import Logo from '@/components/logo';
+import { Loader, SectionHeader } from '@/components/ui';
 import { useFactionsContext } from '@/contexts/factions/context';
 import useRosters from '@/hooks/use-rosters';
 import useCollections from '@/hooks/use-collections';
 import useBookmarks from '@/hooks/use-bookmarks';
 import { takeRecent } from '@/utils/recent';
-import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import { validateRoster } from '@depot/core/utils/roster-legality';
 
 import Hero from './_components/hero';
-import SectionHeader from './_components/section-header';
-import PreviewCard from './_components/preview-card';
 import BookmarkCard from './_components/bookmark-card';
+import RosterRow from './_components/roster-row';
+import CollectionRow from './_components/collection-row';
 
 const PREVIEW_LIMIT = 3;
 
@@ -29,7 +29,19 @@ const Home: React.FC = () => {
 
   return (
     <AppLayout title="depot - Offline Warhammer 40,000 Companion">
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
+        {/* The desktop rail already carries the brand; this is the mobile header. */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <span className="grid size-6 place-items-center rounded-xs bg-accent-600 text-white dark:bg-accent-500">
+            <Logo />
+          </span>
+          <span className="text-[17px] leading-none font-bold text-foreground">depot</span>
+          <span className="ml-auto flex items-center gap-1.5 font-mono text-[10px] font-medium text-muted">
+            <span className="size-1.5 rounded-full bg-success-fg" aria-hidden />
+            {dataVersion ?? 'no data'}
+          </span>
+        </div>
+
         <Hero />
 
         {loading ? (
@@ -39,9 +51,9 @@ const Home: React.FC = () => {
         ) : null}
 
         {bookmarks.length > 0 ? (
-          <section className="flex flex-col gap-3" data-testid="bookmarks-section">
-            <SectionHeader icon={Bookmark} title="Bookmarks" count={bookmarks.length} />
-            <div className="flex flex-wrap gap-2" data-testid="bookmark-previews">
+          <section className="flex flex-col gap-1.5" data-testid="bookmarks-section">
+            <SectionHeader title="Bookmarks" count={bookmarks.length} />
+            <div className="-mx-4 flex gap-1 overflow-x-auto px-4" data-testid="bookmark-previews">
               {bookmarks.map((bookmark) => (
                 <BookmarkCard key={bookmark.id} bookmark={bookmark} />
               ))}
@@ -49,65 +61,48 @@ const Home: React.FC = () => {
           </section>
         ) : null}
 
-        {collections.length > 0 ? (
-          <section className="flex flex-col gap-3" data-testid="collections-section">
-            <SectionHeader
-              icon={Boxes}
-              title="Recent collections"
-              count={collections.length}
-              viewAllTo="/collections"
-              viewAllTestId="view-all-collections"
-            />
-            <div
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              data-testid="collection-previews"
-            >
-              {recentCollections.map((collection) => (
-                <PreviewCard
-                  key={collection.id}
-                  to={`/collections/${collection.id}`}
-                  title={collection.name}
-                  subtitle={
-                    <span className="capitalize">
-                      {collection.faction?.name || collection.factionSlug || collection.factionId}
-                    </span>
-                  }
-                  badge={`${calculateCollectionPoints(collection)} pts`}
-                  testId="collection-preview-card"
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
         {rosters.length > 0 ? (
-          <section className="flex flex-col gap-3" data-testid="rosters-section">
+          <section className="flex flex-col gap-1.5" data-testid="rosters-section">
             <SectionHeader
-              icon={ClipboardList}
               title="Recent rosters"
               count={rosters.length}
               viewAllTo="/rosters"
               viewAllTestId="view-all-rosters"
             />
-            <div
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              data-testid="roster-previews"
-            >
+            <div className="grid gap-1 sm:grid-cols-2" data-testid="roster-previews">
               {recentRosters.map((roster) => (
-                <PreviewCard
+                <RosterRow
                   key={roster.id}
-                  to={`/rosters/${roster.id}`}
-                  title={roster.name}
-                  subtitle={roster.faction?.name ?? roster.factionSlug ?? roster.factionId}
-                  badge={`${roster.points.current}/${roster.points.max}`}
-                  testId="roster-preview-card"
+                  roster={roster}
+                  invalid={validateRoster(roster).length > 0}
                 />
               ))}
             </div>
           </section>
         ) : null}
 
-        <p className="text-center text-xs text-subtle">Last updated: {dataVersion ?? 'Unknown'}</p>
+        {collections.length > 0 ? (
+          <section className="flex flex-col gap-1.5" data-testid="collections-section">
+            <SectionHeader
+              title="Collections"
+              count={collections.length}
+              viewAllTo="/collections"
+              viewAllTestId="view-all-collections"
+            />
+            <div className="grid gap-1 sm:grid-cols-2" data-testid="collection-previews">
+              {recentCollections.map((collection) => (
+                <CollectionRow key={collection.id} collection={collection} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <p
+          className="pt-2 text-center font-mono text-[9.5px] font-medium text-hint"
+          data-testid="data-version"
+        >
+          DATA {dataVersion ?? 'UNKNOWN'}
+        </p>
       </div>
     </AppLayout>
   );

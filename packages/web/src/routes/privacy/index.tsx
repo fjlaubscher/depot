@@ -1,13 +1,14 @@
 import AppLayout from '@/components/layout';
-import { PageHeader } from '@/components/ui';
 
 const PrivacyPolicy = () => (
   <AppLayout title="Privacy Policy">
     <div className="flex flex-col gap-2">
-      <PageHeader
-        title="Privacy Policy"
-        subtitle="How depot collects, stores, and uses information"
-      />
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Privacy Policy</h1>
+        <p className="mt-0.5 text-sm text-muted">
+          How depot collects, stores, and uses information
+        </p>
+      </div>
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold text-foreground">Overview</h2>

@@ -248,3 +248,29 @@ describe('applyCollectionRebind', () => {
     expect(result.collection.points.current).toBeGreaterThan(0);
   });
 });
+
+describe('rebindSelectedWargear profile grouping', () => {
+  const weapon = (id: string, name: string) =>
+    ({ id, name, datasheetId: 'ds-1', line: '1', type: 'Ranged', profiles: [] }) as never;
+
+  it('rebinds a pre-grouping selection onto the grouped weapon', () => {
+    const available = [weapon('ds-1:plasma-pistol', 'Plasma pistol')];
+    const { wargear, dropped } = rebindSelectedWargear(
+      [weapon('ds-1:plasma-pistol-supercharge', 'Plasma pistol – supercharge')],
+      available
+    );
+
+    expect(wargear).toEqual(available);
+    expect(dropped).toEqual([]);
+  });
+
+  it('still drops a selection with no counterpart', () => {
+    const { wargear, dropped } = rebindSelectedWargear(
+      [weapon('ds-1:gone', 'Retired gun – standard')],
+      [weapon('ds-1:plasma-pistol', 'Plasma pistol')]
+    );
+
+    expect(wargear).toEqual([]);
+    expect(dropped).toEqual(['Retired gun – standard']);
+  });
+});

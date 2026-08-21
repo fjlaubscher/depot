@@ -10,6 +10,7 @@ import type {
 } from '../types/depot.js';
 import { normalizeSelectedWargearAbilities, formatAbilityName } from './abilities.js';
 import { calculateCollectionPoints } from './collection.js';
+import { getWargearBaseName } from './wargear.js';
 
 export type RebindIssue =
   | { kind: 'datasheet-missing'; key: string; name: string }
@@ -104,8 +105,13 @@ export function rebindSelectedWargear(
 ): { wargear: Wargear[]; dropped: string[] } {
   const byId = new Map(available.map((weapon) => [weapon.id, weapon]));
   const byName = new Map(available.map((weapon) => [normalizeKey(weapon.name), weapon]));
+  // Selections saved before profiles were grouped carry the full profile name
+  // (`Plasma pistol – supercharge`); fall back to the base weapon.
   const hits = selection.map(
-    (weapon) => byId.get(weapon.id) ?? byName.get(normalizeKey(weapon.name))
+    (weapon) =>
+      byId.get(weapon.id) ??
+      byName.get(normalizeKey(weapon.name)) ??
+      byName.get(normalizeKey(getWargearBaseName(weapon.name)))
   );
   return {
     wargear: [...new Set(hits.filter((hit) => hit !== undefined))],

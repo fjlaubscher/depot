@@ -10,9 +10,10 @@ import { readJsonFile } from '@/utils/file';
 import { isExportedRoster } from '@/types/export';
 import { formatRebindSummaryMessage, refreshRosterDataWithReport } from '@/utils/refresh-user-data';
 import { getRosterDetachments, remapRosterIds } from '@depot/core/utils/roster';
+import { validateRoster } from '@depot/core/utils/roster-legality';
 
 import AppLayout from '@/components/layout';
-import { Alert, PageHeader, Loader, ErrorState, Tag } from '@/components/ui';
+import { Alert, Button, Loader, ErrorState } from '@/components/ui';
 import ImportButton from '@/components/shared/import-button';
 import LibraryCard from '@/components/shared/library-card';
 import { RosterEmptyState } from '@/components/shared/roster';
@@ -113,22 +114,25 @@ const Rosters: React.FC = () => {
   return (
     <AppLayout title="Roster Library">
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="My Rosters"
-          subtitle="Manage your army rosters"
-          action={{
-            icon: <Plus size={16} />,
-            onClick: () => setCreateOpen(true),
-            ariaLabel: 'Create new roster'
-          }}
-        />
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold text-foreground">Rosters</h1>
+            {rosters.length > 0 ? (
+              <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
+                {rosters.length} {rosters.length === 1 ? 'roster' : 'rosters'}
+              </p>
+            ) : null}
+          </div>
           <ImportButton
-            label="Import roster"
+            label="Import"
             onFilesSelected={handleImportRosterFiles}
             buttonTestId="import-roster-button"
             inputTestId="import-roster-input"
           />
+          <Button onClick={() => setCreateOpen(true)} aria-label="Create new roster">
+            <Plus size={16} />
+            New
+          </Button>
         </div>
         {hasStaleRosters ? (
           <Alert
@@ -161,31 +165,33 @@ const Rosters: React.FC = () => {
         ) : (
           <div
             data-testid="rosters-grid"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3"
           >
             {rosters.map((roster) => {
               const detachments = getRosterDetachments(roster);
+              const invalid = validateRoster(roster).length > 0;
               return (
                 <LibraryCard
                   key={roster.id}
                   name={roster.name}
-                  subtitle={roster.faction?.name}
-                  points={`${roster.points.current} / ${roster.points.max} pts`}
-                  unitCount={roster.units.length}
-                  tags={
-                    detachments.length > 0
-                      ? detachments.map((detachment) => (
-                          <Tag
-                            key={detachment.id}
-                            size="sm"
-                            variant="secondary"
-                            className="uppercase tracking-wide"
-                          >
-                            {detachment.name}
-                          </Tag>
-                        ))
-                      : undefined
+                  meta={[
+                    roster.faction?.name,
+                    detachments.map((d) => d.name).join(', '),
+                    `${roster.units.length} ${roster.units.length === 1 ? 'unit' : 'units'}`
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                  points={
+                    <span
+                      className={
+                        roster.points.current > roster.points.max ? 'text-danger-fg' : undefined
+                      }
+                    >
+                      {roster.points.current}
+                      <span className="text-subtle">/{roster.points.max}</span>
+                    </span>
                   }
+                  pointsCaption={invalid ? 'INVALID' : 'PTS'}
                   viewPath={`/rosters/${roster.id}`}
                   editPath={`/rosters/${roster.id}/details`}
                   noun="roster"

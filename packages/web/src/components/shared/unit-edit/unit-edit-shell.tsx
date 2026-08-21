@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save } from 'lucide-react';
 import type { depot } from '@depot/core';
 
-import { PageHeader, Breadcrumbs, Button, Card, Alert } from '@/components/ui';
-import BackButton from '@/components/shared/back-button';
+import AppLayout from '@/components/layout';
+import { Alert, Button, SectionHeader } from '@/components/ui';
 import { DatasheetComposition } from '@/components/shared/datasheet';
 import WargearSelection from '@/components/shared/wargear-selection';
 import ModelCostSelection from './model-cost-selection';
@@ -28,17 +27,14 @@ interface UnitEditShellProps {
   testId: string;
   backTo: string;
   backLabel: string;
-  breadcrumbs: { label: string; path: string }[];
-  breadcrumbsTestId: string;
+  documentTitle: string;
   title: string;
   subtitle?: string;
-  headerTestId: string;
-  saveButtonTestId: string;
   /** Cost rows offered for this unit; defaults to the first-copy bracket. */
   modelCosts?: depot.ModelCost[];
-  /** Extra cards rendered at the top of the left column (e.g. collection build state). */
+  /** Extra content rendered above unit size (e.g. collection build state). */
   beforeModelCost?: React.ReactNode;
-  /** Extra cards rendered below the grid (e.g. roster enhancements/warlord). */
+  /** Extra content rendered at the end (e.g. roster enhancements/warlord). */
   afterGrid?: React.ReactNode;
   onSave: (selection: UnitEditSelection) => void | Promise<void>;
 }
@@ -48,12 +44,9 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   testId,
   backTo,
   backLabel,
-  breadcrumbs,
-  breadcrumbsTestId,
+  documentTitle,
   title,
   subtitle,
-  headerTestId,
-  saveButtonTestId,
   modelCosts,
   beforeModelCost,
   afterGrid,
@@ -98,116 +91,94 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   const handleSave = () =>
     void onSave({ selectedWargear, selectedWargearAbilities, selectedModelCost });
 
+  const currentPoints = parseInt((selectedModelCost ?? unit.modelCost).cost, 10) || 0;
+  const startingPoints = parseInt(unit.modelCost.cost, 10) || 0;
+  const delta = currentPoints - startingPoints;
+
   return (
-    <div className="flex flex-col gap-4" data-testid={testId}>
-      <BackButton to={backTo} label={backLabel} testId="mobile-back-button" className="md:hidden" />
-
-      {/* Desktop Breadcrumbs */}
-      <div className="hidden md:block">
-        <Breadcrumbs items={breadcrumbs} data-testid={breadcrumbsTestId} />
-      </div>
-
-      <PageHeader
-        title={title}
-        subtitle={subtitle}
-        action={{
-          icon: <Save size={16} />,
-          onClick: handleSave,
-          ariaLabel: 'Save changes',
-          testId: saveButtonTestId
-        }}
-        data-testid={headerTestId}
-      />
-
-      <div className="grid gap-4 lg:grid-cols-[1.1fr_1fr]">
-        <div className="flex flex-col gap-4">
-          {beforeModelCost}
-
-          {/* Model Cost Selection - only show if there are multiple options */}
-          {availableModelCosts.length > 1 && (
-            <Card data-testid="model-cost-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Unit Size</h3>
-                <p className="text-sm text-muted">Choose the number of models for this unit</p>
-                <ModelCostSelection
-                  modelCosts={availableModelCosts}
-                  selectedModelCost={selectedModelCost || unit.modelCost}
-                  onModelCostChange={setSelectedModelCost}
-                />
-              </div>
-            </Card>
-          )}
-
-          {/* Unit Composition */}
-          <DatasheetComposition
-            composition={unit.datasheet.unitComposition}
-            loadout={unit.datasheet.loadout}
-            transport={unit.datasheet.transport}
-            data-testid="unit-composition"
-          />
-
-          {/* Wargear Options */}
-          {shouldShowWargearOptions && (
-            <Alert variant="info" title="Wargear Options" data-testid="wargear-options-section">
-              <ul className="space-y-2 list-disc pl-4 text-sm">
-                {unit.datasheet.options.map((option, index) => (
-                  <li
-                    key={`${option.line}-${index}`}
-                    className="[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
-                    dangerouslySetInnerHTML={{ __html: option.description }}
-                    data-testid={`option-${option.line}`}
-                  />
-                ))}
-              </ul>
-            </Alert>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {/* Wargear Selection */}
-          <Card data-testid="wargear-section">
-            <div className="flex flex-col gap-4">
-              <h3 className="text-lg font-semibold text-foreground">Wargear</h3>
-              <p className="text-sm text-muted">Select wargear options for this unit</p>
-              <WargearSelection
-                wargear={unit.datasheet.wargear}
-                selectedWargear={selectedWargear}
-                onSelectionChange={toggleWargear}
-              />
+    <AppLayout
+      title={documentTitle}
+      back={{ to: backTo, label: backLabel }}
+      heading={{ title, subtitle }}
+      footer={
+        <>
+          <div className="flex-1" data-testid="unit-edit-points">
+            <div className="font-mono text-base leading-none font-bold text-foreground">
+              {currentPoints} PTS
             </div>
-          </Card>
+            <div className="mt-0.5 font-mono text-[9px] font-medium text-success-fg">
+              {delta === 0 ? 'NO CHANGE' : `${delta > 0 ? '+' : ''}${delta} PTS`}
+            </div>
+          </div>
+          <Button variant="secondary" onClick={() => navigate(backTo)} data-testid="cancel-button">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} data-testid="save-button">
+            Apply
+          </Button>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-3" data-testid={testId}>
+        {beforeModelCost}
 
-          {/* Wargear Abilities */}
-          {wargearAbilities.length > 0 ? (
-            <Card data-testid="wargear-abilities-section">
-              <div className="flex flex-col gap-4">
-                <h3 className="text-lg font-semibold text-foreground">Wargear Abilities</h3>
-                <p className="text-sm text-muted">
-                  Toggle wargear-linked abilities that apply to this unit&apos;s chosen loadout.
-                </p>
-                <WargearAbilitiesSelection
-                  abilities={wargearAbilities}
-                  selected={selectedWargearAbilities}
-                  onChange={setSelectedWargearAbilities}
+        {/* Unit size — only meaningful when the datasheet offers more than one bracket */}
+        {availableModelCosts.length > 1 && (
+          <section className="flex flex-col gap-1.5" data-testid="model-cost-section">
+            <SectionHeader title="Unit size" />
+            <ModelCostSelection
+              modelCosts={availableModelCosts}
+              selectedModelCost={selectedModelCost || unit.modelCost}
+              onModelCostChange={setSelectedModelCost}
+            />
+          </section>
+        )}
+
+        <DatasheetComposition
+          composition={unit.datasheet.unitComposition}
+          loadout={unit.datasheet.loadout}
+          transport={unit.datasheet.transport}
+          data-testid="unit-composition"
+        />
+
+        <section className="flex flex-col gap-1.5" data-testid="wargear-section">
+          <SectionHeader title="Wargear" />
+          <WargearSelection
+            wargear={unit.datasheet.wargear}
+            selectedWargear={selectedWargear}
+            onSelectionChange={toggleWargear}
+          />
+        </section>
+
+        {wargearAbilities.length > 0 ? (
+          <section className="flex flex-col gap-1.5" data-testid="wargear-abilities-section">
+            <SectionHeader title="Wargear abilities" />
+            <WargearAbilitiesSelection
+              abilities={wargearAbilities}
+              selected={selectedWargearAbilities}
+              onChange={setSelectedWargearAbilities}
+            />
+          </section>
+        ) : null}
+
+        {shouldShowWargearOptions && (
+          <Alert variant="info" title="Wargear options" data-testid="wargear-options-section">
+            <ul className="space-y-2 list-disc pl-4 text-sm">
+              {unit.datasheet.options.map((option, index) => (
+                <li
+                  key={`${option.line}-${index}`}
+                  className="[&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mt-1"
+                  dangerouslySetInnerHTML={{ __html: option.description }}
+                  data-testid={`option-${option.line}`}
                 />
-              </div>
-            </Card>
-          ) : null}
-        </div>
-      </div>
+              ))}
+            </ul>
+          </Alert>
+        )}
 
-      {afterGrid}
-
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-4" data-testid="action-buttons">
-        <Button variant="secondary" onClick={() => navigate(backTo)} data-testid="cancel-button">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} data-testid="save-button">
-          Save Changes
-        </Button>
+        {afterGrid}
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

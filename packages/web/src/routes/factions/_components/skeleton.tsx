@@ -1,10 +1,10 @@
 import React from 'react';
-import Layout from '@/components/ui/layout';
+import AppLayout from '@/components/layout';
 import { SkeletonCard, PageHeaderSkeleton } from '@/components/ui/skeleton';
 
 const LoadingSkeleton: React.FC = () => {
   return (
-    <Layout title="Home">
+    <AppLayout title="Factions">
       <div className="flex flex-col gap-4">
         <PageHeaderSkeleton />
 
@@ -24,7 +24,7 @@ const LoadingSkeleton: React.FC = () => {
           ))}
         </div>
       </div>
-    </Layout>
+    </AppLayout>
   );
 };
 

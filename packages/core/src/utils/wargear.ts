@@ -2,16 +2,26 @@ import { createSlugGenerator } from './slug.js';
 import type { Datasheet, Wargear, WargearProfile } from '../types/depot.js';
 import type { DatasheetWargear } from '../types/wahapedia.js';
 
-const PROFILE_SEPARATOR = ' - ';
+/**
+ * Wahapedia separates a weapon from its profile with a hyphen or, far more
+ * often, an en dash (`Plasma pistol – supercharge`). Match either, or every
+ * en-dashed weapon lands as its own top-level entry instead of one grouped one.
+ */
+const PROFILE_SEPARATOR = /\s[-–—]\s/;
 
 /** `Bolt rifle - frag` → ['Bolt rifle', 'frag']; anything without a two-sided separator is a bare name. */
 const splitWargearName = (name: string): [baseName: string, profileName?: string] => {
   const trimmed = name?.trim() ?? '';
-  const index = trimmed.indexOf(PROFILE_SEPARATOR);
-  const base = index > -1 ? trimmed.slice(0, index).trim() : '';
-  const profile = index > -1 ? trimmed.slice(index + PROFILE_SEPARATOR.length).trim() : '';
+  const match = PROFILE_SEPARATOR.exec(trimmed);
+  if (!match) return [trimmed];
+
+  const base = trimmed.slice(0, match.index).trim();
+  const profile = trimmed.slice(match.index + match[0].length).trim();
   return base && profile ? [base, profile] : [trimmed];
 };
+
+/** `Plasma pistol – supercharge` → `Plasma pistol`; names without a suffix pass through. */
+export const getWargearBaseName = (name: string): string => splitWargearName(name)[0];
 
 const getLineValue = (value: string | undefined, fallback: number) =>
   value?.trim() ? value : `${fallback}`;
@@ -140,6 +150,7 @@ export function parseLoadoutWargear(loadout: string, wargear: Wargear[]): string
       if (profile.profileName) {
         addNameMapping(wargearMap, `${weapon.name} ${profile.profileName}`, weapon.id);
         addNameMapping(wargearMap, `${weapon.name} - ${profile.profileName}`, weapon.id);
+        addNameMapping(wargearMap, `${weapon.name} – ${profile.profileName}`, weapon.id);
         addNameMapping(wargearMap, profile.profileName, weapon.id);
       }
     });
@@ -197,7 +208,7 @@ export function formatWargearDisplayName(weapon: Wargear): string {
             return profile.profileName;
           }
           if (profile.name && profile.name !== weapon.name) {
-            return profile.name.replace(`${weapon.name} - `, '').trim();
+            return splitWargearName(profile.name)[1] ?? profile.name;
           }
           return profile.type === 'Ranged' ? 'Ranged' : 'Melee';
         })

@@ -6,16 +6,12 @@ import { useCollections } from '@/hooks/use-collections';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/context';
 import AppLayout from '@/components/layout';
-import { Alert, PageHeader, Loader, ErrorState, Tag } from '@/components/ui';
+import { Alert, Button, Loader, ErrorState } from '@/components/ui';
 import LibraryCard from '@/components/shared/library-card';
 import { RosterEmptyState } from '@/components/shared/roster';
 import { offlineStorage } from '@/data/offline-storage';
-import {
-  COLLECTION_UNIT_STATES,
-  calculateCollectionPoints,
-  getCollectionStateCounts
-} from '@depot/core/utils/collection';
-import { COLLECTION_STATE_META, getCollectionsSnapshotCopy } from '@/utils/collection';
+import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import { getCollectionsSnapshotCopy, getReadyPercent } from '@/utils/collection';
 import {
   formatCollectionImportToast,
   importCollectionsFromFiles
@@ -113,23 +109,24 @@ const CollectionsPage: React.FC = () => {
   return (
     <AppLayout title="Collection Tracker">
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="Collections"
-          subtitle="Track your kits, set their state, and prep them for roster building."
-          action={{
-            icon: <Plus size={16} />,
-            onClick: () => setCreateOpen(true),
-            ariaLabel: 'Create collection',
-            testId: 'create-collection-button'
-          }}
-        />
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold text-foreground">Collections</h1>
+          </div>
           <ImportButton
             multiple
             onFilesSelected={handleImportCollectionFiles}
             buttonTestId="import-collection-button"
             inputTestId="import-collection-input"
           />
+          <Button
+            onClick={() => setCreateOpen(true)}
+            aria-label="Create collection"
+            data-testid="create-collection-button"
+          >
+            <Plus size={16} />
+            New
+          </Button>
         </div>
 
         {hasStaleCollections ? (
@@ -163,41 +160,33 @@ const CollectionsPage: React.FC = () => {
         ) : (
           <div className="flex flex-col gap-4">
             {hasSnapshotData ? (
-              <CollectionStateChart
-                items={snapshot.items}
-                heading={snapshot.heading}
-                subheading={snapshot.subheading}
-              />
+              <CollectionStateChart items={snapshot.items} heading={snapshot.heading} />
             ) : null}
 
             <div
               data-testid="collections-grid"
-              className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+              className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3"
             >
               {collections.map((collection) => {
-                const stateCounts = getCollectionStateCounts(collection.items);
+                const ready = getReadyPercent(collection.items);
                 return (
                   <LibraryCard
                     key={collection.id}
                     name={collection.name}
-                    subtitle={
-                      collection.faction?.name || collection.factionSlug || collection.factionId
-                    }
-                    points={`${calculateCollectionPoints(collection)} pts`}
-                    unitCount={collection.items.length}
-                    tags={
-                      <div className="flex flex-wrap items-center gap-1">
-                        {COLLECTION_UNIT_STATES.filter((state) => stateCounts[state]).map(
-                          (state) => (
-                            <Tag
-                              key={state}
-                              size="sm"
-                              variant={COLLECTION_STATE_META[state].variant}
-                            >
-                              {COLLECTION_STATE_META[state].label}: {stateCounts[state]}
-                            </Tag>
-                          )
-                        )}
+                    meta={[
+                      collection.faction?.name || collection.factionSlug || collection.factionId,
+                      `${collection.items.length} ${collection.items.length === 1 ? 'unit' : 'units'}`
+                    ].join(' · ')}
+                    points={calculateCollectionPoints(collection)}
+                    pointsCaption="PTS"
+                    content={
+                      <div>
+                        <div className="h-1 overflow-hidden rounded-xs bg-surface-soft">
+                          <div className="h-full bg-success-fg" style={{ width: `${ready}%` }} />
+                        </div>
+                        <div className="mt-1 font-mono text-[9px] font-medium text-success-fg">
+                          {ready}% ready
+                        </div>
                       </div>
                     }
                     viewPath={`/collections/${collection.id}`}

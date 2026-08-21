@@ -33,17 +33,16 @@ test.describe('Faction detail', () => {
     expect(await datasheetLinks.count()).toBeGreaterThan(0);
 
     await detachmentsTab.click();
-    const detachments = page.getByTestId('faction-detachments');
-    if ((await detachments.count()) > 0) {
-      await expect(detachments.first()).toBeVisible();
-    } else {
-      await expect(page.getByText(/No detachments available/i)).toBeVisible();
-    }
+    await expect(page).toHaveURL(/\/faction\/[^/]+\/detachments$/);
+    await expect(page.getByTestId('faction-detachments')).toBeVisible();
+
+    // The tab is a real URL, so a cold load lands on it.
+    await page.reload();
+    await expect(page.getByTestId('faction-detachments')).toBeVisible();
   });
 
   test('Space Marines Gladius shows DP and Force Disposition', async ({ page }) => {
-    await page.goto('/faction/space-marines');
-    await page.getByTestId('faction-tab-detachments').click();
+    await page.goto('/faction/space-marines/detachments');
 
     const detachments = page.getByTestId('faction-detachments');
     await expect(detachments).toBeVisible();
@@ -51,7 +50,9 @@ test.describe('Faction detail', () => {
 
     await detachments.getByRole('link', { name: /Gladius Task Force/i }).click();
     await expect(page).toHaveURL(/\/detachment\/gladius-task-force$/);
-    await expect(page.getByTestId('detachment-header')).toContainText(/Gladius Task Force/i);
+    await expect(
+      page.getByRole('heading', { level: 1, name: /Gladius Task Force/i })
+    ).toBeVisible();
     const meta = page.getByTestId('detachment-meta');
     await expect(meta).toContainText(/\d+\s*DP/);
     await expect(meta).toContainText(
@@ -60,7 +61,9 @@ test.describe('Faction detail', () => {
     await expect(page.getByTestId('detachment-stratagems')).toBeVisible();
 
     await page.goto('/faction/space-marines/detachment/shield-of-the-void');
-    await expect(page.getByTestId('detachment-header')).toContainText(/Shield of the Void/i);
+    await expect(
+      page.getByRole('heading', { level: 1, name: /Shield of the Void/i })
+    ).toBeVisible();
     await expect(page.getByTestId('detachment-meta')).toContainText(/Boarding Actions/);
   });
 });

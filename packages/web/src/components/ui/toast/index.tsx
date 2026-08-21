@@ -9,73 +9,54 @@ interface ToastProps {
   onRemove: (id: string) => void;
 }
 
+/**
+ * A toast sits on the elevated surface like every other overlay — the status
+ * colour rides on the glyph, not a full slab, so a stack of them stays quiet.
+ * Only an error earns a coloured border.
+ */
+const TYPE_CONFIG = {
+  success: { icon: <Check size={14} />, glyph: 'text-success-fg', border: 'border-border-strong' },
+  error: {
+    icon: <AlertCircle size={14} />,
+    glyph: 'text-danger-fg',
+    border: 'border-danger-border'
+  },
+  warning: {
+    icon: <AlertTriangle size={14} />,
+    glyph: 'text-warning-fg',
+    border: 'border-border-strong'
+  },
+  info: { icon: <Info size={14} />, glyph: 'text-info-fg', border: 'border-border-strong' }
+} as const;
+
 const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
   const { id, title, message, type } = toast;
-
-  const typeConfig = {
-    success: {
-      icon: <Check size={16} />,
-      bgColor: 'bg-success-surface',
-      borderColor: 'border-success-border',
-      iconColor: 'text-success-fg',
-      titleColor: 'text-success-fg',
-      messageColor: 'text-success-fg'
-    },
-    error: {
-      icon: <AlertCircle size={16} />,
-      bgColor: 'bg-danger-surface',
-      borderColor: 'border-danger-border',
-      iconColor: 'text-danger-fg',
-      titleColor: 'text-danger-fg',
-      messageColor: 'text-danger-fg'
-    },
-    warning: {
-      icon: <AlertTriangle size={16} />,
-      bgColor: 'bg-warning-surface',
-      borderColor: 'border-warning-border',
-      iconColor: 'text-warning-fg',
-      titleColor: 'text-warning-fg',
-      messageColor: 'text-warning-fg'
-    },
-    info: {
-      icon: <Info size={16} />,
-      bgColor: 'bg-info-surface',
-      borderColor: 'border-info-border',
-      iconColor: 'text-info-fg',
-      titleColor: 'text-info-fg',
-      messageColor: 'text-info-fg'
-    }
-  };
-
-  const config = typeConfig[type];
+  const config = TYPE_CONFIG[type];
 
   return (
     <div
       className={cx(
-        'w-80 shadow-lg rounded-sm pointer-events-auto border',
-        config.bgColor,
-        config.borderColor
+        'pointer-events-auto flex w-full items-center gap-2.5 rounded-sm border bg-surface-elevated px-3 py-2.5 shadow-e2 sm:w-80',
+        config.border
       )}
+      role="status"
     >
-      <div className="p-4">
-        <div className="flex items-start gap-2">
-          <div className={cx('flex-shrink-0', config.iconColor)}>{config.icon}</div>
-          <div className="w-0 flex-1 flex flex-col gap-1">
-            <p className={cx('text-sm font-medium', config.titleColor)}>{title}</p>
-            {message && <p className={cx('text-sm', config.messageColor)}>{message}</p>}
-          </div>
-          <div className="flex-shrink-0 flex">
-            <IconButton
-              variant="ghost"
-              size="sm"
-              onClick={() => onRemove(id)}
-              aria-label="Close notification"
-            >
-              <X size={12} />
-            </IconButton>
-          </div>
-        </div>
+      <span className={cx('flex-none', config.glyph)}>{config.icon}</span>
+
+      <div className="min-w-0 flex-1">
+        <p className="text-xs leading-snug font-bold text-foreground">{title}</p>
+        {message ? <p className="text-[11.5px] leading-snug text-muted">{message}</p> : null}
       </div>
+
+      <IconButton
+        variant="ghost"
+        size="sm"
+        className="-mr-1.5 flex-none"
+        onClick={() => onRemove(id)}
+        aria-label="Dismiss notification"
+      >
+        <X size={14} />
+      </IconButton>
     </div>
   );
 };

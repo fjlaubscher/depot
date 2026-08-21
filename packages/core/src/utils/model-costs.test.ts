@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { ModelCost } from '../types/depot.js';
 import {
   getCostBracketRange,
   modelCostsForOrdinal,
@@ -7,7 +8,8 @@ import {
   groupModelCostsBySection,
   hasNumericCost,
   normalizeModelCosts,
-  selectableModelCosts
+  selectableModelCosts,
+  summarizeModelCosts
 } from './model-costs.js';
 
 const row = (
@@ -236,5 +238,27 @@ describe('getCostBracketRange', () => {
     expect(getCostBracketRange('YOUR UNIT COSTS')).toEqual([1, Infinity]);
     expect(getCostBracketRange(undefined)).toEqual([1, Infinity]);
     expect(getCostBracketRange('WARGEAR OPTIONS')).toEqual([1, Infinity]);
+  });
+});
+
+describe('summarizeModelCosts', () => {
+  const cost = (value: string): ModelCost => ({
+    datasheetId: 'd',
+    line: value,
+    description: '',
+    cost: value
+  });
+
+  it('returns the cheapest cost, marking sheets with more than one price', () => {
+    expect(summarizeModelCosts([cost('65')])).toBe('65');
+    expect(summarizeModelCosts([cost('130'), cost('65')])).toBe('65+');
+    // same price twice (e.g. repeated bracket) is still a single price
+    expect(summarizeModelCosts([cost('65'), cost('65')])).toBe('65');
+  });
+
+  it('ignores non-numeric costs and returns null when none remain', () => {
+    expect(summarizeModelCosts([cost('-'), cost('80')])).toBe('80');
+    expect(summarizeModelCosts([cost('-')])).toBeNull();
+    expect(summarizeModelCosts([])).toBeNull();
   });
 });

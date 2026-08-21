@@ -7,7 +7,6 @@ import AddUnitsView from '@/components/shared/add-units-view';
 import { useToast } from '@/contexts/toast/context';
 import useCollection from '@/hooks/use-collection';
 import type { SelectedUnit } from '@/hooks/use-roster-unit-selection';
-import { useDocumentTitle } from '@/hooks/use-document-title';
 import {
   calculateCollectionPoints,
   createCollectionUnitFromDatasheet
@@ -21,17 +20,23 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
 
   const pageTitle = collection ? `${collection.name} - Add Units` : 'Add Units to Collection';
-  useDocumentTitle(pageTitle);
+  const back = { to: `/collections/${collectionId}`, label: 'Collection' };
 
   if (loading) {
-    return <Loader />;
+    return (
+      <AppLayout title={pageTitle} back={back}>
+        <Loader />
+      </AppLayout>
+    );
   }
 
   if (error || !collection) {
     return (
-      <Alert variant="error" title="Unable to load collection">
-        {error || 'Collection not found'}
-      </Alert>
+      <AppLayout title={pageTitle} back={back}>
+        <Alert variant="error" title="Unable to load collection">
+          {error || 'Collection not found'}
+        </Alert>
+      </AppLayout>
     );
   }
 
@@ -76,14 +81,10 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
     <AddUnitsView
       factionSlug={factionSlug}
       backTo={`/collections/${collection.id}`}
-      backLabel="Back to Collection"
-      breadcrumbs={[
-        { label: 'Collections', path: '/collections' },
-        { label: collection.name, path: `/collections/${collection.id}` },
-        { label: 'Add Units', path: `/collections/${collection.id}/add-units` }
-      ]}
-      title={collection.name}
-      subtitle={subtitle}
+      backLabel={collection.name}
+      documentTitle={pageTitle}
+      title="Add units"
+      subtitle={`${collection.name} · ${subtitle}`}
       onConfirm={handleAddSelectedUnits}
     />
   );
@@ -92,11 +93,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
 const AddCollectionUnitsPage: FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
 
-  return (
-    <AppLayout title="Add Units to Collection">
-      <AddCollectionUnitsView collectionId={collectionId} />
-    </AppLayout>
-  );
+  return <AddCollectionUnitsView collectionId={collectionId} />;
 };
 
 export default AddCollectionUnitsPage;

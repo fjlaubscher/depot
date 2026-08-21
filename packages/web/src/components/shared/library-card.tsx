@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Pencil, Copy } from 'lucide-react';
-import { Card, ActionGroup, Tag } from '@/components/ui';
+import { Card, ActionGroup } from '@/components/ui';
 
 interface LibraryCardProps {
   name: string;
-  subtitle?: string;
-  /** Points badge text, e.g. "120 / 2000 pts". */
-  points: string;
-  unitCount: number;
-  /** Optional tag row rendered between header and footer. */
-  tags?: ReactNode;
+  /** Mono meta line under the name, e.g. `ASTRA MILITARUM · 34 UNITS`. */
+  meta: string;
+  /** Points readout, right aligned. */
+  points: ReactNode;
+  /** Caption under the points, e.g. `PTS` or `/2000`. */
+  pointsCaption?: string;
+  /** Optional block between header and actions — tag row, progress bar. */
+  content?: ReactNode;
   viewPath: string;
   editPath: string;
   /** "roster" | "collection" — used for aria labels, confirm copy and test ids. */
@@ -21,13 +23,13 @@ interface LibraryCardProps {
   'data-testid'?: string;
 }
 
-/** Grid card for the roster/collection libraries: name, faction, points, tags, unit count + actions. */
+/** Row card for the roster/collection libraries: name, meta, points + actions. */
 const LibraryCard: React.FC<LibraryCardProps> = ({
   name,
-  subtitle,
+  meta,
   points,
-  unitCount,
-  tags,
+  pointsCaption,
+  content,
   viewPath,
   editPath,
   noun,
@@ -68,36 +70,33 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
   return (
     <Card
       interactive
-      className="flex h-full cursor-pointer flex-col gap-4"
+      padding="sm"
+      className="flex h-full cursor-pointer flex-col gap-2"
       onClick={() => navigate(viewPath)}
       data-testid={testId}
     >
-      <Card.Header className="items-start gap-2">
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Card.Title as="h3" className="truncate text-base font-semibold md:text-lg">
-            {name}
-          </Card.Title>
-          <Card.Subtitle as="span" className="truncate text-xs capitalize md:text-sm">
-            {subtitle}
-          </Card.Subtitle>
+      <div className="flex items-start gap-2.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <h3 className="truncate text-[14.5px] leading-tight font-bold text-foreground">{name}</h3>
+          <span className="truncate font-mono text-[9.5px] font-medium uppercase text-muted">
+            {meta}
+          </span>
         </div>
-        <Tag variant="primary" size="sm" className="rounded-sm py-1 whitespace-nowrap">
-          {points}
-        </Tag>
-      </Card.Header>
-
-      {tags ? (
-        <Card.Content className="flex flex-wrap items-center gap-2 text-xs text-subtle">
-          {tags}
-        </Card.Content>
-      ) : null}
-
-      <Card.Footer className="mt-auto flex w-full items-center gap-2">
-        <div className="flex flex-1 items-center">
-          <Tag size="sm" variant="default">
-            {unitCount} {unitCount === 1 ? 'unit' : 'units'}
-          </Tag>
+        <div className="shrink-0 text-right">
+          <div className="font-mono text-[15px] leading-none font-bold text-foreground">
+            {points}
+          </div>
+          {pointsCaption ? (
+            <div className="mt-0.5 font-mono text-[8.5px] font-medium text-subtle">
+              {pointsCaption}
+            </div>
+          ) : null}
         </div>
+      </div>
+
+      {content}
+
+      <div className="mt-auto flex justify-end">
         <ActionGroup
           spacing="tight"
           actions={[
@@ -134,7 +133,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
             }
           ]}
         />
-      </Card.Footer>
+      </div>
     </Card>
   );
 };

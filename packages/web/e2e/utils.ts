@@ -40,6 +40,39 @@ export const createRoster = async (page: Page, options?: { factionLabel?: string
 
   const rosterEditUrl = page.url();
   const rosterBaseUrl = rosterEditUrl.replace(/\/edit$/, '');
+  const rosterId = rosterBaseUrl.split('/').pop()!;
+
+  // Landing on /edit does not mean the roster reached IndexedDB. Navigating
+  // before the write commits loses it, so wait for it to be readable back.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (id) =>
+          new Promise<boolean>((resolve) => {
+            const open = indexedDB.open('depot-offline');
+            open.onerror = () => resolve(false);
+            open.onsuccess = () => {
+              const db = open.result;
+              if (!Array.from(db.objectStoreNames).includes('rosters')) {
+                db.close();
+                resolve(false);
+                return;
+              }
+              const get = db.transaction('rosters').objectStore('rosters').get(id);
+              get.onsuccess = () => {
+                db.close();
+                resolve(Boolean(get.result));
+              };
+              get.onerror = () => {
+                db.close();
+                resolve(false);
+              };
+            };
+          }),
+        rosterId
+      )
+    )
+    .toBe(true);
 
   return { rosterName, rosterEditUrl, rosterBaseUrl };
 };

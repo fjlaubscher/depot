@@ -13,17 +13,20 @@
     'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --color-accent-50: #fff4ea;
-  --color-accent-100: #ffe6d0;
-  --color-accent-200: #ffcea3;
-  --color-accent-300: #ffb067;
-  --color-accent-400: #ff9a42;
-  --color-accent-500: #ff8a2a;
-  --color-accent-600: #e06a10;
-  --color-accent-700: #b84d00;
-  --color-accent-800: #8a3a02;
-  --color-accent-900: #5c2703;
-  /* text/icon colour that sits on a solid accent fill — 10.6:1 on accent-500 */
+  /* Accent is depot's original orange — Tailwind's `orange` ramp, which
+     `--color-primary-*` aliased before the Cogitator port. Aliased rather than
+     re-typed as hex so the two can never drift. */
+  --color-accent-50: var(--color-orange-50);
+  --color-accent-100: var(--color-orange-100);
+  --color-accent-200: var(--color-orange-200);
+  --color-accent-300: var(--color-orange-300);
+  --color-accent-400: var(--color-orange-400);
+  --color-accent-500: var(--color-orange-500);
+  --color-accent-600: var(--color-orange-600);
+  --color-accent-700: var(--color-orange-700);
+  --color-accent-800: var(--color-orange-800);
+  --color-accent-900: var(--color-orange-900);
+  /* text/icon colour that sits on a solid accent fill — 7.4:1 on accent-500 */
   --color-accent-ink: #1a0e02;
 }
 
@@ -37,7 +40,7 @@
   --surface-card: #ffffff;
   --surface-muted: #eef1f5;
   --surface-soft: #e4e9ef;
-  --surface-accent: #fff1e5;
+  --surface-accent: var(--color-accent-50);
   --surface-elevated: #ffffff;
   --surface-overlay: rgb(15 23 32 / 0.45);
 
@@ -46,11 +49,11 @@
   --fg-muted: #5a6773;
   --fg-subtle: #7a8794;
   --fg-hint: #99a4b0;
-  --fg-accent: #b84d00;
+  --fg-accent: var(--color-accent-700);
 
   --line-subtle: #dde3ea;
   --line-strong: #c3ccd6;
-  --line-accent: #e06a10;
+  --line-accent: var(--color-accent-600);
 
   --success-fg: #116b33;
   --success-surface: #e9f7ee;
@@ -77,7 +80,7 @@
   --surface-card: #12151a;
   --surface-muted: #0e1116;
   --surface-soft: #161b22;
-  --surface-accent: #26160a;
+  --surface-accent: color-mix(in oklab, var(--color-accent-500) 14%, #0b0d10);
   --surface-elevated: #171c23;
   --surface-overlay: rgb(0 0 0 / 0.6);
 
@@ -86,11 +89,11 @@
   --fg-muted: #8a93a0;
   --fg-subtle: #5c6673;
   --fg-hint: #454f5b;
-  --fg-accent: #ffb067;
+  --fg-accent: var(--color-accent-300);
 
   --line-subtle: #1e242c;
   --line-strong: #2a313c;
-  --line-accent: #ff8a2a;
+  --line-accent: var(--color-accent-500);
 
   --success-fg: #6fd388;
   --success-surface: #10231a;

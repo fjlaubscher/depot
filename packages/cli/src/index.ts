@@ -1,6 +1,8 @@
 import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import type { depot, wahapedia } from '@depot/core';
+import { getBattlefieldRole } from '@depot/core/utils/datasheets';
+import { summarizeModelCosts } from '@depot/core/utils/model-costs';
 
 import convertToJSON from './convert-to-json.js';
 import generateData from './generate-data.js';
@@ -41,13 +43,22 @@ const WAHAPEDIA_BASE_URL = 'https://wahapedia.ru/wh40k11ed/';
 
 const forceDownload = process.argv.includes('--force-download');
 
+/** CSVs are stored lowercased with dashes, e.g. `Datasheets_models.csv` -> `datasheets-models.csv`. */
+const sourceFileName = (fileName: string) => fileName.toLowerCase().replace(/_/g, '-');
+
 const init = async () => {
   rmSync(DATA_DIR, { recursive: true, force: true });
 
-  const sourceDataExists = existsSync(SOURCE_DATA_DIR);
+  // A download that dies part way leaves some CSVs behind. Treat the cache as
+  // usable only when every file is there, or a rerun fails on the missing one.
+  const cachedSourceFiles = [...Object.values(WAHAPEDIA_CSV_FILES), LAST_UPDATE_CSV].map(
+    (fileName) => join(SOURCE_DATA_DIR, sourceFileName(fileName))
+  );
+  const sourceDataExists =
+    existsSync(SOURCE_DATA_DIR) && cachedSourceFiles.every((path) => existsSync(path));
   const shouldDownload = forceDownload || !sourceDataExists;
 
-  if (forceDownload && sourceDataExists) {
+  if (forceDownload && existsSync(SOURCE_DATA_DIR)) {
     log('Force download flag detected, removing existing source data');
     rmSync(SOURCE_DATA_DIR, { recursive: true, force: true });
   }
@@ -62,7 +73,7 @@ const init = async () => {
   );
   // Raw CSVs are kept in source_data so reruns work offline and for debugging.
   const loadTable = async (fileName: string) => {
-    const csvPath = join(SOURCE_DATA_DIR, fileName.toLowerCase().replace(/_/g, '-'));
+    const csvPath = join(SOURCE_DATA_DIR, sourceFileName(fileName));
     const csv = shouldDownload
       ? await fetch(`${WAHAPEDIA_BASE_URL}${fileName}`).then((response) => response.text())
       : readFileSync(csvPath, 'utf-8');
@@ -102,6 +113,8 @@ const init = async () => {
       factionId: faction.id,
       factionSlug: faction.slug,
       isSupport: datasheet.isSupport,
+      role: getBattlefieldRole(datasheet),
+      points: summarizeModelCosts(datasheet.modelCosts),
       supplementKey: datasheet.supplementKey,
       path: `/data/factions/${faction.slug}/datasheets/${datasheet.id}.json`,
       supplementSlug: datasheet.supplementSlug,

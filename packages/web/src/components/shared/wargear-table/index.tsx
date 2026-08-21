@@ -21,10 +21,21 @@ interface TableRow {
   keywords: string[];
 }
 
-// Fixed mono columns so the numbers align down the table and never wrap at
-// 375px — only the weapon name is allowed to reflow. Widths come from the
-// token sheet's weapon-grid spec.
-const STAT_COLUMNS = [36, 24, 26, 22, 26, 24];
+/**
+ * Fixed mono columns so the numbers align down the table and never wrap at
+ * 375px — only the weapon name is allowed to reflow. The narrow widths are the
+ * token sheet's weapon-grid spec; past `sm` there is room to spare, so the stats
+ * take it rather than leaving the name column to swallow the whole viewport.
+ * `D` is the widest in practice — damage runs to `D6+1`.
+ */
+const STAT_COLUMNS = [
+  'w-9 sm:w-20',
+  'w-6 sm:w-14',
+  'w-[26px] sm:w-16',
+  'w-[22px] sm:w-14',
+  'w-[26px] sm:w-14',
+  'w-9 sm:w-20'
+];
 
 const buildProfileLabel = (weapon: depot.Wargear, profile: depot.WargearProfile): string => {
   if (weapon.profiles.length === 1) {
@@ -80,14 +91,17 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
       <colgroup>
         <col />
         {STAT_COLUMNS.map((width, index) => (
-          <col key={`col-${index}`} style={{ width }} />
+          <col key={`col-${index}`} className={width} />
         ))}
       </colgroup>
       <thead>
         <tr className="border-b border-border-subtle">
           <th className="type-section py-1 pr-2 text-left">{title}</th>
           {headers.map((header) => (
-            <th key={header} className="type-section py-1 text-center">
+            <th
+              key={header}
+              className="py-1 text-center font-mono text-[9px] leading-none font-bold uppercase text-subtle"
+            >
               {header}
             </th>
           ))}

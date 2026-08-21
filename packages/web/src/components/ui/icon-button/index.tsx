@@ -18,6 +18,7 @@ const IconButton: FC<IconButtonProps> = ({
   size = 'md',
   className,
   children,
+  title,
   ...props
 }) => {
   const baseClasses =
@@ -36,6 +37,9 @@ const IconButton: FC<IconButtonProps> = ({
   return (
     <button
       className={cx(baseClasses, HIT_AREA, variantClasses[variant], sizeClasses[size], className)}
+      // An icon alone rarely reads as its action; the accessible name is
+      // already required, so surface it on hover too unless one is given.
+      title={title ?? props['aria-label']}
       {...props}
     >
       {children}

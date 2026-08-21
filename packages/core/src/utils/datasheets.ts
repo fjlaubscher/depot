@@ -1,4 +1,5 @@
-import type { Datasheet, DatasheetSummary } from '../types/depot.js';
+import type { BattlefieldRole, Datasheet, DatasheetSummary } from '../types/depot.js';
+import { summarizeModelCosts } from './model-costs.js';
 import { groupBy } from './common.js';
 
 export type DatasheetListItem = Datasheet | DatasheetSummary;
@@ -143,3 +144,44 @@ export const sortDatasheetsBySupplementPreference = <T extends DatasheetListItem
     return a.name.localeCompare(b.name);
   });
 };
+
+export type { BattlefieldRole };
+
+export const BATTLEFIELD_ROLE_LABELS: Record<BattlefieldRole, string> = {
+  'epic-hero': 'Epic Heroes',
+  character: 'Characters',
+  battleline: 'Battleline',
+  other: 'Other Units'
+};
+
+/** Order sections appear in, matching how a list is read top-down. */
+export const BATTLEFIELD_ROLES: BattlefieldRole[] = [
+  'epic-hero',
+  'character',
+  'battleline',
+  'other'
+];
+
+/**
+ * Battlefield role for grouping a roster. 11th edition dropped the old force-org
+ * slots, so the role is read off the keywords — most-specific first, since an
+ * Epic Hero is also a Character.
+ */
+export const getBattlefieldRole = (datasheet: Pick<Datasheet, 'keywords'>): BattlefieldRole => {
+  const keywords = datasheet.keywords.map((entry) => entry.keyword.toLowerCase());
+  if (keywords.some((k) => k.includes('epic hero'))) return 'epic-hero';
+  if (keywords.some((k) => k.includes('character'))) return 'character';
+  if (keywords.some((k) => k.includes('battleline'))) return 'battleline';
+  return 'other';
+};
+
+/**
+ * Role and points for a list row. Full datasheets carry the source data; index
+ * summaries carry precomputed values (absent on manifests built before they
+ * existed, hence the fallbacks).
+ */
+export const getListItemRole = (item: DatasheetListItem): BattlefieldRole =>
+  'keywords' in item ? getBattlefieldRole(item) : (item.role ?? 'other');
+
+export const getListItemPoints = (item: DatasheetListItem): string | null =>
+  'modelCosts' in item ? summarizeModelCosts(item.modelCosts) : (item.points ?? null);
