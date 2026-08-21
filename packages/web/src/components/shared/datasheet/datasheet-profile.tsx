@@ -19,20 +19,16 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = []
 }) => {
-  const { inline: inlineAbilities, referenced: coreAbilities } = useMemo(() => {
-    return categorizeAbilities(datasheet.abilities);
+  const mergedAbilities = useMemo(() => {
+    const { inline, referenced } = categorizeAbilities(datasheet.abilities);
+    return [...referenced, ...inline];
   }, [datasheet.abilities]);
-
-  const mergedAbilities = useMemo(
-    () => [...coreAbilities, ...inlineAbilities],
-    [coreAbilities, inlineAbilities]
-  );
 
   return (
     <div className="flex flex-col gap-2 sm:gap-4" data-testid="datasheet-profile">
       {/* Model Stats Rows */}
       {datasheet.models.map((model) => (
-        <ModelStatsRow key={model.line} model={model} variant="default" />
+        <ModelStatsRow key={model.line} model={model} />
       ))}
 
       <DatasheetHero datasheet={datasheet} />

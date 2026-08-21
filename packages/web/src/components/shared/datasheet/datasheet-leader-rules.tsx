@@ -65,9 +65,7 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
     return Array.from(targets.values());
   }, [datasheet.factionSlug, factionDatasheets, leaders]);
 
-  const hasLeaderContent = Boolean(leaderTargets.length);
-
-  if (!hasLeaderContent) {
+  if (!leaderTargets.length) {
     return null;
   }
 
@@ -81,24 +79,22 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
       <div className="flex flex-col gap-2 text-sm text-body">
         <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderHead }} />
 
-        {leaderTargets.length ? (
-          <ul className="mt-1 list-disc pl-5">
-            {leaderTargets.map((target) => (
-              <li key={target.key} data-testid="leader-target">
-                {target.path ? (
-                  <Link
-                    to={target.path}
-                    className="text-primary-600 hover:underline focus:underline dark:text-primary-400"
-                  >
-                    {target.name}
-                  </Link>
-                ) : (
-                  target.name
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <ul className="mt-1 list-disc pl-5">
+          {leaderTargets.map((target) => (
+            <li key={target.key} data-testid="leader-target">
+              {target.path ? (
+                <Link
+                  to={target.path}
+                  className="text-primary-600 hover:underline focus:underline dark:text-primary-400"
+                >
+                  {target.name}
+                </Link>
+              ) : (
+                target.name
+              )}
+            </li>
+          ))}
+        </ul>
 
         {leaderFooter?.trim() ? (
           <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderFooter }} />
