@@ -10,8 +10,11 @@ interface FiltersProps {
 }
 
 const Filters: FC<FiltersProps> = ({ children, showClear, onClear, className, clearTestId }) => (
-  <div className={cx('flex flex-col sm:flex-row sm:items-center justify-between gap-4', className)}>
-    <div className="flex-1 flex flex-col sm:flex-row gap-4">{children}</div>
+  <div className={cx('flex flex-col sm:flex-row sm:items-center justify-between gap-2', className)}>
+    {/* auto-cols-fr gives every filter an equal share, whether there are one or three. */}
+    <div className="flex-1 flex flex-col gap-2 sm:grid sm:grid-flow-col sm:auto-cols-fr">
+      {children}
+    </div>
     {showClear && (
       <button
         onClick={onClear}

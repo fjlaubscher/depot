@@ -79,7 +79,8 @@ const Factions: React.FC = () => {
           clearTestId="faction-search-clear"
         >
           <Search
-            label="Search by name"
+            label="Search factions"
+            placeholder={`Search ${totalFactions} factions…`}
             value={query}
             onChange={setQuery}
             testId="faction-search"
