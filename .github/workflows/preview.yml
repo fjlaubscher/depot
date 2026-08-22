@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      PREVIEW_BRANCH: pr-${{ github.event.pull_request.number }}
+      PREVIEW_WORKER: depot-pr-${{ github.event.pull_request.number }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -44,15 +44,31 @@ jobs:
           node scripts/copy-data.mjs
           pnpm --filter @depot/web build
 
-      - name: Deploy Pages preview
+      - name: Write preview wrangler config
+        run: |
+          set -euo pipefail
+          cat > wrangler.preview.jsonc <<EOF
+          {
+            "name": "${PREVIEW_WORKER}",
+            "compatibility_date": "2026-08-01",
+            "main": "scripts/preview-worker.ts",
+            "assets": {
+              "binding": "ASSETS",
+              "directory": "packages/web/dist",
+              "not_found_handling": "single-page-application"
+            }
+          }
+          EOF
+
+      - name: Deploy worker
         id: deploy
         run: |
           set -euo pipefail
-          output=$(npx wrangler pages deploy packages/web/dist --project-name depot --branch "$PREVIEW_BRANCH" 2>&1)
+          output=$(pnpm exec wrangler deploy --config wrangler.preview.jsonc 2>&1)
           echo "$output"
-          url=$(echo "$output" | grep -Eo 'https://[^[:space:]]+pages\.dev' | head -n1 || true)
+          url=$(echo "$output" | grep -Eo 'https://[^[:space:]]+workers\.dev' | head -n1 || true)
           if [ -z "$url" ]; then
-            url="https://${PREVIEW_BRANCH}.depot.pages.dev"
+            url="https://${PREVIEW_WORKER}.fjlaubscher.workers.dev"
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
         env:
@@ -66,17 +82,15 @@ jobs:
             const url = '${{ steps.deploy.outputs.url }}';
             const pr = context.payload.pull_request.number;
             const sha = context.payload.pull_request.head.sha.slice(0, 7);
-            const branch = process.env.PREVIEW_BRANCH;
-            const alias = `https://${branch}.depot.pages.dev`;
+            const worker = process.env.PREVIEW_WORKER;
             const marker = `<!-- depot-preview pr=${pr} -->`;
             const body = [
               marker,
-              `**Preview:** ${alias}`,
+              `**Preview:** ${url}`,
               '',
-              'Cloudflare Pages preview (static app + `functions/[[path]].ts` OG rewrite).',
-              `\`${sha}\` · branch \`${branch}\` · deployment ${url}`,
+              `\`${sha}\` · \`${worker}\` · same OG rewrite as prod (`functions/[[path]].ts`).`,
               '',
-              '_Replaced on each push. Alias stays `pr-<n>.depot.pages.dev`._'
+              '_Torn down when this PR closes._'
             ].join('\n');
 
             const { data: comments } = await github.rest.issues.listComments({
@@ -104,23 +118,42 @@ jobs:
               });
             }
 
-  preview-closed:
-    name: Mark preview stale
+  preview-cleanup:
+    name: Preview cleanup
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env:
-      PREVIEW_BRANCH: pr-${{ github.event.pull_request.number }}
+      PREVIEW_WORKER: depot-pr-${{ github.event.pull_request.number }}
     steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Delete preview worker
+        run: pnpm exec wrangler delete --name "$PREVIEW_WORKER" --force 2>/dev/null || true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Update preview comment
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request.number;
-            const alias = `https://${process.env.PREVIEW_BRANCH}.depot.pages.dev`;
+            const worker = process.env.PREVIEW_WORKER;
             const marker = `<!-- depot-preview pr=${pr} -->`;
             const body = [
               marker,
-              `**Preview closed.** ${alias} may linger on Cloudflare until the next deploy overwrites that branch.`,
+              `**Preview torn down.** \`${worker}\` deleted.`,
               '',
               '_PR closed — no further preview deploys._'
             ].join('\n');
