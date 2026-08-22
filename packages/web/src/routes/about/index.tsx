@@ -1,4 +1,5 @@
 import AppLayout from '@/components/layout';
+import AppVersion from '@/components/shared/app-version';
 
 const About = () => (
   <AppLayout title="About depot">
@@ -8,6 +9,7 @@ const About = () => (
         <p className="mt-0.5 text-sm text-muted">
           An offline-first roster companion built for hobby tinkering
         </p>
+        <AppVersion className="mt-1" />
       </div>
 
       <blockquote className="rounded-sm border-l-2 border-border-accent bg-surface-muted p-4 text-sm italic text-body">

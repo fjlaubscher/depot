@@ -5,6 +5,7 @@ import AppLayout from '@/components/layout';
 import { Button, Loader, SectionHeader } from '@/components/ui';
 
 // Components
+import AppVersion from '@/components/shared/app-version';
 import DataVersion from '@/components/shared/data-version';
 import SettingToggleItem from './_components/setting-toggle-item';
 import StorageUsage from './_components/storage-usage';
@@ -111,7 +112,10 @@ const Settings = () => {
           <SectionHeader title="Offline data" />
 
           <div className="surface-card flex flex-col gap-3 p-3">
-            <DataVersion />
+            <div className="flex flex-col gap-1">
+              <AppVersion />
+              <DataVersion />
+            </div>
             <StorageUsage />
 
             {loading ? (
