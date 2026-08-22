@@ -7,6 +7,7 @@ This document describes how depot releases are cut, built, and deployed via GitH
 - **Versioning**: Semantic versioning with git tags (`vX.Y.Z`).
 - **Source of truth for data**: Wahapedia-derived `public/data/index.json:dataVersion` produced by `@depot/cli`.
 - **Build & deploy**: GitHub Actions `Release` workflow builds the monorepo, uploads Sentry sourcemaps, creates a GitHub release, and deploys to Cloudflare Pages (static assets + functions).
+- **PR previews**: `Preview` workflow deploys each open PR to a Cloudflare Pages branch (`pr-<n>`) and comments the `*.pages.dev` URL. That deploy includes `functions/[[path]].ts` (on-the-fly OG/meta rewrite).
 
 ## Required GitHub Secrets
 
@@ -27,29 +28,24 @@ Configure these in **Settings → Security → Secrets and variables → Actions
 
 > `VITE_SENTRY_RELEASE` is set automatically from the git tag inside the workflow.
 
-### OpenAI / Workers (Cloudflare-side)
-
-These are not used directly in the GitHub workflow but must be configured in Cloudflare:
-
-- `OPENAI_API_KEY` — required by the Cogitator worker.
-- `OPENAI_MODEL` (optional) — overrides the default model if needed.
-
 ## Release Workflow (`.github/workflows/release.yml`)
 
 The `Release` workflow runs on:
 
-- `push` to tags matching `v*.*.*` (e.g. `v1.0.0`), and
-- manual `workflow_dispatch`.
+- `push` to tags matching `v*.*.*` (e.g. `v1.0.0`) — builds, creates the GitHub release, deploys production.
+- manual `workflow_dispatch` with a `tag` input (and optional `ref`, default `main`) — creates and pushes the annotated tag. That tag push then runs the release job.
 
-### Steps
+Do not dispatch the workflow without a `vX.Y.Z` tag; a branch-only run would stamp Sentry / the GitHub release with `main`.
+
+### Steps (tag push)
 
 1. **Checkout & setup**
    - Checks out the repo.
-   - Sets up pnpm and Node.js 22 with pnpm caching.
+   - Sets up pnpm and Node.js 24 with pnpm caching.
 2. **Install dependencies**
    - `pnpm install --frozen-lockfile`.
-3. **Prepare Sentry release name**
-   - Exports `VITE_SENTRY_RELEASE=${GITHUB_REF_NAME}` (e.g. `v1.0.0`) into the env.
+3. **Prepare release metadata**
+   - Exports `VITE_SENTRY_RELEASE=${GITHUB_REF_NAME}` and `VITE_APP_VERSION` (tag without the `v`) into the env.
 4. **Build core, CLI, data, and web**
    - Commands:
      - `pnpm --filter @depot/core build`
@@ -57,28 +53,20 @@ The `Release` workflow runs on:
      - `pnpm --filter @depot/cli start`
      - `node scripts/copy-data.mjs`
      - `pnpm --filter @depot/web build`
-   - Environment for the build:
-     - `VITE_SENTRY_DSN`
-     - `VITE_SENTRY_ENVIRONMENT`
-     - `VITE_SENTRY_AUTH_TOKEN`
-     - `VITE_SENTRY_ORG`
-     - `VITE_SENTRY_PROJECT`
-     - `VITE_SENTRY_RELEASE`
-   - The Vite config (`packages/web/vite.config.ts`) uses these to:
-     - Enable Sentry sourcemap upload.
-     - Create/update a Sentry release named after the tag (e.g. `v1.0.0`).
 5. **Create GitHub release**
-   - Uses `softprops/action-gh-release@v2` with `generate_release_notes: true`.
-   - No build artifacts (e.g. zipped data) are attached to avoid redistributing Wahapedia rules data directly.
+   - Uses `softprops/action-gh-release@v3` with `generate_release_notes: true`.
 6. **Deploy to Cloudflare Pages**
-   - Runs:
-     - `npx wrangler pages deploy packages/web/dist --project-name depot --branch main`
-   - Uses:
-     - `CLOUDFLARE_API_TOKEN`
-     - `CLOUDFLARE_ACCOUNT_ID`
-   - This deploys:
-     - The static assets in `packages/web/dist`, and
-     - The functions under `functions/` (Pages Functions), picked up automatically by Wrangler.
+   - `npx wrangler pages deploy packages/web/dist --project-name depot --branch main`
+   - Picks up `functions/` (Pages Functions) from the repo root.
+
+## PR previews (`.github/workflows/preview.yml`)
+
+Mirrors chapterden’s “deploy + comment the URL” loop, on Pages instead of a standalone `workers.dev` worker:
+
+- Depot prod is already Cloudflare Pages. `functions/[[path]].ts` is a Pages Function on the Workers runtime (HTMLRewriter OG tags), not a separate Worker + D1.
+- Each open PR deploys `--branch pr-<number>`.
+- Stable alias: `https://pr-<number>.depot.pages.dev`.
+- The bot comment is upserted (`<!-- depot-preview pr=N -->`). Closing the PR marks the comment stale; Pages keeps the last preview deployment until that branch is overwritten.
 
 ## Data Versioning
 
@@ -102,8 +90,9 @@ The `Release` workflow runs on:
 2. **Update docs**
    - Update `CHANGELOG.md` with the new version and notes.
    - Commit any documentation or UI copy changes tied to the release.
-3. **Tag the release**
-   - From an up-to-date `main`:
+3. **Tag the release** (either):
+   - From Actions: run **Release** with `tag=vX.Y.Z` (optional `ref`, default `main`). The workflow creates the annotated tag and the tag push does the rest.
+   - Or locally from an up-to-date `main`:
      - `git tag -a vX.Y.Z -m "vX.Y.Z"`
      - `git push origin vX.Y.Z`
 4. **Watch the workflow**
@@ -112,15 +101,14 @@ The `Release` workflow runs on:
      - GitHub release is created for `vX.Y.Z`.
      - Cloudflare Pages deploy step completes without errors.
 5. **Verify production**
-   - Load the deployed app:
+   - Load [godepot.dev](https://godepot.dev):
      - Confirm `Last Updated` matches the expected Wahapedia snapshot.
-     - Sanity-check core flows (home, factions, rosters, Cogitator).
+     - Sanity-check core flows (home, factions, rosters).
    - Check Sentry:
      - New release named `vX.Y.Z` exists.
      - Source maps are associated with that release.
 
 ## Notes
 
-- If Cloudflare deploy fails for a tag, you can re-run just the `Release` workflow from the Actions tab.
+- If Cloudflare deploy fails for a tag, re-run the **tag-push** `Release` workflow from the Actions tab (not a new `workflow_dispatch`, which would try to recreate the tag).
 - If you need a new Wahapedia snapshot before a release, regenerate data locally or in CI via the CLI (`@depot/cli`) before tagging so that `index.json:dataVersion` reflects the new snapshot. The release workflow will then build and deploy that snapshot.
-
