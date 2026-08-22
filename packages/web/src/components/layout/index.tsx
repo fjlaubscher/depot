@@ -53,7 +53,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
   useDataVersionToast(dataVersion);
 
   return (
-    <div className="flex h-dvh bg-surface-base">
+    <div className="flex h-dvh overflow-hidden bg-surface-base">
       {/* Desktop nav rail */}
       <aside className="hidden lg:flex w-[220px] flex-none flex-col gap-0.5 border-r border-border-subtle bg-surface-muted px-2 py-4">
         <div className="px-2.5 pb-3.5">
@@ -92,7 +92,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {!online && (
           <div
             className="flex flex-none items-center gap-2 border-b border-warning-border bg-warning-surface px-4 py-2"
@@ -135,7 +135,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
           </header>
         )}
 
-        <main id="app-content" className="flex-1 overflow-y-auto">
+        <main id="app-content" className="min-h-0 flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-[960px] px-4 py-4">{children}</div>
         </main>
 
