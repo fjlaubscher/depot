@@ -66,9 +66,9 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
               <span>{tab.label}</span>
               <span
                 className={cx(
-                  'inline-flex items-center justify-center font-mono text-xs font-bold',
+                  'inline-flex items-center justify-center rounded-xs px-1.5 py-0.5 font-mono text-xs font-bold',
                   isActive
-                    ? 'bg-surface-soft text-accent border border-border-strong'
+                    ? 'bg-white/20 text-current border border-white/30'
                     : 'bg-surface-muted text-muted border border-transparent'
                 )}
               >

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-08-22
+
+### Fixed
+
+- Supplement tab count badges no longer render as a black square on coloured
+  chapter tabs in dark mode. Active badges now use a translucent white overlay
+  with `text-current` so they stay readable on every active tab colour.
+
 ## [2.0.0] - 2026-08-22
 
 ### Changed
@@ -49,4 +57,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@depot/web` React PWA with offline roster building and datasheet browsing.
 - `@depot/workers` Cloudflare worker handlers powering server-side features.
 - CI workflows for build, lint/typecheck/test, and Playwright E2E coverage.
-
