@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-08-22
+
+### Fixed
+
+- Android Chrome and the installed PWA no longer treat the home page as taller
+  than the visible window. The shell is pinned with `fixed inset-0`, document
+  scroll is locked, and `viewport-fit=cover` keeps the tab bar above the
+  system gesture bar.
+- The running app version is shown in Settings, About, and the desktop rail
+  (`depot · {version}`), sourced from the release tag.
+
 ## [2.0.1] - 2026-08-22
 
 ### Fixed
