@@ -45,8 +45,8 @@ jobs:
             exit 1
           fi
           if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists" >&2
-            exit 1
+            echo "Tag $TAG already exists — skipping create"
+            exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -55,12 +55,14 @@ jobs:
 
   release:
     name: Build, release, deploy
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -75,9 +77,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Prepare release metadata
+        env:
+          TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
         run: |
-          echo "VITE_SENTRY_RELEASE=${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          echo "VITE_APP_VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          echo "VITE_SENTRY_RELEASE=${TAG}" >> $GITHUB_ENV
+          echo "VITE_APP_VERSION=${TAG#v}" >> $GITHUB_ENV
 
       - name: Build core, CLI, data and web app
         run: |
@@ -99,6 +103,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
