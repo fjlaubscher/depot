@@ -154,6 +154,13 @@
   --shadow-e3: var(--elevation-3);
 }
 
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--surface-base);

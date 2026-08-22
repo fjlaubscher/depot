@@ -1,5 +1,6 @@
 // Navigation
 export { ErrorBoundary } from './error-boundary';
+export { default as AppVersion } from './app-version';
 export { default as DataVersion } from './data-version';
 export { default as PillTabs } from './pill-tabs';
 
