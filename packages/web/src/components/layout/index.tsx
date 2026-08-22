@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { ArrowLeft, Home, Users, Settings, ClipboardList, Boxes, WifiOff } from 'lucide-react';
 
 import Logo from '@/components/logo';
+import AppVersion from '@/components/shared/app-version';
 import DataVersion from '@/components/shared/data-version';
 import ActionGroup from '@/components/ui/action-group';
 import type { Action } from '@/components/ui/action-group';
@@ -53,7 +54,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
   useDataVersionToast(dataVersion);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-surface-base">
+    <div className="fixed inset-0 flex overflow-hidden bg-surface-base">
       {/* Desktop nav rail */}
       <aside className="hidden lg:flex w-[220px] flex-none flex-col gap-0.5 border-r border-border-subtle bg-surface-muted px-2 py-4">
         <div className="px-2.5 pb-3.5">
@@ -87,8 +88,8 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
           <Link to="/privacy" className="link-subtle text-xs">
             Privacy
           </Link>
-          {/* The source note is the quietest thing here, so it sits last. */}
-          <DataVersion className="pt-1" />
+          <AppVersion className="pt-1" />
+          <DataVersion />
         </div>
       </aside>
 
