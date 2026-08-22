@@ -7,14 +7,15 @@ This document describes how depot releases are cut, built, and deployed via GitH
 - **Versioning**: Semantic versioning with git tags (`vX.Y.Z`).
 - **Source of truth for data**: Wahapedia-derived `public/data/index.json:dataVersion` produced by `@depot/cli`.
 - **Build & deploy**: GitHub Actions `Release` workflow builds the monorepo, uploads Sentry sourcemaps, creates a GitHub release, and deploys to Cloudflare Pages (static assets + functions).
+- **PR previews**: `Preview` workflow deploys a per-PR Worker (`depot-pr-<n>`) and comments the `*.fjlaubscher.workers.dev` URL. Prod stays on Pages (`godepot.dev`).
 
 ## Required GitHub Secrets
 
 Configure these in **Settings → Security → Secrets and variables → Actions → Secrets**:
 
-### Cloudflare Pages
+### Cloudflare
 
-- `CLOUDFLARE_API_TOKEN` — API token with `Account → Cloudflare Pages → Edit` for the account that owns the `depot` Pages project.
+- `CLOUDFLARE_API_TOKEN` — same account as chapterden. Prod needs `Account → Cloudflare Pages → Edit`. PR previews need `Account → Workers Scripts → Edit` (chapterden already uses this).
 - `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID for that account.
 
 ### Sentry (sourcemaps + client config)
@@ -27,100 +28,52 @@ Configure these in **Settings → Security → Secrets and variables → Actions
 
 > `VITE_SENTRY_RELEASE` is set automatically from the git tag inside the workflow.
 
-### OpenAI / Workers (Cloudflare-side)
-
-These are not used directly in the GitHub workflow but must be configured in Cloudflare:
-
-- `OPENAI_API_KEY` — required by the Cogitator worker.
-- `OPENAI_MODEL` (optional) — overrides the default model if needed.
-
 ## Release Workflow (`.github/workflows/release.yml`)
 
 The `Release` workflow runs on:
 
-- `push` to tags matching `v*.*.*` (e.g. `v1.0.0`), and
-- manual `workflow_dispatch`.
+- `push` to tags matching `v*.*.*` (e.g. `v1.0.0`) — builds, creates the GitHub release, deploys production.
+- manual `workflow_dispatch` with a `tag` input (and optional `ref`, default `main`) — creates and pushes the annotated tag. That tag push then runs the release job.
 
-### Steps
+Do not dispatch the workflow without a `vX.Y.Z` tag; a branch-only run would stamp Sentry / the GitHub release with `main`.
 
-1. **Checkout & setup**
-   - Checks out the repo.
-   - Sets up pnpm and Node.js 22 with pnpm caching.
-2. **Install dependencies**
-   - `pnpm install --frozen-lockfile`.
-3. **Prepare Sentry release name**
-   - Exports `VITE_SENTRY_RELEASE=${GITHUB_REF_NAME}` (e.g. `v1.0.0`) into the env.
-4. **Build core, CLI, data, and web**
-   - Commands:
-     - `pnpm --filter @depot/core build`
-     - `pnpm --filter @depot/cli build`
-     - `pnpm --filter @depot/cli start`
-     - `node scripts/copy-data.mjs`
-     - `pnpm --filter @depot/web build`
-   - Environment for the build:
-     - `VITE_SENTRY_DSN`
-     - `VITE_SENTRY_ENVIRONMENT`
-     - `VITE_SENTRY_AUTH_TOKEN`
-     - `VITE_SENTRY_ORG`
-     - `VITE_SENTRY_PROJECT`
-     - `VITE_SENTRY_RELEASE`
-   - The Vite config (`packages/web/vite.config.ts`) uses these to:
-     - Enable Sentry sourcemap upload.
-     - Create/update a Sentry release named after the tag (e.g. `v1.0.0`).
-5. **Create GitHub release**
-   - Uses `softprops/action-gh-release@v2` with `generate_release_notes: true`.
-   - No build artifacts (e.g. zipped data) are attached to avoid redistributing Wahapedia rules data directly.
-6. **Deploy to Cloudflare Pages**
-   - Runs:
-     - `npx wrangler pages deploy packages/web/dist --project-name depot --branch main`
-   - Uses:
-     - `CLOUDFLARE_API_TOKEN`
-     - `CLOUDFLARE_ACCOUNT_ID`
-   - This deploys:
-     - The static assets in `packages/web/dist`, and
-     - The functions under `functions/` (Pages Functions), picked up automatically by Wrangler.
+### Steps (tag push)
+
+1. **Checkout & setup** — pnpm + Node.js 24.
+2. **Install** — `pnpm install --frozen-lockfile`.
+3. **Prepare release metadata** — `VITE_SENTRY_RELEASE` + `VITE_APP_VERSION` from the tag.
+4. **Build** core, CLI, data, web.
+5. **Create GitHub release** — `softprops/action-gh-release@v3`.
+6. **Deploy Pages** — `npx wrangler pages deploy packages/web/dist --project-name depot --branch main` (picks up `functions/`).
+
+## PR previews (`.github/workflows/preview.yml`)
+
+Same loop as chapterden: per-PR Worker + comment the `workers.dev` URL. No D1 (depot is a static PWA).
+
+- Worker name: `depot-pr-<n>`.
+- URL from wrangler output, fallback `https://depot-pr-<n>.fjlaubscher.workers.dev`.
+- Assets: `packages/web/dist` with SPA not-found handling.
+- Worker entry `scripts/preview-worker.ts` calls the existing Pages `onRequest` in `functions/[[path]].ts` so OG/meta rewrite still runs.
+- Bot upserts one comment (`<!-- depot-preview pr=N -->`).
+- PR close: `wrangler delete --name depot-pr-<n> --force` and the comment is marked torn down.
+
+Prod is unchanged (Pages + `godepot.dev`). Previews never deploy `--branch main`.
 
 ## Data Versioning
 
 - The CLI writes a `dataVersion` field into `public/data/index.json`.
-- On startup, the app:
-  - Reads `dataVersion` from the index.
-  - Stores it in IndexedDB.
-  - Resets cached data when the version changes.
-  - Displays it on the home screen (`Last Updated: …`).
-- There is no longer any baked-in or env-driven fallback data version; Wahapedia’s exported `dataVersion` is the only source of truth.
+- On startup, the app reads it from the index, stores it in IndexedDB, resets cached data when it changes, and shows it on the home screen.
+- Wahapedia’s exported `dataVersion` is the only source of truth.
 
 ## How to Cut a Release
 
-1. **Prep main**
-   - Ensure `main` is green:
-     - `pnpm format`
-     - `pnpm lint`
-     - `pnpm typecheck`
-     - `pnpm test`
-   - Optionally run E2E locally or via the Playwright workflow.
-2. **Update docs**
-   - Update `CHANGELOG.md` with the new version and notes.
-   - Commit any documentation or UI copy changes tied to the release.
-3. **Tag the release**
-   - From an up-to-date `main`:
-     - `git tag -a vX.Y.Z -m "vX.Y.Z"`
-     - `git push origin vX.Y.Z`
-4. **Watch the workflow**
-   - Confirm the `Release` workflow passes:
-     - Build + Sentry sourcemap upload succeed.
-     - GitHub release is created for `vX.Y.Z`.
-     - Cloudflare Pages deploy step completes without errors.
-5. **Verify production**
-   - Load the deployed app:
-     - Confirm `Last Updated` matches the expected Wahapedia snapshot.
-     - Sanity-check core flows (home, factions, rosters, Cogitator).
-   - Check Sentry:
-     - New release named `vX.Y.Z` exists.
-     - Source maps are associated with that release.
+1. Prep `main` (`pnpm format && pnpm lint && pnpm typecheck && pnpm test`).
+2. Update `CHANGELOG.md`.
+3. Tag: Actions → **Release** → `tag=vX.Y.Z`, or `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
+4. Confirm the tag-push `Release` run: build, GitHub release, Pages deploy.
+5. Check [godepot.dev](https://godepot.dev) and the Sentry release.
 
 ## Notes
 
-- If Cloudflare deploy fails for a tag, you can re-run just the `Release` workflow from the Actions tab.
-- If you need a new Wahapedia snapshot before a release, regenerate data locally or in CI via the CLI (`@depot/cli`) before tagging so that `index.json:dataVersion` reflects the new snapshot. The release workflow will then build and deploy that snapshot.
-
+- Failed tag deploy: re-run the **tag-push** workflow, do not dispatch a new tag.
+- New Wahapedia snapshot: regenerate via `@depot/cli` before tagging.
