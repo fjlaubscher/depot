@@ -15,11 +15,18 @@ import ThemePicker from './_components/theme-picker';
 import { useSettingsContext } from '@/contexts/settings/context';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { useToast } from '@/contexts/toast/context';
+import { promptInstall, usePwaInstall } from '@/hooks/use-pwa-install';
+import { shouldShowInstallAffordance } from '@/lib/pwa-install';
 
 const Settings = () => {
   const { showToast } = useToast();
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
+  const pwa = usePwaInstall();
+  const installable = shouldShowInstallAffordance({
+    hasPrompt: pwa.hasPrompt,
+    standalone: pwa.standalone
+  });
 
   const handleSettingsChange = async (
     field: keyof depot.Settings,
@@ -63,6 +70,25 @@ const Settings = () => {
             onChange={(theme) => handleSettingsChange('theme', theme)}
           />
         </section>
+
+        {installable && (
+          <section className="flex flex-col gap-2">
+            <SectionHeader title="Install depot" />
+            <div className="surface-card flex items-center justify-between gap-3 p-3">
+              <p className="text-sm text-body">Install depot for offline use.</p>
+              <Button
+                type="button"
+                size="sm"
+                disabled={pwa.busy}
+                onClick={() => {
+                  void promptInstall();
+                }}
+              >
+                Install
+              </Button>
+            </div>
+          </section>
+        )}
 
         <section className="flex flex-col gap-2">
           <SectionHeader title="Factions" />
