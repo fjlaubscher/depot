@@ -65,9 +65,9 @@ export default defineConfig(({ mode }) => {
         ],
         shortcuts: [
           {
-            name: 'Collections',
-            short_name: 'Collections',
-            url: '/collections',
+            name: 'Armies',
+            short_name: 'Armies',
+            url: '/armies',
             icons: [
               {
                 src: 'pwa-192x192.png',
@@ -77,21 +77,9 @@ export default defineConfig(({ mode }) => {
             ]
           },
           {
-            name: 'Factions',
-            short_name: 'Factions',
+            name: 'Rules',
+            short_name: 'Rules',
             url: '/factions',
-            icons: [
-              {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png'
-              }
-            ]
-          },
-          {
-            name: 'Rosters',
-            short_name: 'Rosters',
-            url: '/rosters',
             icons: [
               {
                 src: 'pwa-192x192.png',

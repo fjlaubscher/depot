@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Factions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/factions');
-    await expect(page.getByRole('heading', { name: 'Factions' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Rules' })).toBeVisible();
   });
 
   test('lists factions and allows navigation', async ({ page }) => {

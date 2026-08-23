@@ -64,10 +64,10 @@ const Factions: React.FC = () => {
   }
 
   return (
-    <AppLayout title="Browse Factions">
+    <AppLayout title="Browse Rules">
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Factions</h1>
+          <h1 className="text-2xl font-bold text-foreground">Rules</h1>
           <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
             {totalFactions} factions · {totalAlliances} alliances
           </p>

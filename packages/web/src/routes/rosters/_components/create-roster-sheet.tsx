@@ -14,9 +14,10 @@ import { FieldSkeleton } from '@/components/ui/skeleton';
 import MaxPointsField from './max-points-field';
 
 export interface RosterPrefill {
-  name: string;
-  factionSlug: string;
-  units: depot.RosterUnit[];
+  name?: string;
+  factionSlug?: string;
+  units?: depot.RosterUnit[];
+  collectionId?: string | null;
 }
 
 interface Props {
@@ -56,7 +57,6 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
 
   const factionOptions = sortByName(factions ?? []).map((f) => ({ value: f.slug, label: f.name }));
 
-  // Reset detachments when faction changes
   useEffect(() => {
     setDetachmentSlugs([]);
   }, [factionSlug]);
@@ -76,7 +76,6 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0 || !selectedFactionIndex) return;
 
-    // Collection snapshots may predate the current catalog; rebind them before stamping dataVersion.
     let units = prefillUnits;
     if (units.length > 0 && dataVersion) {
       const rebound = await rebindRosterUnits(
@@ -100,7 +99,8 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       dataVersion: dataVersion ?? null,
       maxPoints,
       detachments: factionDetachments.filter((d) => detachmentSlugs.includes(d.slug)),
-      units
+      units,
+      collectionId: prefill?.collectionId ?? null
     });
     onClose();
     navigate(`/rosters/${newId}/edit`);
@@ -151,7 +151,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
           }}
           placeholder="Select a Faction"
           required
-          disabled={!!prefill}
+          disabled={!!prefill?.factionSlug}
           error={errors.faction}
         />
       )}
@@ -213,7 +213,6 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
   );
 };
 
-/** Bottom sheet for creating a roster; navigates to the editor on success. */
 const CreateRosterSheet: React.FC<Props> = ({ open, onClose, prefill }) => (
   <Sheet open={open} onClose={onClose} title="Create Roster" data-testid="create-roster-sheet">
     <CreateRosterForm onClose={onClose} prefill={prefill} />

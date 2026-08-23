@@ -16,6 +16,7 @@ import ViewRoster from './routes/rosters/[rosterId]';
 import AddRosterUnits from './routes/rosters/[rosterId]/add-units';
 import EditRosterUnit from './routes/rosters/[rosterId]/units/[unitId]/edit';
 import PrivacyPolicy from './routes/privacy';
+import Armies from './routes/armies';
 import Collections from './routes/collections';
 import CollectionView from './routes/collections/[collectionId]';
 import AddCollectionUnits from './routes/collections/[collectionId]/add-units';
@@ -33,6 +34,7 @@ const AppRoutes = () => (
     <Route path="/faction/:factionSlug/datasheet/:datasheetSlug" element={<Datasheet />} />
     <Route path="/faction/:factionSlug/detachment/:detachmentSlug" element={<Detachment />} />
     <Route path="/settings" element={<Settings />} />
+    <Route path="/armies" element={<Armies />} />
     <Route path="/collections" element={<Collections />} />
     <Route path="/collections/:collectionId" element={<CollectionView />} />
     <Route path="/collections/:collectionId/add-units" element={<AddCollectionUnits />} />

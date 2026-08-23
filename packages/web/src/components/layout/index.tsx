@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from '@/lib/navigation';
-import { ArrowLeft, Home, Users, Settings, ClipboardList, Boxes, WifiOff } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { ArrowLeft, Home, BookOpen, Settings, Swords, WifiOff } from 'lucide-react';
 
 import Logo from '@/components/logo';
 import AppVersion from '@/components/shared/app-version';
@@ -13,11 +14,24 @@ import useOnlineStatus from '@/hooks/use-online-status';
 import useDataVersionToast from '@/hooks/use-data-version-toast';
 import { cx } from '@/utils/cx';
 
-const NAV_ITEMS = [
+const NAV_ITEMS: {
+  to: string;
+  icon: typeof Home;
+  label: string;
+  end?: boolean;
+  match?: (pathname: string) => boolean;
+}[] = [
   { to: '/', icon: Home, label: 'Home', end: true },
-  { to: '/factions', icon: Users, label: 'Factions' },
-  { to: '/rosters', icon: ClipboardList, label: 'Rosters' },
-  { to: '/collections', icon: Boxes, label: 'Collections' },
+  { to: '/factions', icon: BookOpen, label: 'Rules' },
+  {
+    to: '/armies',
+    icon: Swords,
+    label: 'Armies',
+    match: (pathname) =>
+      pathname.startsWith('/armies') ||
+      pathname.startsWith('/collections') ||
+      pathname.startsWith('/rosters')
+  },
   { to: '/settings', icon: Settings, label: 'Settings' }
 ];
 
@@ -36,7 +50,7 @@ interface Props {
   title: string;
   /**
    * Drill-in screens pass this and get a sticky back header instead of the
-   * bottom tab bar — the five root tabs keep the bar.
+   * bottom tab bar — the root tabs keep the bar.
    */
   back?: { to: string; label: string };
   heading?: { title: string; subtitle?: string };
@@ -49,6 +63,7 @@ interface Props {
 const AppLayout = ({ children, title, back, heading, actions, footer }: Props) => {
   const { dataVersion } = useFactionsContext();
   const online = useOnlineStatus();
+  const { pathname } = useLocation();
 
   useDocumentTitle(title);
   useDataVersionToast(dataVersion);
@@ -61,7 +76,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
           <Brand />
         </div>
         <nav aria-label="Primary" className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
+          {NAV_ITEMS.map(({ to, icon: Icon, label, end, match }) => (
             <NavLink
               key={to}
               to={to}
@@ -69,7 +84,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
               className={({ isActive }) =>
                 cx(
                   'flex items-center gap-2.5 h-10 px-2.5 text-[13px] font-bold border-l-2 transition-colors',
-                  isActive
+                  (match ? match(pathname) : isActive)
                     ? 'border-border-accent bg-surface-accent text-accent'
                     : 'border-transparent text-muted hover:text-foreground'
                 )
@@ -151,7 +166,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
             aria-label="Primary"
             className="flex flex-none border-t border-border-subtle bg-surface-muted pt-1.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] lg:hidden"
           >
-            {NAV_ITEMS.map(({ to, icon: Icon, label, end }) => (
+            {NAV_ITEMS.map(({ to, icon: Icon, label, end, match }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -159,7 +174,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
                 className={({ isActive }) =>
                   cx(
                     'flex flex-1 flex-col items-center justify-center gap-0.5 min-h-11 font-mono text-[9px] font-medium uppercase tracking-wide',
-                    isActive ? 'text-accent' : 'text-subtle'
+                    (match ? match(pathname) : isActive) ? 'text-accent' : 'text-subtle'
                   )
                 }
               >

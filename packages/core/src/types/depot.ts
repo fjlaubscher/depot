@@ -239,6 +239,11 @@ export interface Roster {
   warlordUnitId?: string | null;
   units: RosterUnit[];
   enhancements: { enhancement: Enhancement; unitId: string }[]; // Applied enhancements linked to a unit
+  /**
+   * Optional cabinet this list is attached to. Null/absent = theorycraft or
+   * legacy list (club night, proxy, opponent). Set when created from a collection.
+   */
+  collectionId?: string | null;
   /** ISO timestamp when the roster was first created (optional for legacy saves). */
   createdAt?: string;
   /** ISO timestamp of the last local save (used for recent sorting). */

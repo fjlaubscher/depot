@@ -21,5 +21,6 @@ export const initialState: depot.Roster = {
   },
   warlordUnitId: null,
   units: [],
-  enhancements: []
+  enhancements: [],
+  collectionId: null
 };

@@ -31,7 +31,6 @@ const RosterEdit: FC = () => {
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
-  /** Sections by battlefield role, mirroring how a list is written out. */
   const sections = useMemo(() => {
     const byRole = new Map<string, depot.RosterUnit[]>();
     for (const unit of roster.units) {
@@ -50,7 +49,6 @@ const RosterEdit: FC = () => {
     });
   }, [roster.units]);
 
-  // Same unit badges as the view roster: warlord, enhancement, unit-scoped legality.
   const issuesByUnit = useMemo(() => {
     const map = new Map<string, string[]>();
     for (const issue of validateRoster(roster)) {
@@ -105,7 +103,6 @@ const RosterEdit: FC = () => {
       }
     >
       <div className="flex flex-col gap-3">
-        {/* The budget bar is the thing you check between every edit — it stays at the top. */}
         <div className="surface-card p-3 lg:sticky lg:top-0 lg:z-10">
           <RosterHeader roster={roster} />
         </div>
