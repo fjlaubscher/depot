@@ -1,5 +1,6 @@
 import { useMemo, type FC } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { Eye, Plus, Pencil } from 'lucide-react';
 import type { depot } from '@depot/core';
 

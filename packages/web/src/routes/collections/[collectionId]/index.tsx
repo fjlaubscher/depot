@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { Plus, ClipboardPlus, Download, RefreshCw } from 'lucide-react';
 import type { depot } from '@depot/core';
 

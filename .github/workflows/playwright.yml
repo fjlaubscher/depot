@@ -1,10 +1,11 @@
 name: Playwright E2E
 
+# E2E is the priciest job in the repo, so it only runs on main. Run it by hand
+# from the Actions tab when a branch needs the check before merge.
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"

@@ -1,5 +1,5 @@
 import type { AnchorHTMLAttributes, FC, ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { cx } from '@/utils/cx';
 import Card from '../card';

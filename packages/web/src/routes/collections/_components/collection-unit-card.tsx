@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { MouseEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { Copy, Maximize2, Minimize2, Trash2 } from 'lucide-react';
 import type { depot } from '@depot/core';
 

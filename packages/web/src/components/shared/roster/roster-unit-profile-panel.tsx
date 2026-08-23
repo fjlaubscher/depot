@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
 import { ModelStatsRow } from '@/components/shared';

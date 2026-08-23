@@ -394,3 +394,10 @@ span.hi_custom {
     @apply border-l-2 border-border-accent pl-3 italic text-subtle my-2;
   }
 }
+
+/* Route cross-fade. Reduced motion skips the transition entirely in
+   lib/navigation, so no media query is needed here. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}

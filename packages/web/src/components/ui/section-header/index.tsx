@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 interface SectionHeaderProps {
   title: string;

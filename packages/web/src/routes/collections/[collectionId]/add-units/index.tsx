@@ -1,5 +1,6 @@
 import type { FC } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 
 import AppLayout from '@/components/layout';
 import { Loader, Alert } from '@/components/ui';

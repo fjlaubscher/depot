@@ -11,6 +11,7 @@ import { takeRecent } from '@/utils/recent';
 import { validateRoster } from '@depot/core/utils/roster-legality';
 
 import Hero from './_components/hero';
+import InstallBanner from './_components/install-banner';
 import BookmarkCard from './_components/bookmark-card';
 import RosterRow from './_components/roster-row';
 import CollectionRow from './_components/collection-row';
@@ -38,6 +39,8 @@ const Home: React.FC = () => {
         </div>
 
         <Hero />
+
+        <InstallBanner />
 
         {loading ? (
           <div className="flex justify-center py-6">

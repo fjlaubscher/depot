@@ -17,11 +17,15 @@ const InstallBanner = () => {
       role="region"
       aria-label="Install"
       data-testid="install-banner"
-      className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-border-accent bg-surface-accent px-4 py-3"
+      className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-border-accent bg-surface-accent px-4 py-3"
     >
-      <p className="min-w-0 flex-1 text-sm leading-snug text-body">
-        Install depot for offline use.
-      </p>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <p className="text-sm leading-snug font-semibold text-foreground">Install depot</p>
+        <p className="max-w-[52ch] text-[12.5px] leading-normal text-body">
+          Add it to your home screen and depot opens like an app — full screen, no address bar, and
+          every faction you've downloaded still opens with no signal at the table.
+        </p>
+      </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
