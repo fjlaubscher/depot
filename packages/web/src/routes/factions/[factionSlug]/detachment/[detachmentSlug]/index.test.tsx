@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mockFaction, toFactionManifest } from '@/test/mock-data';
 import { TestWrapper, setupBrowserMocks } from '@/test/test-utils';
@@ -35,8 +35,14 @@ describe('DetachmentPage', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Gladius Task Force' })).toBeInTheDocument();
-    expect(screen.getByTestId('detachment-meta')).toHaveTextContent('2 DP');
-    expect(screen.getByTestId('detachment-chapter-dp')).toHaveTextContent('Black Templars 2 DP');
+    const header = screen.getByTestId('page-header');
+    expect(within(header).getByTestId('detachment-meta')).toHaveTextContent('2 DP');
+    expect(within(header).getByTestId('detachment-chapter-dp')).toHaveTextContent(
+      'Black Templars 2 DP'
+    );
+    expect(
+      within(screen.getByRole('main')).queryByTestId('detachment-meta')
+    ).not.toBeInTheDocument();
     expect(screen.getByTestId('detachment-abilities')).toHaveTextContent('Combat Doctrines');
     expect(screen.getByTestId('detachment-enhancements')).toHaveTextContent('Artificer Armour');
     expect(screen.getByTestId('detachment-stratagems')).toHaveTextContent(/rapid fire/i);

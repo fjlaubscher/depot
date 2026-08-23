@@ -58,7 +58,7 @@ interface Props {
    * bottom tab bar — the root tabs keep the bar.
    */
   back?: { to: string; label: string };
-  heading?: { title: string; subtitle?: string };
+  heading?: { title: string; subtitle?: string; meta?: ReactNode };
   /** Icon buttons pinned to the right of the back header / desktop bar. */
   actions?: Action[];
   /** Sticky bottom action bar (primary CTA + secondary). */
@@ -183,7 +183,12 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
         )}
 
         {back && !isDesktop && (
-          <header className="flex flex-none items-center gap-0.5 h-[52px] px-1.5 border-b border-border-subtle bg-surface-base">
+          <header
+            className={cx(
+              'flex flex-none gap-0.5 px-1.5 border-b border-border-subtle bg-surface-base',
+              heading?.meta ? 'min-h-[52px] items-start py-1' : 'h-[52px] items-center'
+            )}
+          >
             <Link
               to={back.to}
               aria-label={`Back to ${back.label}`}
@@ -203,6 +208,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
                     {heading.subtitle}
                   </p>
                 )}
+                {heading.meta}
               </div>
             )}
             <ToolbarCluster toolbar={toolbar} actions={actions} />
@@ -227,6 +233,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
                         {heading.subtitle}
                       </p>
                     ) : null}
+                    {heading.meta}
                   </div>
                 ) : null}
                 <ToolbarCluster
@@ -249,13 +256,14 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
                 )}
               >
                 {heading ? (
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1" data-testid="page-header">
                     <h1 className="text-2xl font-bold text-foreground">{heading.title}</h1>
                     {heading.subtitle ? (
                       <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
                         {heading.subtitle}
                       </p>
                     ) : null}
+                    {heading.meta}
                   </div>
                 ) : null}
                 <ToolbarCluster toolbar={toolbar} actions={actions} />

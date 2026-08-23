@@ -195,4 +195,25 @@ describe('AppLayout', () => {
     expect(screen.queryByTestId('desktop-top-bar')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Breadcrumb')).not.toBeInTheDocument();
   });
+
+  it('renders heading.meta inside the desktop page header, not main', () => {
+    media.desktop = true;
+
+    render(
+      <TestWrapper>
+        <AppLayout
+          title="Invasion Fleet"
+          heading={{ title: 'Invasion Fleet', meta: <span data-testid="heading-meta">3 DP</span> }}
+        >
+          <p>abilities</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+
+    const bar = screen.getByTestId('desktop-top-bar');
+    const header = within(bar).getByTestId('page-header');
+    expect(within(header).getByTestId('heading-meta')).toHaveTextContent('3 DP');
+    expect(within(screen.getByRole('main')).queryByTestId('heading-meta')).not.toBeInTheDocument();
+  });
+
 });

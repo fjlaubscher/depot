@@ -111,7 +111,10 @@ const DetachmentPage: FC = () => {
         { label: faction.name, to: `/faction/${faction.slug}` },
         { label: 'Detachments', to: `/faction/${faction.slug}/detachments` }
       ]}
-      heading={{ title: detachment.name, subtitle: 'Detachment' }}
+      heading={{
+        title: detachment.name,
+        meta: <DetachmentMeta detachment={detachment} />
+      }}
       actions={[
         bookmarkAction,
         {
@@ -123,8 +126,6 @@ const DetachmentPage: FC = () => {
       ]}
     >
       <div className="flex flex-col gap-3">
-        <DetachmentMeta detachment={detachment} />
-
         {faction.link ? <RulesLink href={faction.link} /> : null}
 
         {abilities.length > 0 ? (
