@@ -76,23 +76,23 @@
 .dark {
   color-scheme: dark;
 
-  --surface-base: #0b0d10;
-  --surface-card: #12151a;
-  --surface-muted: #0e1116;
-  --surface-soft: #161b22;
-  --surface-accent: color-mix(in oklab, var(--color-accent-500) 14%, #0b0d10);
-  --surface-elevated: #171c23;
-  --surface-overlay: rgb(0 0 0 / 0.6);
+  --surface-base: #111827;
+  --surface-card: #1f2937;
+  --surface-muted: #161c27;
+  --surface-soft: #243044;
+  --surface-accent: color-mix(in oklab, var(--color-accent-500) 16%, #111827);
+  --surface-elevated: #273244;
+  --surface-overlay: rgb(15 20 28 / 0.52);
 
   --fg: #eef2f6;
   --fg-body: #c3cbd5;
-  --fg-muted: #8a93a0;
-  --fg-subtle: #5c6673;
-  --fg-hint: #454f5b;
+  --fg-muted: #9aa3b0;
+  --fg-subtle: #6d7785;
+  --fg-hint: #56606c;
   --fg-accent: var(--color-accent-300);
 
-  --line-subtle: #1e242c;
-  --line-strong: #2a313c;
+  --line-subtle: #374151;
+  --line-strong: #4b5563;
   --line-accent: var(--color-accent-500);
 
   --success-fg: #6fd388;
