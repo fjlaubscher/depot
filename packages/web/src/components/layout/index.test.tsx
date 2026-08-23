@@ -146,6 +146,41 @@ describe('AppLayout', () => {
     expect(screen.queryByTestId('mobile-back-button')).not.toBeInTheDocument();
   });
 
+  it('renders explicit Rules and Faction crumbs above the datasheet heading', () => {
+    media.desktop = true;
+
+    render(
+      <TestWrapper>
+        <AppLayout
+          title="Intercessor Squad - Space Marines"
+          back={{ to: '/faction/space-marines', label: 'Space Marines' }}
+          crumbs={[
+            { label: 'Rules', to: '/factions' },
+            { label: 'Space Marines', to: '/faction/space-marines' }
+          ]}
+          heading={{ title: 'Intercessor Squad', subtitle: 'Datasheet' }}
+        >
+          <p>datasheet</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+
+    const crumbs = screen.getByLabelText('Breadcrumb');
+    expect(within(crumbs).getByRole('link', { name: 'Rules' })).toHaveAttribute(
+      'href',
+      '/factions'
+    );
+    expect(within(crumbs).getByRole('link', { name: 'Space Marines' })).toHaveAttribute(
+      'href',
+      '/faction/space-marines'
+    );
+    expect(within(crumbs).queryByText('Intercessor Squad')).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('page-header')).getByRole('heading', { name: 'Intercessor Squad' })
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toHaveTextContent('Datasheet');
+  });
+
   it('does not render a desktop bar for title-only pages', () => {
     media.desktop = true;
 

@@ -212,24 +212,30 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
         {showDesktopBar && (
           <header
             data-testid="desktop-top-bar"
-            className="flex flex-none items-start gap-2 border-b border-border-subtle bg-surface-base px-4 py-2.5"
+            className="flex flex-none flex-col gap-1.5 border-b border-border-subtle bg-surface-base px-4 py-2.5"
           >
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              {ancestors.length > 0 ? <Breadcrumbs crumbs={ancestors} /> : null}
-              {heading ? (
-                <div className="min-w-0" data-testid="page-header">
-                  <h1 className="truncate text-[17px] leading-tight font-bold text-foreground">
-                    {heading.title}
-                  </h1>
-                  {heading.subtitle ? (
-                    <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
-                      {heading.subtitle}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-            <ToolbarCluster toolbar={toolbar} actions={actions} className="self-center" />
+            {ancestors.length > 0 ? <Breadcrumbs crumbs={ancestors} /> : null}
+            {heading || toolbar || hasActions ? (
+              <div className="flex items-start gap-2">
+                {heading ? (
+                  <div className="min-w-0 flex-1" data-testid="page-header">
+                    <h1 className="truncate text-[17px] leading-tight font-bold text-foreground">
+                      {heading.title}
+                    </h1>
+                    {heading.subtitle ? (
+                      <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
+                        {heading.subtitle}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                <ToolbarCluster
+                  toolbar={toolbar}
+                  actions={actions}
+                  className="ml-auto self-center"
+                />
+              </div>
+            ) : null}
           </header>
         )}
 

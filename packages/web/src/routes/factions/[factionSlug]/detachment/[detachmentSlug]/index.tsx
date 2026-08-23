@@ -106,7 +106,11 @@ const DetachmentPage: FC = () => {
     <AppLayout
       title={`${detachment.name} - ${faction.name}`}
       back={{ to: backPath, label: faction.name }}
-      heading={{ title: detachment.name, subtitle: `${faction.name} · Detachment` }}
+      crumbs={[
+        { label: 'Rules', to: '/factions' },
+        { label: faction.name, to: `/faction/${faction.slug}/detachments` }
+      ]}
+      heading={{ title: detachment.name, subtitle: 'Detachment' }}
       actions={[
         bookmarkAction,
         {

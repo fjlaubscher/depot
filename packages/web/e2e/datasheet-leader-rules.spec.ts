@@ -7,7 +7,7 @@ test.describe('Datasheet leader rules', () => {
   test.beforeEach(async ({ page }) => {
     await resetClientState(page);
     await page.goto(DATASHEET_URL);
-    await expect(page.getByTestId('datasheet-header')).toBeVisible();
+    await expect(page.getByTestId('page-header')).toBeVisible();
   });
 
   test('expands leader rules and shows linked units', async ({ page }) => {

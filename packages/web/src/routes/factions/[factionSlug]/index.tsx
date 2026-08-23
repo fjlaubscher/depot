@@ -87,7 +87,7 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   return (
     <AppLayout
       title={pageTitle}
-      back={{ to: '/factions', label: 'Factions' }}
+      back={{ to: '/factions', label: 'Rules' }}
       heading={{ title: faction.name, subtitle: alliance }}
       actions={[
         bookmarkAction,
