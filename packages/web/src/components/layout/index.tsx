@@ -104,7 +104,7 @@ const PageHeading = ({
   titleClassName: string;
 }) => (
   <div className="min-w-0 flex-1" data-testid="page-header">
-    <div className="flex min-w-0 items-baseline gap-2">
+    <div className="flex min-w-0 flex-col">
       <h1 className={cx('min-w-0 truncate font-bold text-foreground', titleClassName)}>
         {heading.title}
       </h1>
@@ -213,7 +213,9 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
           <header
             className={cx(
               'flex flex-none gap-0.5 px-1.5 border-b border-border-subtle bg-surface-base',
-              heading?.meta ? 'min-h-[52px] items-start py-1' : 'h-[52px] items-center'
+              heading?.subtitle || heading?.meta
+                ? 'min-h-[52px] items-start py-1'
+                : 'h-[52px] items-center'
             )}
           >
             <Link
