@@ -7,7 +7,7 @@ This document describes how depot releases are cut, built, and deployed via GitH
 - **Versioning**: Semantic versioning with git tags (`vX.Y.Z`).
 - **Source of truth for data**: Wahapedia-derived `public/data/index.json:dataVersion` produced by `@depot/cli`.
 - **Build & deploy**: GitHub Actions `Release` workflow builds the monorepo, uploads Sentry sourcemaps, creates a GitHub release, and deploys to Cloudflare Pages (static assets + functions).
-- **PR previews**: `Preview` workflow deploys a per-PR Worker (`depot-pr-<n>`) and comments the `*.fjlaubscher.workers.dev` URL. Prod stays on Pages (`godepot.dev`).
+- **PR previews**: `Preview` workflow deploys a Pages branch `pr-<n>` on the existing `depot` project and comments the `*.pages.dev` URL. Prod stays on Pages (`godepot.dev`).
 
 ## Required GitHub Secrets
 
@@ -15,7 +15,7 @@ Configure these in **Settings → Security → Secrets and variables → Actions
 
 ### Cloudflare
 
-- `CLOUDFLARE_API_TOKEN` — same account as chapterden. Prod needs `Account → Cloudflare Pages → Edit`. PR previews need `Account → Workers Scripts → Edit` (chapterden already uses this).
+- `CLOUDFLARE_API_TOKEN` — same account as chapterden. Prod and PR previews both need `Account → Cloudflare Pages → Edit`.
 - `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID for that account.
 
 ### Sentry (sourcemaps + client config)
@@ -48,14 +48,14 @@ Do not dispatch the workflow without a `vX.Y.Z` tag; a branch-only run would sta
 
 ## PR previews (`.github/workflows/preview.yml`)
 
-Same loop as chapterden: per-PR Worker + comment the `workers.dev` URL. No D1 (depot is a static PWA).
+Same Cloudflare Pages project as production (`depot`). Each PR deploys a Pages branch and comments the `*.pages.dev` URL. No D1 (depot is a static PWA).
 
-- Worker name: `depot-pr-<n>`.
-- URL from wrangler output, fallback `https://depot-pr-<n>.fjlaubscher.workers.dev`.
-- Assets: `packages/web/dist` with SPA not-found handling.
-- Worker entry `scripts/preview-worker.ts` calls the existing Pages `onRequest` in `functions/[[path]].ts` so OG/meta rewrite still runs.
+- Pages branch: `pr-<n>`.
+- Deploy: `wrangler pages deploy packages/web/dist --project-name depot --branch pr-<n>`.
+- URL from wrangler output (`https://pr-<n>.*.pages.dev`, else any `pages.dev`), fallback `https://pr-<n>.depot.pages.dev`.
+- Pages Functions in `functions/` still run (same OG/meta rewrite as prod).
 - Bot upserts one comment (`<!-- depot-preview pr=N -->`).
-- PR close: `wrangler delete --name depot-pr-<n> --force` and the comment is marked torn down.
+- PR close: comment is marked no longer updated (no Worker teardown).
 
 Prod is unchanged (Pages + `godepot.dev`). Previews never deploy `--branch main`.
 
