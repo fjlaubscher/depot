@@ -2,6 +2,7 @@ import type { depot } from '@depot/core';
 import { mergeSettingsWithDefaults } from '@/constants/settings';
 import { normalizeDatasheetWargear } from '@depot/core/utils/wargear';
 import { normalizeUnit } from '@/contexts/roster/reducer';
+import { toStoredCollection, toStoredRoster } from '@depot/core/utils/saved';
 import type { CachedFaction } from '@/types/offline';
 
 // Database configuration constants
@@ -133,18 +134,14 @@ class OfflineStorage {
             upgradeTransaction?.objectStore(STORES.USER_DATA).clear();
           }
 
-          // Create or reset rosters store (schema change for slug support)
+          // Saves survive upgrades: they hold ids and selections, and load
+          // rehydrates them against whatever catalog is cached.
           if (!db.objectStoreNames.contains(STORES.ROSTERS)) {
             db.createObjectStore(STORES.ROSTERS, { keyPath: 'id' });
-          } else {
-            upgradeTransaction?.objectStore(STORES.ROSTERS).clear();
           }
 
-          // Create or reset collections store
           if (!db.objectStoreNames.contains(STORES.COLLECTIONS)) {
             db.createObjectStore(STORES.COLLECTIONS, { keyPath: 'id' });
-          } else {
-            upgradeTransaction?.objectStore(STORES.COLLECTIONS).clear();
           }
         };
       });
@@ -211,20 +208,20 @@ class OfflineStorage {
   }
 
   // Collections
-  async getCollections(): Promise<depot.Collection[]> {
+  async getCollections(): Promise<depot.StoredCollection[]> {
     try {
       const store = await this.store(STORES.COLLECTIONS);
-      return ((await req(store.getAll())) as depot.Collection[] | undefined) ?? [];
+      return ((await req(store.getAll())) as depot.StoredCollection[] | undefined) ?? [];
     } catch (error) {
       console.error('Failed to get collections from IndexedDB:', error);
       return [];
     }
   }
 
-  async getCollection(id: string): Promise<depot.Collection | null> {
+  async getCollection(id: string): Promise<depot.StoredCollection | null> {
     try {
       const store = await this.store(STORES.COLLECTIONS);
-      return ((await req(store.get(id))) as depot.Collection | undefined) ?? null;
+      return ((await req(store.get(id))) as depot.StoredCollection | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get collection ${id} from IndexedDB:`, error);
       return null;
@@ -233,7 +230,7 @@ class OfflineStorage {
 
   async saveCollection(collection: depot.Collection): Promise<void> {
     const store = await this.store(STORES.COLLECTIONS, 'readwrite');
-    await req(store.put(stampTimestamps(normalizeCollection(collection))));
+    await req(store.put(stampTimestamps(toStoredCollection(normalizeCollection(collection)))));
   }
 
   async deleteCollection(id: string): Promise<void> {
@@ -340,23 +337,23 @@ class OfflineStorage {
   // Roster Operations
   async saveRoster(roster: depot.Roster): Promise<void> {
     const store = await this.store(STORES.ROSTERS, 'readwrite');
-    await req(store.put(stampTimestamps(normalizeRoster(roster))));
+    await req(store.put(stampTimestamps(toStoredRoster(normalizeRoster(roster)))));
   }
 
-  async getRoster(rosterId: string): Promise<depot.Roster | null> {
+  async getRoster(rosterId: string): Promise<depot.StoredRoster | null> {
     try {
       const store = await this.store(STORES.ROSTERS);
-      return ((await req(store.get(rosterId))) as depot.Roster | undefined) ?? null;
+      return ((await req(store.get(rosterId))) as depot.StoredRoster | undefined) ?? null;
     } catch (error) {
       console.error(`Failed to get roster ${rosterId} from IndexedDB:`, error);
       return null;
     }
   }
 
-  async getAllRosters(): Promise<depot.Roster[]> {
+  async getAllRosters(): Promise<depot.StoredRoster[]> {
     try {
       const store = await this.store(STORES.ROSTERS);
-      return ((await req(store.getAll())) as depot.Roster[] | undefined) ?? [];
+      return ((await req(store.getAll())) as depot.StoredRoster[] | undefined) ?? [];
     } catch (error) {
       console.error('Failed to get all rosters from IndexedDB:', error);
       return [];

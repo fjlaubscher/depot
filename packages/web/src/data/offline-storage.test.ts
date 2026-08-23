@@ -78,15 +78,10 @@ const mockFaction: depot.Faction = {
       factionSlug: 'space-marines',
       sourceId: 'core',
       sourceName: 'Faction Pack: Space Marines',
-      legend: '',
       isSupport: false,
       loadout: '',
       transport: '',
       virtual: false,
-      leaderHead: '',
-      leaderFooter: '',
-      damagedW: '',
-      damagedDescription: '',
       link: '',
       abilities: [],
       keywords: [],
@@ -95,9 +90,7 @@ const mockFaction: depot.Faction = {
       wargear: [],
       unitComposition: [],
       modelCosts: [],
-      stratagems: [],
-      enhancements: [],
-      detachmentAbilities: [],
+      stratagemIds: [],
       leaders: [],
       isForgeWorld: false,
       isLegends: false
@@ -108,7 +101,6 @@ const mockFaction: depot.Faction = {
       id: '000000100',
       slug: 'gladius-task-force',
       name: 'Gladius Task Force',
-      legend: '',
       type: '',
       dp: '2',
       forceDisposition: 'Take and Hold',
@@ -150,7 +142,6 @@ const mockSettings: depot.Settings = {
   showForgeWorld: false,
   showLegends: true,
   showUnaligned: false,
-  showFluff: true,
   includeWargearOnExport: true,
   useNativeShare: true
 };
@@ -586,7 +577,6 @@ describe('OfflineStorage', () => {
           id: 'test-detachment',
           slug: 'test-detachment',
           name: 'Test Detachment',
-          legend: '',
           type: '',
           dp: '',
           forceDisposition: '',
@@ -614,11 +604,48 @@ describe('OfflineStorage', () => {
       await expect(offlineStorage.saveRoster(mockRoster)).resolves.toBeUndefined();
       expect(mockObjectStore.put).toHaveBeenCalledWith(
         expect.objectContaining({
-          ...mockRoster,
+          id: mockRoster.id,
+          name: mockRoster.name,
+          points: mockRoster.points,
+          // Detachments are stored as references; the catalog copy is rehydrated.
+          detachments: [
+            { id: 'test-detachment', slug: 'test-detachment', name: 'Test Detachment' }
+          ],
           createdAt: expect.any(String),
           updatedAt: expect.any(String)
         })
       );
+    });
+
+    it('stores unit ids and selections instead of the datasheet', async () => {
+      mockObjectStore.put.mockImplementation(() => {
+        const request = { ...mockRequest };
+        setTimeout(() => {
+          if (request.onsuccess) request.onsuccess();
+        }, 0);
+        return request;
+      });
+
+      await offlineStorage.saveRoster({
+        ...mockRoster,
+        units: [
+          {
+            id: 'unit-1',
+            datasheet: mockFaction.datasheets[0],
+            modelCost: { datasheetId: 'captain', line: '1', description: '1 model', cost: '80' },
+            selectedWargear: []
+          }
+        ]
+      });
+
+      const [saved] = mockObjectStore.put.mock.calls.at(-1) as [depot.StoredRoster];
+      expect(saved.units[0].datasheet).toEqual({
+        id: 'captain',
+        slug: 'captain',
+        name: 'Captain',
+        factionSlug: 'space-marines'
+      });
+      expect(saved.units[0].modelCost.cost).toBe('80');
     });
 
     it('should get roster from IndexedDB', async () => {

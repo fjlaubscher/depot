@@ -32,15 +32,10 @@ const datasheet = (overrides: Partial<Datasheet> = {}): Datasheet => ({
   factionId: 'SM',
   factionSlug: 'space-marines',
   sourceId: 'core',
-  legend: '',
   isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
-  leaderHead: '',
-  leaderFooter: '',
-  damagedW: '',
-  damagedDescription: '',
   link: '',
   abilities: [],
   keywords: [],
@@ -52,9 +47,7 @@ const datasheet = (overrides: Partial<Datasheet> = {}): Datasheet => ({
   ],
   unitComposition: [],
   modelCosts: [cost(), cost({ line: '2', description: '10 models', cost: '200' })],
-  stratagems: [],
-  enhancements: [],
-  detachmentAbilities: [],
+  stratagemIds: [],
   leaders: [],
   isForgeWorld: false,
   isLegends: false,
@@ -175,9 +168,7 @@ describe('rebindUnitSelections', () => {
 
   it('rebinds wargear abilities by name when ids change', () => {
     const ability = (overrides: Partial<Ability> & Pick<Ability, 'id' | 'name'>): Ability => ({
-      legend: '',
       factionId: 'SM',
-      description: '',
       type: 'Wargear',
       ...overrides
     });
@@ -200,12 +191,26 @@ describe('rebindUnitSelections', () => {
 });
 
 describe('rebindCollectionUnit', () => {
-  it('keeps embedded snapshot when datasheet is missing', () => {
+  it('keeps the embedded snapshot when a legacy save loses its datasheet', () => {
     const item = collectionUnit();
     const result = rebindCollectionUnit(item, null);
     expect(result.status).toBe('missing');
-    expect(result.item).toBe(item);
+    expect(result.item.datasheet).toBe(item.datasheet);
+    expect(result.item.selectedWargear).toEqual(item.selectedWargear);
     expect(result.issues[0]?.kind).toBe('datasheet-missing');
+  });
+
+  it('falls back to an empty datasheet when a slim save cannot be resolved', () => {
+    const { datasheet: full, ...rest } = collectionUnit();
+    const slim = {
+      ...rest,
+      datasheet: { id: full.id, slug: full.slug, name: full.name, factionSlug: full.factionSlug }
+    };
+    const result = rebindCollectionUnit(slim, null);
+    expect(result.status).toBe('missing');
+    expect(result.item.datasheet.name).toBe(full.name);
+    expect(result.item.datasheet.modelCosts).toEqual([]);
+    expect(result.item.selectedWargear).toEqual([]);
   });
 
   it('updates datasheet and slug on successful rebind', () => {

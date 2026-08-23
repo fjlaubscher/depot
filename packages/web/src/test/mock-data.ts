@@ -13,15 +13,10 @@ export const mockDatasheet: depot.Datasheet = {
   factionSlug: 'space-marines',
   sourceId: 'core',
   sourceName: 'Faction Pack: Space Marines',
-  legend: '',
   isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
-  leaderHead: '',
-  leaderFooter: '',
-  damagedW: '',
-  damagedDescription: '',
   link: '/datasheet/captain',
   isForgeWorld: false,
   isLegends: false,
@@ -194,9 +189,7 @@ export const mockDatasheet: depot.Datasheet = {
     {
       id: 'leader',
       name: 'Leader',
-      legend: '',
       factionId: 'SM',
-      description: 'This model can be attached to a unit.',
       type: 'Core'
     }
   ],
@@ -221,22 +214,7 @@ export const mockDatasheet: depot.Datasheet = {
       description: 'This model may be equipped with a jump pack.'
     }
   ],
-  stratagems: [
-    {
-      id: 'rapid-fire',
-      name: 'Rapid Fire',
-      factionId: 'SM',
-      type: 'Battle Tactic',
-      cpCost: '1',
-      turn: 'Any',
-      detachment: 'Any',
-      legend: '',
-      phase: 'Any',
-      description: 'Test stratagem description'
-    }
-  ],
-  enhancements: [],
-  detachmentAbilities: []
+  stratagemIds: ['rapid-fire']
 };
 
 export const mockStratagem: depot.Stratagem = {
@@ -247,9 +225,7 @@ export const mockStratagem: depot.Stratagem = {
   cpCost: '1',
   turn: 'Any',
   detachment: 'Any',
-  legend: '',
-  phase: 'Any',
-  description: 'Test stratagem description'
+  phase: 'Any'
 };
 
 export const mockEnhancement: depot.Enhancement = {
@@ -257,17 +233,13 @@ export const mockEnhancement: depot.Enhancement = {
   name: 'Artificer Armour',
   factionId: 'SM',
   cost: '10',
-  description: 'Enhanced armor protection',
-  legend: '',
   detachment: 'Gladius Task Force'
 };
 
 export const mockWargearAbility: depot.Ability = {
   id: 'wargear-ability-1',
   name: 'Frag Grenades',
-  legend: 'Frag Grenades',
   factionId: 'SM',
-  description: 'Explosive shrapnel blooms outward.',
   type: 'Wargear',
   parameter: ''
 };
@@ -284,8 +256,6 @@ export const mockDetachmentAbility: depot.DetachmentAbility = {
   id: 'combat-doctrines',
   name: 'Combat Doctrines',
   factionId: 'SM',
-  description: 'Space Marines combat doctrines ability',
-  legend: '',
   detachment: 'Gladius Task Force'
 };
 
@@ -293,7 +263,6 @@ export const mockDetachment: depot.Detachment = {
   id: '000000100',
   slug: 'gladius-task-force',
   name: 'Gladius Task Force',
-  legend: '',
   type: '',
   dp: '2',
   forceDisposition: 'Take and Hold',
@@ -398,16 +367,7 @@ export const mockDatasheetWithSingleCost = createMockDatasheet({
 });
 
 export const mockDatasheetWithMultipleStratagems = createMockDatasheet({
-  stratagems: [
-    mockStratagem,
-    createMockStratagem({
-      id: 'honor-the-chapter',
-      name: 'Honor the Chapter',
-      type: 'Strategic Ploy',
-      cpCost: '2',
-      description: 'Honor the chapter stratagem'
-    })
-  ]
+  stratagemIds: ['rapid-fire', 'honor-the-chapter']
 });
 
 export const mockFactionWithoutDatasheets = createMockFaction({

@@ -19,6 +19,16 @@ vi.mock('../../data/offline-storage', () => ({
   offlineStorage: mockOfflineStorage
 }));
 
+// The roster load path rehydrates units from the catalog.
+const mockCatalog = vi.hoisted(() => ({
+  getDatasheet: vi.fn().mockResolvedValue(null),
+  getFactionManifest: vi.fn().mockResolvedValue(null)
+}));
+
+vi.mock('@/contexts/factions/context', () => ({
+  useFactionsContext: () => mockCatalog
+}));
+
 vi.mock('@/contexts/toast/context', () => ({
   useToast: () => ({
     state: { toasts: [] },
@@ -50,7 +60,6 @@ const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
           id: 'test-detachment',
           slug: 'test-detachment',
           name: 'Test Detachment',
-          legend: '',
           type: '',
           dp: '',
           forceDisposition: '',

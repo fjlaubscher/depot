@@ -105,12 +105,9 @@ test.describe('Roster unit card view', () => {
     }
     expect(matchedNames).toBeGreaterThan(0);
 
-    // Click an ability tag and confirm the modal opens
+    // Abilities are listed by name; the rules text lives on Wahapedia.
     const abilities = page.getByTestId('roster-unit-abilities');
     const abilityTags = abilities.locator('[data-testid^="roster-unit-abilities-tag-"]');
     await expect(abilityTags.first()).toBeVisible();
-    await abilityTags.first().click();
-
-    await expect(page.getByTestId('ability-sheet')).toBeVisible();
   });
 });

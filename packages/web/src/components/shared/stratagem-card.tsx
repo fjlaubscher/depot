@@ -32,10 +32,6 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
           {stratagem.name.toLowerCase()}
         </Card.Title>
 
-        {stratagem.legend ? (
-          <Card.Legend className="ShowFluff text-sm">{stratagem.legend}</Card.Legend>
-        ) : null}
-
         <div className="flex flex-wrap items-center gap-1">
           {stratagem.turn ? (
             <Card.Badge
@@ -56,10 +52,6 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
           </Card.Badge>
         </div>
 
-        <Card.Content
-          className="flex-1"
-          dangerouslySetInnerHTML={{ __html: stratagem.description }}
-        />
         {unitNames.length > 0 ? (
           <Card.Footer className="flex-col items-start gap-1 text-xs text-subtle">
             <span className="type-label">Available to:</span>

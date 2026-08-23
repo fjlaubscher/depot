@@ -40,7 +40,6 @@ describe('SettingsProvider', () => {
     showForgeWorld: false,
     showLegends: true,
     showUnaligned: false,
-    showFluff: true,
     includeWargearOnExport: true,
     useNativeShare: true
   };
@@ -54,18 +53,6 @@ describe('SettingsProvider', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
-  });
-
-  it('toggles the hide-fluff root class from showFluff', async () => {
-    mockOfflineStorage.getSettings.mockResolvedValue({ ...mockSettings, showFluff: false });
-    render(
-      <SettingsProvider>
-        <TestComponent />
-      </SettingsProvider>
-    );
-    await waitFor(() =>
-      expect(document.documentElement.classList.contains('hide-fluff')).toBe(true)
-    );
   });
 
   it.each([

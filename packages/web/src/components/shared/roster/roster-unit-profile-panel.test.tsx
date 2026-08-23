@@ -11,17 +11,13 @@ describe('RosterUnitProfilePanel', () => {
         {
           id: 'core-1',
           name: 'Leader',
-          legend: '',
           factionId: 'SM',
-          description: '<p>Leader description</p>',
           type: 'Core'
         },
         {
           id: 'wg-1',
           name: 'Blade Storm',
-          legend: '',
           factionId: 'SM',
-          description: '<p>Blade storm description</p>',
           type: 'Wargear'
         }
       ]

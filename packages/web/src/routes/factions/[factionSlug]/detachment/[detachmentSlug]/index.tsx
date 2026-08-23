@@ -6,10 +6,10 @@ import AppLayout from '@/components/layout';
 import { ErrorState, Grid, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import { DetachmentAbilityCard, EnhancementCard, StratagemCard } from '@/components/shared';
 import { DetachmentMeta } from '../../_components/faction-detachments';
+import RulesLink from '@/components/shared/rules-link';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
-import { useSettingsContext } from '@/contexts/settings/context';
 import { useShareAction } from '@/hooks/use-share-action';
 import { useBookmarkAction } from '@/hooks/use-bookmark-action';
 
@@ -36,7 +36,6 @@ const DetachmentPage: FC = () => {
     detachmentSlug: string;
   }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
-  const { settings } = useSettingsContext();
 
   const detachment = faction
     ? matchDetachment({ slug: detachmentSlug }, faction.detachments)
@@ -121,13 +120,7 @@ const DetachmentPage: FC = () => {
       <div className="flex flex-col gap-3">
         <DetachmentMeta detachment={detachment} />
 
-        {settings?.showFluff && detachment.legend ? (
-          <div
-            className="text-sm text-muted font-medium italic"
-            data-testid="detachment-legend"
-            dangerouslySetInnerHTML={{ __html: detachment.legend }}
-          />
-        ) : null}
+        {faction.link ? <RulesLink href={faction.link} /> : null}
 
         {abilities.length > 0 ? (
           <Section

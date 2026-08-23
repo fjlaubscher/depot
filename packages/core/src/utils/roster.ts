@@ -1,10 +1,11 @@
-import type { Detachment, Roster } from '../types/depot.js';
+import type { DetachmentRef, Roster } from '../types/depot.js';
 import { toTitleCase } from './datasheets.js';
 
 /** Selected detachments, falling back to the legacy single `detachment` field. */
-export const getRosterDetachments = (
-  roster: Partial<Pick<Roster, 'detachments' | 'detachment'>>
-): Detachment[] =>
+export const getRosterDetachments = <T extends DetachmentRef>(roster: {
+  detachments?: T[];
+  detachment?: T;
+}): T[] =>
   roster.detachments?.length ? roster.detachments : roster.detachment ? [roster.detachment] : [];
 
 export const getRosterDetachmentNames = (

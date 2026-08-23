@@ -27,17 +27,13 @@ describe('DatasheetProfile', () => {
         {
           id: 'core-1',
           name: 'Leader',
-          legend: '',
           factionId: 'SM',
-          description: '<p>Leader description</p>',
           type: 'Core'
         },
         {
           id: 'inline-1',
           name: 'Rapid Assault',
-          legend: '',
           factionId: 'SM',
-          description: '<p>Rapid assault description</p>',
           type: 'Datasheet'
         }
       ]
@@ -46,16 +42,11 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.getByTestId('datasheet-abilities')).toBeInTheDocument();
-    expect(screen.getByText(/click a tag to view full rules/i)).toBeInTheDocument();
-
     const coreAbilityTag = screen.getByTestId('datasheet-abilities-tag-core-1');
     const unitAbilityTag = screen.getByTestId('datasheet-abilities-tag-inline-1');
 
-    expect(coreAbilityTag).toBeInTheDocument();
-    expect(coreAbilityTag.querySelector('span')).toHaveClass('bg-surface-accent');
-
-    expect(unitAbilityTag).toBeInTheDocument();
-    expect(unitAbilityTag.querySelector('span')).toHaveClass('bg-success-surface');
+    expect(coreAbilityTag).toHaveClass('bg-surface-accent');
+    expect(unitAbilityTag).toHaveClass('bg-success-surface');
 
     expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();

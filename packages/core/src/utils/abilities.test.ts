@@ -5,8 +5,6 @@ import { normalizeSelectedWargearAbilities } from './abilities.js';
 const createAbility = (overrides: Partial<Ability> = {}): Ability => ({
   id: overrides.id ?? 'ab-1',
   name: overrides.name ?? 'Test Ability',
-  description: overrides.description ?? 'Rules text',
-  legend: overrides.legend ?? '',
   factionId: overrides.factionId ?? 'test',
   type: overrides.type ?? 'Datasheet',
   parameter: overrides.parameter

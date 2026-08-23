@@ -1,15 +1,22 @@
 import type {
   Ability,
+  AbilityRef,
   Collection,
   CollectionUnit,
   Datasheet,
+  DatasheetRef,
   DatasheetSummary,
   ModelCost,
   RosterUnit,
-  Wargear
+  StoredCollectionUnit,
+  StoredRosterUnit,
+  StoredUnit,
+  Wargear,
+  WargearRef
 } from '../types/depot.js';
 import { normalizeSelectedWargearAbilities, formatAbilityName } from './abilities.js';
 import { calculateCollectionPoints } from './collection.js';
+import { isFullDatasheet, placeholderDatasheet } from './saved.js';
 import { getWargearBaseName } from './wargear.js';
 
 export type RebindIssue =
@@ -71,7 +78,7 @@ export function matchDatasheetIdentity<T extends { id: string; slug: string; nam
 /**
  * Resolve identity keys from a collection/roster unit for catalog lookup.
  */
-export function unitDatasheetIdentity(unit: { datasheet: Datasheet; datasheetSlug?: string }): {
+export function unitDatasheetIdentity(unit: { datasheet: DatasheetRef; datasheetSlug?: string }): {
   id?: string;
   slug?: string;
   name?: string;
@@ -100,7 +107,7 @@ export function rebindModelCost(
 }
 
 export function rebindSelectedWargear(
-  selection: Wargear[] = [],
+  selection: WargearRef[] = [],
   available: Wargear[]
 ): { wargear: Wargear[]; dropped: string[] } {
   const byId = new Map(available.map((weapon) => [weapon.id, weapon]));
@@ -125,8 +132,8 @@ export function rebindSelectedWargear(
 export function rebindUnitSelections(
   input: {
     modelCost: ModelCost;
-    selectedWargear?: Wargear[];
-    selectedWargearAbilities?: Ability[];
+    selectedWargear?: WargearRef[];
+    selectedWargearAbilities?: AbilityRef[];
   },
   datasheet: Datasheet
 ): RebindUnitSelections {
@@ -177,14 +184,25 @@ export function rebindUnitSelections(
   };
 }
 
-function rebindUnit<T extends CollectionUnit | RosterUnit>(
+type Rebound<T> = Omit<T, 'datasheet' | 'selectedWargear' | 'selectedWargearAbilities'> & {
+  datasheet: Datasheet;
+  selectedWargear: Wargear[];
+  selectedWargearAbilities: Ability[];
+};
+
+function rebindUnit<T extends StoredUnit>(
   unit: T,
   datasheet: Datasheet | null
-): { unit: T; status: RebindStatus; issues: RebindIssue[] } {
+): { unit: Rebound<T>; status: RebindStatus; issues: RebindIssue[] } {
   if (!datasheet) {
     const identity = unitDatasheetIdentity(unit);
+    // Slim saves carry identity only; an empty datasheet keeps the UI renderable.
+    const fallback = isFullDatasheet(unit.datasheet)
+      ? unit.datasheet
+      : placeholderDatasheet(unit.datasheet);
+    const { selectedWargear, selectedWargearAbilities } = rebindUnitSelections(unit, fallback);
     return {
-      unit,
+      unit: { ...unit, datasheet: fallback, selectedWargear, selectedWargearAbilities },
       status: 'missing',
       issues: [
         {
@@ -213,7 +231,7 @@ function rebindUnit<T extends CollectionUnit | RosterUnit>(
 }
 
 export function rebindCollectionUnit(
-  item: CollectionUnit,
+  item: StoredCollectionUnit | CollectionUnit,
   datasheet: Datasheet | null
 ): RebindCollectionUnitResult {
   const { unit, ...rest } = rebindUnit(item, datasheet);
@@ -221,7 +239,7 @@ export function rebindCollectionUnit(
 }
 
 export const rebindRosterUnit: (
-  unit: RosterUnit,
+  unit: StoredRosterUnit | RosterUnit,
   datasheet: Datasheet | null
 ) => RebindRosterUnitResult = rebindUnit;
 
@@ -240,7 +258,7 @@ export function summarizeRebindStatuses(statuses: RebindStatus[]): {
  * Always stamps dataVersion when provided (partial/missing still update the stamp).
  */
 export function applyCollectionRebind(
-  collection: Collection,
+  collection: Collection | Omit<Collection, 'items'>,
   itemResults: RebindCollectionUnitResult[],
   dataVersion?: string | null
 ): RebindCollectionResult {

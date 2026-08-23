@@ -4,7 +4,9 @@ import {
   formatRebindSummaryMessage,
   rebindRosterUnits,
   refreshRosterDataWithReport,
-  refreshCollectionDataWithReport
+  refreshCollectionDataWithReport,
+  hydrateRoster,
+  hydrateCollection
 } from './refresh-user-data';
 
 const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet => ({
@@ -15,15 +17,10 @@ const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet =
   factionSlug: 'faction-1',
   sourceId: 'src',
   sourceName: 'Source',
-  legend: '',
   isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
-  leaderHead: '',
-  leaderFooter: '',
-  damagedW: '',
-  damagedDescription: '',
   link: '',
   abilities: [],
   keywords: [],
@@ -32,9 +29,7 @@ const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet =
   wargear: [],
   unitComposition: [],
   modelCosts: [{ datasheetId: 'ds-1', line: '1', description: '10', cost: '10' }],
-  stratagems: [],
-  enhancements: [],
-  detachmentAbilities: [],
+  stratagemIds: [],
   leaders: [],
   isForgeWorld: false,
   isLegends: false,
@@ -59,7 +54,6 @@ describe('refresh-user-data utilities', () => {
         id: 'det-1',
         slug: 'det-1',
         name: 'Old Detachment',
-        legend: '',
         type: '',
         dp: '',
         forceDisposition: '',
@@ -116,7 +110,6 @@ describe('refresh-user-data utilities', () => {
       id: 'det-1',
       slug: 'det-1',
       name: 'New Detachment',
-      legend: '',
       type: '',
       dp: '2',
       forceDisposition: 'Take and Hold',
@@ -272,5 +265,131 @@ describe('refresh-user-data utilities', () => {
     expect(formatRebindSummaryMessage({ ok: 0, partial: 0, missing: 1 })).toContain(
       '1 unit not found'
     );
+  });
+});
+
+describe('hydration of saved documents', () => {
+  const datasheet: depot.Datasheet = {
+    id: 'ds-1',
+    slug: 'unit-one',
+    name: 'Unit One',
+    factionId: 'faction-1',
+    factionSlug: 'faction-1',
+    sourceId: 'src',
+    isSupport: false,
+    loadout: '',
+    transport: '',
+    virtual: false,
+    link: '',
+    abilities: [],
+    keywords: [],
+    models: [],
+    options: [],
+    wargear: [
+      { id: 'w1', datasheetId: 'ds-1', line: '1', name: 'Bolter', type: 'Ranged', profiles: [] }
+    ],
+    unitComposition: [],
+    modelCosts: [{ datasheetId: 'ds-1', line: '1', description: '5 models', cost: '90' }],
+    stratagemIds: [],
+    leaders: [],
+    isForgeWorld: false,
+    isLegends: false
+  };
+
+  const detachment: depot.Detachment = {
+    id: 'det-1',
+    slug: 'det-1',
+    name: 'Detachment',
+    type: '',
+    dp: '',
+    forceDisposition: '',
+    chapterDp: [],
+    abilities: [],
+    enhancements: [
+      { id: 'enh-1', factionId: 'faction-1', name: 'Relic', cost: '15', detachment: 'Detachment' }
+    ],
+    stratagems: []
+  };
+
+  const catalog = {
+    getDatasheet: vi.fn().mockResolvedValue(datasheet),
+    getFactionManifest: vi.fn().mockResolvedValue({
+      id: 'faction-1',
+      slug: 'faction-1',
+      name: 'Faction',
+      link: '',
+      datasheets: [],
+      detachments: [detachment],
+      datasheetCount: 0,
+      detachmentCount: 1
+    })
+  };
+
+  const storedRoster: depot.StoredRoster = {
+    id: 'r1',
+    name: 'Slim Roster',
+    factionId: 'faction-1',
+    factionSlug: 'faction-1',
+    dataVersion: 'v1',
+    detachments: [{ id: 'det-1', slug: 'det-1', name: 'Detachment' }],
+    points: { current: 105, max: 2000 },
+    warlordUnitId: 'u1',
+    units: [
+      {
+        id: 'u1',
+        datasheet: { id: 'ds-1', slug: 'unit-one', name: 'Unit One', factionSlug: 'faction-1' },
+        datasheetSlug: 'unit-one',
+        modelCost: { datasheetId: 'ds-1', line: '1', description: '5 models', cost: '90' },
+        selectedWargear: [{ id: 'w1', name: 'Bolter' }],
+        selectedWargearAbilities: []
+      }
+    ],
+    enhancements: [
+      {
+        enhancement: { id: 'enh-1', name: 'Relic', cost: '15', detachment: 'Detachment' },
+        unitId: 'u1'
+      }
+    ]
+  };
+
+  it('rebuilds units, detachments and enhancements from the catalog', async () => {
+    const roster = await hydrateRoster(storedRoster, catalog);
+
+    expect(roster.units[0].datasheet).toEqual(datasheet);
+    expect(roster.units[0].selectedWargear[0].datasheetId).toBe('ds-1');
+    expect(roster.detachments[0]).toEqual(detachment);
+    expect(roster.enhancements[0].enhancement.factionId).toBe('faction-1');
+    expect(roster.points).toEqual({ current: 105, max: 2000 });
+    expect(roster.dataVersion).toBe('v1');
+  });
+
+  it('falls back to an empty datasheet when the catalog no longer has the unit', async () => {
+    const roster = await hydrateRoster(storedRoster, {
+      ...catalog,
+      getDatasheet: vi.fn().mockResolvedValue(null),
+      getFactionManifest: vi.fn().mockResolvedValue(null)
+    });
+
+    expect(roster.units[0].datasheet.name).toBe('Unit One');
+    expect(roster.units[0].datasheet.wargear).toEqual([]);
+    expect(roster.detachments[0].name).toBe('Detachment');
+  });
+
+  it('hydrates collection items and keeps their painted state', async () => {
+    const collection = await hydrateCollection(
+      {
+        id: 'c1',
+        name: 'Slim Collection',
+        factionId: 'faction-1',
+        factionSlug: 'faction-1',
+        dataVersion: 'v1',
+        points: { current: 90 },
+        items: [{ ...storedRoster.units[0], state: 'built' }]
+      },
+      catalog
+    );
+
+    expect(collection.items[0].datasheet).toEqual(datasheet);
+    expect(collection.items[0].state).toBe('built');
   });
 });

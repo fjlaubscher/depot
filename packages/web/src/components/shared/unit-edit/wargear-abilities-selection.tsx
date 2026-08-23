@@ -19,11 +19,7 @@ interface AbilityEntry {
 
 const getAbilityKey = (ability: depot.Ability, index: number) => {
   const friendlyName =
-    formatAbilityName(ability) ||
-    ability.name ||
-    ability.parameter ||
-    ability.description ||
-    `wargear-ability-${index}`;
+    formatAbilityName(ability) || ability.name || ability.parameter || `wargear-ability-${index}`;
   return slugify(friendlyName);
 };
 

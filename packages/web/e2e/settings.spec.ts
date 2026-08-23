@@ -4,7 +4,6 @@ const toggles = [
   { name: 'Forge World Units', testId: 'forge-world-units-toggle', defaultChecked: false },
   { name: 'Legends Units', testId: 'legends-units-toggle', defaultChecked: false },
   { name: 'Unaligned Factions', testId: 'unaligned-factions-toggle', defaultChecked: false },
-  { name: 'Show Fluff Text', testId: 'show-fluff-text-toggle', defaultChecked: true },
   {
     name: 'Include Wargear',
     testId: 'include-wargear-toggle',
