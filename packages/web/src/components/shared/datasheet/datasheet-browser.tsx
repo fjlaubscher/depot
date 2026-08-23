@@ -1,25 +1,25 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { sortByName } from '@depot/core/utils/common';
 import {
+  BATTLEFIELD_ROLES,
+  BATTLEFIELD_ROLE_LABELS,
   CODEX_SLUG,
+  type BattlefieldRole,
   type DatasheetListItem,
   type DatasheetVisibilityFilters,
   buildSupplementLabel,
   deriveSupplementMetadata,
   filterDatasheetsBySettings,
   filterDatasheetsBySupplement,
+  getListItemRole,
   getSupplementKey,
   isSupplementEntry,
   normalizeSupplementValue,
   shouldResetSupplementSelection,
   sortDatasheetsBySupplementPreference
 } from '@depot/core/utils/datasheets';
-import {
-  BATTLEFIELD_ROLES,
-  BATTLEFIELD_ROLE_LABELS,
-  getListItemRole
-} from '@depot/core/utils/datasheets';
-import { Filters, Search, SectionHeader } from '@/components/ui';
+import { Filters, Grid, Search } from '@/components/ui';
+import PillTabs from '@/components/shared/pill-tabs';
 import useDebounce from '@/hooks/use-debounce';
 import { cx } from '@/utils/cx';
 import DatasheetSupplementTabs from './datasheet-supplement-tabs';
@@ -35,6 +35,8 @@ interface DatasheetBrowserProps<T extends DatasheetListItem> {
   /** Extra classes on the results list (e.g. bottom gap so a floating chip clears the last card). */
   resultsClassName?: string;
 }
+
+type RoleTab = 'all' | BattlefieldRole;
 
 const deriveSupplementState = <T extends DatasheetListItem>(
   datasheets: T[],
@@ -98,6 +100,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   resultsClassName
 }: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState('all');
+  const [selectedRole, setSelectedRole] = useState<RoleTab>('all');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
 
@@ -142,7 +145,7 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   );
 
   const normalizedQuery = debouncedQuery.trim().toLowerCase();
-  const visibleDatasheets = useMemo(() => {
+  const searchedDatasheets = useMemo(() => {
     const matches = normalizedQuery
       ? filteredBySettings.filter((sheet) => sheet.name.toLowerCase().includes(normalizedQuery))
       : filteredBySettings;
@@ -153,11 +156,6 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     );
   }, [filteredBySettings, normalizedQuery, supplement.selected, supplement.hasSupplements]);
 
-  const handleClearFilters = () => {
-    setSelectedSupplement('all');
-    setQuery('');
-  };
-
   const renderItem: (datasheet: T) => ReactNode =
     renderDatasheet ??
     ((datasheet) => (
@@ -167,29 +165,50 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       />
     ));
 
-  // Only the default row list groups by role; custom renderers (the add-units
-  // picker) are flat by design.
-  const roleSections = useMemo(() => {
+  // Role pills only on the default card grid. Custom renderers (the add-units
+  // picker) stay a flat list. Manifests generated before `role` existed report
+  // everything as "other"; stay unfiltered rather than showing one meaningless pill.
+  const roleTabs = useMemo(() => {
     if (renderDatasheet) return null;
-    // Manifests generated before `role` existed report everything as "other";
-    // stay flat rather than showing one meaningless section.
-    if (!visibleDatasheets.some((sheet) => getListItemRole(sheet) !== 'other')) return null;
+    if (!searchedDatasheets.some((sheet) => getListItemRole(sheet) !== 'other')) return null;
 
-    const byRole = new Map<string, T[]>();
-    for (const sheet of visibleDatasheets) {
+    const counts = new Map<BattlefieldRole, number>();
+    for (const sheet of searchedDatasheets) {
       const role = getListItemRole(sheet);
-      byRole.set(role, [...(byRole.get(role) ?? []), sheet]);
+      counts.set(role, (counts.get(role) ?? 0) + 1);
     }
-    return BATTLEFIELD_ROLES.filter((role) => byRole.has(role)).map((role) => ({
-      role,
-      sheets: byRole.get(role)!
-    }));
-  }, [renderDatasheet, visibleDatasheets]);
 
-  const showClear = Boolean(query.trim()) || supplement.isFiltered;
+    return [
+      { value: 'all' as const, label: 'All', count: searchedDatasheets.length },
+      ...BATTLEFIELD_ROLES.filter((role) => (counts.get(role) ?? 0) > 0).map((role) => ({
+        value: role,
+        label: BATTLEFIELD_ROLE_LABELS[role],
+        count: counts.get(role)!
+      }))
+    ];
+  }, [renderDatasheet, searchedDatasheets]);
+
+  const visibleDatasheets = useMemo(() => {
+    if (!roleTabs || selectedRole === 'all') return searchedDatasheets;
+    return searchedDatasheets.filter((sheet) => getListItemRole(sheet) === selectedRole);
+  }, [roleTabs, selectedRole, searchedDatasheets]);
+
+  const handleClearFilters = () => {
+    setSelectedSupplement('all');
+    setSelectedRole('all');
+    setQuery('');
+  };
+
+  const showClear = Boolean(query.trim()) || supplement.isFiltered || selectedRole !== 'all';
   const emptyMessage = debouncedQuery
     ? 'No datasheets found matching your filters.'
     : emptyStateMessage;
+
+  const resultItems = visibleDatasheets.map((datasheet) => (
+    <div key={datasheet.slug} id={datasheet.id}>
+      {renderItem(datasheet)}
+    </div>
+  ));
 
   return (
     <div className="flex flex-col gap-2">
@@ -221,6 +240,15 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
             {supplement.summary}
           </span>
         ) : null}
+        {roleTabs ? (
+          <PillTabs
+            tabs={roleTabs}
+            active={selectedRole}
+            onChange={setSelectedRole}
+            ariaLabel="Datasheet roles"
+            testIdPrefix="datasheet-role"
+          />
+        ) : null}
         {showItemCount ? (
           <span className="text-sm text-subtle">
             Showing {visibleDatasheets.length} of {filteredBySettings.length} datasheets
@@ -230,30 +258,25 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       </div>
 
       {visibleDatasheets.length > 0 ? (
-        <div
-          className={cx('flex flex-col gap-2', resultsClassName)}
-          aria-live="polite"
-          id="datasheet-results"
-        >
-          {roleSections
-            ? roleSections.map(({ role, sheets }) => (
-                <section key={role} className="flex flex-col gap-0.5">
-                  <SectionHeader title={BATTLEFIELD_ROLE_LABELS[role]} count={sheets.length} />
-                  <div className="divide-y divide-border-subtle">
-                    {sheets.map((datasheet) => (
-                      <div key={datasheet.slug} id={datasheet.id}>
-                        {renderItem(datasheet)}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))
-            : visibleDatasheets.map((datasheet) => (
-                <div key={datasheet.slug} id={datasheet.id}>
-                  {renderItem(datasheet)}
-                </div>
-              ))}
-        </div>
+        renderDatasheet ? (
+          <div
+            className={cx('flex flex-col gap-2', resultsClassName)}
+            aria-live="polite"
+            id="datasheet-results"
+            data-testid="datasheet-results"
+          >
+            {resultItems}
+          </div>
+        ) : (
+          <Grid
+            data-testid="datasheet-results"
+            id="datasheet-results"
+            className={resultsClassName}
+            aria-live="polite"
+          >
+            {resultItems}
+          </Grid>
+        )
       ) : (
         <div className="flex flex-col items-center justify-center py-12 text-center text-subtle">
           <p>{emptyMessage}</p>
