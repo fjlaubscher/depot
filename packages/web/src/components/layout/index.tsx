@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from '@/lib/navigation';
 import { useLocation } from 'react-router-dom';
-import { ArrowLeft, Home, BookOpen, Settings, Swords, WifiOff } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Home, BookOpen, Settings, Swords, WifiOff } from 'lucide-react';
 
 import Logo from '@/components/logo';
 import AppVersion from '@/components/shared/app-version';
@@ -10,9 +10,14 @@ import ActionGroup from '@/components/ui/action-group';
 import type { Action } from '@/components/ui/action-group';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useFactionsContext } from '@/contexts/factions/context';
+import useMediaQuery from '@/hooks/use-media-query';
 import useOnlineStatus from '@/hooks/use-online-status';
 import useDataVersionToast from '@/hooks/use-data-version-toast';
 import { cx } from '@/utils/cx';
+import { resolveCrumbs, type AppCrumb } from './crumbs';
+
+export type { AppCrumb };
+export { resolveCrumbs };
 
 const NAV_ITEMS: {
   to: string;
@@ -54,19 +59,91 @@ interface Props {
    */
   back?: { to: string; label: string };
   heading?: { title: string; subtitle?: string };
-  /** Icon buttons pinned to the right of the back header. */
+  /** Icon buttons pinned to the right of the back header / desktop bar. */
   actions?: Action[];
   /** Sticky bottom action bar (primary CTA + secondary). */
   footer?: ReactNode;
+  /** Desktop breadcrumbs. Last item is the current page (no link). */
+  crumbs?: AppCrumb[];
+  /** Non-icon CTAs (Import, New). Placed in the desktop bar / mobile heading row. */
+  toolbar?: ReactNode;
 }
 
-const AppLayout = ({ children, title, back, heading, actions, footer }: Props) => {
+const Breadcrumbs = ({ crumbs, subtitle }: { crumbs: AppCrumb[]; subtitle?: string }) => (
+  <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
+    <ol className="flex min-w-0 items-center gap-1">
+      {crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1;
+        const isCurrent = isLast && !crumb.to;
+        return (
+          <li
+            key={`${crumb.label}-${index}`}
+            className={cx('flex items-center gap-1', isCurrent ? 'min-w-0 flex-1' : 'shrink-0')}
+          >
+            {index > 0 ? <ChevronRight size={12} className="flex-none text-muted" /> : null}
+            {isCurrent ? (
+              <div className="min-w-0 flex-1" data-testid="page-header">
+                <h1 className="truncate text-[15px] leading-tight font-bold text-foreground">
+                  {crumb.label}
+                </h1>
+                {subtitle ? (
+                  <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
+                    {subtitle}
+                  </p>
+                ) : null}
+              </div>
+            ) : crumb.to ? (
+              <Link
+                to={crumb.to}
+                className="truncate text-[13px] font-medium text-muted hover:text-foreground"
+              >
+                {crumb.label}
+              </Link>
+            ) : (
+              <span className="truncate text-[13px] font-medium text-muted">{crumb.label}</span>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+);
+
+const ToolbarCluster = ({
+  toolbar,
+  actions,
+  className
+}: {
+  toolbar?: ReactNode;
+  actions?: Action[];
+  className?: string;
+}) => {
+  const hasActions = Boolean(actions && actions.length > 0);
+  if (!toolbar && !hasActions) return null;
+
+  return (
+    <div className={cx('flex flex-none items-center gap-2', className)}>
+      {toolbar}
+      {hasActions && actions ? (
+        <ActionGroup actions={actions} spacing="tight" className="flex-none" />
+      ) : null}
+    </div>
+  );
+};
+
+const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, toolbar }: Props) => {
   const { dataVersion } = useFactionsContext();
   const online = useOnlineStatus();
   const { pathname } = useLocation();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   useDocumentTitle(title);
   useDataVersionToast(dataVersion);
+
+  const resolvedCrumbs = resolveCrumbs({ crumbs, back, heading, title });
+  const hasActions = Boolean(actions && actions.length > 0);
+  const showDesktopBar = isDesktop && (resolvedCrumbs.length > 0 || Boolean(toolbar) || hasActions);
+  const showMobileRootRow = !back && !isDesktop && Boolean(heading || toolbar);
 
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-surface-base">
@@ -122,7 +199,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
           </div>
         )}
 
-        {back && (
+        {back && !isDesktop && (
           <header className="flex flex-none items-center gap-0.5 h-[52px] px-1.5 border-b border-border-subtle bg-surface-base">
             <Link
               to={back.to}
@@ -145,14 +222,48 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
                 )}
               </div>
             )}
-            {actions && actions.length > 0 && (
-              <ActionGroup actions={actions} spacing="tight" className="flex-none" />
+            <ToolbarCluster toolbar={toolbar} actions={actions} />
+          </header>
+        )}
+
+        {showDesktopBar && (
+          <header
+            data-testid="desktop-top-bar"
+            className="flex h-[52px] flex-none items-center gap-2 border-b border-border-subtle bg-surface-base px-4"
+          >
+            {resolvedCrumbs.length > 0 ? (
+              <Breadcrumbs crumbs={resolvedCrumbs} subtitle={heading?.subtitle} />
+            ) : (
+              <div className="min-w-0 flex-1" />
             )}
+            <ToolbarCluster toolbar={toolbar} actions={actions} className="ml-auto" />
           </header>
         )}
 
         <main id="app-content" className="min-h-0 flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[960px] px-4 py-4">{children}</div>
+          <div className="mx-auto w-full max-w-[960px] px-4 py-4">
+            {showMobileRootRow && (
+              <div
+                className={cx(
+                  'mb-4 flex gap-2',
+                  heading ? 'items-start justify-between' : 'items-center justify-end'
+                )}
+              >
+                {heading ? (
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-2xl font-bold text-foreground">{heading.title}</h1>
+                    {heading.subtitle ? (
+                      <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
+                        {heading.subtitle}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                <ToolbarCluster toolbar={toolbar} actions={actions} />
+              </div>
+            )}
+            {children}
+          </div>
         </main>
 
         {footer && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
@@ -19,12 +19,15 @@ import LibraryCard from '@/components/shared/library-card';
 import { RosterEmptyState } from '@/components/shared/roster';
 import CreateRosterSheet from './create-roster-sheet';
 
+type Slots = { toolbar: ReactNode; body: ReactNode };
+
 interface Props {
   /** When set, only show lists attached to this collection. */
   collectionId?: string;
+  children?: (slots: Slots) => ReactNode;
 }
 
-const ListsPanel: React.FC<Props> = ({ collectionId }) => {
+const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { collections } = useCollections();
   const { showToast } = useToast();
@@ -126,21 +129,23 @@ const ListsPanel: React.FC<Props> = ({ collectionId }) => {
     }
   };
 
-  return (
+  const toolbar = (
+    <>
+      <ImportButton
+        label="Import"
+        onFilesSelected={handleImportRosterFiles}
+        buttonTestId="import-roster-button"
+        inputTestId="import-roster-input"
+      />
+      <Button onClick={() => setCreateOpen(true)} aria-label="Create new roster">
+        <Plus size={16} />
+        New
+      </Button>
+    </>
+  );
+
+  const body = (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1" />
-        <ImportButton
-          label="Import"
-          onFilesSelected={handleImportRosterFiles}
-          buttonTestId="import-roster-button"
-          inputTestId="import-roster-input"
-        />
-        <Button onClick={() => setCreateOpen(true)} aria-label="Create new roster">
-          <Plus size={16} />
-          New
-        </Button>
-      </div>
       {hasStaleRosters ? (
         <Alert
           variant="info"
@@ -223,6 +228,17 @@ const ListsPanel: React.FC<Props> = ({ collectionId }) => {
             : undefined
         }
       />
+    </div>
+  );
+
+  if (children) {
+    return <>{children({ toolbar, body })}</>;
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-2">{toolbar}</div>
+      {body}
     </div>
   );
 };

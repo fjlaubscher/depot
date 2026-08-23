@@ -177,6 +177,11 @@ const RosterView: FC = () => {
     <AppLayout
       title={pageTitle}
       back={{ to: '/rosters', label: 'Rosters' }}
+      crumbs={[
+        { label: 'Armies', to: '/armies' },
+        { label: 'Rosters', to: '/rosters' },
+        { label: roster.name }
+      ]}
       heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
       actions={[
         {

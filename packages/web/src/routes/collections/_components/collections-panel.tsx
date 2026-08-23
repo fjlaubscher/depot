@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, type ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
@@ -19,7 +19,9 @@ import ImportButton from '@/components/shared/import-button';
 import CollectionStateChart from './collection-state-chart';
 import CreateCollectionSheet from './create-collection-sheet';
 
-const CollectionsPanel: React.FC = () => {
+type Slots = { toolbar: ReactNode; body: ReactNode };
+
+const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({ children }) => {
   const { collections, loading, error, refresh } = useCollections();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
   const { showToast } = useToast();
@@ -105,26 +107,27 @@ const CollectionsPanel: React.FC = () => {
     }
   };
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="min-w-0 flex-1" />
-        <ImportButton
-          multiple
-          onFilesSelected={handleImportCollectionFiles}
-          buttonTestId="import-collection-button"
-          inputTestId="import-collection-input"
-        />
-        <Button
-          onClick={() => setCreateOpen(true)}
-          aria-label="Create collection"
-          data-testid="create-collection-button"
-        >
-          <Plus size={16} />
-          New
-        </Button>
-      </div>
+  const toolbar = (
+    <>
+      <ImportButton
+        multiple
+        onFilesSelected={handleImportCollectionFiles}
+        buttonTestId="import-collection-button"
+        inputTestId="import-collection-input"
+      />
+      <Button
+        onClick={() => setCreateOpen(true)}
+        aria-label="Create collection"
+        data-testid="create-collection-button"
+      >
+        <Plus size={16} />
+        New
+      </Button>
+    </>
+  );
 
+  const body = (
+    <div className="flex flex-col gap-4">
       {hasStaleCollections ? (
         <Alert
           variant="info"
@@ -200,6 +203,8 @@ const CollectionsPanel: React.FC = () => {
       <CreateCollectionSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
   );
+
+  return <>{children({ toolbar, body })}</>;
 };
 
 export default CollectionsPanel;

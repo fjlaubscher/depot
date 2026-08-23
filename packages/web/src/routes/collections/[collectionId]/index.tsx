@@ -205,6 +205,11 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     <AppLayout
       title={pageTitle}
       back={back}
+      crumbs={[
+        { label: 'Armies', to: '/armies' },
+        { label: 'Collections', to: '/collections' },
+        { label: collection.name }
+      ]}
       heading={{ title: collection.name, subtitle }}
       actions={
         hasUnits
