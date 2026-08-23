@@ -28,4 +28,14 @@ describe('DatasheetBrowser', () => {
       expect(screen.queryByText('Captain')).not.toBeInTheDocument();
     });
   });
+
+  it('applies resultsClassName to the datasheet list', () => {
+    render(
+      <TestWrapper>
+        <DatasheetBrowser datasheets={datasheets} resultsClassName="pb-28 md:pb-24" />
+      </TestWrapper>
+    );
+
+    expect(document.getElementById('datasheet-results')).toHaveClass('pb-28', 'md:pb-24');
+  });
 });

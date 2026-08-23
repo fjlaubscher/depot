@@ -160,7 +160,7 @@ const CollectionNewRoster: React.FC = () => {
       back={{ to: `/collections/${collection.id}`, label: collection.name }}
       heading={{ title: 'Build roster', subtitle: `${collection.name} · ${subtitle}` }}
     >
-      <div className={`flex flex-col gap-3${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
+      <div className="flex flex-col gap-3">
         {collection.items.length === 0 ? (
           <RosterEmptyState
             title="No units in this collection"
@@ -179,6 +179,7 @@ const CollectionNewRoster: React.FC = () => {
               emptyStateMessage="No units match your filters."
               filters={datasheetFilters}
               showItemCount={false}
+              resultsClassName={hasSelections ? 'pb-28 md:pb-24' : undefined}
               renderDatasheet={(datasheet) => (
                 <CollectionSelectionCard
                   unit={datasheet.unit}

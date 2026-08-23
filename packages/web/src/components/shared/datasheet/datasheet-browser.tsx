@@ -21,6 +21,7 @@ import {
 } from '@depot/core/utils/datasheets';
 import { Filters, Search, SectionHeader } from '@/components/ui';
 import useDebounce from '@/hooks/use-debounce';
+import { cx } from '@/utils/cx';
 import DatasheetSupplementTabs from './datasheet-supplement-tabs';
 import DatasheetListItemCard from './datasheet-list-item-card';
 
@@ -31,6 +32,8 @@ interface DatasheetBrowserProps<T extends DatasheetListItem> {
   emptyStateMessage?: string;
   showItemCount?: boolean;
   filters?: DatasheetVisibilityFilters;
+  /** Extra classes on the results list (e.g. bottom gap so a floating chip clears the last card). */
+  resultsClassName?: string;
 }
 
 const deriveSupplementState = <T extends DatasheetListItem>(
@@ -91,7 +94,8 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   searchPlaceholder = 'Search datasheets...',
   emptyStateMessage = 'No datasheets found.',
   showItemCount = true,
-  filters
+  filters,
+  resultsClassName
 }: DatasheetBrowserProps<T>) => {
   const [selectedSupplement, setSelectedSupplement] = useState('all');
   const [query, setQuery] = useState('');
@@ -226,7 +230,11 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
       </div>
 
       {visibleDatasheets.length > 0 ? (
-        <div className="flex flex-col gap-2" aria-live="polite" id="datasheet-results">
+        <div
+          className={cx('flex flex-col gap-2', resultsClassName)}
+          aria-live="polite"
+          id="datasheet-results"
+        >
           {roleSections
             ? roleSections.map(({ role, sheets }) => (
                 <section key={role} className="flex flex-col gap-0.5">
