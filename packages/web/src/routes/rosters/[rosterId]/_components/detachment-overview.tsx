@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import DetachmentAbilityCard from '@/components/shared/detachment-ability-card';
 import EnhancementCard from '@/components/shared/enhancement-card';
 import StratagemCard from '@/components/shared/stratagem-card';

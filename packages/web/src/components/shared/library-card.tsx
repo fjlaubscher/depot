@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { Trash2, Pencil, Copy } from 'lucide-react';
 import { Card, ActionGroup } from '@/components/ui';
 

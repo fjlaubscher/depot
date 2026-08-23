@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FC, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import { Save } from 'lucide-react';
 
 import { RosterProvider } from '@/contexts/roster/context';

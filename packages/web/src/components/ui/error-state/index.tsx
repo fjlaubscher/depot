@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Button from '../button';
 

@@ -94,6 +94,6 @@ test('cancel returns to the roster list', async ({ page }) => {
   await gotoCreateRoster(page);
 
   await page.getByTestId('cancel-button').click();
-  await expect(page.getByTestId('create-roster-sheet')).toHaveCount(0);
+  await expect(page.getByTestId('create-roster-sheet')).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Rosters', exact: true })).toBeVisible();
 });

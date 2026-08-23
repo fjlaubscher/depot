@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
 import { Sheet, Field, SelectField, Button } from '@/components/ui';

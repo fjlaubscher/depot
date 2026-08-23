@@ -79,9 +79,7 @@ test.describe('Roster unit card view', () => {
 
     // Save changes and return to roster edit
     await page.getByTestId('save-button').click();
-    const editUrl = await page.url();
-    expect(editUrl).toMatch(/\/rosters\/[a-z0-9-]+\/edit(#unit-[a-z0-9-]+)?$/i);
-    expect(editUrl.includes('#unit-')).toBe(true);
+    await expect(page).toHaveURL(/\/rosters\/[a-z0-9-]+\/edit#unit-[a-z0-9-]+$/i);
 
     // Navigate to roster view
     await page.getByTestId('view-roster-button').click();
