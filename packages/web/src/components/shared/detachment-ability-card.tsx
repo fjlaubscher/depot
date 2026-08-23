@@ -19,6 +19,15 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
           </Tag>
         )}
       </div>
+
+      {ability.legend && (
+        <div className="ShowFluff text-sm text-muted font-medium italic">{ability.legend}</div>
+      )}
+
+      <div
+        className="ability-rich-text"
+        dangerouslySetInnerHTML={{ __html: ability.description }}
+      />
     </Card>
   );
 };

@@ -109,12 +109,14 @@ describe('detachment helpers', () => {
       dp: '2',
       forceDisposition: 'Take and Hold',
       type: '',
+      legend: 'Codex doctrine.',
       chapterDp: [{ keyword: 'Black Templars', dp: '2' }]
     });
     expect(gladius.abilities.map((entry) => entry.name)).toEqual(['Combat Doctrines']);
     expect(gladius.enhancements[0]).toMatchObject({
       name: 'Artificer Armour',
-      upgrade: true
+      upgrade: true,
+      supportLeader: '<span>LEADER:</span> Captain'
     });
     expect(gladius.stratagems.map((entry) => entry.name)).toEqual(['Fire Discipline']);
 
@@ -159,7 +161,7 @@ describe('detachment helpers', () => {
     ]);
   });
 
-  it('keeps only names and numbers on depot enhancements', () => {
+  it('maps upgrade/supportLeader onto depot enhancements', () => {
     expect(
       toDepotEnhancement({
         id: 'en-1',
@@ -177,6 +179,8 @@ describe('detachment helpers', () => {
       id: 'en-1',
       factionId: 'SM',
       name: 'The Honour Veil',
+      legend: '',
+      description: 'Fluff',
       cost: '15',
       detachment: 'Gladius'
     });

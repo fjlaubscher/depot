@@ -3,7 +3,9 @@ import type * as wahapedia from './wahapedia.js';
 export interface Ability {
   id: string;
   name: string;
+  legend: string;
   factionId: string;
+  description: string;
   type: string;
   parameter?: string;
 }
@@ -23,8 +25,10 @@ export interface Stratagem {
   name: string;
   type: string;
   cpCost: string;
+  legend: string;
   turn: string;
   phase: string;
+  description: string;
   detachment: string;
 }
 
@@ -69,15 +73,20 @@ export interface Enhancement {
   id: string;
   factionId: string;
   name: string;
+  legend: string;
+  description: string;
   cost: string;
   detachment: string;
   upgrade?: boolean;
+  supportLeader?: string;
 }
 
 export interface DetachmentAbility {
   id: string;
   factionId: string;
   name: string;
+  legend: string;
+  description: string;
   detachment: string;
 }
 
@@ -103,10 +112,15 @@ export interface Datasheet {
    * True when the datasheet belongs to a supplement (i.e. not the core codex).
    */
   isSupplement?: boolean;
+  legend: string;
   isSupport: boolean;
   loadout: string;
   transport: string;
   virtual: boolean;
+  leaderHead: string;
+  leaderFooter: string;
+  damagedW: string;
+  damagedDescription: string;
   link: string;
   abilities: Ability[];
   keywords: Keyword[];
@@ -188,6 +202,7 @@ export interface Settings {
   showForgeWorld?: boolean;
   showLegends?: boolean;
   showUnaligned?: boolean;
+  showFluff?: boolean;
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
   theme?: Theme;
@@ -197,6 +212,7 @@ export interface Detachment {
   id: string;
   slug: string;
   name: string;
+  legend: string;
   type: string;
   dp: string;
   forceDisposition: string;

@@ -17,25 +17,26 @@ const buildDatasheet = (
   const own = <T extends { datasheetId: string }>(rows: T[]): T[] =>
     rows.filter((row) => row.datasheetId === datasheet.id);
 
-  // Names and types only; the rules text stays on Wahapedia.
   const abilities = own(data.datasheetAbilities).flatMap((a): depot.Ability[] => {
     if (a.abilityId) {
       const referenced = data.abilities.find((ability) => ability.id === a.abilityId);
       return referenced
-        ? [
-            {
-              id: referenced.id,
-              name: referenced.name,
-              factionId: referenced.factionId,
-              type: a.type,
-              parameter: a.parameter || referenced.parameter
-            }
-          ]
+        ? [{ ...referenced, type: a.type, parameter: a.parameter || referenced.parameter }]
         : [];
     }
-    // Inline abilities carry no id / factionId of their own.
+    // Inline abilities carry no id / legend / factionId of their own.
     return a.name
-      ? [{ id: '', name: a.name, factionId: '', type: a.type, parameter: a.parameter }]
+      ? [
+          {
+            id: '',
+            name: a.name,
+            legend: '',
+            factionId: '',
+            description: a.description,
+            type: a.type,
+            parameter: a.parameter
+          }
+        ]
       : [];
   });
 
@@ -73,10 +74,15 @@ const buildDatasheet = (
     supplementName: supplementInfo?.name,
     supplementLabel,
     isSupplement,
+    legend: datasheet.legend,
     isSupport: datasheet.isSupport === 'true',
     loadout: datasheet.loadout,
     transport: datasheet.transport,
     virtual: datasheet.virtual === 'true',
+    leaderHead: datasheet.leaderHead,
+    leaderFooter: datasheet.leaderFooter,
+    damagedW: datasheet.damagedW,
+    damagedDescription: datasheet.damagedDescription,
     link: datasheet.link,
     abilities,
     keywords: own(data.datasheetKeywords),

@@ -244,7 +244,12 @@ export const hydrateRoster = async (
     units,
     enhancements: roster.enhancements.map(({ enhancement, unitId }) => ({
       unitId,
-      enhancement: catalogEnhancements.get(enhancement.id) ?? { ...enhancement, factionId: '' }
+      enhancement: catalogEnhancements.get(enhancement.id) ?? {
+        ...enhancement,
+        factionId: '',
+        legend: '',
+        description: ''
+      }
     }))
   };
 };
