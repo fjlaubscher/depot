@@ -1,31 +1,20 @@
 export type AppCrumb = { label: string; to?: string };
 
-const SHORT_TITLE_MAX = 32;
-
-/** Document titles like "Name - Roster Overview" or Home's long tagline stay out of the bar. */
-const isShortPageName = (title: string): boolean => {
-  const trimmed = title.trim();
-  return trimmed.length > 0 && trimmed.length <= SHORT_TITLE_MAX && !trimmed.includes(' - ');
-};
-
-export const resolveCrumbs = ({
+/** Ancestor links only — the current page is the heading, never a crumb. */
+export const resolveAncestors = ({
   crumbs,
-  back,
-  heading,
-  title
+  back
 }: {
   crumbs?: AppCrumb[];
   back?: { to: string; label: string };
   heading?: { title: string };
-  title: string;
+  title?: string;
 }): AppCrumb[] => {
-  if (crumbs && crumbs.length > 0) return crumbs;
-  if (back) {
-    const items: AppCrumb[] = [{ label: back.label, to: back.to }];
-    if (heading) items.push({ label: heading.title });
-    return items;
+  if (crumbs && crumbs.length > 0) {
+    const last = crumbs[crumbs.length - 1];
+    const ancestors = last.to ? crumbs : crumbs.slice(0, -1);
+    return ancestors.filter((crumb): crumb is AppCrumb & { to: string } => Boolean(crumb.to));
   }
-  if (heading) return [{ label: heading.title }];
-  if (isShortPageName(title)) return [{ label: title.trim() }];
+  if (back) return [{ label: back.label, to: back.to }];
   return [];
 };

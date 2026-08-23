@@ -82,7 +82,7 @@ describe('AppLayout', () => {
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
   });
 
-  it('renders desktop breadcrumbs and toolbar instead of the back chevron', () => {
+  it('renders ancestor crumbs and the real heading in the desktop bar', () => {
     media.desktop = true;
 
     render(
@@ -106,11 +106,58 @@ describe('AppLayout', () => {
     expect(screen.queryByTestId('mobile-back-button')).not.toBeInTheDocument();
     expect(screen.getByTestId('desktop-top-bar')).toBeInTheDocument();
     const crumbs = screen.getByLabelText('Breadcrumb');
-    expect(crumbs).toHaveTextContent('Armies');
-    expect(crumbs).toHaveTextContent('Collections');
-    expect(screen.getByTestId('page-header')).toHaveTextContent('My Marines');
-    expect(screen.getByTestId('page-header')).toHaveTextContent('Adeptus Astartes');
     expect(within(crumbs).getByRole('link', { name: 'Armies' })).toHaveAttribute('href', '/armies');
+    expect(within(crumbs).getByRole('link', { name: 'Collections' })).toHaveAttribute(
+      'href',
+      '/collections'
+    );
+    expect(within(crumbs).queryByText('My Marines')).not.toBeInTheDocument();
+    const header = screen.getByTestId('page-header');
+    expect(within(header).getByRole('heading', { name: 'My Marines' })).toBeInTheDocument();
+    expect(header).toHaveTextContent('Adeptus Astartes');
     expect(screen.getByTestId('import-collection-button')).toBeInTheDocument();
+  });
+
+  it('uses only the parent as a desktop breadcrumb when given back and heading', () => {
+    media.desktop = true;
+
+    render(
+      <TestWrapper>
+        <AppLayout
+          title="Intercessor Squad - Space Marines"
+          back={{ to: '/faction/space-marines', label: 'Space Marines' }}
+          heading={{ title: 'Intercessor Squad', subtitle: 'Datasheet' }}
+        >
+          <p>datasheet</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+
+    const crumbs = screen.getByLabelText('Breadcrumb');
+    expect(within(crumbs).getByRole('link', { name: 'Space Marines' })).toHaveAttribute(
+      'href',
+      '/faction/space-marines'
+    );
+    expect(within(crumbs).queryByText('Intercessor Squad')).not.toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('page-header')).getByRole('heading', { name: 'Intercessor Squad' })
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toHaveTextContent('Datasheet');
+    expect(screen.queryByTestId('mobile-back-button')).not.toBeInTheDocument();
+  });
+
+  it('does not render a desktop bar for title-only pages', () => {
+    media.desktop = true;
+
+    render(
+      <TestWrapper>
+        <AppLayout title="Settings">
+          <h1>Settings</h1>
+        </AppLayout>
+      </TestWrapper>
+    );
+
+    expect(screen.queryByTestId('desktop-top-bar')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Breadcrumb')).not.toBeInTheDocument();
   });
 });

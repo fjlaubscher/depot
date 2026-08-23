@@ -14,10 +14,10 @@ import useMediaQuery from '@/hooks/use-media-query';
 import useOnlineStatus from '@/hooks/use-online-status';
 import useDataVersionToast from '@/hooks/use-data-version-toast';
 import { cx } from '@/utils/cx';
-import { resolveCrumbs, type AppCrumb } from './crumbs';
+import { resolveAncestors, type AppCrumb } from './crumbs';
 
 export type { AppCrumb };
-export { resolveCrumbs };
+export { resolveAncestors };
 
 const NAV_ITEMS: {
   to: string;
@@ -63,48 +63,30 @@ interface Props {
   actions?: Action[];
   /** Sticky bottom action bar (primary CTA + secondary). */
   footer?: ReactNode;
-  /** Desktop breadcrumbs. Last item is the current page (no link). */
+  /** Ancestor crumbs for the desktop bar (current page is the heading, not a crumb). */
   crumbs?: AppCrumb[];
   /** Non-icon CTAs (Import, New). Placed in the desktop bar / mobile heading row. */
   toolbar?: ReactNode;
 }
 
-const Breadcrumbs = ({ crumbs, subtitle }: { crumbs: AppCrumb[]; subtitle?: string }) => (
-  <nav aria-label="Breadcrumb" className="min-w-0 flex-1">
+const Breadcrumbs = ({ crumbs }: { crumbs: AppCrumb[] }) => (
+  <nav aria-label="Breadcrumb" className="min-w-0">
     <ol className="flex min-w-0 items-center gap-1">
-      {crumbs.map((crumb, index) => {
-        const isLast = index === crumbs.length - 1;
-        const isCurrent = isLast && !crumb.to;
-        return (
-          <li
-            key={`${crumb.label}-${index}`}
-            className={cx('flex items-center gap-1', isCurrent ? 'min-w-0 flex-1' : 'shrink-0')}
-          >
-            {index > 0 ? <ChevronRight size={12} className="flex-none text-muted" /> : null}
-            {isCurrent ? (
-              <div className="min-w-0 flex-1" data-testid="page-header">
-                <h1 className="truncate text-[15px] leading-tight font-bold text-foreground">
-                  {crumb.label}
-                </h1>
-                {subtitle ? (
-                  <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
-                    {subtitle}
-                  </p>
-                ) : null}
-              </div>
-            ) : crumb.to ? (
-              <Link
-                to={crumb.to}
-                className="truncate text-[13px] font-medium text-muted hover:text-foreground"
-              >
-                {crumb.label}
-              </Link>
-            ) : (
-              <span className="truncate text-[13px] font-medium text-muted">{crumb.label}</span>
-            )}
-          </li>
-        );
-      })}
+      {crumbs.map((crumb, index) => (
+        <li key={`${crumb.label}-${index}`} className="flex shrink-0 items-center gap-1">
+          {index > 0 ? <ChevronRight size={12} className="flex-none text-muted" /> : null}
+          {crumb.to ? (
+            <Link
+              to={crumb.to}
+              className="truncate text-[12px] font-medium text-muted hover:text-foreground"
+            >
+              {crumb.label}
+            </Link>
+          ) : (
+            <span className="truncate text-[12px] font-medium text-muted">{crumb.label}</span>
+          )}
+        </li>
+      ))}
     </ol>
   </nav>
 );
@@ -140,9 +122,10 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
   useDocumentTitle(title);
   useDataVersionToast(dataVersion);
 
-  const resolvedCrumbs = resolveCrumbs({ crumbs, back, heading, title });
+  const ancestors = resolveAncestors({ crumbs, back, heading, title });
   const hasActions = Boolean(actions && actions.length > 0);
-  const showDesktopBar = isDesktop && (resolvedCrumbs.length > 0 || Boolean(toolbar) || hasActions);
+  const showDesktopBar =
+    isDesktop && (ancestors.length > 0 || Boolean(heading) || Boolean(toolbar) || hasActions);
   const showMobileRootRow = !back && !isDesktop && Boolean(heading || toolbar);
 
   return (
@@ -229,14 +212,24 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
         {showDesktopBar && (
           <header
             data-testid="desktop-top-bar"
-            className="flex h-[52px] flex-none items-center gap-2 border-b border-border-subtle bg-surface-base px-4"
+            className="flex flex-none items-start gap-2 border-b border-border-subtle bg-surface-base px-4 py-2.5"
           >
-            {resolvedCrumbs.length > 0 ? (
-              <Breadcrumbs crumbs={resolvedCrumbs} subtitle={heading?.subtitle} />
-            ) : (
-              <div className="min-w-0 flex-1" />
-            )}
-            <ToolbarCluster toolbar={toolbar} actions={actions} className="ml-auto" />
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              {ancestors.length > 0 ? <Breadcrumbs crumbs={ancestors} /> : null}
+              {heading ? (
+                <div className="min-w-0" data-testid="page-header">
+                  <h1 className="truncate text-[17px] leading-tight font-bold text-foreground">
+                    {heading.title}
+                  </h1>
+                  {heading.subtitle ? (
+                    <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
+                      {heading.subtitle}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+            <ToolbarCluster toolbar={toolbar} actions={actions} className="self-center" />
           </header>
         )}
 

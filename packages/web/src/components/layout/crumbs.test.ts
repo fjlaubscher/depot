@@ -1,38 +1,52 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveCrumbs } from './crumbs';
+import { resolveAncestors } from './crumbs';
 
-describe('resolveCrumbs', () => {
-  it('uses explicit crumbs when provided', () => {
+describe('resolveAncestors', () => {
+  it('keeps explicit crumbs that have a destination and drops the current page', () => {
     expect(
-      resolveCrumbs({
+      resolveAncestors({
         crumbs: [{ label: 'Armies', to: '/armies' }, { label: 'Collections' }],
         back: { to: '/armies', label: 'Armies' },
         heading: { title: 'Collections' },
         title: 'Collections'
       })
-    ).toEqual([{ label: 'Armies', to: '/armies' }, { label: 'Collections' }]);
+    ).toEqual([{ label: 'Armies', to: '/armies' }]);
   });
 
-  it('derives from back and heading', () => {
+  it('keeps every explicit crumb when each has a destination', () => {
     expect(
-      resolveCrumbs({
+      resolveAncestors({
+        crumbs: [
+          { label: 'Armies', to: '/armies' },
+          { label: 'Collections', to: '/collections' },
+          { label: 'My Marines' }
+        ],
+        heading: { title: 'My Marines' },
+        title: 'My Marines - Collection Tracker'
+      })
+    ).toEqual([
+      { label: 'Armies', to: '/armies' },
+      { label: 'Collections', to: '/collections' }
+    ]);
+  });
+
+  it('uses back as the only ancestor and does not append heading', () => {
+    expect(
+      resolveAncestors({
         back: { to: '/factions', label: 'Factions' },
         heading: { title: 'Space Marines' },
         title: 'Space Marines - Faction Overview'
       })
-    ).toEqual([{ label: 'Factions', to: '/factions' }, { label: 'Space Marines' }]);
+    ).toEqual([{ label: 'Factions', to: '/factions' }]);
   });
 
-  it('falls back to heading, then a short page title', () => {
-    expect(resolveCrumbs({ heading: { title: 'Collections' }, title: 'Collections' })).toEqual([
-      { label: 'Collections' }
-    ]);
-    expect(resolveCrumbs({ title: 'Settings' })).toEqual([{ label: 'Settings' }]);
-  });
-
-  it('does not put a long document title in the bar', () => {
-    expect(resolveCrumbs({ title: 'depot - Offline Warhammer 40,000 Companion' })).toEqual([]);
-    expect(resolveCrumbs({ title: 'Gladius Task Force - Detachment' })).toEqual([]);
+  it('does not fall back to heading or a short document title', () => {
+    expect(resolveAncestors({ heading: { title: 'Collections' }, title: 'Collections' })).toEqual(
+      []
+    );
+    expect(resolveAncestors({ title: 'Settings' })).toEqual([]);
+    expect(resolveAncestors({ title: 'depot - Offline Warhammer 40,000 Companion' })).toEqual([]);
+    expect(resolveAncestors({ title: 'Gladius Task Force - Detachment' })).toEqual([]);
   });
 });
