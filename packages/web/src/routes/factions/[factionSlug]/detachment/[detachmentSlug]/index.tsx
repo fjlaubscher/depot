@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import { ErrorState, Grid, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import { DetachmentAbilityCard, EnhancementCard, StratagemCard } from '@/components/shared';
-import { DetachmentMeta } from '../../_components/faction-detachments';
 import RulesLink from '@/components/shared/rules-link';
 
 // hooks
@@ -103,6 +102,12 @@ const DetachmentPage: FC = () => {
 
   const backPath = `/faction/${faction.slug}/detachments`;
   const { abilities, enhancements, stratagems } = detachment;
+  const headingSubtitle = [
+    detachment.dp && `${detachment.dp} DP`,
+    detachment.forceDisposition || detachment.type
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <AppLayout
@@ -113,10 +118,7 @@ const DetachmentPage: FC = () => {
         { label: faction.name, to: `/faction/${faction.slug}` },
         { label: 'Detachments', to: `/faction/${faction.slug}/detachments` }
       ]}
-      heading={{
-        title: detachment.name,
-        meta: <DetachmentMeta detachment={detachment} />
-      }}
+      heading={{ title: detachment.name, subtitle: headingSubtitle || undefined }}
       actions={[
         bookmarkAction,
         {

@@ -96,6 +96,28 @@ const Breadcrumbs = ({ crumbs }: { crumbs: AppCrumb[] }) => (
   </nav>
 );
 
+const PageHeading = ({
+  heading,
+  titleClassName
+}: {
+  heading: NonNullable<Props['heading']>;
+  titleClassName: string;
+}) => (
+  <div className="min-w-0 flex-1" data-testid="page-header">
+    <div className="flex min-w-0 items-baseline gap-2">
+      <h1 className={cx('min-w-0 truncate font-bold text-foreground', titleClassName)}>
+        {heading.title}
+      </h1>
+      {heading.subtitle ? (
+        <p className="min-w-0 truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
+          {heading.subtitle}
+        </p>
+      ) : null}
+    </div>
+    {heading.meta}
+  </div>
+);
+
 const ToolbarCluster = ({
   toolbar,
   actions,
@@ -204,17 +226,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
               <ArrowLeft size={18} />
             </Link>
             {heading && (
-              <div className="min-w-0 flex-1" data-testid="page-header">
-                <h1 className="truncate text-[15px] leading-tight font-bold text-foreground">
-                  {heading.title}
-                </h1>
-                {heading.subtitle && (
-                  <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
-                    {heading.subtitle}
-                  </p>
-                )}
-                {heading.meta}
-              </div>
+              <PageHeading heading={heading} titleClassName="text-[15px] leading-tight" />
             )}
             <ToolbarCluster toolbar={toolbar} actions={actions} />
           </header>
@@ -229,17 +241,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
             {heading || toolbar || hasActions ? (
               <div className="flex items-start gap-2">
                 {heading ? (
-                  <div className="min-w-0 flex-1" data-testid="page-header">
-                    <h1 className="truncate text-[17px] leading-tight font-bold text-foreground">
-                      {heading.title}
-                    </h1>
-                    {heading.subtitle ? (
-                      <p className="truncate font-mono text-[9px] leading-tight font-medium uppercase text-muted">
-                        {heading.subtitle}
-                      </p>
-                    ) : null}
-                    {heading.meta}
-                  </div>
+                  <PageHeading heading={heading} titleClassName="text-[17px] leading-tight" />
                 ) : null}
                 <ToolbarCluster
                   toolbar={toolbar}
@@ -260,17 +262,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
                   heading ? 'items-start justify-between' : 'items-center justify-end'
                 )}
               >
-                {heading ? (
-                  <div className="min-w-0 flex-1" data-testid="page-header">
-                    <h1 className="text-2xl font-bold text-foreground">{heading.title}</h1>
-                    {heading.subtitle ? (
-                      <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
-                        {heading.subtitle}
-                      </p>
-                    ) : null}
-                    {heading.meta}
-                  </div>
-                ) : null}
+                {heading ? <PageHeading heading={heading} titleClassName="text-2xl" /> : null}
                 <ToolbarCluster toolbar={toolbar} actions={actions} />
               </div>
             )}

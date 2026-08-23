@@ -36,13 +36,10 @@ describe('DetachmentPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Gladius Task Force' })).toBeInTheDocument();
     const header = screen.getByTestId('page-header');
-    expect(within(header).getByTestId('detachment-meta')).toHaveTextContent('2 DP');
-    expect(within(header).getByTestId('detachment-chapter-dp')).toHaveTextContent(
-      'Black Templars 2 DP'
-    );
-    expect(
-      within(screen.getByRole('main')).queryByTestId('detachment-meta')
-    ).not.toBeInTheDocument();
+    expect(header).toHaveTextContent('2 DP');
+    expect(header).toHaveTextContent('Take and Hold');
+    expect(within(header).queryByTestId('detachment-meta')).not.toBeInTheDocument();
+    expect(header).not.toHaveTextContent('Black Templars');
     expect(screen.getByTestId('detachment-abilities')).toHaveTextContent('Combat Doctrines');
     expect(screen.getByTestId('detachment-enhancements')).toHaveTextContent('Artificer Armour');
     expect(screen.getByTestId('detachment-stratagems')).toHaveTextContent(/rapid fire/i);
