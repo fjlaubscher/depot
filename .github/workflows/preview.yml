@@ -126,18 +126,93 @@ jobs:
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      PREVIEW_BRANCH: pr-${{ github.event.pull_request.number }}
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Delete Pages preview deployments
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node <<'NODE'
+          const { spawnSync } = require('node:child_process');
+
+          const branch = process.env.PREVIEW_BRANCH;
+          if (!branch || !/^pr-\d+$/.test(branch)) {
+            console.error(`Refusing to delete: invalid PREVIEW_BRANCH=${JSON.stringify(branch)}`);
+            process.exit(1);
+          }
+
+          const npx = (args, opts = {}) => {
+            const result = spawnSync('npx', ['--yes', 'wrangler@4', ...args], {
+              encoding: 'utf8',
+              stdio: opts.stdio ?? ['ignore', 'pipe', 'pipe']
+            });
+            if (result.status !== 0) {
+              const err = (result.stderr || result.stdout || '').trim();
+              console.error(err || `wrangler exited ${result.status}`);
+              process.exit(result.status ?? 1);
+            }
+            return result.stdout || '';
+          };
+
+          const raw = npx([
+            'pages', 'deployment', 'list',
+            '--project-name', 'depot',
+            '--environment', 'preview',
+            '--json'
+          ]);
+
+          const start = raw.indexOf('[');
+          const end = raw.lastIndexOf(']');
+          const deployments = start === -1 || end === -1 ? [] : JSON.parse(raw.slice(start, end + 1));
+          if (!Array.isArray(deployments)) {
+            console.log('No preview deployments listed; nothing to delete.');
+            process.exit(0);
+          }
+
+          const branchOf = (d) =>
+            d.Branch ?? d.branch ?? d.deployment_trigger?.metadata?.branch ?? '';
+          const idOf = (d) => d.Id ?? d.id ?? '';
+
+          // Strict: only this PR's preview branch. Never production / main / other branches.
+          const matches = deployments.filter((d) => branchOf(d) === branch);
+          if (matches.length === 0) {
+            console.log(`No preview deployments for branch ${branch}.`);
+            process.exit(0);
+          }
+
+          for (const d of matches) {
+            const id = idOf(d);
+            if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
+              console.log(`Skipping deployment with unexpected id: ${JSON.stringify(id)}`);
+              continue;
+            }
+            console.log(`Deleting deployment ${id} (branch ${branchOf(d)})`);
+            npx(
+              ['pages', 'deployment', 'delete', id, '--project-name', 'depot', '--force'],
+              { stdio: 'inherit' }
+            );
+          }
+          NODE
+
       - name: Update preview comment
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request.number;
+            const branch = process.env.PREVIEW_BRANCH;
             const marker = `<!-- depot-preview pr=${pr} -->`;
             const body = [
               marker,
-              '**Preview no longer updated.**',
+              '**Preview deleted.**',
               '',
-              '_PR closed — no further preview deploys._'
+              `_PR closed — Pages branch \`${branch}\` removed._`
             ].join('\n');
 
             const { data: comments } = await github.rest.issues.listComments({
