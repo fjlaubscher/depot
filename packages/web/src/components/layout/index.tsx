@@ -98,13 +98,17 @@ const Breadcrumbs = ({ crumbs }: { crumbs: AppCrumb[] }) => (
 
 const PageHeading = ({
   heading,
-  titleClassName
+  titleClassName,
+  className,
+  align
 }: {
   heading: NonNullable<Props['heading']>;
   titleClassName: string;
+  className?: string;
+  align?: 'left' | 'center';
 }) => (
-  <div className="min-w-0 flex-1" data-testid="page-header">
-    <div className="flex min-w-0 flex-col">
+  <div className={cx('min-w-0 flex-1', className)} data-testid="page-header">
+    <div className={cx('flex min-w-0 flex-col', align === 'center' && 'items-center text-center')}>
       <h1 className={cx('min-w-0 truncate font-bold text-foreground', titleClassName)}>
         {heading.title}
       </h1>
@@ -210,27 +214,27 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
         )}
 
         {back && !isDesktop && (
-          <header
-            className={cx(
-              'flex flex-none gap-0.5 px-1.5 border-b border-border-subtle bg-surface-base',
-              heading?.subtitle || heading?.meta
-                ? 'min-h-[52px] items-start py-1'
-                : 'h-[52px] items-center'
-            )}
-          >
+          <header className="relative flex min-h-[52px] flex-none items-center gap-0.5 border-b border-border-subtle bg-surface-base px-1.5 py-1">
             <Link
               to={back.to}
               aria-label={`Back to ${back.label}`}
               title={`Back to ${back.label}`}
               data-testid="mobile-back-button"
-              className="grid place-items-center size-11 flex-none text-body hover:text-foreground rounded-sm focus-ring-primary"
+              className="relative z-10 grid place-items-center size-11 flex-none text-body hover:text-foreground rounded-sm focus-ring-primary"
             >
               <ArrowLeft size={18} />
             </Link>
             {heading && (
-              <PageHeading heading={heading} titleClassName="text-[15px] leading-tight" />
+              <div className="pointer-events-none absolute inset-x-12 inset-y-0 flex items-center justify-center">
+                <PageHeading
+                  heading={heading}
+                  titleClassName="text-[15px] leading-tight"
+                  className="text-center"
+                  align="center"
+                />
+              </div>
             )}
-            <ToolbarCluster toolbar={toolbar} actions={actions} />
+            <ToolbarCluster toolbar={toolbar} actions={actions} className="relative z-10 ml-auto" />
           </header>
         )}
 

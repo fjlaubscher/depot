@@ -78,6 +78,7 @@ describe('AppLayout', () => {
     expect(screen.getByTestId('mobile-back-button')).toBeInTheDocument();
     expect(screen.getByTestId('page-header')).toHaveTextContent('Gladius Task Force');
     expect(screen.getByTestId('page-header')).toHaveTextContent('Detachment');
+    expect(screen.getByTestId('page-header')).toHaveClass('text-center');
     expect(screen.queryByTestId('desktop-top-bar')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
   });
@@ -115,6 +116,7 @@ describe('AppLayout', () => {
     const header = screen.getByTestId('page-header');
     expect(within(header).getByRole('heading', { name: 'My Marines' })).toBeInTheDocument();
     expect(header).toHaveTextContent('Adeptus Astartes');
+    expect(header).not.toHaveClass('text-center');
     expect(screen.getByTestId('import-collection-button')).toBeInTheDocument();
   });
 
