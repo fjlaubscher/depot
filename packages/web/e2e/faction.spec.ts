@@ -53,9 +53,9 @@ test.describe('Faction detail', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: /Gladius Task Force/i })
     ).toBeVisible();
-    const meta = page.getByTestId('detachment-meta');
-    await expect(meta).toContainText(/\d+\s*DP/);
-    await expect(meta).toContainText(
+    const header = page.getByTestId('page-header');
+    await expect(header).toContainText(/\d+\s*DP/);
+    await expect(header).toContainText(
       /Take and Hold|Disruption|Purge the Foe|Priority Assets|Reconnaissance/
     );
     await expect(page.getByTestId('detachment-stratagems')).toBeVisible();
@@ -64,6 +64,6 @@ test.describe('Faction detail', () => {
     await expect(
       page.getByRole('heading', { level: 1, name: /Shield of the Void/i })
     ).toBeVisible();
-    await expect(page.getByTestId('detachment-meta')).toContainText(/Boarding Actions/);
+    await expect(page.getByTestId('page-header')).toContainText(/Boarding Actions/);
   });
 });
