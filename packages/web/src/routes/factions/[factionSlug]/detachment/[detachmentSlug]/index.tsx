@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import { ErrorState, Grid, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import { DetachmentAbilityCard, EnhancementCard, StratagemCard } from '@/components/shared';
-import RulesLink from '@/components/shared/rules-link';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
@@ -130,8 +129,6 @@ const DetachmentPage: FC = () => {
       ]}
     >
       <div className="flex flex-col gap-3">
-        {faction.link ? <RulesLink href={faction.link} /> : null}
-
         {settings?.showFluff && detachment.legend ? (
           <div
             className="text-sm text-muted font-medium italic"

@@ -15,7 +15,6 @@ import { createDatasheetBookmark } from '@/utils/bookmarks';
 
 // page components
 import { DatasheetProfile } from '@/components/shared/datasheet';
-import RulesLink from '@/components/shared/rules-link';
 import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
@@ -106,7 +105,6 @@ const DatasheetPage: FC = () => {
       ]}
     >
       <div className="flex flex-col gap-3">
-        {datasheet.link ? <RulesLink href={datasheet.link} /> : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>
     </AppLayout>
