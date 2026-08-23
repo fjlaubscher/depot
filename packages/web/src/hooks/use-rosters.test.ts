@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import type { depot } from '@depot/core';
 import useRosters from './use-rosters';
-import { createMockRoster, mockRoster } from '@/test/mock-data';
+import { createMockRoster, mockDatasheet, mockDetachment, mockRoster } from '@/test/mock-data';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -15,9 +15,30 @@ vi.mock('../data/offline-storage', () => ({
   offlineStorage: mockOfflineStorage
 }));
 
+// The roster load path rehydrates units from the catalog.
+const mockCatalog = vi.hoisted(() => ({
+  getDatasheet: vi.fn().mockResolvedValue(null),
+  getFactionManifest: vi.fn().mockResolvedValue(null)
+}));
+
+vi.mock('@/contexts/factions/context', () => ({
+  useFactionsContext: () => mockCatalog
+}));
+
 describe('useRosters', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCatalog.getDatasheet.mockResolvedValue(mockDatasheet);
+    mockCatalog.getFactionManifest.mockResolvedValue({
+      id: 'SM',
+      slug: 'space-marines',
+      name: 'Space Marines',
+      link: '',
+      datasheets: [],
+      detachments: [mockDetachment],
+      datasheetCount: 0,
+      detachmentCount: 1
+    });
   });
 
   afterEach(() => {

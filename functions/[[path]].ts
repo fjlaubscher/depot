@@ -167,11 +167,9 @@ const buildMetadata = async (
     if (!detachment) {
       return null;
     }
-    const legend = detachment.legend ? truncateText(stripHtml(detachment.legend)) : '';
     return {
       title: `${detachment.name} - ${manifest.name} | depot`,
-      description:
-        legend || `${detachment.name} detachment rules for ${manifest.name} in Warhammer 40,000.`,
+      description: `${detachment.name} detachment rules for ${manifest.name} in Warhammer 40,000.`,
       url: canonicalUrl
     };
   }
@@ -181,18 +179,9 @@ const buildMetadata = async (
     return null;
   }
 
-  const datasheetDetails = await fetchJson<{ legend?: string }>(
-    env,
-    requestUrl,
-    datasheetEntry.path
-  );
-  const legend = datasheetDetails?.legend ? truncateText(stripHtml(datasheetDetails.legend)) : '';
-  const description =
-    legend || `${datasheetEntry.name} datasheet for ${manifest.name} in Warhammer 40,000.`;
-
   return {
     title: `${datasheetEntry.name} - ${manifest.name} | depot`,
-    description,
+    description: `${datasheetEntry.name} datasheet for ${manifest.name} in Warhammer 40,000.`,
     url: canonicalUrl
   };
 };
@@ -222,15 +211,6 @@ const findDatasheet = (manifest: FactionManifest, slugOrId: string): DatasheetSu
     null
   );
 };
-
-const stripHtml = (value: string): string =>
-  value
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-const truncateText = (value: string, maxLength = 200): string =>
-  value.length <= maxLength ? value : `${value.slice(0, maxLength - 3).trimEnd()}...`;
 
 const formatCount = (count: number, singular: string): string =>
   `${count} ${count === 1 ? singular : `${singular}s`}`;

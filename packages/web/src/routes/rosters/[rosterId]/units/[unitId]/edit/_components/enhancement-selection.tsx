@@ -99,11 +99,6 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
                   {enhancement.detachment}
                 </span>
               ) : null}
-
-              <span
-                className="text-[11.5px] leading-snug text-muted"
-                dangerouslySetInnerHTML={{ __html: enhancement.description }}
-              />
             </span>
           </button>
         );

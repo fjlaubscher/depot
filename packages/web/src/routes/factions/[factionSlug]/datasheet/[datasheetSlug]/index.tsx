@@ -8,7 +8,6 @@ import { ErrorState } from '@/components/ui';
 // hooks
 import useFaction from '@/hooks/use-faction';
 import useDatasheet from '@/hooks/use-datasheet';
-import { useSettingsContext } from '@/contexts/settings/context';
 import { buildAbsoluteUrl } from '@/utils/paths';
 import { useShareAction } from '@/hooks/use-share-action';
 import { useBookmarkAction } from '@/hooks/use-bookmark-action';
@@ -16,6 +15,7 @@ import { createDatasheetBookmark } from '@/utils/bookmarks';
 
 // page components
 import { DatasheetProfile } from '@/components/shared/datasheet';
+import RulesLink from '@/components/shared/rules-link';
 import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
@@ -29,7 +29,6 @@ const DatasheetPage: FC = () => {
     loading: datasheetLoading,
     error: datasheetError
   } = useDatasheet(factionSlug, datasheetSlug);
-  const { settings } = useSettingsContext();
   const bookmarkAction = useBookmarkAction(
     faction && datasheet ? createDatasheetBookmark(faction, datasheet) : undefined
   );
@@ -112,9 +111,7 @@ const DatasheetPage: FC = () => {
           </h1>
         </div>
 
-        {settings?.showFluff && datasheet.legend?.trim() ? (
-          <p className="text-sm text-muted font-medium italic">{datasheet.legend}</p>
-        ) : null}
+        {datasheet.link ? <RulesLink href={datasheet.link} /> : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>
     </AppLayout>

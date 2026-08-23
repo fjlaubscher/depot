@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Shipped game data carries names, points, composition, options and stat lines
+  only. Rules text (ability, stratagem, enhancement and detachment-ability
+  descriptions, plus every legend) is gone, and datasheets link out to
+  Wahapedia for the full rules. Datasheets no longer embed the faction's
+  stratagems, enhancements and detachment abilities — they keep `stratagemIds`
+  and read the rest from the faction manifest. `/data` drops from 113 MB to
+  13 MB.
+- Saved rosters and collections store ids, selections and points instead of a
+  full datasheet snapshot, and rehydrate from local game data on load. Older
+  saves that still embed a datasheet keep loading through the same path.
+- Rosters and collections survive an IndexedDB upgrade; only cached game data
+  is rebuilt.
+
+### Removed
+
+- The "Show Fluff Text" setting, along with the ability rules sheet — ability
+  names are now plain tags.
+
 ## [2.1.0] - 2026-08-23
 
 ### Added

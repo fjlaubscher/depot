@@ -1,6 +1,8 @@
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { createRosterDuplicate } from '@depot/core/utils/roster';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { hydrateRoster } from '@/utils/refresh-user-data';
 import useAsync from './use-async';
 
 interface UseRosters {
@@ -13,7 +15,13 @@ interface UseRosters {
 }
 
 function useRosters(): UseRosters {
-  const { data, loading, error, refresh } = useAsync(() => offlineStorage.getAllRosters(), []);
+  const { getDatasheet, getFactionManifest } = useFactionsContext();
+  const { data, loading, error, refresh } = useAsync(async () => {
+    const stored = await offlineStorage.getAllRosters();
+    return Promise.all(
+      stored.map((roster) => hydrateRoster(roster, { getDatasheet, getFactionManifest }))
+    );
+  }, [getDatasheet, getFactionManifest]);
 
   const deleteRoster = async (rosterId: string) => {
     await offlineStorage.deleteRoster(rosterId);

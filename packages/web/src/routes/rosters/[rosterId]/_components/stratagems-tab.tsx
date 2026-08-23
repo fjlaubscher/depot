@@ -44,14 +44,11 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
     const map = new Map<string, Set<string>>();
 
     units.forEach((unit) => {
-      const stratagems = unit.datasheet.stratagems ?? [];
-
-      stratagems.forEach((stratagem) => {
-        const key = getStratagemKey(stratagem);
-        if (!map.has(key)) {
-          map.set(key, new Set());
+      (unit.datasheet.stratagemIds ?? []).forEach((stratagemId) => {
+        if (!map.has(stratagemId)) {
+          map.set(stratagemId, new Set());
         }
-        map.get(key)?.add(unit.datasheet.name);
+        map.get(stratagemId)?.add(unit.datasheet.name);
       });
     });
 

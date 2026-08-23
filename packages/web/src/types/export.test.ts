@@ -18,7 +18,6 @@ const baseRoster: depot.Roster = {
       id: 'det',
       slug: 'det',
       name: 'Det',
-      legend: '',
       type: '',
       dp: '',
       forceDisposition: '',

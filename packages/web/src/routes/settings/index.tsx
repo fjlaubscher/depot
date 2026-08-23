@@ -110,12 +110,6 @@ const Settings = () => {
             enabled={settings.showUnaligned ?? false}
             onChange={(value) => handleSettingsChange('showUnaligned', value)}
           />
-          <SettingToggleItem
-            title="Show Fluff Text"
-            description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
-            enabled={settings.showFluff ?? true}
-            onChange={(value) => handleSettingsChange('showFluff', value)}
-          />
         </section>
 
         <section className="flex flex-col gap-2">

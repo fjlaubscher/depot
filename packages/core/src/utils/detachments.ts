@@ -1,4 +1,4 @@
-import type { Detachment, Enhancement } from '../types/depot.js';
+import type { Detachment, DetachmentAbility, Enhancement, Stratagem } from '../types/depot.js';
 import type * as wahapedia from '../types/wahapedia.js';
 import { sortByName } from './common.js';
 
@@ -6,12 +6,30 @@ export const toDepotEnhancement = (enhancement: wahapedia.Enhancement): Enhancem
   id: enhancement.id,
   factionId: enhancement.factionId,
   name: enhancement.name,
-  legend: enhancement.legend,
-  description: enhancement.description,
   cost: enhancement.cost,
   detachment: enhancement.detachment,
-  ...(enhancement.upgrade === 'true' ? { upgrade: true } : {}),
-  ...(enhancement.supportLeader ? { supportLeader: enhancement.supportLeader } : {})
+  ...(enhancement.upgrade === 'true' ? { upgrade: true } : {})
+});
+
+/** Rules text stays on Wahapedia; depot ships names and numbers only. */
+export const toDepotStratagem = (stratagem: wahapedia.Stratagem): Stratagem => ({
+  id: stratagem.id,
+  factionId: stratagem.factionId,
+  name: stratagem.name,
+  type: stratagem.type,
+  cpCost: stratagem.cpCost,
+  turn: stratagem.turn,
+  phase: stratagem.phase,
+  detachment: stratagem.detachment
+});
+
+export const toDepotDetachmentAbility = (
+  ability: wahapedia.DetachmentAbility
+): DetachmentAbility => ({
+  id: ability.id,
+  factionId: ability.factionId,
+  name: ability.name,
+  detachment: ability.detachment
 });
 
 const shortIdSuffix = (id: string): string => id.replace(/^0+/, '').slice(-4) || id.slice(-4);
@@ -46,20 +64,23 @@ export const buildFactionDetachments = ({
       id: row.id,
       slug: createSlug(slugSource),
       name: row.name,
-      legend: row.legend ?? '',
       type: row.type ?? '',
       dp: row.dp ?? '',
       forceDisposition: row.forceDisposition ?? '',
       chapterDp: chapterDp
         .filter((entry) => entry.detachmentId === row.id)
         .map((entry) => ({ keyword: entry.keyword, dp: entry.dp })),
-      abilities: sortByName(abilities.filter((ability) => ability.detachmentId === row.id)),
+      abilities: sortByName(
+        abilities.filter((ability) => ability.detachmentId === row.id).map(toDepotDetachmentAbility)
+      ),
       enhancements: sortByName(
         enhancements
           .filter((enhancement) => enhancement.detachmentId === row.id)
           .map(toDepotEnhancement)
       ),
-      stratagems: sortByName(stratagems.filter((stratagem) => stratagem.detachmentId === row.id))
+      stratagems: sortByName(
+        stratagems.filter((stratagem) => stratagem.detachmentId === row.id).map(toDepotStratagem)
+      )
     };
   });
 

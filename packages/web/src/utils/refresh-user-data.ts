@@ -11,6 +11,7 @@ import {
 } from '@depot/core/utils/rebind';
 import { calculateTotalPoints, getRosterDetachments } from '@depot/core/utils/roster';
 import { matchDetachment } from '@depot/core/utils/detachments';
+import { placeholderDetachment } from '@depot/core/utils/saved';
 
 type GetDatasheet = (
   factionSlug: string,
@@ -44,7 +45,7 @@ export interface RefreshCollectionParams {
  * Resolve a datasheet for a stored unit: id → slug → name (via faction manifest).
  */
 export const resolveDatasheetForUnit = async (
-  unit: { datasheet: depot.Datasheet; datasheetSlug?: string },
+  unit: { datasheet: depot.DatasheetRef; datasheetSlug?: string },
   factionSlug: string | undefined,
   getDatasheet: GetDatasheet,
   getFactionManifest?: GetFactionManifest,
@@ -84,7 +85,7 @@ export const resolveDatasheetForUnit = async (
 
 /** Rebind roster units onto the current catalog (id → slug → name). */
 export const rebindRosterUnits = async (
-  units: depot.RosterUnit[],
+  units: (depot.StoredRosterUnit | depot.RosterUnit)[],
   factionSlug: string | undefined,
   getDatasheet: GetDatasheet,
   getFactionManifest?: GetFactionManifest,
@@ -197,4 +198,76 @@ export const formatRebindSummaryMessage = (summary: RebindSummary): string | nul
     parts.push(`${missing} unit${missing === 1 ? '' : 's'} not found in the current catalog`);
   }
   return parts.join('. ') + '.';
+};
+
+export interface Catalog {
+  getDatasheet: GetDatasheet;
+  getFactionManifest: GetFactionManifest;
+}
+
+/**
+ * Saves keep ids and selections only, so loading one resolves it against the
+ * local game data. Legacy saves with an embedded datasheet take the same path.
+ */
+export const hydrateRoster = async (
+  roster: depot.StoredRoster,
+  { getDatasheet, getFactionManifest }: Catalog
+): Promise<depot.Roster> => {
+  const factionSlug = roster.factionSlug || roster.faction?.slug || roster.factionId;
+  const manifest = factionSlug ? await getFactionManifest(factionSlug) : null;
+  const manifestCache = new Map<string, depot.FactionManifest | null>();
+  if (factionSlug) {
+    manifestCache.set(factionSlug, manifest);
+  }
+
+  const detachments = getRosterDetachments(roster).map(
+    (ref) => matchDetachment(ref, manifest?.detachments ?? []) ?? placeholderDetachment(ref)
+  );
+  const catalogEnhancements = new Map(
+    detachments.flatMap((detachment) =>
+      detachment.enhancements.map((enhancement) => [enhancement.id, enhancement] as const)
+    )
+  );
+
+  const { units } = await rebindRosterUnits(
+    roster.units,
+    factionSlug,
+    getDatasheet,
+    getFactionManifest,
+    manifestCache
+  );
+
+  const { detachment: _legacyDetachment, ...rest } = roster;
+  return {
+    ...rest,
+    detachments,
+    units,
+    enhancements: roster.enhancements.map(({ enhancement, unitId }) => ({
+      unitId,
+      enhancement: catalogEnhancements.get(enhancement.id) ?? { ...enhancement, factionId: '' }
+    }))
+  };
+};
+
+export const hydrateCollection = async (
+  collection: depot.StoredCollection,
+  { getDatasheet, getFactionManifest }: Catalog
+): Promise<depot.Collection> => {
+  const factionSlug = collection.factionSlug || collection.faction?.slug || collection.factionId;
+  const manifestCache = new Map<string, depot.FactionManifest | null>();
+
+  const items = await Promise.all(
+    collection.items.map(async (item) => {
+      const datasheet = await resolveDatasheetForUnit(
+        item,
+        factionSlug,
+        getDatasheet,
+        getFactionManifest,
+        manifestCache
+      );
+      return rebindCollectionUnit(item, datasheet).item;
+    })
+  );
+
+  return { ...collection, items };
 };

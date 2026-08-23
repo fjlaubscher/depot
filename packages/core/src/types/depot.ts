@@ -3,9 +3,7 @@ import type * as wahapedia from './wahapedia.js';
 export interface Ability {
   id: string;
   name: string;
-  legend: string;
   factionId: string;
-  description: string;
   type: string;
   parameter?: string;
 }
@@ -25,10 +23,8 @@ export interface Stratagem {
   name: string;
   type: string;
   cpCost: string;
-  legend: string;
   turn: string;
   phase: string;
-  description: string;
   detachment: string;
 }
 
@@ -73,20 +69,15 @@ export interface Enhancement {
   id: string;
   factionId: string;
   name: string;
-  legend: string;
-  description: string;
   cost: string;
   detachment: string;
   upgrade?: boolean;
-  supportLeader?: string;
 }
 
 export interface DetachmentAbility {
   id: string;
   factionId: string;
   name: string;
-  legend: string;
-  description: string;
   detachment: string;
 }
 
@@ -112,15 +103,10 @@ export interface Datasheet {
    * True when the datasheet belongs to a supplement (i.e. not the core codex).
    */
   isSupplement?: boolean;
-  legend: string;
   isSupport: boolean;
   loadout: string;
   transport: string;
   virtual: boolean;
-  leaderHead: string;
-  leaderFooter: string;
-  damagedW: string;
-  damagedDescription: string;
   link: string;
   abilities: Ability[];
   keywords: Keyword[];
@@ -129,9 +115,8 @@ export interface Datasheet {
   wargear: Wargear[];
   unitComposition: UnitComposition[];
   modelCosts: ModelCost[];
-  stratagems: Stratagem[];
-  enhancements: Enhancement[];
-  detachmentAbilities: DetachmentAbility[];
+  /** Stratagems this unit can use; the text lives on the faction detachments. */
+  stratagemIds: string[];
   leaders: DatasheetLeaderReference[];
   isForgeWorld: boolean;
   isLegends: boolean;
@@ -203,7 +188,6 @@ export interface Settings {
   showForgeWorld?: boolean;
   showLegends?: boolean;
   showUnaligned?: boolean;
-  showFluff?: boolean;
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
   theme?: Theme;
@@ -213,7 +197,6 @@ export interface Detachment {
   id: string;
   slug: string;
   name: string;
-  legend: string;
   type: string;
   dp: string;
   forceDisposition: string;
@@ -318,3 +301,38 @@ export type Bookmark =
       factionName?: string;
       createdAt: string;
     };
+
+/**
+ * Saved rosters/collections keep identity + user choices only; the catalog data
+ * is rehydrated from local game data on load. Legacy saves that still embed a
+ * full datasheet satisfy these shapes structurally, so they keep loading.
+ */
+export type DatasheetRef = Pick<Datasheet, 'id' | 'slug' | 'name' | 'factionSlug'>;
+export type WargearRef = Pick<Wargear, 'id' | 'name'>;
+export type AbilityRef = Pick<Ability, 'id' | 'name' | 'type' | 'parameter'>;
+export type DetachmentRef = Pick<Detachment, 'id' | 'slug' | 'name'>;
+/** `cost` is kept so points survive a datasheet that no longer resolves. */
+export type EnhancementRef = Pick<Enhancement, 'id' | 'name' | 'cost' | 'detachment'>;
+
+export interface StoredUnit {
+  id: string;
+  datasheet: DatasheetRef;
+  datasheetSlug?: string;
+  modelCost: ModelCost;
+  selectedWargear: WargearRef[];
+  selectedWargearAbilities?: AbilityRef[];
+}
+
+export type StoredRosterUnit = StoredUnit;
+export type StoredCollectionUnit = StoredUnit & { state: CollectionUnitState };
+
+export type StoredRoster = Omit<Roster, 'units' | 'detachments' | 'detachment' | 'enhancements'> & {
+  units: StoredRosterUnit[];
+  detachments: DetachmentRef[];
+  detachment?: DetachmentRef;
+  enhancements: { enhancement: EnhancementRef; unitId: string }[];
+};
+
+export type StoredCollection = Omit<Collection, 'items'> & {
+  items: StoredCollectionUnit[];
+};

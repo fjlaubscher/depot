@@ -30,9 +30,7 @@ const formatLeaderName = (slug: string, fallback: string) => {
 };
 
 const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factionDatasheets }) => {
-  const { leaderFooter, leaders } = datasheet;
-  const leaderHead =
-    datasheet.leaderHead?.trim() || 'This leader can be attached to the following units.';
+  const { leaders } = datasheet;
 
   const leaderTargets = useMemo<LeaderTarget[]>(() => {
     if (!leaders.length) {
@@ -77,7 +75,7 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
       dataTestId="datasheet-leader-rules"
     >
       <div className="flex flex-col gap-2 text-sm text-body">
-        <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderHead }} />
+        <p className="m-0">This leader can be attached to the following units.</p>
 
         <ul className="mt-1 list-disc pl-5">
           {leaderTargets.map((target) => (
@@ -92,10 +90,6 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
             </li>
           ))}
         </ul>
-
-        {leaderFooter?.trim() ? (
-          <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderFooter }} />
-        ) : null}
       </div>
     </CollapsibleSection>
   );

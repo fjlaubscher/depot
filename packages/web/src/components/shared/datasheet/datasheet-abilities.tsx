@@ -1,10 +1,7 @@
-import type { MouseEvent } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import type { depot } from '@depot/core';
-import { cx } from '@/utils/cx';
 
 import { Tag, TagSection } from '@/components/ui';
-import AbilitySheet from '@/components/shared/ability-sheet';
 import { formatAbilityName, sortAbilitiesByType } from '@depot/core/utils/abilities';
 import { getAbilityTypeMeta } from '@/utils/abilities';
 
@@ -15,26 +12,14 @@ interface DatasheetAbilitiesProps {
   className?: string;
 }
 
+/** Ability names only — the rules text lives on Wahapedia. */
 export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
   title,
   abilities,
   dataTestId,
   className
 }) => {
-  const [selectedAbility, setSelectedAbility] = useState<depot.Ability | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const sortedAbilities = useMemo(() => sortAbilitiesByType(abilities), [abilities]);
-
-  // Keep the ability mounted on close so the sheet content stays during the slide-out.
-  const handleClose = useCallback(() => setIsModalOpen(false), []);
-
-  const handleOpen = useCallback((event: MouseEvent<HTMLButtonElement>, ability: depot.Ability) => {
-    event.stopPropagation();
-    setSelectedAbility(ability);
-    setIsModalOpen(true);
-  }, []);
-
   const sectionTestId = dataTestId || `${title.toLowerCase().replace(/\s+/g, '-')}`;
 
   if (sortedAbilities.length === 0) {
@@ -42,38 +27,18 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
   }
 
   return (
-    <>
-      <TagSection
-        title={title}
-        description="Click a tag to view full rules."
-        spacing="sm"
-        className={className}
-        data-testid={sectionTestId}
-      >
-        {sortedAbilities.map((ability) => {
-          const { variant } = getAbilityTypeMeta(ability.type);
-          const label = formatAbilityName(ability).toLowerCase();
-
-          return (
-            <button
-              key={ability.id || ability.name}
-              type="button"
-              onClick={(event) => handleOpen(event, ability)}
-              className={cx(
-                'group inline-flex items-center rounded-sm border border-transparent bg-surface-card px-0 py-0 text-left transition-all duration-150 cursor-pointer',
-                'focus-ring-primary'
-              )}
-              data-testid={`${sectionTestId}-tag-${ability.id || ability.name}`}
-            >
-              <Tag variant={variant} size="sm" className="pointer-events-none capitalize">
-                {label}
-              </Tag>
-            </button>
-          );
-        })}
-      </TagSection>
-
-      <AbilitySheet ability={selectedAbility} open={isModalOpen} onClose={handleClose} />
-    </>
+    <TagSection title={title} spacing="sm" className={className} data-testid={sectionTestId}>
+      {sortedAbilities.map((ability) => (
+        <Tag
+          key={ability.id || ability.name}
+          variant={getAbilityTypeMeta(ability.type).variant}
+          size="sm"
+          className="capitalize cursor-default"
+          data-testid={`${sectionTestId}-tag-${ability.id || ability.name}`}
+        >
+          {formatAbilityName(ability).toLowerCase()}
+        </Tag>
+      ))}
+    </TagSection>
   );
 };

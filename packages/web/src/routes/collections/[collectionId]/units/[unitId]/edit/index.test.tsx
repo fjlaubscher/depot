@@ -42,7 +42,6 @@ describe('CollectionUnitEditPage', () => {
     const wargearAbility = createMockWargearAbility({
       id: 'wg-ability',
       name: 'Blade Storm',
-      description: 'Cutting edge.',
       type: 'Wargear'
     });
 

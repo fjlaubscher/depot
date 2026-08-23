@@ -1,6 +1,6 @@
 import type { wahapedia, depot } from '@depot/core';
 import { sortByName } from '@depot/core/utils/common';
-import { buildFactionDetachments, toDepotEnhancement } from '@depot/core/utils/detachments';
+import { buildFactionDetachments, toDepotStratagem } from '@depot/core/utils/detachments';
 import { normalizeModelCosts } from '@depot/core/utils/model-costs';
 import { createSlugGenerator } from '@depot/core/utils/slug';
 import { groupWargearProfiles } from '@depot/core/utils/wargear';
@@ -17,26 +17,25 @@ const buildDatasheet = (
   const own = <T extends { datasheetId: string }>(rows: T[]): T[] =>
     rows.filter((row) => row.datasheetId === datasheet.id);
 
+  // Names and types only; the rules text stays on Wahapedia.
   const abilities = own(data.datasheetAbilities).flatMap((a): depot.Ability[] => {
     if (a.abilityId) {
       const referenced = data.abilities.find((ability) => ability.id === a.abilityId);
       return referenced
-        ? [{ ...referenced, type: a.type, parameter: a.parameter || referenced.parameter }]
+        ? [
+            {
+              id: referenced.id,
+              name: referenced.name,
+              factionId: referenced.factionId,
+              type: a.type,
+              parameter: a.parameter || referenced.parameter
+            }
+          ]
         : [];
     }
-    // Inline abilities carry no id / legend / factionId of their own.
+    // Inline abilities carry no id / factionId of their own.
     return a.name
-      ? [
-          {
-            id: '',
-            name: a.name,
-            legend: '',
-            factionId: '',
-            description: a.description,
-            type: a.type,
-            parameter: a.parameter
-          }
-        ]
+      ? [{ id: '', name: a.name, factionId: '', type: a.type, parameter: a.parameter }]
       : [];
   });
 
@@ -50,18 +49,9 @@ const buildDatasheet = (
   const isSupplement = supplementKey !== CODEX_SLUG;
   const supplementLabel = isSupplement && supplementInfo ? supplementInfo.name : 'None';
 
-  const stratagems = own(data.datasheetStratagems).map((ds) =>
-    data.stratagems.find((s) => s.id === ds.stratagemId)!
-  );
-
-  const enhancements = own(data.datasheetEnhancements)
-    .map((de) => data.enhancements.find((e) => e.id === de.enhancementId))
-    .filter((e) => e !== undefined)
-    .map(toDepotEnhancement);
-
-  const detachmentAbilities = own(data.datasheetDetachmentAbilities).map((dda) =>
-    data.detachmentAbilities.find((da) => da.id === dda.detachmentAbilityId)!
-  );
+  // Enhancements and detachment abilities already ship on the faction's
+  // detachments; only the stratagem link is per-datasheet.
+  const stratagemIds = own(data.datasheetStratagems).map((ds) => ds.stratagemId);
 
   const leaders = data.datasheetLeaders
     .filter((dl) => dl.leaderId === datasheet.id)
@@ -83,15 +73,10 @@ const buildDatasheet = (
     supplementName: supplementInfo?.name,
     supplementLabel,
     isSupplement,
-    legend: datasheet.legend,
     isSupport: datasheet.isSupport === 'true',
     loadout: datasheet.loadout,
     transport: datasheet.transport,
     virtual: datasheet.virtual === 'true',
-    leaderHead: datasheet.leaderHead,
-    leaderFooter: datasheet.leaderFooter,
-    damagedW: datasheet.damagedW,
-    damagedDescription: datasheet.damagedDescription,
     link: datasheet.link,
     abilities,
     keywords: own(data.datasheetKeywords),
@@ -100,9 +85,7 @@ const buildDatasheet = (
     wargear: groupWargearProfiles(own(data.datasheetWargear)),
     unitComposition: own(data.datasheetUnitComposition),
     modelCosts: normalizeModelCosts(own(data.datasheetModelCosts)),
-    stratagems,
-    enhancements,
-    detachmentAbilities,
+    stratagemIds,
     leaders,
     isForgeWorld,
     isLegends
@@ -153,7 +136,7 @@ const generateData = (data: wahapedia.Data) => {
     buildFactionData(data, f, datasheetSlugs, factionSlugs)
   );
   const coreStratagems = sortByName(
-    data.stratagems.filter((stratagem) => !stratagem.factionId?.trim())
+    data.stratagems.filter((stratagem) => !stratagem.factionId?.trim()).map(toDepotStratagem)
   );
 
   return { factions, coreStratagems, dataVersion: data.lastUpdate ?? undefined };

@@ -1,4 +1,4 @@
-import type { Ability } from '../types/depot.js';
+import type { Ability, AbilityRef } from '../types/depot.js';
 import { slugify } from './slug.js';
 
 export interface CategorizedAbilities {
@@ -43,7 +43,7 @@ export const categorizeAbilities = (abilities: Ability[]): CategorizedAbilities 
   referenced: abilities.filter(isReferencedAbility)
 });
 
-export const formatAbilityName = (ability: Ability): string =>
+export const formatAbilityName = (ability: { name?: string; parameter?: string }): string =>
   [ability.name?.trim(), ability.parameter?.trim()].filter(Boolean).join(' ');
 
 export const getWargearAbilities = (abilities: Ability[] = []): Ability[] => {
@@ -51,14 +51,14 @@ export const getWargearAbilities = (abilities: Ability[] = []): Ability[] => {
 };
 
 export const normalizeSelectedWargearAbilities = (
-  selectedAbilities: Ability[] | undefined,
+  selectedAbilities: AbilityRef[] | undefined,
   datasheetAbilities: Ability[] = []
 ): Ability[] => {
   if (!selectedAbilities?.length) {
     return [];
   }
 
-  const slugOf = (ability: Ability) => slugify(formatAbilityName(ability) || ability.name || '');
+  const slugOf = (ability: AbilityRef) => slugify(formatAbilityName(ability) || ability.name || '');
   const available = new Map(
     getWargearAbilities(datasheetAbilities).flatMap((ability) =>
       [ability.id, slugOf(ability)].filter(Boolean).map((key) => [key, ability] as const)

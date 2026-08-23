@@ -2,13 +2,16 @@ import { useCallback } from 'react';
 import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { hydrateCollection } from '@/utils/refresh-user-data';
 import useAsync from './use-async';
 
 export const useCollection = (collectionId?: string) => {
-  const { data, setData, loading, error } = useAsync(
-    async () => (collectionId ? offlineStorage.getCollection(collectionId) : null),
-    [collectionId]
-  );
+  const { getDatasheet, getFactionManifest } = useFactionsContext();
+  const { data, setData, loading, error } = useAsync(async () => {
+    const stored = collectionId ? await offlineStorage.getCollection(collectionId) : null;
+    return stored ? hydrateCollection(stored, { getDatasheet, getFactionManifest }) : null;
+  }, [collectionId, getDatasheet, getFactionManifest]);
 
   const save = useCallback(
     async (updated: depot.Collection) => {

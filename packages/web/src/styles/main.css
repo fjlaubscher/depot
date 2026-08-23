@@ -320,10 +320,6 @@ span.hi_custom {
     @apply text-xs italic text-muted mb-2;
   }
 
-  .hide-fluff .ShowFluff {
-    display: none;
-  }
-
   .ability-rich-text tr:first-child td {
     border-top-width: 0;
   }

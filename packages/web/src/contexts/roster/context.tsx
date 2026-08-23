@@ -2,6 +2,8 @@ import type { FC, ReactNode } from 'react';
 import { createContext, useContext, useReducer, useEffect, useMemo, useRef } from 'react';
 import { offlineStorage } from '@/data/offline-storage';
 import { useToast } from '@/contexts/toast/context';
+import { useFactionsContext } from '@/contexts/factions/context';
+import { hydrateRoster } from '@/utils/refresh-user-data';
 import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
@@ -16,6 +18,7 @@ interface RosterProviderProps {
 export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) => {
   const [state, dispatch] = useReducer(rosterReducer, initialState);
   const { showToast } = useToast();
+  const { getDatasheet, getFactionManifest } = useFactionsContext();
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve()); // Serialise roster saves
 
   // Load roster on mount if rosterId is provided
@@ -23,8 +26,9 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
     if (rosterId) {
       const loadRoster = async () => {
         try {
-          const roster = await offlineStorage.getRoster(rosterId);
-          if (roster) {
+          const stored = await offlineStorage.getRoster(rosterId);
+          if (stored) {
+            const roster = await hydrateRoster(stored, { getDatasheet, getFactionManifest });
             dispatch({ type: 'SET_ROSTER', payload: roster });
           }
         } catch (err) {
@@ -33,7 +37,7 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
       };
       loadRoster();
     }
-  }, [rosterId]);
+  }, [rosterId, getDatasheet, getFactionManifest]);
 
   // Auto-save roster on state change
   useEffect(() => {

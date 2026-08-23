@@ -30,11 +30,6 @@ export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
       .catch((error) => console.warn('Failed to load settings from IndexedDB:', error));
   }, []);
 
-  // Lets CSS hide fluff baked into rich-text HTML (e.g. `.ShowFluff` sub-ability legends).
-  useEffect(() => {
-    document.documentElement.classList.toggle('hide-fluff', settings.showFluff === false);
-  }, [settings.showFluff]);
-
   // `.dark` class strategy — follows the OS while the setting is 'system'.
   useEffect(() => {
     const theme = settings.theme ?? 'system';
