@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
-import { useNavigate } from '@/lib/navigation';
+import { Link, useNavigate } from '@/lib/navigation';
 import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
 import { useRoster } from '@/contexts/roster/context';
 import { useToast } from '@/contexts/toast/context';
 import useCoreStratagems from '@/hooks/use-core-stratagems';
+import { useCollections } from '@/hooks/use-collections';
 import { downloadFile } from '@/utils/file';
 import { safeSlug } from '@depot/core/utils/common';
 import { CURRENT_GAME_EDITION, type ExportedRoster } from '@/types/export';
@@ -45,6 +46,7 @@ const RosterView: FC = () => {
     loading: loadingCoreStratagems,
     error: coreStratagemsError
   } = useCoreStratagems();
+  const { collections } = useCollections();
   const [refreshingRoster, setRefreshingRoster] = useState(false);
 
   const factionName = getRosterFactionName(roster);
@@ -141,6 +143,10 @@ const RosterView: FC = () => {
     );
   }
 
+  const linkedCollection = roster.collectionId
+    ? collections.find((collection) => collection.id === roster.collectionId)
+    : undefined;
+
   const detachments = getRosterDetachments(roster);
   const tabs = [
     { label: 'Units', panel: <UnitsTab key="units" roster={roster} /> },
@@ -182,7 +188,19 @@ const RosterView: FC = () => {
         { label: 'Rosters', to: '/rosters' },
         { label: roster.name }
       ]}
-      heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
+      heading={{
+        title: roster.name,
+        subtitle: getRosterSubtitle(roster),
+        meta: linkedCollection ? (
+          <Link
+            to={`/collections/${linkedCollection.id}`}
+            className="mt-0.5 truncate text-xs font-medium text-muted hover:text-foreground"
+            data-testid="roster-collection-link"
+          >
+            Collection · {linkedCollection.name}
+          </Link>
+        ) : undefined
+      }}
       actions={[
         {
           icon: <Pencil size={16} />,

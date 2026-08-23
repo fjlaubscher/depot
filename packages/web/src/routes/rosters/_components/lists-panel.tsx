@@ -22,26 +22,17 @@ import CreateRosterSheet from './create-roster-sheet';
 type Slots = { toolbar: ReactNode; body: ReactNode };
 
 interface Props {
-  /** When set, only show lists attached to this collection. */
-  collectionId?: string;
   children?: (slots: Slots) => ReactNode;
 }
 
-const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
+const ListsPanel: React.FC<Props> = ({ children }) => {
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { collections } = useCollections();
   const { showToast } = useToast();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
-  const linkedCollection = collectionId
-    ? collections.find((collection) => collection.id === collectionId)
-    : undefined;
-
-  const visible = collectionId
-    ? rosters.filter((roster) => roster.collectionId === collectionId)
-    : rosters;
 
   const hasStaleRosters = Boolean(
-    dataVersion && visible.some((roster) => roster.dataVersion !== dataVersion)
+    dataVersion && rosters.some((roster) => roster.dataVersion !== dataVersion)
   );
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -109,9 +100,6 @@ const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
         imported = result.roster;
         rebindNote = formatRebindSummaryMessage(result.summary);
       }
-      if (collectionId) {
-        imported = { ...imported, collectionId };
-      }
       await offlineStorage.saveRoster(imported);
       await refresh();
       showToast({
@@ -164,12 +152,12 @@ const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
         </div>
       ) : error ? (
         <ErrorState title="Failed to load rosters" message={error} />
-      ) : visible.length === 0 ? (
+      ) : rosters.length === 0 ? (
         <RosterEmptyState
-          title={collectionId ? 'No lists for this collection' : 'No lists yet'}
+          title="No rosters yet"
           dataTestId="empty-rosters"
           action={{
-            label: collectionId ? 'Create list' : 'Create roster',
+            label: 'Create roster',
             onClick: () => setCreateOpen(true),
             icon: <Plus size={14} />
           }}
@@ -179,15 +167,19 @@ const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
           data-testid="rosters-grid"
           className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3"
         >
-          {visible.map((roster) => {
+          {rosters.map((roster) => {
             const detachments = getRosterDetachments(roster);
             const invalid = validateRoster(roster).length > 0;
+            const collectionName = roster.collectionId
+              ? collections.find((collection) => collection.id === roster.collectionId)?.name
+              : undefined;
             return (
               <LibraryCard
                 key={roster.id}
                 name={roster.name}
                 meta={[
                   roster.faction?.name,
+                  collectionName,
                   detachments.map((d) => d.name).join(', '),
                   `${roster.units.length} ${roster.units.length === 1 ? 'unit' : 'units'}`
                 ]
@@ -215,19 +207,7 @@ const ListsPanel: React.FC<Props> = ({ collectionId, children }) => {
           })}
         </div>
       )}
-      <CreateRosterSheet
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        prefill={
-          collectionId
-            ? {
-                collectionId,
-                name: linkedCollection ? `${linkedCollection.name} roster` : undefined,
-                factionSlug: linkedCollection?.factionSlug ?? linkedCollection?.factionId
-              }
-            : undefined
-        }
-      />
+      <CreateRosterSheet open={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
   );
 

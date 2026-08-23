@@ -11,7 +11,6 @@ import { TAG_VARIANT_CLASSES } from '@/components/ui/tag';
 import { RosterSection, RosterEmptyState } from '@/components/shared/roster';
 import CollectionUnitCard from '@/routes/collections/_components/collection-unit-card';
 import useCollection from '@/hooks/use-collection';
-import useRosters from '@/hooks/use-rosters';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import usePersistedTagSelection from '@/hooks/use-persisted-tag-selection';
 import { downloadFile } from '@/utils/file';
@@ -30,14 +29,12 @@ import {
 } from '@depot/core/utils/collection';
 import { COLLECTION_STATE_META, getCollectionChartCopy } from '@/utils/collection';
 import CollectionStateChart from '@/routes/collections/_components/collection-state-chart';
-import ListsPanel from '@/routes/rosters/_components/lists-panel';
 
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
-  const { rosters } = useRosters();
   const { getDatasheet, getFactionManifest, dataVersion } = useFactionsContext();
   const { showToast } = useToast();
   const [refreshing, setRefreshing] = useState(false);
@@ -48,8 +45,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     'all',
     (value) => value === 'all' || COLLECTION_UNIT_STATES.includes(value)
   );
-  const [sectionTab, setSectionTab] = useState<'units' | 'lists'>('units');
-
   const stateCounts = useMemo(
     () => getCollectionStateCounts(collection?.items ?? []),
     [collection]
@@ -199,8 +194,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
   const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
   const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
-  const listCount = rosters.filter((roster) => roster.collectionId === collection.id).length;
-
   return (
     <AppLayout
       title={pageTitle}
@@ -230,16 +223,14 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           : undefined
       }
       footer={
-        sectionTab === 'units' ? (
-          <Button
-            fullWidth
-            onClick={() => navigate(`/collections/${collection.id}/add-units`)}
-            data-testid="add-collection-units-button"
-          >
-            <Plus size={16} />
-            Add units
-          </Button>
-        ) : undefined
+        <Button
+          fullWidth
+          onClick={() => navigate(`/collections/${collection.id}/add-units`)}
+          data-testid="add-collection-units-button"
+        >
+          <Plus size={16} />
+          Add units
+        </Button>
       }
     >
       <div className="flex flex-col gap-3">
@@ -269,63 +260,48 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           <CollectionStateChart items={collection.items} heading={collectionHeading} />
         ) : null}
 
-        <PillTabs
-          tabs={[
-            { value: 'units', label: 'Units', count: totalUnits },
-            { value: 'lists', label: 'Lists', count: listCount }
-          ]}
-          active={sectionTab}
-          onChange={setSectionTab}
-          ariaLabel="Collection sections"
-          testIdPrefix="collection-section"
-        />
-
-        {sectionTab === 'lists' ? (
-          <ListsPanel collectionId={collection.id} />
-        ) : (
-          <RosterSection
-            title="Units"
-            count={totalUnits}
-            data-testid="collection-units-section"
-            className="gap-4"
-            belowContent={
-              <PillTabs
-                tabs={stateFilters}
-                active={activeStateFilter}
-                onChange={setStateFilter}
-                ariaLabel="Filter units by build state"
-                testIdPrefix="collection-state-filter"
-              />
-            }
-          >
-            {filteredItems.length > 0 ? (
-              <div className="flex flex-col gap-4" data-testid="collection-unit-cards">
-                {filteredItems.map((item) => (
-                  <CollectionUnitCard
-                    key={item.id}
-                    unit={item}
-                    collectionId={collection.id}
-                    onRemove={handleRemove}
-                    onDuplicate={handleDuplicate}
-                    state={item.state}
-                    dataTestId="collection-unit-card"
-                  />
-                ))}
-              </div>
-            ) : (
-              <RosterEmptyState
-                title="No units in this collection"
-                dataTestId="empty-collection-state"
-                action={{
-                  label: 'Add units',
-                  onClick: () => navigate(`/collections/${collection.id}/add-units`),
-                  icon: <Plus size={14} />,
-                  testId: 'empty-collection-add-units'
-                }}
-              />
-            )}
-          </RosterSection>
-        )}
+        <RosterSection
+          title="Units"
+          count={totalUnits}
+          data-testid="collection-units-section"
+          className="gap-4"
+          belowContent={
+            <PillTabs
+              tabs={stateFilters}
+              active={activeStateFilter}
+              onChange={setStateFilter}
+              ariaLabel="Filter units by build state"
+              testIdPrefix="collection-state-filter"
+            />
+          }
+        >
+          {filteredItems.length > 0 ? (
+            <div className="flex flex-col gap-4" data-testid="collection-unit-cards">
+              {filteredItems.map((item) => (
+                <CollectionUnitCard
+                  key={item.id}
+                  unit={item}
+                  collectionId={collection.id}
+                  onRemove={handleRemove}
+                  onDuplicate={handleDuplicate}
+                  state={item.state}
+                  dataTestId="collection-unit-card"
+                />
+              ))}
+            </div>
+          ) : (
+            <RosterEmptyState
+              title="No units in this collection"
+              dataTestId="empty-collection-state"
+              action={{
+                label: 'Add units',
+                onClick: () => navigate(`/collections/${collection.id}/add-units`),
+                icon: <Plus size={14} />,
+                testId: 'empty-collection-add-units'
+              }}
+            />
+          )}
+        </RosterSection>
       </div>
     </AppLayout>
   );
