@@ -117,8 +117,8 @@ const PageHeading = ({
           {heading.subtitle}
         </p>
       ) : null}
+      {heading.meta}
     </div>
-    {heading.meta}
   </div>
 );
 

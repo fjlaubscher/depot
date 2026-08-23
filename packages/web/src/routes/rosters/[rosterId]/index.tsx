@@ -194,7 +194,7 @@ const RosterView: FC = () => {
         meta: linkedCollection ? (
           <Link
             to={`/collections/${linkedCollection.id}`}
-            className="mt-0.5 truncate text-xs font-medium text-muted hover:text-foreground"
+            className="pointer-events-auto relative z-10 mt-0.5 truncate text-xs font-medium text-muted hover:text-foreground"
             data-testid="roster-collection-link"
           >
             Collection · {linkedCollection.name}
