@@ -7,8 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-23
+
+### Added
+
+- Armies hub: Collections (painted inventory) and Rosters (matched-play lists)
+  live under one Armies tab. Factions in the nav is now Rules.
+- In-app route changes use the View Transitions API.
+- PR previews deploy to Cloudflare Pages (`pr-N.depot.pages.dev`) and are
+  deleted when the PR closes.
+
 ### Changed
 
+- Desktop pages use ancestor-only breadcrumbs, then a stacked title and
+  subtitle. Detachment DP and force disposition are muted subtitle text, not
+  tags. Datasheet lists use role chips and collection-style cards; fluff sits
+  under the invulnerable save, above Wargear.
+- Collections are units only. A roster linked to a collection has a
+  Collection · name backlink instead of listing rosters inside the cabinet.
 - Saved rosters and collections store ids, selections and points instead of a
   full datasheet snapshot, and rehydrate from local game data on load. Older
   saves that still embed a datasheet keep loading through the same path.
@@ -23,6 +39,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In-app rules text and fluff are restored (ability sheet, stratagem /
   enhancement / detachment-ability descriptions, datasheet and detachment
   legends, Show Fluff Text setting). Saved documents stay slim.
+- Datasheet pages no longer crash when a cached pack has no legend/fluff.
+- Wahapedia “Read the full rules” links are gone from datasheet and
+  detachment pages.
+- Mobile back nav centers the title and subtitle between the back button and
+  actions. Datasheet search Clear is an X inside the field, only when text is
+  typed.
 
 ## [2.1.0] - 2026-08-23
 
