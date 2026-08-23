@@ -27,7 +27,8 @@ describe('InstallBanner', () => {
   it('shows the one-time install copy when Chrome has a deferred prompt', () => {
     render(<InstallBanner />);
     expect(screen.getByTestId('install-banner')).toBeInTheDocument();
-    expect(screen.getByText('Install depot for offline use.')).toBeInTheDocument();
+    expect(screen.getByText('Install depot')).toBeInTheDocument();
+    expect(screen.getByText(/opens like an app/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Install' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
   });
