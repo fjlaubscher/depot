@@ -33,7 +33,7 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
 
       <div
         className="text-sm text-body leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: enhancement.description }}
+        dangerouslySetInnerHTML={{ __html: enhancement.description ?? '' }}
       />
 
       {enhancement.supportLeader ? (

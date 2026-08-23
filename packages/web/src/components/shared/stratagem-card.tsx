@@ -58,7 +58,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
 
         <Card.Content
           className="flex-1"
-          dangerouslySetInnerHTML={{ __html: stratagem.description }}
+          dangerouslySetInnerHTML={{ __html: stratagem.description ?? '' }}
         />
         {unitNames.length > 0 ? (
           <Card.Footer className="flex-col items-start gap-1 text-xs text-subtle">

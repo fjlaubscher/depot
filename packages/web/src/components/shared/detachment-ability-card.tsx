@@ -26,7 +26,7 @@ const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }
 
       <div
         className="ability-rich-text"
-        dangerouslySetInnerHTML={{ __html: ability.description }}
+        dangerouslySetInnerHTML={{ __html: ability.description ?? '' }}
       />
     </Card>
   );

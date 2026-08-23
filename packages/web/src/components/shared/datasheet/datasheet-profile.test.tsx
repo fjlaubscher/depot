@@ -85,4 +85,14 @@ describe('DatasheetProfile', () => {
       'A captain of the Adeptus Astartes.'
     );
   });
+
+  it('does not throw or render fluff when legend is omitted', () => {
+    const datasheet = createMockDatasheet({ legend: undefined });
+
+    expect(() => {
+      render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
+    }).not.toThrow();
+
+    expect(screen.queryByTestId('datasheet-fluff')).not.toBeInTheDocument();
+  });
 });

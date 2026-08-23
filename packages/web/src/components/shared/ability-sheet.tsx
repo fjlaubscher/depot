@@ -33,7 +33,7 @@ const AbilitySheet: React.FC<AbilitySheetProps> = ({ ability, open, onClose }) =
         ) : null}
         <div
           className="ability-rich-text"
-          dangerouslySetInnerHTML={{ __html: ability.description }}
+          dangerouslySetInnerHTML={{ __html: ability.description ?? '' }}
         />
       </div>
     </Sheet>

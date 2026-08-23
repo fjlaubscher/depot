@@ -33,7 +33,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
         <ModelStatsRow key={model.line} model={model} />
       ))}
 
-      {settings.showFluff && datasheet.legend.trim() ? (
+      {settings.showFluff !== false && datasheet.legend?.trim() ? (
         <p
           className="ShowFluff text-sm text-muted font-medium italic"
           data-testid="datasheet-fluff"
