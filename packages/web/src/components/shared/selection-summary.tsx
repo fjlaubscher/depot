@@ -47,16 +47,16 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
       {/* Stays mounted while the dialog is open so the native <dialog> can restore focus to it on close. */}
       <button
         type="button"
-        className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-lg border-t border-border-subtle bg-surface-base px-4 py-4 text-body shadow-e2 transition hover:bg-surface-soft focus-ring-primary md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-sm md:border md:px-5 md:py-3 md:text-sm md:shadow-e2"
+        className="fixed bottom-0 left-0 right-0 z-40 flex cursor-pointer items-center justify-between gap-3 rounded-t-lg border-t border-accent-600 bg-accent-600 px-4 py-4 text-accent-ink shadow-e3 transition hover:bg-accent-700 focus-ring-primary dark:border-accent-500 dark:bg-accent-500 dark:hover:bg-accent-400 md:bottom-6 md:left-auto md:right-6 md:w-auto md:gap-2 md:rounded-sm md:border md:px-5 md:py-3 md:text-sm md:shadow-e3"
         onClick={() => onOpenChange(true)}
       >
         <span className="flex flex-col text-left md:flex-row md:items-center md:gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted md:text-sm">
+          <span className="text-xs font-semibold uppercase tracking-wide text-accent-ink md:text-sm">
             Review Selection
           </span>
-          <span className="text-lg font-semibold text-foreground md:text-sm">{summary}</span>
+          <span className="text-lg font-semibold text-accent-ink md:text-sm">{summary}</span>
         </span>
-        <span className="text-sm font-medium text-muted underline underline-offset-4 md:hidden">
+        <span className="text-sm font-medium text-accent-ink underline underline-offset-4 md:hidden">
           Review
         </span>
       </button>

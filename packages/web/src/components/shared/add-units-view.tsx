@@ -98,7 +98,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
       back={{ to: backTo, label: backLabel }}
       heading={{ title, subtitle }}
     >
-      <div className={`flex flex-col gap-3${hasSelections ? ' pb-28 md:pb-0' : ''}`}>
+      <div className="flex flex-col gap-3">
         {headerStats ? <div className="surface-card p-3">{headerStats}</div> : null}
 
         {factionError || datasheetError ? (
@@ -142,6 +142,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
               searchPlaceholder="Search by unit name..."
               emptyStateMessage="No units available for this faction."
               filters={datasheetFilters}
+              resultsClassName={hasSelections ? 'pb-28 md:pb-24' : undefined}
               renderDatasheet={(datasheet) => (
                 <DatasheetSelectionCard
                   datasheet={datasheet}
