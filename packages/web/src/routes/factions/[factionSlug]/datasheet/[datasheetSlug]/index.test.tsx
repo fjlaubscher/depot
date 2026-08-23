@@ -77,13 +77,13 @@ describe('DatasheetPage', () => {
   it('renders datasheet name', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toBeInTheDocument();
   });
 
   it('displays source and points info', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
-    expect(screen.getByTestId('datasheet-header')).toHaveTextContent('Faction Pack: Space Marines');
+    expect(screen.getByTestId('page-header')).toHaveTextContent('Faction Pack: Space Marines');
     expect(screen.getByTestId('datasheet-points')).toHaveTextContent('Captain · 80 pts');
   });
 
@@ -138,7 +138,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     // Back navigation is handled by browser/router, just verify page renders
-    expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toBeInTheDocument();
   });
 
   it('handles datasheet with no costs', () => {
@@ -161,7 +161,7 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     // Cost handling is done by child components, just verify main content renders
-    expect(screen.getByTestId('datasheet-header')).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toBeInTheDocument();
     expect(screen.queryByTestId('datasheet-points')).not.toBeInTheDocument();
   });
 

@@ -4,7 +4,8 @@ Route-aligned React views with colocated tests, `_components`, and `_utils`. Rou
 
 ## Available Routes
 - `/` -> `home`
-- `/factions` -> `factions`
+- `/factions` -> `factions` (Rules tab)
+- `/armies` -> `armies` (dashboard tiles into collections / rosters)
 - `/faction/:factionSlug` -> `factions/[factionSlug]`
 - `/faction/:factionSlug/datasheet/:datasheetSlug` -> `factions/[factionSlug]/datasheet/[datasheetSlug]`
 - `/faction/:factionSlug/detachment/:detachmentSlug` -> `factions/[factionSlug]/detachment/[detachmentSlug]`

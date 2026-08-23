@@ -105,7 +105,6 @@ const CollectionNewRoster: React.FC = () => {
       return next;
     });
 
-  /** Select the next unselected matching unit (+1) or deselect the last selected one (-1). */
   const adjust = (datasheet: depot.Datasheet, modelCost: depot.ModelCost, delta: 1 | -1) =>
     setSelectedIds((prev) => {
       const candidates = (collection?.items ?? []).filter(
@@ -210,7 +209,8 @@ const CollectionNewRoster: React.FC = () => {
         prefill={{
           name: `${collection.name} roster`,
           factionSlug: collection.factionSlug ?? collection.factionId,
-          units: selectedRosterUnits
+          units: selectedRosterUnits,
+          collectionId: collection.id
         }}
       />
     </AppLayout>

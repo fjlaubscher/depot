@@ -71,7 +71,8 @@ export const rosterReducer = (state: RosterState, action: RosterAction): RosterS
         points: { current: 0, max: action.payload.maxPoints },
         warlordUnitId: null,
         units: action.payload.units?.map(normalizeUnit) ?? [],
-        enhancements: []
+        enhancements: [],
+        collectionId: action.payload.collectionId ?? null
       });
 
     case 'UPDATE_DETAILS':

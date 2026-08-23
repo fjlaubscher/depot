@@ -31,6 +31,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Wahapedia version
+        id: wahapedia
+        run: echo "hash=$(bash scripts/wahapedia-version.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Wahapedia CSVs
+        uses: actions/cache@v4
+        with:
+          path: packages/cli/dist/source_data
+          key: wahapedia-${{ steps.wahapedia.outputs.hash }}
+          restore-keys: |
+            wahapedia-
+
       - name: Install Playwright (workspace)
         run: pnpm --filter @depot/web exec playwright install --with-deps chromium
 

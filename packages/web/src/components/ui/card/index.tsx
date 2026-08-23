@@ -86,6 +86,14 @@ const CardDescription = ({ as: Component = 'p', className, ...props }: CardDescr
 
 CardDescription.displayName = 'Card.Description';
 
+const CardLegend = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p ref={ref} className={cx('text-sm italic text-muted', className)} {...props} />
+  )
+);
+
+CardLegend.displayName = 'Card.Legend';
+
 interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
 
 const CardContent = forwardRef<HTMLDivElement, CardContentProps>(({ className, ...props }, ref) => (
@@ -145,6 +153,7 @@ const Card = Object.assign(CardRoot, {
   Title: CardTitle,
   Subtitle: CardSubtitle,
   Description: CardDescription,
+  Legend: CardLegend,
   Content: CardContent,
   Footer: CardFooter,
   Badge: CardBadge

@@ -15,7 +15,9 @@ import {
 const mockWargearAbility: depot.Ability = {
   id: 'wg-1',
   name: 'Relic Blade',
+  legend: '',
   factionId: 'SM',
+  description: 'When equipped, improves weapon damage.',
   type: 'Wargear'
 };
 
@@ -388,6 +390,7 @@ describe('rosterReducer', () => {
                 slug: 'immutability-detachment',
                 name: 'Test',
                 id: 'immutability-detachment',
+                legend: '',
                 type: '',
                 dp: '',
                 forceDisposition: '',

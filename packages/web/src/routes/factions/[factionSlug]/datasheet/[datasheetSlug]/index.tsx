@@ -15,7 +15,6 @@ import { createDatasheetBookmark } from '@/utils/bookmarks';
 
 // page components
 import { DatasheetProfile } from '@/components/shared/datasheet';
-import RulesLink from '@/components/shared/rules-link';
 import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
@@ -84,12 +83,17 @@ const DatasheetPage: FC = () => {
   const supplement = datasheet.supplementLabel ?? datasheet.sourceName;
   const eyebrowSuffix =
     supplement && !/^(none|codex)$/i.test(supplement.trim()) ? supplement : undefined;
+  const headingSubtitle = eyebrowSuffix ? `Datasheet · ${eyebrowSuffix}` : 'Datasheet';
 
   return (
     <AppLayout
       title={pageTitle}
       back={{ to: backPath, label: faction.name }}
-      heading={{ title: datasheet.name, subtitle: 'Datasheet' }}
+      crumbs={[
+        { label: 'Rules', to: '/factions' },
+        { label: faction.name, to: `/faction/${faction.slug}` }
+      ]}
+      heading={{ title: datasheet.name, subtitle: headingSubtitle }}
       actions={[
         bookmarkAction,
         {
@@ -101,17 +105,6 @@ const DatasheetPage: FC = () => {
       ]}
     >
       <div className="flex flex-col gap-3">
-        <div data-testid="datasheet-header">
-          <p className="type-section">
-            {faction.name}
-            {eyebrowSuffix ? ` // ${eyebrowSuffix}` : ''}
-          </p>
-          <h1 className="mt-1.5 text-2xl leading-tight font-bold text-foreground">
-            {datasheet.name}
-          </h1>
-        </div>
-
-        {datasheet.link ? <RulesLink href={datasheet.link} /> : null}
         <DatasheetProfile datasheet={datasheet} factionDatasheets={faction.datasheets} />
       </div>
     </AppLayout>

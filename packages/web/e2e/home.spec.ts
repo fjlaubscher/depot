@@ -15,10 +15,10 @@ test.describe('Home', () => {
     ).toHaveCount(1);
   });
 
-  test('the bottom bar navigates to rosters', async ({ page }) => {
+  test('the bottom bar navigates to armies', async ({ page }) => {
     await page.goto('/');
 
-    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Rosters' }).click();
-    await expect(page).toHaveURL(/\/rosters$/);
+    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Armies' }).click();
+    await expect(page).toHaveURL(/\/armies$/);
   });
 });

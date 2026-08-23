@@ -6,20 +6,24 @@ export const toDepotEnhancement = (enhancement: wahapedia.Enhancement): Enhancem
   id: enhancement.id,
   factionId: enhancement.factionId,
   name: enhancement.name,
+  legend: enhancement.legend,
+  description: enhancement.description,
   cost: enhancement.cost,
   detachment: enhancement.detachment,
-  ...(enhancement.upgrade === 'true' ? { upgrade: true } : {})
+  ...(enhancement.upgrade === 'true' ? { upgrade: true } : {}),
+  ...(enhancement.supportLeader ? { supportLeader: enhancement.supportLeader } : {})
 });
 
-/** Rules text stays on Wahapedia; depot ships names and numbers only. */
 export const toDepotStratagem = (stratagem: wahapedia.Stratagem): Stratagem => ({
   id: stratagem.id,
   factionId: stratagem.factionId,
   name: stratagem.name,
   type: stratagem.type,
   cpCost: stratagem.cpCost,
+  legend: stratagem.legend,
   turn: stratagem.turn,
   phase: stratagem.phase,
+  description: stratagem.description,
   detachment: stratagem.detachment
 });
 
@@ -29,6 +33,8 @@ export const toDepotDetachmentAbility = (
   id: ability.id,
   factionId: ability.factionId,
   name: ability.name,
+  legend: ability.legend,
+  description: ability.description,
   detachment: ability.detachment
 });
 
@@ -64,6 +70,7 @@ export const buildFactionDetachments = ({
       id: row.id,
       slug: createSlug(slugSource),
       name: row.name,
+      legend: row.legend ?? '',
       type: row.type ?? '',
       dp: row.dp ?? '',
       forceDisposition: row.forceDisposition ?? '',

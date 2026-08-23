@@ -20,6 +20,13 @@ vi.mock('@/components/shared', () => ({
   ModelStatsRow: () => <div data-testid="model-stats-row">Model Row</div>
 }));
 
+vi.mock('@/contexts/settings/context', () => ({
+  useSettingsContext: () => ({
+    settings: { showFluff: true },
+    updateSettings: vi.fn()
+  })
+}));
+
 describe('DatasheetProfile', () => {
   it('renders combined abilities with type-specific tag styles', () => {
     const datasheet = createMockDatasheet({
@@ -27,13 +34,17 @@ describe('DatasheetProfile', () => {
         {
           id: 'core-1',
           name: 'Leader',
+          legend: '',
           factionId: 'SM',
+          description: '<p>Leader description</p>',
           type: 'Core'
         },
         {
           id: 'inline-1',
           name: 'Rapid Assault',
+          legend: '',
           factionId: 'SM',
+          description: '<p>Rapid assault description</p>',
           type: 'Datasheet'
         }
       ]
@@ -42,11 +53,16 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.getByTestId('datasheet-abilities')).toBeInTheDocument();
+    expect(screen.getByText(/click a tag to view full rules/i)).toBeInTheDocument();
+
     const coreAbilityTag = screen.getByTestId('datasheet-abilities-tag-core-1');
     const unitAbilityTag = screen.getByTestId('datasheet-abilities-tag-inline-1');
 
-    expect(coreAbilityTag).toHaveClass('bg-surface-accent');
-    expect(unitAbilityTag).toHaveClass('bg-success-surface');
+    expect(coreAbilityTag).toBeInTheDocument();
+    expect(coreAbilityTag.querySelector('span')).toHaveClass('bg-surface-accent');
+
+    expect(unitAbilityTag).toBeInTheDocument();
+    expect(unitAbilityTag.querySelector('span')).toHaveClass('bg-success-surface');
 
     expect(screen.getByTestId('datasheet-leader-rules')).toBeInTheDocument();
     expect(screen.getByTestId('datasheet-wargear')).toBeInTheDocument();
@@ -58,5 +74,25 @@ describe('DatasheetProfile', () => {
     render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
 
     expect(screen.queryByTestId('datasheet-abilities')).not.toBeInTheDocument();
+  });
+
+  it('shows fluff after the stat row when legend is present', () => {
+    const datasheet = createMockDatasheet({ legend: 'A captain of the Adeptus Astartes.' });
+
+    render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
+
+    expect(screen.getByTestId('datasheet-fluff')).toHaveTextContent(
+      'A captain of the Adeptus Astartes.'
+    );
+  });
+
+  it('does not throw or render fluff when legend is omitted', () => {
+    const datasheet = createMockDatasheet({ legend: undefined });
+
+    expect(() => {
+      render(<DatasheetProfile datasheet={datasheet} factionDatasheets={[datasheet]} />);
+    }).not.toThrow();
+
+    expect(screen.queryByTestId('datasheet-fluff')).not.toBeInTheDocument();
   });
 });

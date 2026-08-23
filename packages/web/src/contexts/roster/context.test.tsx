@@ -60,6 +60,7 @@ const TestComponent = ({ rosterId: _rosterId }: { rosterId?: string }) => {
           id: 'test-detachment',
           slug: 'test-detachment',
           name: 'Test Detachment',
+          legend: '',
           type: '',
           dp: '',
           forceDisposition: '',

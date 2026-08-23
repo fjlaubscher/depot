@@ -71,10 +71,15 @@ export const placeholderDatasheet = (ref: DatasheetRef): Datasheet => ({
   ...ref,
   factionId: '',
   sourceId: '',
+  legend: '',
   isSupport: false,
   loadout: '',
   transport: '',
   virtual: false,
+  leaderHead: '',
+  leaderFooter: '',
+  damagedW: '',
+  damagedDescription: '',
   link: '',
   abilities: [],
   keywords: [],
@@ -92,6 +97,7 @@ export const placeholderDatasheet = (ref: DatasheetRef): Datasheet => ({
 /** Stand-in for a detachment the local catalog no longer has. */
 export const placeholderDetachment = (ref: DetachmentRef): Detachment => ({
   ...ref,
+  legend: '',
   type: '',
   dp: '',
   forceDisposition: '',

@@ -9,6 +9,7 @@ import DatasheetLeaderRules from './datasheet-leader-rules';
 import { ModelStatsRow } from '@/components/shared';
 import { DatasheetAbilities } from '@/components/shared/datasheet';
 import { categorizeAbilities } from '@depot/core/utils/abilities';
+import { useSettingsContext } from '@/contexts/settings/context';
 
 interface DatasheetProfileProps {
   datasheet: depot.Datasheet;
@@ -19,6 +20,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = []
 }) => {
+  const { settings } = useSettingsContext();
   const mergedAbilities = useMemo(() => {
     const { inline, referenced } = categorizeAbilities(datasheet.abilities);
     return [...referenced, ...inline];
@@ -30,6 +32,15 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
       {datasheet.models.map((model) => (
         <ModelStatsRow key={model.line} model={model} />
       ))}
+
+      {settings.showFluff !== false && datasheet.legend?.trim() ? (
+        <p
+          className="ShowFluff text-sm text-muted font-medium italic"
+          data-testid="datasheet-fluff"
+        >
+          {datasheet.legend}
+        </p>
+      ) : null}
 
       {/* Desktop splits the body: wargear tables left, rules and keywords pinned right */}
       <div className="flex flex-col gap-2 sm:gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">

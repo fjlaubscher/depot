@@ -26,6 +26,23 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
           </div>
         ) : null}
       </div>
+
+      {enhancement.legend ? (
+        <div className="ShowFluff text-sm text-muted font-medium italic">{enhancement.legend}</div>
+      ) : null}
+
+      <div
+        className="text-sm text-body leading-relaxed"
+        dangerouslySetInnerHTML={{ __html: enhancement.description ?? '' }}
+      />
+
+      {enhancement.supportLeader ? (
+        <div
+          className="text-sm text-body leading-relaxed"
+          data-testid="enhancement-support-leader"
+          dangerouslySetInnerHTML={{ __html: enhancement.supportLeader }}
+        />
+      ) : null}
     </Card>
   );
 };

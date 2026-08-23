@@ -5,6 +5,7 @@ export { default as DataVersion } from './data-version';
 export { default as PillTabs } from './pill-tabs';
 
 // Data display
+export { default as AbilitySheet } from './ability-sheet';
 export * from './datasheet';
 export * from './roster';
 export { default as WargearSelection } from './wargear-selection';

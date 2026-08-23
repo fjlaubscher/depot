@@ -16,6 +16,7 @@ export type RosterAction =
         name: string;
         detachments: depot.Detachment[];
         units?: depot.RosterUnit[];
+        collectionId?: string | null;
       };
     }
   | {

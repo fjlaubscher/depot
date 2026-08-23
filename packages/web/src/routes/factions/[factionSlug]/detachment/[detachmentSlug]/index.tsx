@@ -5,11 +5,10 @@ import { useParams } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import { ErrorState, Grid, PageHeaderSkeleton, SectionHeader, SkeletonCard } from '@/components/ui';
 import { DetachmentAbilityCard, EnhancementCard, StratagemCard } from '@/components/shared';
-import { DetachmentMeta } from '../../_components/faction-detachments';
-import RulesLink from '@/components/shared/rules-link';
 
 // hooks
 import useFaction from '@/hooks/use-faction';
+import { useSettingsContext } from '@/contexts/settings/context';
 import { useShareAction } from '@/hooks/use-share-action';
 import { useBookmarkAction } from '@/hooks/use-bookmark-action';
 
@@ -36,6 +35,7 @@ const DetachmentPage: FC = () => {
     detachmentSlug: string;
   }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
+  const { settings } = useSettingsContext();
 
   const detachment = faction
     ? matchDetachment({ slug: detachmentSlug }, faction.detachments)
@@ -101,12 +101,23 @@ const DetachmentPage: FC = () => {
 
   const backPath = `/faction/${faction.slug}/detachments`;
   const { abilities, enhancements, stratagems } = detachment;
+  const headingSubtitle = [
+    detachment.dp && `${detachment.dp} DP`,
+    detachment.forceDisposition || detachment.type
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <AppLayout
       title={`${detachment.name} - ${faction.name}`}
-      back={{ to: backPath, label: faction.name }}
-      heading={{ title: detachment.name, subtitle: `${faction.name} · Detachment` }}
+      back={{ to: backPath, label: 'Detachments' }}
+      crumbs={[
+        { label: 'Rules', to: '/factions' },
+        { label: faction.name, to: `/faction/${faction.slug}` },
+        { label: 'Detachments', to: `/faction/${faction.slug}/detachments` }
+      ]}
+      heading={{ title: detachment.name, subtitle: headingSubtitle || undefined }}
       actions={[
         bookmarkAction,
         {
@@ -118,9 +129,13 @@ const DetachmentPage: FC = () => {
       ]}
     >
       <div className="flex flex-col gap-3">
-        <DetachmentMeta detachment={detachment} />
-
-        {faction.link ? <RulesLink href={faction.link} /> : null}
+        {settings?.showFluff && detachment.legend ? (
+          <div
+            className="text-sm text-muted font-medium italic"
+            data-testid="detachment-legend"
+            dangerouslySetInnerHTML={{ __html: detachment.legend }}
+          />
+        ) : null}
 
         {abilities.length > 0 ? (
           <Section

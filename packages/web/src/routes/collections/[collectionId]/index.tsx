@@ -45,7 +45,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     'all',
     (value) => value === 'all' || COLLECTION_UNIT_STATES.includes(value)
   );
-
   const stateCounts = useMemo(
     () => getCollectionStateCounts(collection?.items ?? []),
     [collection]
@@ -60,7 +59,6 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
               value: state,
               label: COLLECTION_STATE_META[state].label,
               count: stateCounts[state],
-              // Selecting a state tints the pill with that state's colour.
               activeClassName: TAG_VARIANT_CLASSES[COLLECTION_STATE_META[state].variant]
             }))
           ]
@@ -174,7 +172,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     ? getCollectionChartCopy(collection, points)
     : { heading: undefined };
 
-  const back = { to: '/collections', label: 'Collections' };
+  const back = { to: '/armies', label: 'Armies' };
 
   if (loading) {
     return (
@@ -196,11 +194,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
 
   const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
   const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
-
   return (
     <AppLayout
       title={pageTitle}
       back={back}
+      crumbs={[
+        { label: 'Armies', to: '/armies' },
+        { label: 'Collections', to: '/collections' },
+        { label: collection.name }
+      ]}
       heading={{ title: collection.name, subtitle }}
       actions={
         hasUnits
