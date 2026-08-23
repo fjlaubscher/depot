@@ -18,7 +18,7 @@ import {
   shouldResetSupplementSelection,
   sortDatasheetsBySupplementPreference
 } from '@depot/core/utils/datasheets';
-import { Filters, Grid, Search } from '@/components/ui';
+import { Grid, Search } from '@/components/ui';
 import PillTabs from '@/components/shared/pill-tabs';
 import useDebounce from '@/hooks/use-debounce';
 import { cx } from '@/utils/cx';
@@ -193,13 +193,6 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     return searchedDatasheets.filter((sheet) => getListItemRole(sheet) === selectedRole);
   }, [roleTabs, selectedRole, searchedDatasheets]);
 
-  const handleClearFilters = () => {
-    setSelectedSupplement('all');
-    setSelectedRole('all');
-    setQuery('');
-  };
-
-  const showClear = Boolean(query.trim()) || supplement.isFiltered || selectedRole !== 'all';
   const emptyMessage = debouncedQuery
     ? 'No datasheets found matching your filters.'
     : emptyStateMessage;
@@ -221,20 +214,16 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
           />
         ) : null}
 
-        <Filters
-          showClear={showClear}
-          onClear={handleClearFilters}
+        <Search
+          label="Search datasheets"
+          value={query}
+          onChange={setQuery}
+          placeholder={searchPlaceholder}
+          testId="datasheet-search"
+          className="w-full"
+          clearable
           clearTestId="datasheet-search-clear"
-        >
-          <Search
-            label="Search datasheets"
-            value={query}
-            onChange={setQuery}
-            placeholder={searchPlaceholder}
-            testId="datasheet-search"
-            className="w-full"
-          />
-        </Filters>
+        />
         {supplement.summary ? (
           <span className="text-xs text-subtle" data-testid="supplement-summary">
             {supplement.summary}

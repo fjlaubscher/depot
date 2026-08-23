@@ -129,11 +129,51 @@ describe('DatasheetBrowser', () => {
     expect(screen.queryByText('Captain')).not.toBeInTheDocument();
     expect(screen.queryByText('Intercessor Squad')).not.toBeInTheDocument();
     expect(screen.queryByText('Predator Destructor')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('datasheet-search-clear')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId('datasheet-search-clear'));
+    fireEvent.click(screen.getByTestId('datasheet-role-all'));
 
     expect(screen.getByText('Captain')).toBeInTheDocument();
     expect(screen.getByText('Intercessor Squad')).toBeInTheDocument();
     expect(screen.getByText('Predator Destructor')).toBeInTheDocument();
+  });
+
+  it('shows search clear only when the query is non-empty and clears the query only', async () => {
+    const roleDatasheets = [
+      createMockDatasheet({
+        id: 'captain',
+        slug: 'captain',
+        name: 'Captain',
+        keywords: keyword('CHARACTER')
+      }),
+      createMockDatasheet({
+        id: 'intercessor',
+        slug: 'intercessor-squad',
+        name: 'Intercessor Squad',
+        keywords: keyword('BATTLELINE')
+      })
+    ];
+
+    render(
+      <TestWrapper>
+        <DatasheetBrowser datasheets={roleDatasheets} />
+      </TestWrapper>
+    );
+
+    fireEvent.click(screen.getByTestId('datasheet-role-character'));
+    expect(screen.queryByTestId('datasheet-search-clear')).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByTestId('datasheet-search'), { target: { value: 'cap' } });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('datasheet-search-clear')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('datasheet-search-clear'));
+
+    expect(screen.getByTestId('datasheet-search')).toHaveValue('');
+    expect(screen.queryByTestId('datasheet-search-clear')).not.toBeInTheDocument();
+    expect(screen.getByText('Captain')).toBeInTheDocument();
+    expect(screen.queryByText('Intercessor Squad')).not.toBeInTheDocument();
   });
 });
