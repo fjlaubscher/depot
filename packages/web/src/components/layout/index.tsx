@@ -27,7 +27,12 @@ const NAV_ITEMS: {
   match?: (pathname: string) => boolean;
 }[] = [
   { to: '/', icon: Home, label: 'Home', end: true },
-  { to: '/factions', icon: BookOpen, label: 'Rules' },
+  {
+    to: '/factions',
+    icon: BookOpen,
+    label: 'Rules',
+    match: (pathname) => pathname.startsWith('/factions') || pathname.startsWith('/faction/')
+  },
   {
     to: '/armies',
     icon: Swords,

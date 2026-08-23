@@ -216,4 +216,26 @@ describe('AppLayout', () => {
     expect(within(screen.getByRole('main')).queryByTestId('heading-meta')).not.toBeInTheDocument();
   });
 
+  it('keeps Rules active on faction and datasheet pages', () => {
+    media.desktop = true;
+
+    render(
+      <TestWrapper initialEntries={['/faction/astra-militarum/datasheet/yarrick']}>
+        <AppLayout
+          title="Yarrick - Astra Militarum"
+          back={{ to: '/faction/astra-militarum', label: 'Astra Militarum' }}
+          heading={{ title: 'Yarrick', subtitle: 'Datasheet' }}
+        >
+          <p>datasheet</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+
+    const rules = screen.getByRole('link', { name: 'Rules' });
+    expect(rules).toHaveClass('border-border-accent');
+    expect(rules).toHaveClass('text-accent');
+    const armies = screen.getByRole('link', { name: 'Armies' });
+    expect(armies).not.toHaveClass('border-border-accent');
+    expect(armies).not.toHaveClass('text-accent');
+  });
 });

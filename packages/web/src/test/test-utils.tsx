@@ -8,8 +8,11 @@ import { AppProvider } from '@/contexts/app-provider';
  */
 
 // Common test wrapper with all required providers - uses MemoryRouter for isolated testing
-export const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <MemoryRouter>
+export const TestWrapper: React.FC<{
+  children: React.ReactNode;
+  initialEntries?: string[];
+}> = ({ children, initialEntries }) => (
+  <MemoryRouter initialEntries={initialEntries}>
     <AppProvider>{children}</AppProvider>
   </MemoryRouter>
 );
