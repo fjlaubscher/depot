@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { ArrowLeft, Home, Users, Settings, ClipboardList, Boxes, WifiOff } from 'lucide-react';
 
 import Logo from '@/components/logo';
+import InstallBanner from '@/components/layout/install-banner';
 import AppVersion from '@/components/shared/app-version';
 import DataVersion from '@/components/shared/data-version';
 import ActionGroup from '@/components/ui/action-group';
@@ -137,7 +138,10 @@ const AppLayout = ({ children, title, back, heading, actions, footer }: Props) =
         )}
 
         <main id="app-content" className="min-h-0 flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[960px] px-4 py-4">{children}</div>
+          <div className="mx-auto w-full max-w-[960px] px-4 py-4">
+            <InstallBanner />
+            {children}
+          </div>
         </main>
 
         {footer && (
