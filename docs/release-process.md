@@ -41,10 +41,11 @@ Do not dispatch the workflow without a `vX.Y.Z` tag; a branch-only run would sta
 
 1. **Checkout & setup** — pnpm + Node.js 24.
 2. **Install** — `pnpm install --frozen-lockfile`.
-3. **Prepare release metadata** — `VITE_SENTRY_RELEASE` + `VITE_APP_VERSION` from the tag.
-4. **Build** core, CLI, data, web.
-5. **Create GitHub release** — `softprops/action-gh-release@v3`.
-6. **Deploy Pages** — `npx wrangler pages deploy packages/web/dist --project-name depot --branch main` (picks up `functions/`).
+3. **Wahapedia CSV cache** — `scripts/wahapedia-version.sh` hashes Wahapedia `Last_update.csv` (or prints `stale` if that fetch fails). Actions cache restores `packages/cli/dist/source_data` keyed `wahapedia-<hash>` with restore-keys `wahapedia-`. The CLI skips the download when every CSV is already present, so a `stale` hash still pulls the latest CSV cache and generates offline. Preview and Playwright use the same steps after install.
+4. **Prepare release metadata** — `VITE_SENTRY_RELEASE` + `VITE_APP_VERSION` from the tag.
+5. **Build** core, CLI, data, web.
+6. **Create GitHub release** — `softprops/action-gh-release@v3`.
+7. **Deploy Pages** — `npx wrangler pages deploy packages/web/dist --project-name depot --branch main` (picks up `functions/`).
 
 ## PR previews (`.github/workflows/preview.yml`)
 
@@ -64,6 +65,7 @@ Prod is unchanged (Pages + `godepot.dev`). Previews never deploy `--branch main`
 - The CLI writes a `dataVersion` field into `public/data/index.json`.
 - On startup, the app reads it from the index, stores it in IndexedDB, resets cached data when it changes, and shows it on the home screen.
 - Wahapedia’s exported `dataVersion` is the only source of truth.
+- CI caches Wahapedia CSVs in `packages/cli/dist/source_data` until `Last_update.csv` changes (see Release steps above). If Last_update is unreachable, the version script prints `stale` and restore-keys still reuse the latest cache.
 
 ## How to Cut a Release
 
