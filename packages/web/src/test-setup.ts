@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeAll, beforeEach, vi } from 'vitest';
+import './i18n';
 
 beforeAll(() => {
   if (!import.meta.env.VITE_APP_VERSION) {

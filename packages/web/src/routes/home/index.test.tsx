@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, render, screen } from '@testing-library/react';
 import type { depot } from '@depot/core';
 
 import { TestWrapper } from '@/test/test-utils';
 import { mockRoster, createMockRoster } from '@/test/mock-data';
 import Home from './index';
+import i18n from '@/i18n';
 
 vi.mock('@/components/layout', () => ({
   default: ({ children, title }: { children: React.ReactNode; title: string }) => (
@@ -73,6 +74,12 @@ vi.mock('@/hooks/use-bookmarks', () => ({
 }));
 
 describe('Home', () => {
+  afterEach(async () => {
+    await act(async () => {
+      await i18n.changeLanguage('en');
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseRosters.rosters = [];
@@ -137,5 +144,27 @@ describe('Home', () => {
     expect(rosterCards[0]).toHaveTextContent('Newest List');
     expect(screen.getByTestId('view-all-rosters')).toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
+  });
+
+  it('updates the bookmarks label when the configured language changes', async () => {
+    mockUseBookmarks.bookmarks = [
+      {
+        id: 'faction:space-marines',
+        kind: 'faction',
+        factionSlug: 'space-marines',
+        name: 'Space Marines',
+        createdAt: '2024-01-01T00:00:00.000Z'
+      }
+    ];
+
+    render(<Home />, { wrapper: TestWrapper });
+    expect(screen.getByTestId('bookmarks-section')).toHaveTextContent('Bookmarks');
+
+    await act(async () => {
+      await i18n.changeLanguage('fr');
+    });
+
+    expect(screen.getByTestId('bookmarks-section')).toHaveTextContent('Favoris');
+    expect(screen.getByTestId('bookmark-card')).toHaveTextContent('Space Marines');
   });
 });

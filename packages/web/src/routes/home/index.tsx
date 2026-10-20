@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppLayout from '@/components/layout';
 import Logo from '@/components/logo';
@@ -19,6 +20,7 @@ import CollectionRow from './_components/collection-row';
 const PREVIEW_LIMIT = 3;
 
 const Home: React.FC = () => {
+  const { t } = useTranslation();
   const { rosters, loading: rostersLoading } = useRosters();
   const { collections, loading: collectionsLoading } = useCollections();
   const { bookmarks, loading: bookmarksLoading } = useBookmarks();
@@ -50,7 +52,7 @@ const Home: React.FC = () => {
 
         {bookmarks.length > 0 ? (
           <section className="flex flex-col gap-1.5" data-testid="bookmarks-section">
-            <SectionHeader title="Bookmarks" count={bookmarks.length} />
+            <SectionHeader title={t('home.bookmarks')} count={bookmarks.length} />
             <div className="-mx-4 flex gap-1 overflow-x-auto px-4" data-testid="bookmark-previews">
               {bookmarks.map((bookmark) => (
                 <BookmarkCard key={bookmark.id} bookmark={bookmark} />

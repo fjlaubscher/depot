@@ -12,6 +12,7 @@ import { initPwaInstall } from './hooks/use-pwa-install';
 
 import './styles/main.css';
 import './sentry';
+import './i18n';
 
 initPwaInstall();
 
