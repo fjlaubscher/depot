@@ -4,6 +4,7 @@ import type { depot } from '@depot/core';
 import { offlineStorage } from '@/data/offline-storage';
 import { DEFAULT_SETTINGS, mergeSettingsWithDefaults } from '@/constants/settings';
 import { applyTheme } from '@/utils/theme';
+import i18n, { detectBrowserLanguage } from '@/i18n';
 
 export interface SettingsContextType {
   settings: depot.Settings;
@@ -18,6 +19,8 @@ interface SettingsProviderProps {
 
 export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
   const [settings, setSettings] = useState<depot.Settings>(DEFAULT_SETTINGS);
+  const [browserLanguage] = useState(() => detectBrowserLanguage(navigator.languages));
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     offlineStorage
@@ -27,8 +30,17 @@ export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
           setSettings(mergeSettingsWithDefaults(stored));
         }
       })
-      .catch((error) => console.warn('Failed to load settings from IndexedDB:', error));
+      .catch((error) => console.warn('Failed to load settings from IndexedDB:', error))
+      .finally(() => setLoaded(true));
   }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    const language = settings.language ?? 'auto';
+    const resolved = language === 'auto' ? browserLanguage : language;
+    void i18n.changeLanguage(resolved);
+    document.documentElement.lang = resolved;
+  }, [loaded, settings.language, browserLanguage]);
 
   // Lets CSS hide fluff baked into rich-text HTML (e.g. `.ShowFluff` sub-ability legends).
   useEffect(() => {

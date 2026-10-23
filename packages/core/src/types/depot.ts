@@ -206,6 +206,7 @@ export interface Settings {
   includeWargearOnExport?: boolean;
   useNativeShare?: boolean;
   theme?: Theme;
+  language?: 'auto' | 'fr' | 'en';
 }
 
 export interface Detachment {

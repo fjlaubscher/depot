@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import i18n from './i18n';
+import i18n, { detectBrowserLanguage } from './i18n';
+
+describe('detectBrowserLanguage', () => {
+  it.each([
+    [['de', 'fr-CA', 'en'], 'fr'],
+    [['en-GB', 'fr'], 'en'],
+    [['fr-FR'], 'fr'],
+    [['FR-ca'], 'fr'],
+    [['ja'], 'en'],
+    [[], 'en'],
+    [['french', 'francais'], 'en'],
+    [['english', 'fr'], 'fr']
+  ])('detects %j as %s', (languages, expected) => {
+    expect(detectBrowserLanguage(languages)).toBe(expected);
+  });
+});
 
 describe('i18n', () => {
   it('initializes with both bundled languages and English by default', () => {

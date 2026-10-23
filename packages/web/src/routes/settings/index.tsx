@@ -1,8 +1,9 @@
 import type { depot } from '@depot/core';
+import { useTranslation } from 'react-i18next';
 
 // UI Components
 import AppLayout from '@/components/layout';
-import { Button, Loader, SectionHeader } from '@/components/ui';
+import { Button, Loader, SectionHeader, SelectField } from '@/components/ui';
 
 // Components
 import AppVersion from '@/components/shared/app-version';
@@ -19,6 +20,7 @@ import { promptInstall, usePwaInstall } from '@/hooks/use-pwa-install';
 import { shouldShowInstallAffordance } from '@/lib/pwa-install';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
@@ -68,6 +70,22 @@ const Settings = () => {
           <ThemePicker
             value={settings.theme ?? 'system'}
             onChange={(theme) => handleSettingsChange('theme', theme)}
+          />
+          <SelectField
+            id="interface-language"
+            label={t('settings.language')}
+            value={settings.language ?? 'auto'}
+            options={[
+              { value: 'auto', label: t('settings.automaticLanguage') },
+              { value: 'fr', label: 'Français' },
+              { value: 'en', label: 'English' }
+            ]}
+            onChange={(event) =>
+              handleSettingsChange(
+                'language',
+                event.currentTarget.value as depot.Settings['language']
+              )
+            }
           />
         </section>
 
