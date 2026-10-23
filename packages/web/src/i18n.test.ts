@@ -17,11 +17,14 @@ describe('detectBrowserLanguage', () => {
 });
 
 describe('i18n', () => {
-  it('initializes with both bundled languages and English by default', () => {
+  it('uses a separate common namespace for shared interface text', () => {
+    expect(i18n.options.defaultNS).toBe('common');
+  });
+  it('uses English by default and keeps domains separate', () => {
     expect(i18n.isInitialized).toBe(true);
     expect(i18n.language).toBe('en');
-    expect(i18n.getFixedT('en')('home.bookmarks')).toBe('Bookmarks');
-    expect(i18n.getFixedT('fr')('home.bookmarks')).toBe('Favoris');
+    expect(i18n.getFixedT('en', 'home')('bookmarks')).toBe('Bookmarks');
+    expect(i18n.getFixedT('fr', 'home')('bookmarks')).toBe('Favoris');
   });
 
   it.each([
@@ -32,23 +35,23 @@ describe('i18n', () => {
     ['fr', 0, '0 favori'],
     ['fr', 42, '42 favoris']
   ])('interpolates and pluralizes in %s for count %i', (language, count, expected) => {
-    expect(i18n.getFixedT(language)('home.bookmarkCount', { count })).toBe(expected);
+    expect(i18n.getFixedT(language, 'home')('bookmarkCount', { count })).toBe(expected);
   });
 
   it('falls back to English when a French key is missing', () => {
     const isolated = i18n.cloneInstance({ lng: 'fr', forkResourceStore: true });
-    isolated.removeResourceBundle('fr', 'translation');
-    isolated.addResourceBundle('fr', 'translation', { home: { bookmarks: 'Favoris' } });
+    isolated.removeResourceBundle('fr', 'home');
+    isolated.addResourceBundle('fr', 'home', { bookmarks: 'Favoris' });
 
-    expect(isolated.t('home.bookmarks')).toBe('Favoris');
-    expect(isolated.t('home.bookmarkCount', { count: 2 })).toBe('2 bookmarks');
-    expect(i18n.getFixedT('fr')('home.bookmarkCount', { count: 2 })).toBe('2 favoris');
+    expect(isolated.t('bookmarks', { ns: 'home' })).toBe('Favoris');
+    expect(isolated.t('bookmarkCount', { ns: 'home', count: 2 })).toBe('2 bookmarks');
+    expect(i18n.getFixedT('fr', 'home')('bookmarkCount', { count: 2 })).toBe('2 favoris');
   });
 
   it('rejects unknown keys at compile time, including with a default value', () => {
     // @ts-expect-error Unknown keys must not compile.
-    i18n.t('home.unknown');
+    i18n.t('unknown', { ns: 'home' });
     // @ts-expect-error A default value must not bypass key checking.
-    i18n.t('home.unknown', { defaultValue: 'Unknown' });
+    i18n.t('unknown', { ns: 'home', defaultValue: 'Unknown' });
   });
 });

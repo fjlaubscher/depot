@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Button from '../button';
@@ -15,8 +16,8 @@ interface ErrorStateProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const ErrorState: FC<ErrorStateProps> = ({
-  title = 'Something went wrong',
-  message = 'We encountered an error while loading this content. Please try again.',
+  title,
+  message,
   stackTrace,
   showRetry = true,
   showHome = true,
@@ -25,6 +26,7 @@ const ErrorState: FC<ErrorStateProps> = ({
   className = '',
   ...props
 }) => {
+  const { t } = useTranslation('common');
   return (
     <div
       data-testid="error-state"
@@ -34,13 +36,17 @@ const ErrorState: FC<ErrorStateProps> = ({
       <div className="flex flex-col gap-4 w-full max-w-lg">
         <AlertTriangle size={48} className="text-danger-fg mx-auto sm:w-16 sm:h-16" />
         <div className="flex flex-col gap-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-foreground px-2">{title}</h2>
-          <p className="text-muted text-sm sm:text-base leading-relaxed px-2">{message}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground px-2">
+            {title ?? t('error.title')}
+          </h2>
+          <p className="text-muted text-sm sm:text-base leading-relaxed px-2">
+            {message ?? t('error.message')}
+          </p>
         </div>
         {stackTrace && (
           <details className="text-left w-full mt-2">
             <summary className="cursor-pointer text-sm text-subtle hover:text-foreground mb-2 text-center transition-colors">
-              Show technical details
+              {t('error.technicalDetails')}
             </summary>
             <pre className="p-3 bg-danger-surface border border-danger-border rounded-sm font-mono text-xs text-danger-fg overflow-auto max-h-32 sm:max-h-40 w-full">
               {stackTrace}
@@ -53,7 +59,7 @@ const ErrorState: FC<ErrorStateProps> = ({
         {showRetry && (
           <Button onClick={onRetry} className="flex items-center justify-center gap-2 w-full">
             <RefreshCw size={16} />
-            Try Again
+            {t('error.retry')}
           </Button>
         )}
 
@@ -61,7 +67,7 @@ const ErrorState: FC<ErrorStateProps> = ({
           <Link to={homeUrl} className="w-full">
             <Button variant="secondary" className="flex items-center justify-center gap-2 w-full">
               <Home size={16} />
-              Back to Home
+              {t('error.home')}
             </Button>
           </Link>
         )}

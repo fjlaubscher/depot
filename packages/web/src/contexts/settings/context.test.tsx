@@ -18,7 +18,7 @@ vi.mock('../../data/offline-storage', () => ({
 
 const TestComponent = () => {
   const { settings, updateSettings } = useSettingsContext();
-  const { t } = useTranslation();
+  const { t } = useTranslation('home');
   const [status, setStatus] = useState<'idle' | 'saving' | 'done'>('idle');
 
   const handleUpdate = async () => {
@@ -31,7 +31,7 @@ const TestComponent = () => {
     <div>
       <div data-testid="settings">{JSON.stringify(settings)}</div>
       <div data-testid="local-status">{status}</div>
-      <div data-testid="translation">{t('home.bookmarks')}</div>
+      <div data-testid="translation">{t('bookmarks')}</div>
       {(['auto', 'fr', 'en'] as const).map((language) => (
         <button key={language} onClick={() => void updateSettings({ ...settings, language })}>
           {language}

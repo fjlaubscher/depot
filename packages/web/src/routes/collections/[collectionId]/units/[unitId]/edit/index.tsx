@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
@@ -96,11 +97,12 @@ const CollectionUnitEditForm: React.FC<{
 };
 
 const CollectionUnitEditView: React.FC = () => {
+  const { t } = useTranslation('common');
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const { collection, loading, error, save } = useCollection(collectionId);
   const unit = collection?.items.find((item) => item.id === unitId);
 
-  const back = { to: `/collections/${collectionId}`, label: 'Collection' };
+  const back = { to: `/collections/${collectionId}`, label: t('navigation.collection') };
 
   if (loading) {
     return (

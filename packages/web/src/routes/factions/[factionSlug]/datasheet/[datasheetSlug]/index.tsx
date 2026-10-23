@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 // components
@@ -18,6 +19,7 @@ import { DatasheetProfile } from '@/components/shared/datasheet';
 import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
+  const { t } = useTranslation('common');
   const { factionSlug, datasheetSlug } = useParams<{
     factionSlug: string;
     datasheetSlug: string;
@@ -38,10 +40,10 @@ const DatasheetPage: FC = () => {
       faction && datasheet
         ? buildAbsoluteUrl(`/faction/${faction.slug}/datasheet/${datasheet.slug}`)
         : undefined,
-    ariaLabel: 'Share datasheet link',
+    ariaLabel: t('share.datasheetLabel'),
     testId: 'share-datasheet',
-    copySuccessMessage: 'Datasheet link copied to clipboard.',
-    shareSuccessMessage: 'Datasheet link shared.'
+    copySuccessKey: 'share.datasheetCopied',
+    shareSuccessKey: 'share.datasheetShared'
   });
 
   const errorMessage = datasheetError || factionError;
@@ -90,7 +92,7 @@ const DatasheetPage: FC = () => {
       title={pageTitle}
       back={{ to: backPath, label: faction.name }}
       crumbs={[
-        { label: 'Rules', to: '/factions' },
+        { label: t('navigation.rules'), to: '/factions' },
         { label: faction.name, to: `/faction/${faction.slug}` }
       ]}
       heading={{ title: datasheet.name, subtitle: headingSubtitle }}

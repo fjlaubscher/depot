@@ -5,6 +5,7 @@ import { offlineStorage } from '@/data/offline-storage';
 import { DEFAULT_SETTINGS, mergeSettingsWithDefaults } from '@/constants/settings';
 import { applyTheme } from '@/utils/theme';
 import i18n, { detectBrowserLanguage } from '@/i18n';
+import { preloadTranslations } from '@/locales/loader';
 
 export interface SettingsContextType {
   settings: depot.Settings;
@@ -38,8 +39,17 @@ export const SettingsProvider: FC<SettingsProviderProps> = ({ children }) => {
     if (!loaded) return;
     const language = settings.language ?? 'auto';
     const resolved = language === 'auto' ? browserLanguage : language;
-    void i18n.changeLanguage(resolved);
-    document.documentElement.lang = resolved;
+    let cancelled = false;
+    let preparation: ReturnType<typeof setTimeout> | undefined;
+    void i18n.changeLanguage(resolved).then(() => {
+      if (cancelled) return;
+      document.documentElement.lang = resolved;
+      preparation = setTimeout(() => void preloadTranslations(resolved), 0);
+    });
+    return () => {
+      cancelled = true;
+      clearTimeout(preparation);
+    };
   }, [loaded, settings.language, browserLanguage]);
 
   // Lets CSS hide fluff baked into rich-text HTML (e.g. `.ShowFluff` sub-ability legends).

@@ -1,4 +1,5 @@
 import { useMemo, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Eye, Plus, Pencil } from 'lucide-react';
@@ -28,6 +29,7 @@ import RosterIssues from '@/routes/rosters/_components/roster-issues';
 const unitPoints = (unit: depot.RosterUnit) => parseInt(unit.modelCost.cost, 10) || 0;
 
 const RosterEdit: FC = () => {
+  const { t } = useTranslation('common');
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
@@ -67,7 +69,10 @@ const RosterEdit: FC = () => {
 
   if (!roster.id) {
     return (
-      <AppLayout title="Manage Roster Units" back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout
+        title="Manage Roster Units"
+        back={{ to: '/rosters', label: t('navigation.rosters') }}
+      >
         <Loader />
       </AppLayout>
     );
@@ -76,7 +81,7 @@ const RosterEdit: FC = () => {
   return (
     <AppLayout
       title={`${roster.name} - Manage Roster Units`}
-      back={{ to: '/rosters', label: 'Rosters' }}
+      back={{ to: '/rosters', label: t('navigation.rosters') }}
       heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
       actions={[
         {

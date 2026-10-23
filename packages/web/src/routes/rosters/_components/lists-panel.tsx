@@ -120,7 +120,6 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
   const toolbar = (
     <>
       <ImportButton
-        label="Import"
         onFilesSelected={handleImportRosterFiles}
         buttonTestId="import-roster-button"
         inputTestId="import-roster-input"

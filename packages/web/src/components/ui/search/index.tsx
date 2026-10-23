@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import Field from '../field';
 import { cx } from '@/utils/cx';
@@ -18,13 +19,14 @@ interface SearchProps {
 const Search: FC<SearchProps> = ({
   label,
   value,
-  placeholder = 'Search',
+  placeholder,
   onChange,
   className,
   testId,
   clearable,
   clearTestId
 }) => {
+  const { t } = useTranslation('common');
   const showClear = Boolean(clearable && value.trim());
 
   return (
@@ -39,7 +41,7 @@ const Search: FC<SearchProps> = ({
           id="search"
           name="search"
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('search.placeholder')}
           value={value}
           onChange={(e) => onChange(e.currentTarget.value)}
           data-testid={testId}
@@ -48,7 +50,7 @@ const Search: FC<SearchProps> = ({
         {showClear ? (
           <button
             type="button"
-            aria-label="Clear search"
+            aria-label={t('search.clear')}
             data-testid={clearTestId}
             onClick={() => onChange('')}
             className="absolute inset-y-0 right-0 grid w-9 place-items-center text-muted hover:text-foreground focus-ring-primary"

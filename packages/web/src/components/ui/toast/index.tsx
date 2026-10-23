@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cx } from '@/utils/cx';
 import { X, Check, AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import type { Toast as ToastType } from '@/contexts/toast/context';
@@ -30,7 +31,12 @@ const TYPE_CONFIG = {
 } as const;
 
 const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
-  const { id, title, message, type } = toast;
+  const { t } = useTranslation('common');
+  const { id, type, translation } = toast;
+  const title = translation ? t(translation.title, { ...translation.values }) : toast.title;
+  const message = translation?.message
+    ? t(translation.message, { ...translation.values })
+    : toast.message;
   const config = TYPE_CONFIG[type];
 
   return (
@@ -53,7 +59,7 @@ const Toast: FC<ToastProps> = ({ toast, onRemove }) => {
         size="sm"
         className="-mr-1.5 flex-none"
         onClick={() => onRemove(id)}
-        aria-label="Dismiss notification"
+        aria-label={t('notification.dismiss')}
       >
         <X size={14} />
       </IconButton>

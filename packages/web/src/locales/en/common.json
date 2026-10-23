@@ -1,0 +1,112 @@
+{
+  "loading": "Loading…",
+  "navigation": {
+    "home": "Home",
+    "rules": "Rules",
+    "armies": "Armies",
+    "settings": "Settings",
+    "about": "About",
+    "privacy": "Privacy",
+    "collections": "Collections",
+    "collection": "Collection",
+    "rosters": "Rosters",
+    "roster": "Roster",
+    "detachments": "Detachments",
+    "primary": "Primary",
+    "breadcrumb": "Breadcrumb",
+    "backTo": "Back to {{name}}"
+  },
+  "offline": {
+    "title": "Offline",
+    "description": "everything still works · data {{version}}",
+    "unknownVersion": "unknown"
+  },
+  "actions": {
+    "close": "Close",
+    "clear": "Clear",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "import": "Import",
+    "all": "All →",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
+    "decreaseItem": "Decrease {{name}}",
+    "increaseItem": "Increase {{name}}",
+    "duplicateItem": "Duplicate {{item}}",
+    "editItem": "Edit {{item}}",
+    "deleteItem": "Delete {{item}}",
+    "editRosterDetails": "Edit roster details"
+  },
+  "entities": {
+    "roster": "roster",
+    "collection": "collection"
+  },
+  "search": {
+    "placeholder": "Search",
+    "clear": "Clear search"
+  },
+  "tabs": "Tabs",
+  "notification": {
+    "dismiss": "Dismiss notification"
+  },
+  "error": {
+    "label": "Error",
+    "title": "Something went wrong",
+    "message": "We encountered an error while loading this content. Please try again.",
+    "technicalDetails": "Show technical details",
+    "retry": "Try Again",
+    "home": "Back to Home",
+    "applicationTitle": "Application Error",
+    "applicationMessage": "Something went wrong with the application. Please refresh the page or try again later."
+  },
+  "library": {
+    "confirmDelete": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+  },
+  "share": {
+    "label": "Share link",
+    "title": "Share",
+    "copied": "Copied",
+    "linkCopied": "Link copied",
+    "shared": "Shared",
+    "copySuccess": "Link copied to clipboard.",
+    "shareSuccess": "Link shared.",
+    "unavailable": "Sharing is not available on this device.",
+    "copyFailed": "Failed to copy",
+    "copyError": "Could not copy to the clipboard.",
+    "factionLabel": "Share faction link",
+    "factionCopied": "Faction link copied to clipboard.",
+    "factionShared": "Faction link shared.",
+    "datasheetLabel": "Share datasheet link",
+    "datasheetCopied": "Datasheet link copied to clipboard.",
+    "datasheetShared": "Datasheet link shared.",
+    "detachmentLabel": "Share detachment link",
+    "detachmentCopied": "Detachment link copied to clipboard.",
+    "detachmentShared": "Detachment link shared.",
+    "rosterLabel": "Share roster",
+    "copyRosterLabel": "Copy roster share text",
+    "rosterCopied": "Roster copied to clipboard.",
+    "rosterShared": "Roster shared."
+  },
+  "bookmark": {
+    "added": "Bookmarked",
+    "removed": "Bookmark removed",
+    "addedMessage": "{{name}} pinned to your desk.",
+    "removedMessage": "{{name}} removed from bookmarks.",
+    "failed": "Bookmark failed",
+    "error": "Could not update bookmarks.",
+    "remove": "Remove bookmark",
+    "add": {
+      "faction": "Bookmark faction",
+      "datasheet": "Bookmark datasheet",
+      "detachment": "Bookmark detachment",
+      "item": "Bookmark item"
+    }
+  },
+  "data": {
+    "updated": "Rules data updated",
+    "nowOn": "Now on {{version}}.",
+    "source": "Wahapedia data",
+    "notSynced": "not synced"
+  }
+}

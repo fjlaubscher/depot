@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { Button, QuantityStepper, Drawer } from '@/components/ui';
@@ -34,6 +35,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
   isOpen,
   onOpenChange
 }) => {
+  const { t } = useTranslation('common');
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   if (selectedUnitsCount === 0) {
@@ -81,7 +83,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
               className="cursor-pointer rounded-sm px-3 min-h-11 text-sm font-medium text-info-fg transition hover:bg-info-surface focus-ring-info"
               onClick={() => onOpenChange(false)}
             >
-              Close
+              {t('actions.close')}
             </button>
           </div>
 
@@ -107,8 +109,8 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
                     value={count}
                     onDecrease={() => onDecrement(datasheet, modelCost)}
                     onIncrease={() => onIncrement(datasheet, modelCost)}
-                    decreaseLabel={`Decrease ${datasheet.name}`}
-                    increaseLabel={`Increase ${datasheet.name}`}
+                    decreaseLabel={t('actions.decreaseItem', { name: datasheet.name })}
+                    increaseLabel={t('actions.increaseItem', { name: datasheet.name })}
                   />
                 </div>
               );
@@ -119,10 +121,10 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
             <span className="text-sm font-medium text-info-fg">Total: {totalPoints} pts</span>
             <div className="flex gap-2">
               <Button size="sm" variant="secondary" onClick={onClear}>
-                Clear
+                {t('actions.clear')}
               </Button>
               <Button size="sm" onClick={onConfirm}>
-                Confirm
+                {t('actions.confirm')}
               </Button>
             </div>
           </div>

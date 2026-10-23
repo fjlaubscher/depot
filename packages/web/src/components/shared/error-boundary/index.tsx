@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ErrorInfo, ReactNode } from 'react';
 import AppLayout from '@/components/layout';
 import { ErrorState } from '@/components/ui';
@@ -8,6 +9,23 @@ interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
 }
+
+const ErrorFallback = ({ error, onRetry }: { error?: Error; onRetry: () => void }) => {
+  const { t } = useTranslation('common');
+  return (
+    <AppLayout title={t('error.applicationTitle')}>
+      <ErrorState
+        title={t('error.applicationTitle')}
+        message={t('error.applicationMessage')}
+        stackTrace={error?.stack}
+        showRetry
+        showHome
+        homeUrl="/"
+        onRetry={onRetry}
+      />
+    </AppLayout>
+  );
+};
 
 export class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
   state: ErrorBoundaryState = { hasError: false };
@@ -24,17 +42,10 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBound
   render() {
     if (this.state.hasError) {
       return (
-        <AppLayout title="Application Error">
-          <ErrorState
-            title="Application Error"
-            message="Something went wrong with the application. Please refresh the page or try again later."
-            stackTrace={this.state.error?.stack}
-            showRetry
-            showHome
-            homeUrl="/"
-            onRetry={() => this.setState({ hasError: false })}
-          />
-        </AppLayout>
+        <ErrorFallback
+          error={this.state.error}
+          onRetry={() => this.setState({ hasError: false })}
+        />
       );
     }
 

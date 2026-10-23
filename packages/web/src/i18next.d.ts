@@ -1,10 +1,12 @@
 import 'i18next';
-import type en from './locales/en';
+import type common from './locales/en/common.json';
+import type home from './locales/en/home.json';
+import type settings from './locales/en/settings.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
-    defaultNS: 'translation';
-    resources: { translation: typeof en };
+    defaultNS: 'common';
+    resources: { common: typeof common; home: typeof home; settings: typeof settings };
     strictKeyChecks: true;
   }
 }

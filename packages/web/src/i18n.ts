@@ -1,7 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import en from './locales/en';
-import fr from './locales/fr';
+import { translationBackend } from './locales/loader';
 
 export const detectBrowserLanguage = (languages: readonly string[]): 'fr' | 'en' => {
   for (const language of languages) {
@@ -11,17 +10,19 @@ export const detectBrowserLanguage = (languages: readonly string[]): 'fr' | 'en'
   return 'en';
 };
 
-void i18n.use(initReactI18next).init({
-  resources: {
-    en: { translation: en },
-    fr: { translation: fr }
-  },
-  lng: 'en',
-  fallbackLng: 'en',
-  supportedLngs: ['en', 'fr'],
-  defaultNS: 'translation',
-  initAsync: false,
-  interpolation: { escapeValue: false }
-});
+void i18n
+  .use(translationBackend)
+  .use(initReactI18next)
+  .init({
+    resources: {},
+    partialBundledLanguages: true,
+    lng: 'en',
+    fallbackLng: 'en',
+    supportedLngs: ['en', 'fr'],
+    ns: [],
+    defaultNS: 'common',
+    initAsync: false,
+    interpolation: { escapeValue: false }
+  });
 
 export default i18n;

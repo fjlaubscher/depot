@@ -1,4 +1,5 @@
 import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import type { Action } from '@/components/ui/action-group';
 import { useToast } from '@/contexts/toast/context';
@@ -9,6 +10,7 @@ import useBookmarks from './use-bookmarks';
  * Pass `undefined` while the page data is still loading.
  */
 export const useBookmarkAction = (bookmark: depot.Bookmark | undefined): Action => {
+  const { t } = useTranslation('common');
   const { showToast } = useToast();
   const { isBookmarked, toggleBookmark } = useBookmarks();
   const bookmarked = bookmark ? isBookmarked(bookmark.id) : false;
@@ -20,17 +22,23 @@ export const useBookmarkAction = (bookmark: depot.Bookmark | undefined): Action 
       const next = await toggleBookmark(bookmark);
       showToast({
         type: 'success',
-        title: next ? 'Bookmarked' : 'Bookmark removed',
+        title: next ? t('bookmark.added') : t('bookmark.removed'),
         message: next
-          ? `${bookmark.name} pinned to your desk.`
-          : `${bookmark.name} removed from bookmarks.`
+          ? t('bookmark.addedMessage', { name: bookmark.name })
+          : t('bookmark.removedMessage', { name: bookmark.name }),
+        translation: {
+          title: next ? 'bookmark.added' : 'bookmark.removed',
+          message: next ? 'bookmark.addedMessage' : 'bookmark.removedMessage',
+          values: { name: bookmark.name }
+        }
       });
     } catch (err) {
       console.error(`Failed to toggle ${kind} bookmark`, err);
       showToast({
         type: 'error',
-        title: 'Bookmark failed',
-        message: 'Could not update bookmarks.'
+        title: t('bookmark.failed'),
+        message: t('bookmark.error'),
+        translation: { title: 'bookmark.failed', message: 'bookmark.error' }
       });
     }
   };
@@ -40,7 +48,7 @@ export const useBookmarkAction = (bookmark: depot.Bookmark | undefined): Action 
     onClick: () => {
       void toggle();
     },
-    ariaLabel: bookmarked ? 'Remove bookmark' : `Bookmark ${kind}`,
+    ariaLabel: bookmarked ? t('bookmark.remove') : t(`bookmark.add.${kind}`),
     variant: bookmarked ? 'primary' : 'ghost',
     'data-testid': `bookmark-${kind}-button`
   };

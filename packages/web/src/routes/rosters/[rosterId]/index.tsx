@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from '@/lib/navigation';
 import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -32,6 +33,7 @@ import StratagemsTab from './_components/stratagems-tab';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 const RosterView: FC = () => {
+  const { t } = useTranslation('common');
   const { state: roster, setRoster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -126,10 +128,10 @@ const RosterView: FC = () => {
     title: roster.name,
     text: shareText,
     icon: canUseNativeShare ? <Share2 size={16} /> : <Copy size={16} />,
-    ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
+    ariaLabel: canUseNativeShare ? t('share.rosterLabel') : t('share.copyRosterLabel'),
     testId: 'share-roster-button',
-    copySuccessMessage: 'Roster copied to clipboard.',
-    shareSuccessMessage: 'Roster shared.'
+    copySuccessKey: 'share.rosterCopied',
+    shareSuccessKey: 'share.rosterShared'
   });
 
   const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
@@ -137,7 +139,7 @@ const RosterView: FC = () => {
 
   if (!roster.id) {
     return (
-      <AppLayout title="Roster Overview" back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout title="Roster Overview" back={{ to: '/rosters', label: t('navigation.rosters') }}>
         <Loader />
       </AppLayout>
     );
@@ -182,10 +184,10 @@ const RosterView: FC = () => {
   return (
     <AppLayout
       title={pageTitle}
-      back={{ to: '/rosters', label: 'Rosters' }}
+      back={{ to: '/rosters', label: t('navigation.rosters') }}
       crumbs={[
-        { label: 'Armies', to: '/armies' },
-        { label: 'Rosters', to: '/rosters' },
+        { label: t('navigation.armies'), to: '/armies' },
+        { label: t('navigation.rosters'), to: '/rosters' },
         { label: roster.name }
       ]}
       heading={{

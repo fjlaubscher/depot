@@ -20,7 +20,7 @@ import { promptInstall, usePwaInstall } from '@/hooks/use-pwa-install';
 import { shouldShowInstallAffordance } from '@/lib/pwa-install';
 
 const Settings = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('settings');
   const { showToast } = useToast();
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
@@ -73,10 +73,10 @@ const Settings = () => {
           />
           <SelectField
             id="interface-language"
-            label={t('settings.language')}
+            label={t('language')}
             value={settings.language ?? 'auto'}
             options={[
-              { value: 'auto', label: t('settings.automaticLanguage') },
+              { value: 'auto', label: t('automaticLanguage') },
               { value: 'fr', label: 'Français' },
               { value: 'en', label: 'English' }
             ]}

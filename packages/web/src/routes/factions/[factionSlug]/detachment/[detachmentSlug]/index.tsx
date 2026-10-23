@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 // components
@@ -30,6 +31,7 @@ const Section: FC<{
 );
 
 const DetachmentPage: FC = () => {
+  const { t } = useTranslation('common');
   const { factionSlug, detachmentSlug } = useParams<{
     factionSlug: string;
     detachmentSlug: string;
@@ -51,10 +53,10 @@ const DetachmentPage: FC = () => {
       faction && detachment
         ? buildAbsoluteUrl(`/faction/${faction.slug}/detachment/${detachment.slug}`)
         : undefined,
-    ariaLabel: 'Share detachment link',
+    ariaLabel: t('share.detachmentLabel'),
     testId: 'share-detachment',
-    copySuccessMessage: 'Detachment link copied to clipboard.',
-    shareSuccessMessage: 'Detachment link shared.'
+    copySuccessKey: 'share.detachmentCopied',
+    shareSuccessKey: 'share.detachmentShared'
   });
 
   if (error) {
@@ -111,11 +113,11 @@ const DetachmentPage: FC = () => {
   return (
     <AppLayout
       title={`${detachment.name} - ${faction.name}`}
-      back={{ to: backPath, label: 'Detachments' }}
+      back={{ to: backPath, label: t('navigation.detachments') }}
       crumbs={[
-        { label: 'Rules', to: '/factions' },
+        { label: t('navigation.rules'), to: '/factions' },
         { label: faction.name, to: `/faction/${faction.slug}` },
-        { label: 'Detachments', to: `/faction/${faction.slug}/detachments` }
+        { label: t('navigation.detachments'), to: `/faction/${faction.slug}/detachments` }
       ]}
       heading={{ title: detachment.name, subtitle: headingSubtitle || undefined }}
       actions={[

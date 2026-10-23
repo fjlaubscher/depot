@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 
@@ -14,6 +15,7 @@ import {
 } from '@depot/core/utils/collection';
 
 const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { collection, loading, error, save } = useCollection(collectionId);
@@ -21,7 +23,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
 
   const pageTitle = collection ? `${collection.name} - Add Units` : 'Add Units to Collection';
-  const back = { to: `/collections/${collectionId}`, label: 'Collection' };
+  const back = { to: `/collections/${collectionId}`, label: t('navigation.collection') };
 
   if (loading) {
     return (

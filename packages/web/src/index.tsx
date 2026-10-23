@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AppProvider } from './contexts/app-provider';
 import { RosterProvider } from './contexts/roster/context';
 import { ErrorBoundary } from './components/shared';
-import { ToastContainer } from './components/ui';
+import { Loader, ToastContainer } from './components/ui';
 import Routes from './routes';
 import { getRouterBasePath } from './utils/paths';
 import { initPwaInstall } from './hooks/use-pwa-install';
@@ -21,10 +21,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <BrowserRouter basename={getRouterBasePath()}>
       <AppProvider>
         <RosterProvider>
-          <ErrorBoundary>
-            <Routes />
-          </ErrorBoundary>
-          <ToastContainer />
+          <React.Suspense fallback={<Loader />}>
+            <ErrorBoundary>
+              <Routes />
+            </ErrorBoundary>
+            <ToastContainer />
+          </React.Suspense>
         </RosterProvider>
       </AppProvider>
     </BrowserRouter>

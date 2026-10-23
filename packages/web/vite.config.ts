@@ -23,6 +23,10 @@ export default defineConfig(({ mode }) => {
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        // Languages are cached on demand, never as part of the global precache.
+        globIgnores: ['**/*.json']
+      },
       includeAssets: [
         'favicon.ico',
         'apple-touch-icon-180x180.png',

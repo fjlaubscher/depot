@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -52,6 +53,7 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   afterGrid,
   onSave
 }) => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const availableModelCosts = modelCosts ?? modelCostsForOrdinal(unit.datasheet.modelCosts);
 
@@ -111,10 +113,10 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
             </div>
           </div>
           <Button variant="secondary" onClick={() => navigate(backTo)} data-testid="cancel-button">
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button onClick={handleSave} data-testid="save-button">
-            Apply
+            {t('actions.apply')}
           </Button>
         </>
       }

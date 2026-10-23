@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useFactionsContext } from '@/contexts/factions/context';
 import { cx } from '@/utils/cx';
@@ -13,6 +14,7 @@ interface Props {
  * comes from a Wahapedia export, and this is the date that export was taken.
  */
 const DataVersion: FC<Props> = ({ className, 'data-testid': testId }) => {
+  const { t } = useTranslation('common');
   const { dataVersion } = useFactionsContext();
 
   return (
@@ -20,7 +22,7 @@ const DataVersion: FC<Props> = ({ className, 'data-testid': testId }) => {
       className={cx('font-mono text-[9.5px] font-medium uppercase text-hint', className)}
       data-testid={testId}
     >
-      Wahapedia data · {dataVersion?.split(' ')[0] ?? 'not synced'}
+      {t('data.source')} · {dataVersion?.split(' ')[0] ?? t('data.notSynced')}
     </p>
   );
 };

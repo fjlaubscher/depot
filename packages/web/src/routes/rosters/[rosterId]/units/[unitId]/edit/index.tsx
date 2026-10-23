@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -141,6 +142,7 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
 };
 
 const EditRosterUnitView: React.FC = () => {
+  const { t } = useTranslation('common');
   const { state: roster } = useRoster();
   const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
   const unit = roster.units.find((u) => u.id === unitId);
@@ -150,7 +152,7 @@ const EditRosterUnitView: React.FC = () => {
     return (
       <AppLayout
         title="Edit Roster Unit"
-        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+        back={{ to: `/rosters/${rosterId}/edit`, label: t('navigation.roster') }}
       >
         <div className="flex flex-col gap-4" data-testid="edit-unit-loading">
           <PageHeaderSkeleton />
@@ -166,7 +168,7 @@ const EditRosterUnitView: React.FC = () => {
     return (
       <AppLayout
         title="Edit Roster Unit"
-        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+        back={{ to: `/rosters/${rosterId}/edit`, label: t('navigation.roster') }}
       >
         <ErrorState
           title="Unit Not Found"

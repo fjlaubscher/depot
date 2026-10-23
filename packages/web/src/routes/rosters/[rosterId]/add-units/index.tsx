@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 
@@ -14,6 +15,7 @@ import AddUnitsView from '@/components/shared/add-units-view';
 import { getRosterSubtitle } from '@depot/core/utils/roster';
 
 const AddRosterUnitsView: FC = () => {
+  const { t } = useTranslation('common');
   const { state: roster, addUnit } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ const AddRosterUnitsView: FC = () => {
 
   if (!roster.id) {
     return (
-      <AppLayout title={pageTitle} back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout title={pageTitle} back={{ to: '/rosters', label: t('navigation.rosters') }}>
         <Loader />
       </AppLayout>
     );

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FC, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Save } from 'lucide-react';
@@ -17,6 +18,7 @@ import MaxPointsField from '@/routes/rosters/_components/max-points-field';
 import DetachmentPicker from '@/routes/rosters/_components/detachment-picker';
 
 const RosterDetailsContent: FC = () => {
+  const { t } = useTranslation('common');
   const { state: roster, updateRosterDetails } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ const RosterDetailsContent: FC = () => {
 
   if (isLoading) {
     return (
-      <AppLayout title={pageTitle} back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout title={pageTitle} back={{ to: '/rosters', label: t('navigation.rosters') }}>
         <Loader />
       </AppLayout>
     );

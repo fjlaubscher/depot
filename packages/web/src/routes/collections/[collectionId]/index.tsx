@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Plus, ClipboardPlus, Download, RefreshCw } from 'lucide-react';
@@ -33,6 +34,7 @@ import CollectionStateChart from '@/routes/collections/_components/collection-st
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
   const { getDatasheet, getFactionManifest, dataVersion } = useFactionsContext();
@@ -172,7 +174,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     ? getCollectionChartCopy(collection, points)
     : { heading: undefined };
 
-  const back = { to: '/armies', label: 'Armies' };
+  const back = { to: '/armies', label: t('navigation.armies') };
 
   if (loading) {
     return (
@@ -199,8 +201,8 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       title={pageTitle}
       back={back}
       crumbs={[
-        { label: 'Armies', to: '/armies' },
-        { label: 'Collections', to: '/collections' },
+        { label: t('navigation.armies'), to: '/armies' },
+        { label: t('navigation.collections'), to: '/collections' },
         { label: collection.name }
       ]}
       heading={{ title: collection.name, subtitle }}

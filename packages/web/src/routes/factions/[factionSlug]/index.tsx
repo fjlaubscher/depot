@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Share2 } from 'lucide-react';
@@ -27,6 +28,7 @@ import FactionDetachments from './_components/faction-detachments';
 type FactionTab = 'datasheets' | 'detachments';
 
 const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
+  const { t } = useTranslation('common');
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
@@ -54,10 +56,10 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   const shareAction = useShareAction({
     title: faction?.name,
     url: faction ? buildAbsoluteUrl(`/faction/${faction.slug}`) : undefined,
-    ariaLabel: 'Share faction link',
+    ariaLabel: t('share.factionLabel'),
     testId: 'share-faction',
-    copySuccessMessage: 'Faction link copied to clipboard.',
-    shareSuccessMessage: 'Faction link shared.'
+    copySuccessKey: 'share.factionCopied',
+    shareSuccessKey: 'share.factionShared'
   });
 
   useScrollToHash({ enabled: !loading && Boolean(faction) });
@@ -87,7 +89,7 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   return (
     <AppLayout
       title={pageTitle}
-      back={{ to: '/factions', label: 'Rules' }}
+      back={{ to: '/factions', label: t('navigation.rules') }}
       heading={{ title: faction.name, subtitle: alliance }}
       actions={[
         bookmarkAction,

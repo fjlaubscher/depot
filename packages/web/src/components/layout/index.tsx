@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from '@/lib/navigation';
 import { useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronRight, Home, BookOpen, Settings, Swords, WifiOff } from 'lucide-react';
@@ -22,27 +23,27 @@ export { resolveAncestors };
 const NAV_ITEMS: {
   to: string;
   icon: typeof Home;
-  label: string;
+  label: 'navigation.home' | 'navigation.rules' | 'navigation.armies' | 'navigation.settings';
   end?: boolean;
   match?: (pathname: string) => boolean;
 }[] = [
-  { to: '/', icon: Home, label: 'Home', end: true },
+  { to: '/', icon: Home, label: 'navigation.home', end: true },
   {
     to: '/factions',
     icon: BookOpen,
-    label: 'Rules',
+    label: 'navigation.rules',
     match: (pathname) => pathname.startsWith('/factions') || pathname.startsWith('/faction/')
   },
   {
     to: '/armies',
     icon: Swords,
-    label: 'Armies',
+    label: 'navigation.armies',
     match: (pathname) =>
       pathname.startsWith('/armies') ||
       pathname.startsWith('/collections') ||
       pathname.startsWith('/rosters')
   },
-  { to: '/settings', icon: Settings, label: 'Settings' }
+  { to: '/settings', icon: Settings, label: 'navigation.settings' }
 ];
 
 const Brand = () => (
@@ -74,27 +75,30 @@ interface Props {
   toolbar?: ReactNode;
 }
 
-const Breadcrumbs = ({ crumbs }: { crumbs: AppCrumb[] }) => (
-  <nav aria-label="Breadcrumb" className="min-w-0">
-    <ol className="flex min-w-0 items-center gap-1">
-      {crumbs.map((crumb, index) => (
-        <li key={`${crumb.label}-${index}`} className="flex shrink-0 items-center gap-1">
-          {index > 0 ? <ChevronRight size={12} className="flex-none text-muted" /> : null}
-          {crumb.to ? (
-            <Link
-              to={crumb.to}
-              className="truncate text-[12px] font-medium text-muted hover:text-foreground"
-            >
-              {crumb.label}
-            </Link>
-          ) : (
-            <span className="truncate text-[12px] font-medium text-muted">{crumb.label}</span>
-          )}
-        </li>
-      ))}
-    </ol>
-  </nav>
-);
+const Breadcrumbs = ({ crumbs }: { crumbs: AppCrumb[] }) => {
+  const { t } = useTranslation('common');
+  return (
+    <nav aria-label={t('navigation.breadcrumb')} className="min-w-0">
+      <ol className="flex min-w-0 items-center gap-1">
+        {crumbs.map((crumb, index) => (
+          <li key={`${crumb.label}-${index}`} className="flex shrink-0 items-center gap-1">
+            {index > 0 ? <ChevronRight size={12} className="flex-none text-muted" /> : null}
+            {crumb.to ? (
+              <Link
+                to={crumb.to}
+                className="truncate text-[12px] font-medium text-muted hover:text-foreground"
+              >
+                {crumb.label}
+              </Link>
+            ) : (
+              <span className="truncate text-[12px] font-medium text-muted">{crumb.label}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+};
 
 const PageHeading = ({
   heading,
@@ -145,6 +149,7 @@ const ToolbarCluster = ({
 };
 
 const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, toolbar }: Props) => {
+  const { t } = useTranslation('common');
   const { dataVersion } = useFactionsContext();
   const online = useOnlineStatus();
   const { pathname } = useLocation();
@@ -166,7 +171,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
         <div className="px-2.5 pb-3.5">
           <Brand />
         </div>
-        <nav aria-label="Primary" className="flex flex-col gap-0.5">
+        <nav aria-label={t('navigation.primary')} className="flex flex-col gap-0.5">
           {NAV_ITEMS.map(({ to, icon: Icon, label, end, match }) => (
             <NavLink
               key={to}
@@ -182,17 +187,17 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
               }
             >
               <Icon size={14} />
-              {label}
+              {t(label)}
             </NavLink>
           ))}
         </nav>
 
         <div className="mt-auto flex flex-col gap-1 px-2.5 pt-4">
           <Link to="/about" className="link-subtle text-xs">
-            About
+            {t('navigation.about')}
           </Link>
           <Link to="/privacy" className="link-subtle text-xs">
-            Privacy
+            {t('navigation.privacy')}
           </Link>
           <AppVersion className="pt-1" />
           <DataVersion />
@@ -207,8 +212,8 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
           >
             <WifiOff size={14} className="shrink-0 text-warning-fg" />
             <p className="text-xs leading-snug text-body">
-              <span className="font-bold text-warning-fg">Offline</span> — everything still works ·
-              data {dataVersion ?? 'unknown'}
+              <span className="font-bold text-warning-fg">{t('offline.title')}</span> ·{' '}
+              {t('offline.description', { version: dataVersion ?? t('offline.unknownVersion') })}
             </p>
           </div>
         )}
@@ -217,8 +222,8 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
           <header className="relative flex min-h-[52px] flex-none items-center gap-0.5 border-b border-border-subtle bg-surface-base px-1.5 py-1">
             <Link
               to={back.to}
-              aria-label={`Back to ${back.label}`}
-              title={`Back to ${back.label}`}
+              aria-label={t('navigation.backTo', { name: back.label })}
+              title={t('navigation.backTo', { name: back.label })}
               data-testid="mobile-back-button"
               className="relative z-10 grid place-items-center size-11 flex-none text-body hover:text-foreground rounded-sm focus-ring-primary"
             >
@@ -284,7 +289,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
 
         {!back && (
           <nav
-            aria-label="Primary"
+            aria-label={t('navigation.primary')}
             className="flex flex-none border-t border-border-subtle bg-surface-muted pt-1.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] lg:hidden"
           >
             {NAV_ITEMS.map(({ to, icon: Icon, label, end, match }) => (
@@ -300,7 +305,7 @@ const AppLayout = ({ children, title, back, heading, actions, footer, crumbs, to
                 }
               >
                 <Icon size={18} />
-                {label}
+                {t(label)}
               </NavLink>
             ))}
           </nav>
