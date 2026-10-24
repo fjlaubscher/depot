@@ -103,6 +103,17 @@
       "item": "Bookmark item"
     }
   },
+  "settingsNotifications": {
+    "saveError": "Failed to save settings.",
+    "cacheCleared": "Offline cache cleared",
+    "cacheClearedMessage": "Cached faction packs and datasheets were removed.",
+    "cacheError": "Failed to clear the offline cache."
+  },
+  "install": {
+    "title": "Install depot",
+    "action": "Install",
+    "dismiss": "Dismiss"
+  },
   "data": {
     "updated": "Rules data updated",
     "nowOn": "Now on {{version}}.",

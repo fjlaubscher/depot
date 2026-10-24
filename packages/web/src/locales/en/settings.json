@@ -1,4 +1,55 @@
 {
   "language": "Interface language",
-  "automaticLanguage": "Automatic"
+  "automaticLanguage": "Automatic",
+  "documentTitle": "Settings & Preferences",
+  "title": "Settings",
+  "appearance": "Appearance",
+  "theme": {
+    "label": "Theme",
+    "light": "light",
+    "system": "system",
+    "dark": "dark"
+  },
+  "installDescription": "Install depot for offline use.",
+  "factions": "Factions",
+  "forgeWorld": {
+    "title": "Forge World Units",
+    "description": "Show Forge World datasheets and rules"
+  },
+  "legends": {
+    "title": "Legends Units",
+    "description": "Show legacy Legends datasheets"
+  },
+  "unaligned": {
+    "title": "Unaligned Factions",
+    "description": "Show factions without specific allegiances"
+  },
+  "fluff": {
+    "title": "Show Fluff Text",
+    "description": "Display lore and background text. Disable if you're a heretic who only cares about numbers."
+  },
+  "sharing": "Sharing",
+  "wargear": {
+    "title": "Include Wargear",
+    "description": "Add selected wargear when sharing rosters"
+  },
+  "nativeShare": {
+    "title": "Use Native Sharing",
+    "description": "Attempt to use the device share sheet when available; otherwise copy to clipboard"
+  },
+  "offline": {
+    "title": "Offline data",
+    "factionOnly": "faction only",
+    "datasheetCount_one": "{{count, number}} datasheet",
+    "datasheetCount_other": "{{count, number}} datasheets",
+    "clear": "Clear offline cache",
+    "description": "Removes cached faction packs and datasheets. Rosters, collections, and bookmarks stay. Faction data is re-cached as you browse.",
+    "empty": "Nothing cached yet — visit a faction page and it is stored for offline use."
+  },
+  "storage": {
+    "unavailable": "Storage estimate unavailable",
+    "label": "Storage used",
+    "used": "{{usage}} MB used",
+    "quota": "{{usage}} MB used of {{quota}} MB available"
+  }
 }

@@ -1,5 +1,36 @@
 {
   "bookmarks": "Bookmarks",
-  "bookmarkCount_one": "{{count}} bookmark",
-  "bookmarkCount_other": "{{count}} bookmarks"
+  "bookmarkCount_one": "{{count, number}} bookmark",
+  "bookmarkCount_other": "{{count, number}} bookmarks",
+  "documentTitle": "depot - Offline Warhammer 40,000 Companion",
+  "hero": {
+    "edition": "// Now in 11th edition",
+    "title": "depot has a new look",
+    "description": "Rebuilt for reading rules at the table — denser, faster, and still fully offline. Crusade features are on the way."
+  },
+  "recentRosters": "Recent rosters",
+  "collections": "Collections",
+  "rosterCount_one": "{{count, number}} roster",
+  "rosterCount_other": "{{count, number}} rosters",
+  "collectionCount_one": "{{count, number}} collection",
+  "collectionCount_other": "{{count, number}} collections",
+  "bookmarkKinds": {
+    "faction": "FACTION",
+    "detachment": "DETACHMENT",
+    "datasheet": "DATASHEET"
+  },
+  "invalid": "INVALID",
+  "edited": {
+    "never": "EDITED NEVER",
+    "now": "EDITED JUST NOW",
+    "minute_one": "EDITED {{count, number}}M AGO",
+    "minute_other": "EDITED {{count, number}}M AGO",
+    "hour_one": "EDITED {{count, number}}H AGO",
+    "hour_other": "EDITED {{count, number}}H AGO",
+    "day_one": "EDITED {{count, number}}D AGO",
+    "day_other": "EDITED {{count, number}}D AGO"
+  },
+  "readyPercent": "{{percent, number(style: percent)}}",
+  "collectionReady": "READY · {{points, number}} PTS",
+  "installDescription": "Add it to your home screen and depot opens like an app — full screen, no address bar, and every faction you've downloaded still opens with no signal at the table."
 }

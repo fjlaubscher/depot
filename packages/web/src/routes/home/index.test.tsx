@@ -167,4 +167,75 @@ describe('Home', () => {
     expect(screen.getByTestId('bookmarks-section')).toHaveTextContent('Favoris');
     expect(screen.getByTestId('bookmark-card')).toHaveTextContent('Space Marines');
   });
+
+  it('translates the hero, document title, cards and counts when language changes', async () => {
+    mockUseBookmarks.bookmarks = [
+      {
+        id: 'faction:test',
+        kind: 'faction',
+        factionSlug: 'test',
+        name: 'My Faction',
+        createdAt: ''
+      }
+    ];
+    mockUseRosters.rosters = [
+      createMockRoster({ name: 'My List', points: { current: 1234, max: 2000 } })
+    ];
+    mockUseCollections.collections = [
+      {
+        id: 'my-collection',
+        name: 'My Collection',
+        factionId: 'test',
+        points: { current: 0 },
+        items: [],
+        createdAt: '',
+        updatedAt: ''
+      }
+    ];
+    const view = render(<Home />, { wrapper: TestWrapper });
+    expect(screen.getByTestId('app-layout')).toHaveAttribute(
+      'data-title',
+      'depot - Offline Warhammer 40,000 Companion'
+    );
+    expect(screen.getByLabelText('1 bookmark')).toHaveTextContent('1');
+    expect(screen.getByRole('region', { name: '1 bookmark' })).toBeInTheDocument();
+    expect(screen.getByTestId('roster-preview-card')).toHaveTextContent('1,234/2,000');
+    expect(screen.getByTestId('collection-preview-card')).toHaveTextContent('READY · 0 PTS');
+
+    await act(async () => {
+      await i18n.changeLanguage('fr');
+    });
+    expect(screen.getByTestId('app-layout')).toHaveAttribute(
+      'data-title',
+      'depot - Compagnon Warhammer 40,000 hors ligne'
+    );
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot fait peau neuve');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('11e édition');
+    expect(screen.getByTestId('rosters-section')).toHaveTextContent('Listes récentes');
+    expect(screen.getByTestId('bookmark-card')).toHaveTextContent('My FactionFACTION');
+    expect(screen.getByLabelText('1 favori')).toHaveTextContent('1');
+    expect(screen.getByRole('region', { name: '1 favori' })).toBeInTheDocument();
+    expect(screen.getByTestId('roster-preview-card')).toHaveTextContent('My List');
+    expect(screen.getByTestId('roster-preview-card').textContent).toContain('1 234/2 000');
+    expect(screen.getByTestId('roster-preview-card')).toHaveTextContent('INVALIDE');
+    expect(screen.getByTestId('collection-preview-card')).toHaveTextContent('My Collection');
+    expect(screen.getByTestId('collection-preview-card')).toHaveTextContent('PRÊTE · 0 PTS');
+
+    mockUseBookmarks.bookmarks = [
+      ...mockUseBookmarks.bookmarks,
+      { ...mockUseBookmarks.bookmarks[0], id: 'faction:second' }
+    ];
+    view.rerender(<Home />);
+    expect(screen.getByLabelText('2 favoris')).toHaveTextContent('2');
+  });
+
+  it('uses the translated loading label', async () => {
+    mockUseRosters.loading = true;
+    render(<Home />, { wrapper: TestWrapper });
+    expect(screen.getByRole('status')).toHaveAccessibleName('Loading…');
+    await act(async () => {
+      await i18n.changeLanguage('fr');
+    });
+    expect(screen.getByRole('status')).toHaveAccessibleName('Chargement…');
+  });
 });

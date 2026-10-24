@@ -1,5 +1,36 @@
 {
   "bookmarks": "Favoris",
-  "bookmarkCount_one": "{{count}} favori",
-  "bookmarkCount_other": "{{count}} favoris"
+  "bookmarkCount_one": "{{count, number}} favori",
+  "bookmarkCount_other": "{{count, number}} favoris",
+  "documentTitle": "depot - Compagnon Warhammer 40,000 hors ligne",
+  "hero": {
+    "edition": "// Maintenant en 11e édition",
+    "title": "depot fait peau neuve",
+    "description": "Repensé pour consulter les règles à la table de jeu : plus dense, plus rapide et toujours entièrement accessible hors ligne. Les fonctionnalités de Croisade arrivent bientôt."
+  },
+  "recentRosters": "Listes récentes",
+  "collections": "Collections",
+  "rosterCount_one": "{{count, number}} liste",
+  "rosterCount_other": "{{count, number}} listes",
+  "collectionCount_one": "{{count, number}} collection",
+  "collectionCount_other": "{{count, number}} collections",
+  "bookmarkKinds": {
+    "faction": "FACTION",
+    "detachment": "DÉTACHEMENT",
+    "datasheet": "FICHE"
+  },
+  "invalid": "INVALIDE",
+  "edited": {
+    "never": "JAMAIS MODIFIÉE",
+    "now": "MODIFIÉE À L’INSTANT",
+    "minute_one": "MODIFIÉE IL Y A {{count, number}} MIN",
+    "minute_other": "MODIFIÉE IL Y A {{count, number}} MIN",
+    "hour_one": "MODIFIÉE IL Y A {{count, number}} H",
+    "hour_other": "MODIFIÉE IL Y A {{count, number}} H",
+    "day_one": "MODIFIÉE IL Y A {{count, number}} J",
+    "day_other": "MODIFIÉE IL Y A {{count, number}} J"
+  },
+  "readyPercent": "{{percent, number(style: percent)}}",
+  "collectionReady": "PRÊTE · {{points, number}} PTS",
+  "installDescription": "Ajoutez depot à votre écran d’accueil pour l’ouvrir comme une application : en plein écran, sans barre d’adresse. Toutes les factions téléchargées restent accessibles sans réseau à la table de jeu."
 }

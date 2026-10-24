@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -6,6 +7,7 @@ import { calculateCollectionPoints } from '@depot/core/utils/collection';
 import { getReadyPercent } from '@/utils/collection';
 
 const CollectionRow: FC<{ collection: depot.Collection }> = ({ collection }) => {
+  const { t } = useTranslation('home');
   const ready = getReadyPercent(collection.items);
 
   return (
@@ -23,9 +25,11 @@ const CollectionRow: FC<{ collection: depot.Collection }> = ({ collection }) => 
         </div>
       </div>
       <div className="shrink-0 text-right">
-        <div className="font-mono text-[13px] leading-none font-bold text-success-fg">{ready}%</div>
+        <div className="font-mono text-[13px] leading-none font-bold text-success-fg">
+          {t('readyPercent', { percent: ready / 100 })}
+        </div>
         <div className="mt-0.5 font-mono text-[9px] font-medium text-subtle">
-          READY · {calculateCollectionPoints(collection)} PTS
+          {t('collectionReady', { points: calculateCollectionPoints(collection) })}
         </div>
       </div>
     </Link>

@@ -20,7 +20,7 @@ import { promptInstall, usePwaInstall } from '@/hooks/use-pwa-install';
 import { shouldShowInstallAffordance } from '@/lib/pwa-install';
 
 const Settings = () => {
-  const { t } = useTranslation('settings');
+  const { t } = useTranslation(['settings', 'common']);
   const { showToast } = useToast();
   const { settings, updateSettings } = useSettingsContext();
   const { offlineFactions, clearOfflineData, loading } = useFactionsContext();
@@ -38,7 +38,12 @@ const Settings = () => {
       await updateSettings({ ...settings, [field]: value });
     } catch (error) {
       console.error('Failed to update settings:', error);
-      showToast({ type: 'error', title: 'Error', message: 'Failed to save settings.' });
+      showToast({
+        type: 'error',
+        title: t('common:error.label'),
+        message: t('common:settingsNotifications.saveError'),
+        translation: { title: 'error.label', message: 'settingsNotifications.saveError' }
+      });
     }
   };
 
@@ -47,26 +52,31 @@ const Settings = () => {
       await clearOfflineData();
       showToast({
         type: 'success',
-        title: 'Offline cache cleared',
-        message: 'Cached faction packs and datasheets were removed.'
+        title: t('common:settingsNotifications.cacheCleared'),
+        message: t('common:settingsNotifications.cacheClearedMessage'),
+        translation: {
+          title: 'settingsNotifications.cacheCleared',
+          message: 'settingsNotifications.cacheClearedMessage'
+        }
       });
     } catch (error) {
       console.error('Failed to delete offline data:', error);
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to clear the offline cache.'
+        title: t('common:error.label'),
+        message: t('common:settingsNotifications.cacheError'),
+        translation: { title: 'error.label', message: 'settingsNotifications.cacheError' }
       });
     }
   };
 
   return (
-    <AppLayout title="Settings & Preferences">
+    <AppLayout title={t('documentTitle')}>
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
 
         <section className="flex flex-col gap-2">
-          <SectionHeader title="Appearance" />
+          <SectionHeader title={t('appearance')} />
           <ThemePicker
             value={settings.theme ?? 'system'}
             onChange={(theme) => handleSettingsChange('theme', theme)}
@@ -91,9 +101,9 @@ const Settings = () => {
 
         {installable && (
           <section className="flex flex-col gap-2">
-            <SectionHeader title="Install depot" />
+            <SectionHeader title={t('common:install.title')} />
             <div className="surface-card flex items-center justify-between gap-3 p-3">
-              <p className="text-sm text-body">Install depot for offline use.</p>
+              <p className="text-sm text-body">{t('installDescription')}</p>
               <Button
                 type="button"
                 size="sm"
@@ -102,58 +112,58 @@ const Settings = () => {
                   void promptInstall();
                 }}
               >
-                Install
+                {t('common:install.action')}
               </Button>
             </div>
           </section>
         )}
 
         <section className="flex flex-col gap-2">
-          <SectionHeader title="Factions" />
+          <SectionHeader title={t('factions')} />
           <SettingToggleItem
-            title="Forge World Units"
-            description="Show Forge World datasheets and rules"
+            title={t('forgeWorld.title')}
+            description={t('forgeWorld.description')}
             enabled={settings.showForgeWorld || false}
             onChange={(value) => handleSettingsChange('showForgeWorld', value)}
           />
           <SettingToggleItem
-            title="Legends Units"
-            description="Show legacy Legends datasheets"
+            title={t('legends.title')}
+            description={t('legends.description')}
             enabled={settings.showLegends || false}
             onChange={(value) => handleSettingsChange('showLegends', value)}
           />
           <SettingToggleItem
-            title="Unaligned Factions"
-            description="Show factions without specific allegiances"
+            title={t('unaligned.title')}
+            description={t('unaligned.description')}
             enabled={settings.showUnaligned ?? false}
             onChange={(value) => handleSettingsChange('showUnaligned', value)}
           />
           <SettingToggleItem
-            title="Show Fluff Text"
-            description="Display lore and background text. Disable if you're a heretic who only cares about numbers."
+            title={t('fluff.title')}
+            description={t('fluff.description')}
             enabled={settings.showFluff ?? true}
             onChange={(value) => handleSettingsChange('showFluff', value)}
           />
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionHeader title="Sharing" />
+          <SectionHeader title={t('sharing')} />
           <SettingToggleItem
-            title="Include Wargear"
-            description="Add selected wargear when sharing rosters"
+            title={t('wargear.title')}
+            description={t('wargear.description')}
             enabled={settings.includeWargearOnExport ?? true}
             onChange={(value) => handleSettingsChange('includeWargearOnExport', value)}
           />
           <SettingToggleItem
-            title="Use Native Sharing"
-            description="Attempt to use the device share sheet when available; otherwise copy to clipboard"
+            title={t('nativeShare.title')}
+            description={t('nativeShare.description')}
             enabled={settings.useNativeShare ?? true}
             onChange={(value) => handleSettingsChange('useNativeShare', value)}
           />
         </section>
 
         <section className="flex flex-col gap-2">
-          <SectionHeader title="Offline data" />
+          <SectionHeader title={t('offline.title')} />
 
           <div className="surface-card flex flex-col gap-3 p-3">
             <div className="flex flex-col gap-1">
@@ -178,24 +188,19 @@ const Settings = () => {
                       <span className="truncate">{f.name}</span>
                       <span className="ml-auto shrink-0 font-mono text-[10px] font-medium uppercase text-subtle">
                         {f.cachedDatasheets === 0
-                          ? 'faction only'
-                          : `${f.cachedDatasheets} datasheet${f.cachedDatasheets === 1 ? '' : 's'}`}
+                          ? t('offline.factionOnly')
+                          : t('offline.datasheetCount', { count: f.cachedDatasheets })}
                       </span>
                     </div>
                   ))}
                 </div>
                 <Button variant="error" onClick={handleReset} size="sm" fullWidth>
-                  Clear offline cache
+                  {t('offline.clear')}
                 </Button>
-                <p className="text-xs text-subtle">
-                  Removes cached faction packs and datasheets. Rosters, collections, and bookmarks
-                  stay. Faction data is re-cached as you browse.
-                </p>
+                <p className="text-xs text-subtle">{t('offline.description')}</p>
               </>
             ) : (
-              <p className="text-sm text-subtle">
-                Nothing cached yet — visit a faction page and it is stored for offline use.
-              </p>
+              <p className="text-sm text-subtle">{t('offline.empty')}</p>
             )}
           </div>
         </section>

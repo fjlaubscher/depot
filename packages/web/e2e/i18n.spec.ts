@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { createRoster } from './utils';
 
 test.use({ locale: 'en-GB', viewport: { width: 390, height: 844 } });
 
@@ -65,6 +66,67 @@ test('preserves French and cached translations across reloads', async ({ page })
   await page.reload();
   await expect(page.getByLabel('Langue de l’interface')).toHaveValue('fr');
   await expect(page.getByRole('link', { name: 'Accueil', exact: true })).toBeVisible();
+});
+
+test('keeps French home and settings readable on narrow mobile screens', async ({
+  page
+}, testInfo) => {
+  const { rosterName } = await createRoster(page);
+  await page.goto('/settings');
+  await page.getByLabel('Interface language').selectOption('fr');
+  await expect(page).toHaveTitle('Paramètres et préférences | depot');
+  await expect(page.getByRole('radio', { name: 'Système', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true'
+  );
+  await expect(
+    page.getByRole('switch', { name: 'Afficher les textes d’ambiance' })
+  ).toHaveAttribute('aria-checked', 'true');
+
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.getByRole('heading', { name: 'Paramètres', exact: true }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`settings-fr-${width}.png`) });
+    await page
+      .getByRole('switch', { name: 'Utiliser le partage du système' })
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath(`settings-sharing-fr-${width}.png`) });
+    expect(
+      await page
+        .locator('#app-content')
+        .evaluate((element) => element.scrollWidth <= element.clientWidth)
+    ).toBe(true);
+  }
+
+  await page.getByRole('link', { name: 'Accueil', exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveTitle('depot - Compagnon Warhammer 40,000 hors ligne');
+  await expect(page.getByTestId('home-hero')).toContainText('depot fait peau neuve');
+  await expect(page.getByTestId('roster-preview-card')).toContainText(rosterName);
+  await expect(page.getByTestId('roster-preview-card')).toContainText('MODIFIÉE À L’INSTANT');
+  await expect(page.getByTestId('rosters-section')).toContainText('Listes récentes');
+  await page.evaluate(() => {
+    const event = new Event('beforeinstallprompt');
+    Object.assign(event, {
+      prompt: async () => {},
+      userChoice: Promise.resolve({ outcome: 'dismissed', platform: '' })
+    });
+    window.dispatchEvent(event);
+  });
+  await expect(page.getByRole('region', { name: 'Installer' })).toBeVisible();
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    const copy = await page.getByTestId('install-banner').locator('p').last().boundingBox();
+    expect(copy!.width).toBeGreaterThan(width - 80);
+    await page.screenshot({ path: testInfo.outputPath(`home-fr-${width}.png`) });
+    expect(
+      await page
+        .locator('#app-content')
+        .evaluate((element) => element.scrollWidth <= element.clientWidth)
+    ).toBe(true);
+  }
+  await page.getByRole('button', { name: 'Masquer', exact: true }).click();
+  await expect(page.getByTestId('install-banner')).not.toBeVisible();
 });
 
 test('reloads in French offline with a production service worker', async ({ page, context }) => {

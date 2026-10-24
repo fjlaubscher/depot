@@ -103,6 +103,17 @@
       "item": "Ajouter aux favoris"
     }
   },
+  "settingsNotifications": {
+    "saveError": "Impossible d’enregistrer les paramètres.",
+    "cacheCleared": "Cache hors ligne vidé",
+    "cacheClearedMessage": "Les packs de factions et les fiches en cache ont été supprimés.",
+    "cacheError": "Impossible de vider le cache hors ligne."
+  },
+  "install": {
+    "title": "Installer depot",
+    "action": "Installer",
+    "dismiss": "Masquer"
+  },
   "data": {
     "updated": "Données de règles mises à jour",
     "nowOn": "Version actuelle : {{version}}.",

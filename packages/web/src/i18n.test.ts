@@ -33,7 +33,9 @@ describe('i18n', () => {
     ['fr', 1, '1 favori'],
     ['fr', 2, '2 favoris'],
     ['fr', 0, '0 favori'],
-    ['fr', 42, '42 favoris']
+    ['fr', 42, '42 favoris'],
+    ['en', 1234, '1,234 bookmarks'],
+    ['fr', 1234, '1 234 favoris']
   ])('interpolates and pluralizes in %s for count %i', (language, count, expected) => {
     expect(i18n.getFixedT(language, 'home')('bookmarkCount', { count })).toBe(expected);
   });
