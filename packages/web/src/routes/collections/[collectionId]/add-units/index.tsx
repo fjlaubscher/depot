@@ -15,14 +15,17 @@ import {
 } from '@depot/core/utils/collection';
 
 const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId }) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation(['common', 'collections', 'rosters']);
+  const { t: collectionT } = useTranslation('collections');
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { collection, loading, error, save } = useCollection(collectionId);
 
   const factionSlug = collection?.faction?.slug ?? collection?.factionSlug ?? collection?.factionId;
 
-  const pageTitle = collection ? `${collection.name} - Add Units` : 'Add Units to Collection';
+  const pageTitle = collection
+    ? collectionT('units.addTitle', { name: collection.name })
+    : collectionT('units.addDocument');
   const back = { to: `/collections/${collectionId}`, label: t('navigation.collection') };
 
   if (loading) {
@@ -36,16 +39,16 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle} back={back}>
-        <Alert variant="error" title="Unable to load collection">
-          {error || 'Collection not found'}
+        <Alert variant="error" title={collectionT('pages.loadCollectionFailed')}>
+          {collectionT(error ? 'pages.collectionError' : 'pages.notFound')}
         </Alert>
       </AppLayout>
     );
   }
 
   const points = calculateCollectionPoints(collection);
-  const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
-  const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
+  const factionLabel = collection.faction?.name || collection.factionSlug || collection.factionId;
+  const subtitle = `${factionLabel} - ${t('form.totalPoints', { ns: 'rosters', points: points.toLocaleString(i18n.resolvedLanguage) })}`;
 
   const handleAddSelectedUnits = async (
     selectedUnits: SelectedUnit[],
@@ -66,16 +69,16 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       clearSelection();
       showToast({
         type: 'success',
-        title: 'Units Added',
-        message: `Added ${selectedUnits.length} unit${selectedUnits.length === 1 ? '' : 's'}`
+        title: t('notifications.unitsAdded', { ns: 'rosters' }),
+        message: collectionT('notifications.unitsAddedMessage', { count: selectedUnits.length })
       });
       navigate(`/collections/${collection.id}`);
     } catch (err) {
       console.error('Failed to add units to collection entry', err);
       showToast({
         type: 'error',
-        title: 'Error',
-        message: 'Could not add units to this collection.'
+        title: t('error.label'),
+        message: collectionT('notifications.addError')
       });
     }
   };
@@ -86,7 +89,7 @@ const AddCollectionUnitsView: FC<{ collectionId?: string }> = ({ collectionId })
       backTo={`/collections/${collection.id}`}
       backLabel={collection.name}
       documentTitle={pageTitle}
-      title="Add units"
+      title={t('units.add', { ns: 'rosters' })}
       subtitle={`${collection.name} · ${subtitle}`}
       onConfirm={handleAddSelectedUnits}
     />

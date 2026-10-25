@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import i18n from '@/i18n';
 import { calculateCollectionPoints } from '@depot/core/utils/collection';
 
 import { readJsonFile } from '@/utils/file';
@@ -58,7 +59,7 @@ export const importCollectionsFromFiles = async (
       if (!isExportedCollection(parsed)) {
         failed.push({
           fileName: file.name,
-          reason: 'Not a depot collection export'
+          reason: i18n.t('import.invalid', { ns: 'collections' })
         });
         continue;
       }
@@ -82,16 +83,13 @@ export const importCollectionsFromFiles = async (
     } catch {
       failed.push({
         fileName: file.name,
-        reason: 'Could not read or parse file'
+        reason: i18n.t('import.readError', { ns: 'collections' })
       });
     }
   }
 
   return { imported, failed, summary };
 };
-
-const describeImportedCount = (count: number): string =>
-  count === 1 ? '1 collection' : `${count} collections`;
 
 export const formatCollectionImportToast = (
   result: ImportCollectionsResult
@@ -101,11 +99,11 @@ export const formatCollectionImportToast = (
   if (result.imported.length === 0) {
     return {
       type: 'error',
-      title: 'Import failed',
+      title: i18n.t('import.failed', { ns: 'collections' }),
       message:
         total === 1
-          ? (result.failed[0]?.reason ?? 'Could not import this file.')
-          : `None of the ${total} files looked like valid exports.`
+          ? (result.failed[0]?.reason ?? i18n.t('import.fileError', { ns: 'collections' }))
+          : i18n.t('import.none', { ns: 'collections', count: total })
     };
   }
 
@@ -114,8 +112,11 @@ export const formatCollectionImportToast = (
   if (result.failed.length === 0) {
     return {
       type: rebindNote ? 'warning' : 'success',
-      title: 'Import complete',
-      message: [`Imported ${describeImportedCount(result.imported.length)}.`, rebindNote]
+      title: i18n.t('import.complete', { ns: 'collections' }),
+      message: [
+        i18n.t('import.imported', { ns: 'collections', count: result.imported.length }),
+        rebindNote
+      ]
         .filter(Boolean)
         .join(' ')
     };
@@ -123,9 +124,14 @@ export const formatCollectionImportToast = (
 
   return {
     type: 'warning',
-    title: 'Import partially complete',
+    title: i18n.t('import.partial', { ns: 'collections' }),
     message: [
-      `Imported ${result.imported.length} of ${total} files. ${result.failed.length} skipped.`,
+      i18n.t('import.skipped', {
+        ns: 'collections',
+        imported: result.imported.length,
+        total,
+        count: result.failed.length
+      }),
       rebindNote
     ]
       .filter(Boolean)

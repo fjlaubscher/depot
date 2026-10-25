@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { resetClientState } from './utils';
 
+test.use({ locale: 'en-GB' });
+
 test.describe('Roster from Collection', () => {
   test.beforeEach(async ({ page }) => {
     await resetClientState(page);

@@ -3,9 +3,8 @@
 The web app uses i18next and react-i18next. Catalogues live in
 `src/locales/{language}/{namespace}.json`: `common` for shared interface text,
 `home` for the dashboard, `settings` for preferences and `catalog` for catalogue
-screens and shared unit/weapon profiles. Create other domains
-such as `rosters` for army lists, their legality diagnostics and share labels
-when their screens are translated, rather than creating empty catalogues.
+screens and shared unit/weapon profiles, `rosters` for army lists, legality and
+share labels, and `collections` for inventory, build states and collection imports.
 
 Vite emits separate JSON assets (never inline). The backend in `loader.ts` fetches
 namespaces when components request them and caches successful responses through

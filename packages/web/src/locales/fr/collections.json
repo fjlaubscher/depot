@@ -1,0 +1,103 @@
+{
+  "states": {
+    "sprue": "Sur grappe",
+    "built": "Assemblé",
+    "battle-ready": "Prêt à jouer",
+    "parade-ready": "Pour Exposition"
+  },
+  "pages": {
+    "subtitle": "Figurines possédées et progression de peinture",
+    "create": "Créer une collection",
+    "createAction": "Créer une collection",
+    "empty": "Aucune collection pour le moment",
+    "loadFailed": "Impossible de charger les collections",
+    "loadError": "Impossible de charger les collections. Veuillez réessayer.",
+    "loadCollectionFailed": "Impossible de charger la collection",
+    "collectionError": "Impossible de charger cette collection. Veuillez réessayer.",
+    "notFound": "Collection introuvable",
+    "staleLists": "Les collections existantes doivent être actualisées",
+    "staleListsMessage": "Elles utilisent les données de la 10e édition. Ouvrez une collection et actualisez-la pour passer à la 11e.",
+    "overview": "Aperçu de la collection",
+    "overviewTitle": "{{name}} - Suivi de collection",
+    "export": "Exporter la collection",
+    "stale": "Cette collection utilise des données anciennes",
+    "staleMessage": "Actualisez pour récupérer les dernières données Wahapedia de ces unités.",
+    "all": "Tous",
+    "filter": "Filtrer les unités par état de montage",
+    "emptyUnits": "Aucune unité dans cette collection"
+  },
+  "form": {
+    "name": "Nom",
+    "namePlaceholder": "Ma collection",
+    "defaultName": "Collection {{name}}",
+    "create": "Créer",
+    "missingInfo": "Informations manquantes",
+    "required": "Veuillez saisir un nom et sélectionner une faction."
+  },
+  "chart": {
+    "empty": "Ajoutez des unités pour voir la répartition des états de montage.",
+    "noUnits": "Aucune unité pour le moment",
+    "start": "Commencez votre collection",
+    "count_one": "{{count, number}} unité",
+    "count_other": "{{count, number}} unités",
+    "snapshotSingle_one": "{{count, number}} unité dans {{collections, number}} collection",
+    "snapshotSingle_other": "{{count, number}} unités dans {{collections, number}} collection",
+    "snapshotMultiple_one": "{{count, number}} unité dans {{collections, number}} collections",
+    "snapshotMultiple_other": "{{count, number}} unités dans {{collections, number}} collections",
+    "ready": "{{percent, number}} % prêt à jouer"
+  },
+  "units": {
+    "addDocument": "Ajouter des unités à la collection",
+    "addTitle": "{{name}} - Ajouter des unités",
+    "editDocument": "Modifier une unité de collection",
+    "editTitle": "{{name}} - Modifier une unité de collection",
+    "state": "État",
+    "stateDescription": "Suivez votre progression, de la grappe à l’exposition.",
+    "buildState": "État de montage",
+    "remove": "Retirer l’unité de la collection",
+    "collapse": "Masquer les détails de l’unité",
+    "expand": "Afficher les détails de l’unité"
+  },
+  "roster": {
+    "document": "Créer une liste depuis une collection",
+    "title": "{{name}} - Créer une liste",
+    "heading": "Créer une liste",
+    "create": "Créer une liste depuis la collection",
+    "search": "Rechercher des unités de la collection...",
+    "empty": "Aucune unité ne correspond à vos filtres.",
+    "name": "Liste {{name}}",
+    "selected": "Sélectionné",
+    "add": "Ajouter"
+  },
+  "notifications": {
+    "deleted": "Collection supprimée",
+    "deletedMessage": "La collection a été supprimée.",
+    "deleteFailed": "Échec de la suppression",
+    "deleteError": "Impossible de supprimer cette collection.",
+    "duplicated": "Collection dupliquée",
+    "duplicatedMessage": "{{name}} créée.",
+    "duplicateFailed": "Échec de la duplication",
+    "duplicateError": "Impossible de dupliquer cette collection.",
+    "createError": "Impossible de créer la collection.",
+    "exported": "Collection exportée",
+    "updated": "Collection actualisée",
+    "refreshError": "Impossible d’actualiser cette collection. Veuillez réessayer.",
+    "unitsAddedMessage_one": "{{count, number}} unité ajoutée",
+    "unitsAddedMessage_other": "{{count, number}} unités ajoutées",
+    "addError": "Impossible d’ajouter des unités à cette collection."
+  },
+  "import": {
+    "invalid": "Ce fichier n’est pas un export de collection depot",
+    "readError": "Impossible de lire ou d’analyser le fichier",
+    "failed": "Échec de l’import",
+    "error": "Impossible d’importer les fichiers sélectionnés. Veuillez réessayer.",
+    "fileError": "Impossible d’importer ce fichier.",
+    "none": "Aucun des {{count, number}} fichiers n’est un export valide.",
+    "complete": "Import terminé",
+    "partial": "Import partiellement terminé",
+    "imported_one": "{{count, number}} collection importée.",
+    "imported_other": "{{count, number}} collections importées.",
+    "skipped": "Fichiers importés : {{imported, number}} sur {{total, number}}. Fichiers ignorés : {{count, number}}."
+  },
+  "copyName": "{{name}} Copie"
+}

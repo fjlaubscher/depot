@@ -34,7 +34,8 @@ import CollectionStateChart from '@/routes/collections/_components/collection-st
 const COLLECTION_STATE_FILTER_KEY = 'collection-state-filter';
 
 const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collectionId }) => {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation(['common', 'collections', 'rosters']);
+  const { t: collectionT } = useTranslation('collections');
   const navigate = useNavigate();
   const { collection, loading, error, save } = useCollection(collectionId);
   const { getDatasheet, getFactionManifest, dataVersion } = useFactionsContext();
@@ -56,16 +57,20 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     () =>
       collection
         ? [
-            { value: 'all' as const, label: 'All', count: collection.items.length },
+            {
+              value: 'all' as const,
+              label: t('pages.all', { ns: 'collections' }),
+              count: collection.items.length
+            },
             ...COLLECTION_UNIT_STATES.map((state) => ({
               value: state,
-              label: COLLECTION_STATE_META[state].label,
+              label: t(COLLECTION_STATE_META[state].labelKey, { ns: 'collections' }),
               count: stateCounts[state],
               activeClassName: TAG_VARIANT_CLASSES[COLLECTION_STATE_META[state].variant]
             }))
           ]
         : [],
-    [collection, stateCounts]
+    [collection, stateCounts, t]
   );
 
   const points = useMemo(
@@ -93,8 +98,8 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
     if (!currentDataVersion) {
       showToast({
         type: 'warning',
-        title: 'No data version detected',
-        message: 'Unable to refresh because the current data version is unknown.'
+        title: t('notifications.noVersion', { ns: 'rosters' }),
+        message: t('notifications.noVersionMessage', { ns: 'rosters' })
       });
       return;
     }
@@ -112,17 +117,17 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       const rebindNote = formatRebindSummaryMessage(result.summary);
       showToast({
         type: rebindNote ? 'warning' : 'success',
-        title: 'Collection updated',
+        title: collectionT('notifications.updated'),
         message: rebindNote
-          ? `Refreshed with the latest data. ${rebindNote}`
-          : 'Refreshed with the latest Wahapedia data.'
+          ? `${t('notifications.refreshed', { ns: 'rosters' })} ${rebindNote}`
+          : t('notifications.refreshedWahapedia', { ns: 'rosters' })
       });
     } catch (err) {
       console.error('Failed to refresh collection data', err);
       showToast({
         type: 'error',
-        title: 'Refresh failed',
-        message: 'Could not refresh this collection. Please try again.'
+        title: t('notifications.refreshFailed', { ns: 'rosters' }),
+        message: collectionT('notifications.refreshError')
       });
     } finally {
       setRefreshing(false);
@@ -163,12 +168,14 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
       `collection-${safeSlug(collection.name)}-${collection.id}.json`,
       JSON.stringify(payload, null, 2)
     );
-    showToast({ type: 'success', title: 'Collection exported' });
+    showToast({ type: 'success', title: collectionT('notifications.exported') });
   };
 
   const totalUnits = collection?.items.length ?? 0;
   const hasUnits = totalUnits > 0;
-  const pageTitle = collection ? `${collection.name} - Collection Tracker` : 'Collection Overview';
+  const pageTitle = collection
+    ? collectionT('pages.overviewTitle', { name: collection.name })
+    : collectionT('pages.overview');
   useScrollToHash({ enabled: Boolean(collection) });
   const { heading: collectionHeading } = collection
     ? getCollectionChartCopy(collection, points)
@@ -187,15 +194,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle} back={back}>
-        <Alert variant="error" title="Unable to load collection">
-          {error || 'Collection not found'}
+        <Alert variant="error" title={collectionT('pages.loadCollectionFailed')}>
+          {collectionT(error ? 'pages.collectionError' : 'pages.notFound')}
         </Alert>
       </AppLayout>
     );
   }
 
-  const factionLabel = collection.faction?.name || collection.factionSlug || 'Unknown faction';
-  const subtitle = `${factionLabel} - ${points} point${points === 1 ? '' : 's'}`;
+  const factionLabel = collection.faction?.name || collection.factionSlug || collection.factionId;
+  const subtitle = `${factionLabel} - ${t('form.totalPoints', { ns: 'rosters', points: points.toLocaleString(i18n.resolvedLanguage) })}`;
   return (
     <AppLayout
       title={pageTitle}
@@ -212,13 +219,13 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
               {
                 icon: <ClipboardPlus size={16} />,
                 onClick: () => navigate(`/collections/${collection.id}/new-roster`),
-                ariaLabel: 'Create roster from collection',
+                ariaLabel: collectionT('roster.create'),
                 'data-testid': 'create-roster-from-collection-button'
               },
               {
                 icon: <Download size={16} />,
                 onClick: handleExportCollection,
-                ariaLabel: 'Export collection',
+                ariaLabel: collectionT('pages.export'),
                 'data-testid': 'export-collection-button'
               }
             ]
@@ -231,17 +238,15 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
           data-testid="add-collection-units-button"
         >
           <Plus size={16} />
-          Add units
+          {t('units.add', { ns: 'rosters' })}
         </Button>
       }
     >
       <div className="flex flex-col gap-3">
         {isStale ? (
-          <Alert variant="warning" title="Collection uses older data">
+          <Alert variant="warning" title={collectionT('pages.stale')}>
             <div className="flex flex-col gap-2">
-              <span className="text-sm text-muted">
-                Refresh to pull the latest Wahapedia data for these units.
-              </span>
+              <span className="text-sm text-muted">{collectionT('pages.staleMessage')}</span>
               <div>
                 <Button
                   variant="secondary"
@@ -251,7 +256,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
                   className="inline-flex items-center gap-2"
                 >
                   <RefreshCw className="h-4 w-4" />
-                  {refreshing ? 'Refreshing…' : 'Refresh with latest data'}
+                  {t(refreshing ? 'pages.refreshing' : 'pages.refresh', { ns: 'rosters' })}
                 </Button>
               </div>
             </div>
@@ -263,7 +268,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
         ) : null}
 
         <RosterSection
-          title="Units"
+          title={t('pages.units', { ns: 'rosters' })}
           count={totalUnits}
           data-testid="collection-units-section"
           className="gap-4"
@@ -272,7 +277,7 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
               tabs={stateFilters}
               active={activeStateFilter}
               onChange={setStateFilter}
-              ariaLabel="Filter units by build state"
+              ariaLabel={collectionT('pages.filter')}
               testIdPrefix="collection-state-filter"
             />
           }
@@ -293,10 +298,10 @@ const CollectionPageContent: React.FC<{ collectionId?: string }> = ({ collection
             </div>
           ) : (
             <RosterEmptyState
-              title="No units in this collection"
+              title={collectionT('pages.emptyUnits')}
               dataTestId="empty-collection-state"
               action={{
-                label: 'Add units',
+                label: t('units.add', { ns: 'rosters' }),
                 onClick: () => navigate(`/collections/${collection.id}/add-units`),
                 icon: <Plus size={14} />,
                 testId: 'empty-collection-add-units'

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { depot } from '@depot/core';
 import { mockDatasheet } from '@/test/mock-data';
+import i18n from '@/i18n';
 
 import {
   formatCollectionImportToast,
@@ -151,6 +152,77 @@ describe('remapCollectionIds', () => {
 });
 
 describe('formatCollectionImportToast', () => {
+  it.each(['en', 'fr'])(
+    'localizes %s import outcomes while preserving legacy data',
+    async (language) => {
+      await i18n.changeLanguage(language);
+      const item: depot.CollectionUnit = {
+        id: 'item-1',
+        datasheet: mockDatasheet,
+        modelCost: mockDatasheet.modelCosts[0],
+        selectedWargear: [],
+        state: 'parade-ready'
+      };
+      const result = await importCollectionsFromFiles(
+        [
+          fileFrom(
+            'legacy.json',
+            exportPayload({ ...baseCollection, name: 'Mes Tyranides', items: [item] })
+          ),
+          fileFrom('invalid.json', '{}'),
+          fileFrom('broken.json', '{')
+        ],
+        { saveCollection: async () => undefined }
+      );
+      expect(result.imported[0]).toMatchObject({
+        name: 'Mes Tyranides',
+        items: [expect.objectContaining({ state: 'parade-ready', modelCost: item.modelCost })],
+        points: { current: Number(item.modelCost.cost) }
+      });
+      expect(result.imported[0].id).not.toBe(baseCollection.id);
+      expect(result.imported[0].items[0].id).not.toBe(item.id);
+      expect(result.failed.map((f) => f.reason)).toEqual(
+        language === 'fr'
+          ? [
+              'Ce fichier n’est pas un export de collection depot',
+              'Impossible de lire ou d’analyser le fichier'
+            ]
+          : ['Not a depot collection export', 'Could not read or parse file']
+      );
+      expect(formatCollectionImportToast(result)).toMatchObject({
+        type: 'warning',
+        title: language === 'fr' ? 'Import partiellement terminé' : 'Import partially complete'
+      });
+      for (const count of [1, 2]) {
+        const toast = formatCollectionImportToast({
+          imported: Array.from({ length: count }, () => baseCollection),
+          failed: [],
+          summary: { ok: 0, partial: 0, missing: 0 }
+        });
+        expect(toast).toMatchObject({
+          type: 'success',
+          message:
+            language === 'fr'
+              ? `${count} collection${count === 1 ? ' importée.' : 's importées.'}`
+              : `Imported ${count} collection${count === 1 ? '.' : 's.'}`
+        });
+      }
+      const failure = formatCollectionImportToast({ ...result, imported: [] });
+      expect(failure).toMatchObject({
+        type: 'error',
+        title: language === 'fr' ? 'Échec de l’import' : 'Import failed'
+      });
+      const rebind = formatCollectionImportToast({
+        imported: [baseCollection],
+        failed: [],
+        summary: { ok: 0, partial: 1, missing: 1 }
+      });
+      expect(rebind.type).toBe('warning');
+      expect(rebind.message).toContain(language === 'fr' ? 'partiellement' : 'partially');
+      expect(JSON.stringify(result.imported)).toContain('parade-ready');
+      expect(JSON.stringify(result.imported)).not.toContain('Pour Exposition');
+    }
+  );
   it('reports full success', () => {
     const toast = formatCollectionImportToast({
       summary: { ok: 0, partial: 0, missing: 0 },

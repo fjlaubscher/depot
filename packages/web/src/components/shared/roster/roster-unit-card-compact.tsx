@@ -38,7 +38,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   enhancementName,
   issues = []
 }) => {
-  const { t } = useTranslation('rosters');
+  const { t } = useTranslation(['rosters', 'collections']);
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
 
   // A single model is the default, so saying so is noise. Anything else — a real
@@ -157,7 +157,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
         <div className="mt-auto flex items-center justify-between gap-2">
           {stateMeta ? (
             <Tag variant={stateMeta.variant} size="sm" className="whitespace-nowrap">
-              {stateMeta.label}
+              {t(stateMeta.labelKey, { ns: 'collections' })}
             </Tag>
           ) : (
             <span />

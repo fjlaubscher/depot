@@ -5,13 +5,16 @@ import AppLayout from '@/components/layout';
 import CollectionsPanel from '@/routes/collections/_components/collections-panel';
 
 const CollectionsPage: React.FC = () => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'collections']);
   return (
     <CollectionsPanel>
       {({ toolbar, body }) => (
         <AppLayout
           title={t('navigation.collections')}
-          heading={{ title: t('navigation.collections'), subtitle: 'Owned models and paint state' }}
+          heading={{
+            title: t('navigation.collections'),
+            subtitle: t('pages.subtitle', { ns: 'collections' })
+          }}
           crumbs={[
             { label: t('navigation.armies'), to: '/armies' },
             { label: t('navigation.collections') }

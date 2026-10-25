@@ -1,0 +1,103 @@
+{
+  "states": {
+    "sprue": "Sprue",
+    "built": "Assembled",
+    "battle-ready": "Battle Ready",
+    "parade-ready": "Parade Ready"
+  },
+  "pages": {
+    "subtitle": "Owned models and paint state",
+    "create": "Create Collection",
+    "createAction": "Create collection",
+    "empty": "No collections yet",
+    "loadFailed": "Failed to load collections",
+    "loadError": "Could not load collections. Please try again.",
+    "loadCollectionFailed": "Unable to load collection",
+    "collectionError": "Could not load this collection. Please try again.",
+    "notFound": "Collection not found",
+    "staleLists": "Existing collections need a refresh",
+    "staleListsMessage": "They were built on 10th edition data. Open a collection and hit Refresh to bring it onto 11th.",
+    "overview": "Collection Overview",
+    "overviewTitle": "{{name}} - Collection Tracker",
+    "export": "Export collection",
+    "stale": "Collection uses older data",
+    "staleMessage": "Refresh to pull the latest Wahapedia data for these units.",
+    "all": "All",
+    "filter": "Filter units by build state",
+    "emptyUnits": "No units in this collection"
+  },
+  "form": {
+    "name": "Name",
+    "namePlaceholder": "My Collection",
+    "defaultName": "{{name}} collection",
+    "create": "Create",
+    "missingInfo": "Missing Info",
+    "required": "Please provide a name and select a faction."
+  },
+  "chart": {
+    "empty": "Add units to see a build-state breakdown.",
+    "noUnits": "No units yet",
+    "start": "Start your collection",
+    "count_one": "{{count, number}} unit",
+    "count_other": "{{count, number}} units",
+    "snapshotSingle_one": "{{count, number}} unit across {{collections, number}} collection",
+    "snapshotSingle_other": "{{count, number}} units across {{collections, number}} collection",
+    "snapshotMultiple_one": "{{count, number}} unit across {{collections, number}} collections",
+    "snapshotMultiple_other": "{{count, number}} units across {{collections, number}} collections",
+    "ready": "{{percent, number}}% ready"
+  },
+  "units": {
+    "addDocument": "Add Units to Collection",
+    "addTitle": "{{name}} - Add Units",
+    "editDocument": "Edit Collection Unit",
+    "editTitle": "{{name}} - Edit Collection Unit",
+    "state": "State",
+    "stateDescription": "Track your build progress from sprue to parade-ready glory.",
+    "buildState": "Build state",
+    "remove": "Remove unit from collection",
+    "collapse": "Collapse unit details",
+    "expand": "Expand unit details"
+  },
+  "roster": {
+    "document": "Build Roster from Collection",
+    "title": "{{name}} - Build Roster",
+    "heading": "Build roster",
+    "create": "Create roster from collection",
+    "search": "Search collection units...",
+    "empty": "No units match your filters.",
+    "name": "{{name}} roster",
+    "selected": "Selected",
+    "add": "Add"
+  },
+  "notifications": {
+    "deleted": "Collection deleted",
+    "deletedMessage": "Entry deleted successfully.",
+    "deleteFailed": "Delete failed",
+    "deleteError": "Could not delete this collection.",
+    "duplicated": "Duplicated",
+    "duplicatedMessage": "Created {{name}}.",
+    "duplicateFailed": "Duplicate failed",
+    "duplicateError": "Could not duplicate this collection.",
+    "createError": "Could not create collection.",
+    "exported": "Collection exported",
+    "updated": "Collection updated",
+    "refreshError": "Could not refresh this collection. Please try again.",
+    "unitsAddedMessage_one": "Added {{count, number}} unit",
+    "unitsAddedMessage_other": "Added {{count, number}} units",
+    "addError": "Could not add units to this collection."
+  },
+  "import": {
+    "invalid": "Not a depot collection export",
+    "readError": "Could not read or parse file",
+    "failed": "Import failed",
+    "error": "Could not import the selected files. Please try again.",
+    "fileError": "Could not import this file.",
+    "none": "None of the {{count, number}} files looked like valid exports.",
+    "complete": "Import complete",
+    "partial": "Import partially complete",
+    "imported_one": "Imported {{count, number}} collection.",
+    "imported_other": "Imported {{count, number}} collections.",
+    "skipped": "Imported {{imported, number}} of {{total, number}} files. {{count, number}} skipped."
+  },
+  "copyName": "{{name}} Copy"
+}

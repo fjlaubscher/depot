@@ -17,6 +17,15 @@ describe('detectBrowserLanguage', () => {
 });
 
 describe('i18n', () => {
+  it('loads collection states and falls back to English for the new domain', () => {
+    expect(i18n.getFixedT('fr', 'collections')('states.battle-ready')).toBe('Prêt à jouer');
+    expect(i18n.getFixedT('fr', 'collections')('states.parade-ready')).toBe('Pour Exposition');
+    const isolated = i18n.cloneInstance({ lng: 'fr', forkResourceStore: true });
+    isolated.removeResourceBundle('fr', 'collections');
+    expect(isolated.t('copyName', { ns: 'collections', name: 'Mes Tyranides' })).toBe(
+      'Mes Tyranides Copy'
+    );
+  });
   it('loads roster translations and falls back to English for missing French keys', () => {
     expect(i18n.getFixedT('fr', 'rosters')('copyName', { name: 'Ma liste' })).toBe(
       'Ma liste (Copie)'
