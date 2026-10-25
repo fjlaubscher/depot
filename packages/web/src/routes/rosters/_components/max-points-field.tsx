@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Field, SelectField } from '@/components/ui';
 
@@ -17,6 +18,7 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
   error,
   'data-testid': dataTestId
 }) => {
+  const { t } = useTranslation('rosters');
   // Explicitly chosen "Custom" sticks even when the typed value matches a preset.
   const [isCustom, setIsCustom] = useState(false);
   const preset = Object.keys(PRESET_POINTS).find((key) => PRESET_POINTS[key] === value);
@@ -25,11 +27,11 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
   return (
     <div className="flex flex-col gap-4" data-testid={dataTestId}>
       <SelectField
-        label="Max Points"
+        label={t('form.maxPoints')}
         options={[
           { value: 'incursion', label: 'Incursion (1000 pts)' },
           { value: 'strike-force', label: 'Strike Force (2000 pts)' },
-          { value: 'custom', label: 'Custom' }
+          { value: 'custom', label: t('form.custom') }
         ]}
         selectDataTestId="max-points-field-select"
         value={selectedOption}
@@ -47,7 +49,7 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
           className="gap-1"
         >
           <label htmlFor="custom-max-points" className="block text-sm font-medium text-body">
-            Custom Max Points
+            {t('form.customMaxPoints')}
           </label>
           <input
             data-testid="max-points-input"
@@ -57,7 +59,7 @@ const MaxPointsField: React.FC<MaxPointsFieldProps> = ({
             className="input-base"
             value={value || ''}
             onChange={(event) => onChange(parseInt(event.target.value, 10) || 0)}
-            placeholder="Enter points limit"
+            placeholder={t('form.pointsPlaceholder')}
             required
           />
         </Field>

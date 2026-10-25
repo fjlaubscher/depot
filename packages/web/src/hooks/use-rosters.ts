@@ -4,6 +4,7 @@ import { createRosterDuplicate } from '@depot/core/utils/roster';
 import { useFactionsContext } from '@/contexts/factions/context';
 import { hydrateRoster } from '@/utils/refresh-user-data';
 import useAsync from './use-async';
+import { useTranslation } from 'react-i18next';
 
 interface UseRosters {
   rosters: depot.Roster[];
@@ -15,6 +16,7 @@ interface UseRosters {
 }
 
 function useRosters(): UseRosters {
+  const { t } = useTranslation('rosters');
   const { getDatasheet, getFactionManifest } = useFactionsContext();
   const { data, loading, error, refresh } = useAsync(async () => {
     const stored = await offlineStorage.getAllRosters();
@@ -29,7 +31,10 @@ function useRosters(): UseRosters {
   };
 
   const duplicateRoster = async (roster: depot.Roster, dataVersion?: string | null) => {
-    const duplicatedRoster = createRosterDuplicate(roster, { dataVersion });
+    const duplicatedRoster = createRosterDuplicate(roster, {
+      dataVersion,
+      name: t('copyName', { name: roster.name })
+    });
     await offlineStorage.saveRoster(duplicatedRoster);
     await refresh();
     return duplicatedRoster;

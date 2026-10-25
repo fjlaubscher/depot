@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Crown } from 'lucide-react';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
@@ -37,6 +38,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
   enhancementName,
   issues = []
 }) => {
+  const { t } = useTranslation('rosters');
   const unitPoints = parseInt(unit.modelCost.cost, 10) || 0;
 
   // A single model is the default, so saying so is noise. Anything else — a real
@@ -77,8 +79,8 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
             {isWarlord ? (
               <span
                 role="img"
-                aria-label="Warlord"
-                title="Warlord"
+                aria-label={t('units.warlord')}
+                title={t('units.warlord')}
                 className="mr-1 shrink-0 text-accent"
                 data-testid="unit-warlord-tag"
               >
@@ -110,7 +112,7 @@ const RosterUnitCardCompact: FC<RosterUnitCardCompactProps> = ({
             ) : null}
             {issues.length > 0 ? (
               <Tag variant="danger" size="sm" data-testid="unit-invalid-tag">
-                Invalid
+                {t('units.invalid')}
               </Tag>
             ) : null}
           </div>

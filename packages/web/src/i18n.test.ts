@@ -17,6 +17,14 @@ describe('detectBrowserLanguage', () => {
 });
 
 describe('i18n', () => {
+  it('loads roster translations and falls back to English for missing French keys', () => {
+    expect(i18n.getFixedT('fr', 'rosters')('copyName', { name: 'Ma liste' })).toBe(
+      'Ma liste (Copie)'
+    );
+    const isolated = i18n.cloneInstance({ lng: 'fr', forkResourceStore: true });
+    isolated.removeResourceBundle('fr', 'rosters');
+    expect(isolated.t('copyName', { ns: 'rosters', name: 'Ma liste' })).toBe('Ma liste (Copy)');
+  });
   it('uses a separate common namespace for shared interface text', () => {
     expect(i18n.options.defaultNS).toBe('common');
   });

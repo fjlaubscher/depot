@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import i18n from '@/i18n';
 import type { depot } from '@depot/core';
 import { TestWrapper } from '@/test/test-utils';
 import { mockFactionIndexes, mockFaction } from '@/test/mock-data';
@@ -54,6 +55,22 @@ vi.mock('@/contexts/roster/context', () => ({
 const CreateRoster = () => <CreateRosterSheet open onClose={vi.fn()} />;
 
 describe('CreateRosterSheet', () => {
+  it('translates an open form and its errors without resetting fields or submitting again', async () => {
+    render(<CreateRoster />, { wrapper: TestWrapper });
+    fireEvent.change(screen.getByTestId('roster-name-input'), {
+      target: { value: 'Ma liste d’essai' }
+    });
+    fireEvent.change(screen.getByTestId('faction-field-select'), {
+      target: { value: mockFaction.slug }
+    });
+    fireEvent.submit(screen.getByTestId('roster-form'));
+    expect(screen.getByText('Please select at least one detachment.')).toBeInTheDocument();
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByText('Veuillez sélectionner au moins un détachement.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nom de la liste')).toHaveValue('Ma liste d’essai');
+    expect(screen.getByTestId('faction-field-select')).toHaveValue(mockFaction.slug);
+    expect(mockUseRoster.createRoster).not.toHaveBeenCalled();
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     mockFactionsContext.factionIndex = mockFactionIndexes;

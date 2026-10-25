@@ -19,17 +19,15 @@ import {
 } from '@/components/shared/roster';
 import { getRosterSubtitle } from '@depot/core/utils/roster';
 import { validateRoster } from '@depot/core/utils/roster-legality';
-import {
-  BATTLEFIELD_ROLES,
-  BATTLEFIELD_ROLE_LABELS,
-  getBattlefieldRole
-} from '@depot/core/utils/datasheets';
+import { BATTLEFIELD_ROLES, getBattlefieldRole } from '@depot/core/utils/datasheets';
 import RosterIssues from '@/routes/rosters/_components/roster-issues';
+import { formatRosterIssue } from '@/utils/roster';
 
 const unitPoints = (unit: depot.RosterUnit) => parseInt(unit.modelCost.cost, 10) || 0;
 
 const RosterEdit: FC = () => {
   const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation(['rosters', 'catalog']);
   const { state: roster, duplicateUnit, removeUnit } = useRoster();
   const navigate = useNavigate();
 
@@ -55,10 +53,10 @@ const RosterEdit: FC = () => {
     const map = new Map<string, string[]>();
     for (const issue of validateRoster(roster)) {
       if (!issue.unitId) continue;
-      map.set(issue.unitId, [...(map.get(issue.unitId) ?? []), issue.message]);
+      map.set(issue.unitId, [...(map.get(issue.unitId) ?? []), formatRosterIssue(issue, rosterT)]);
     }
     return map;
-  }, [roster]);
+  }, [roster, rosterT]);
 
   const enhancementsByUnit = useMemo(
     () => new Map(roster.enhancements.map((entry) => [entry.unitId, entry.enhancement.name])),
@@ -70,7 +68,7 @@ const RosterEdit: FC = () => {
   if (!roster.id) {
     return (
       <AppLayout
-        title="Manage Roster Units"
+        title={rosterT('pages.manage')}
         back={{ to: '/rosters', label: t('navigation.rosters') }}
       >
         <Loader />
@@ -80,19 +78,19 @@ const RosterEdit: FC = () => {
 
   return (
     <AppLayout
-      title={`${roster.name} - Manage Roster Units`}
+      title={rosterT('pages.manageTitle', { name: roster.name })}
       back={{ to: '/rosters', label: t('navigation.rosters') }}
       heading={{ title: roster.name, subtitle: getRosterSubtitle(roster) }}
       actions={[
         {
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/details`),
-          ariaLabel: 'Edit roster details'
+          ariaLabel: rosterT('pages.editDetails')
         },
         {
           icon: <Eye size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}`),
-          ariaLabel: 'View roster',
+          ariaLabel: rosterT('pages.view'),
           'data-testid': 'view-roster-button'
         }
       ]}
@@ -103,7 +101,7 @@ const RosterEdit: FC = () => {
           data-testid="add-units-button"
         >
           <Plus size={16} />
-          Add units
+          {rosterT('units.add')}
         </Button>
       }
     >
@@ -118,8 +116,8 @@ const RosterEdit: FC = () => {
           sections.map(({ role, units, points }) => (
             <RosterSection
               key={role}
-              title={BATTLEFIELD_ROLE_LABELS[role]}
-              count={`${units.length} · ${points} PTS`}
+              title={rosterT(`catalog:roles.${role}`)}
+              count={`${units.length} · ${points} ${rosterT('units.pointsCaption')}`}
               data-testid={`roster-units-${role}`}
             >
               <div className="grid gap-1 lg:grid-cols-2">
@@ -141,10 +139,10 @@ const RosterEdit: FC = () => {
           ))
         ) : (
           <RosterEmptyState
-            title="No units in this roster"
+            title={rosterT('units.empty')}
             dataTestId="empty-roster-state"
             action={{
-              label: 'Add units',
+              label: rosterT('units.add'),
               onClick: () => navigate(`/rosters/${roster.id}/add-units`),
               icon: <Plus size={14} />,
               testId: 'empty-roster-add-units'

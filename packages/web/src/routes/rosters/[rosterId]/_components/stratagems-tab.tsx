@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { RosterSection, StratagemCard } from '@/components/shared';
@@ -38,6 +39,7 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
   loadingCore,
   coreError
 }) => {
+  const { t } = useTranslation(['rosters', 'catalog', 'common']);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const availabilityMap = useMemo(() => {
@@ -57,7 +59,7 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
 
   const categoryTabs = useMemo(() => {
     if (!coreStratagems || coreStratagems.length === 0) {
-      return [{ value: 'All', label: 'All', count: 0 }];
+      return [{ value: 'All', label: t('catalog:all'), count: 0 }];
     }
 
     const counts = coreStratagems.reduce<Record<string, number>>((acc, strat) => {
@@ -79,8 +81,8 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
       count: counts[category]
     }));
 
-    return [{ value: 'All', label: 'All', count: coreStratagems.length }, ...tabs];
-  }, [coreStratagems]);
+    return [{ value: 'All', label: t('catalog:all'), count: coreStratagems.length }, ...tabs];
+  }, [coreStratagems, t]);
 
   const activeCategory = categoryTabs.some((tab) => tab.value === selectedCategory)
     ? selectedCategory
@@ -107,7 +109,7 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
 
   const renderStratagemGrid = (stratagems: depot.Stratagem[], testId: string) => {
     if (stratagems.length === 0) {
-      return <p className="text-sm text-subtle">No stratagems available.</p>;
+      return <p className="text-sm text-subtle">{t('pages.noCoreStratagems')}</p>;
     }
 
     return (
@@ -125,14 +127,14 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
 
   return (
     <div className="flex flex-col gap-6" data-testid="stratagems-tab">
-      <RosterSection title="Core Stratagems" data-testid="core-stratagems-section">
+      <RosterSection title={t('pages.coreStratagems')} data-testid="core-stratagems-section">
         <div className="flex flex-col gap-3">
           {categoryTabs.length > 1 ? (
             <PillTabs
               tabs={categoryTabs}
               active={activeCategory}
               onChange={setSelectedCategory}
-              ariaLabel="Core stratagem types"
+              ariaLabel={t('pages.stratagemTypes')}
             />
           ) : null}
 
@@ -141,8 +143,8 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
               <Loader />
             </div>
           ) : coreError ? (
-            <Alert variant="error" title="Unable to load core stratagems">
-              {coreError}
+            <Alert variant="error" title={t('pages.coreError')}>
+              {t('common:error.message')}
             </Alert>
           ) : (
             renderStratagemGrid(filteredCoreStratagems, 'core-stratagems-grid')
@@ -150,11 +152,14 @@ const StratagemsTab: React.FC<StratagemsTabProps> = ({
         </div>
       </RosterSection>
 
-      <RosterSection title="Detachment Stratagems" data-testid="detachment-stratagems-section">
+      <RosterSection
+        title={t('pages.detachmentStratagems')}
+        data-testid="detachment-stratagems-section"
+      >
         {detachmentStratagems.length > 0 ? (
           renderStratagemGrid(detachmentStratagems, 'detachment-stratagems-grid')
         ) : (
-          <p className="text-sm text-subtle">No detachment stratagems available for this roster.</p>
+          <p className="text-sm text-subtle">{t('pages.noRosterStratagems')}</p>
         )}
       </RosterSection>
     </div>

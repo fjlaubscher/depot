@@ -80,11 +80,33 @@ export const getEligibleEnhancements = (
     : pool.filter((enhancement) => enhancement.upgrade);
 };
 
-export interface RosterIssue {
-  code: string;
-  message: string;
-  unitId?: string;
-}
+export type RosterIssue = { code: string; unitId?: string } & (
+  | { reason: 'points-exceeded'; params: { current: number; max: number } }
+  | {
+      reason: 'detachment-missing' | 'detachment-duplicate' | 'warlord-missing';
+      params: Record<string, never>;
+    }
+  | { reason: 'dp-exceeded'; params: { spent: number; max: number; battleSize: string } }
+  | {
+      reason: 'unit-limit-exceeded';
+      params: { name: string; count: number; limit: number; battleSize: string };
+    }
+  | { reason: 'cost-bracket-mismatch'; params: { name: string; ordinal: number } }
+  | { reason: 'enhancement-outside-detachments' | 'support-unmatched'; params: { name: string } }
+  | { reason: 'enhancement-repeat-limit'; params: { name: string; count: number; limit: number } }
+  | {
+      reason: 'enhancement-total-limit';
+      params: { count: number; limit: number; battleSize: string };
+    }
+  | {
+      reason: 'enhancement-unit-limit';
+      params: { unitName?: string; count: number; limit: number };
+    }
+  | {
+      reason: 'enhancement-epic-hero' | 'enhancement-non-character';
+      params: { unitName: string; enhancementName: string };
+    }
+);
 
 /** Support units each need their own bodyguard; returns the support units left unmatched. */
 const unmatchedSupportUnits = (units: RosterUnit[]): RosterUnit[] => {
@@ -123,28 +145,30 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
   const size = getBattleSize(roster.points.max);
   const detachments = getRosterDetachments(roster);
   const { units } = roster;
-  const unitName = (id: string) => units.find((unit) => unit.id === id)?.datasheet.name ?? 'Unit';
+  const unitName = (id: string) => units.find((unit) => unit.id === id)?.datasheet.name;
 
   if (roster.points.current > roster.points.max) {
     issues.push({
       code: 'points',
-      message: `${roster.points.current} pts exceeds the ${roster.points.max} pt limit.`
+      reason: 'points-exceeded',
+      params: { current: roster.points.current, max: roster.points.max }
     });
   }
 
   if (detachments.length === 0) {
-    issues.push({ code: 'detachment', message: 'No detachment selected.' });
+    issues.push({ code: 'detachment', reason: 'detachment-missing', params: {} });
   }
   // A lone detachment is always legal (an Incursion army may take a single 3 DP detachment).
   const dpSpent = getRosterDpSpent(roster);
   if (detachments.length > 1 && dpSpent > size.dp) {
     issues.push({
       code: 'dp',
-      message: `${dpSpent} DP spent; ${size.name} allows ${size.dp} DP.`
+      reason: 'dp-exceeded',
+      params: { spent: dpSpent, max: size.dp, battleSize: size.name }
     });
   }
   if (new Set(detachments.map((detachment) => detachment.id)).size !== detachments.length) {
-    issues.push({ code: 'detachment', message: 'The same detachment is selected more than once.' });
+    issues.push({ code: 'detachment', reason: 'detachment-duplicate', params: {} });
   }
 
   for (const [name, count] of countBy(units, (unit) => unit.datasheet.name)) {
@@ -157,7 +181,8 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
     if (count > limit) {
       issues.push({
         code: 'unit-limit',
-        message: `${name}: ${count} units selected; ${size.name} allows ${limit}.`
+        reason: 'unit-limit-exceeded',
+        params: { name, count, limit, battleSize: size.name }
       });
     }
   }
@@ -170,13 +195,14 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
       issues.push({
         code: 'bracket',
         unitId: unit.id,
-        message: `${unit.datasheet.name} #${ordinal} is using the wrong cost bracket.`
+        reason: 'cost-bracket-mismatch',
+        params: { name: unit.datasheet.name, ordinal }
       });
     }
   }
 
   if (units.length > 0 && !roster.warlordUnitId) {
-    issues.push({ code: 'warlord', message: 'No Warlord selected.' });
+    issues.push({ code: 'warlord', reason: 'warlord-missing', params: {} });
   }
 
   const pool = new Set(
@@ -192,21 +218,24 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
     if (!pool.has(id)) {
       issues.push({
         code: 'enhancement',
-        message: `${enhancement.name} is not from a selected detachment.`
+        reason: 'enhancement-outside-detachments',
+        params: { name: enhancement.name }
       });
     }
     const max = enhancement.upgrade ? 3 : 1;
     if (count > max) {
       issues.push({
         code: 'enhancement',
-        message: `${enhancement.name} is taken ${count} times; max ${max}.`
+        reason: 'enhancement-repeat-limit',
+        params: { name: enhancement.name, count, limit: max }
       });
     }
   }
   if (enhancementTotal > size.enhancementLimit) {
     issues.push({
       code: 'enhancement',
-      message: `${enhancementTotal} enhancements selected; ${size.name} allows ${size.enhancementLimit}.`
+      reason: 'enhancement-total-limit',
+      params: { count: enhancementTotal, limit: size.enhancementLimit, battleSize: size.name }
     });
   }
   for (const [unitId, count] of countBy(roster.enhancements, (entry) => entry.unitId)) {
@@ -214,7 +243,12 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
       issues.push({
         code: 'enhancement',
         unitId,
-        message: `${unitName(unitId)} has ${count} enhancements; max 1 per unit.`
+        reason: 'enhancement-unit-limit',
+        params: {
+          ...(unitName(unitId) === undefined ? {} : { unitName: unitName(unitId) }),
+          count,
+          limit: 1
+        }
       });
     }
   }
@@ -225,13 +259,15 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
       issues.push({
         code: 'enhancement',
         unitId,
-        message: `${unit.datasheet.name} is an Epic Hero and cannot take ${enhancement.name}.`
+        reason: 'enhancement-epic-hero',
+        params: { unitName: unit.datasheet.name, enhancementName: enhancement.name }
       });
     } else if (!enhancement.upgrade && !hasKeyword(unit.datasheet, 'Character')) {
       issues.push({
         code: 'enhancement',
         unitId,
-        message: `${unit.datasheet.name} is not a Character and cannot take ${enhancement.name}.`
+        reason: 'enhancement-non-character',
+        params: { unitName: unit.datasheet.name, enhancementName: enhancement.name }
       });
     }
   }
@@ -240,7 +276,8 @@ export const validateRoster = (roster: Roster): RosterIssue[] => {
     issues.push({
       code: 'support',
       unitId: support.id,
-      message: `${support.datasheet.name} is a Support unit with no free bodyguard unit to attach to.`
+      reason: 'support-unmatched',
+      params: { name: support.datasheet.name }
     });
   }
 

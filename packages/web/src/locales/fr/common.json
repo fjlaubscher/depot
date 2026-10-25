@@ -1,5 +1,11 @@
 {
   "loading": "Chargement…",
+  "rebind": {
+    "partial_one": "{{count}} unité partiellement rattachée (équipement modifié).",
+    "partial_other": "{{count}} unités partiellement rattachées (équipement modifié).",
+    "missing_one": "{{count}} unité introuvable dans le catalogue actuel.",
+    "missing_other": "{{count}} unités introuvables dans le catalogue actuel."
+  },
   "navigation": {
     "home": "Accueil",
     "rules": "Règles",

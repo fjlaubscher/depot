@@ -7,6 +7,8 @@ import { hydrateRoster } from '@/utils/refresh-user-data';
 import type { RosterContextValue } from './types';
 import { rosterReducer } from './reducer';
 import { initialState } from './constants';
+import i18n from '@/i18n';
+import { useTranslation } from 'react-i18next';
 
 export const RosterContext = createContext<RosterContextValue | undefined>(undefined);
 
@@ -16,6 +18,7 @@ interface RosterProviderProps {
 }
 
 export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) => {
+  useTranslation('rosters');
   const [state, dispatch] = useReducer(rosterReducer, initialState);
   const { showToast } = useToast();
   const { getDatasheet, getFactionManifest } = useFactionsContext();
@@ -54,8 +57,8 @@ export const RosterProvider: FC<RosterProviderProps> = ({ children, rosterId }) 
             if (!isCancelled) {
               showToast({
                 type: 'error',
-                title: 'Failed to save roster',
-                message: 'Changes may not be saved. Please try again.'
+                title: i18n.t('rosters:notifications.saveFailed'),
+                message: i18n.t('rosters:notifications.saveError')
               });
             }
           }

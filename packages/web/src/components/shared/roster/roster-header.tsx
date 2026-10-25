@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { cx } from '@/utils/cx';
 import { getRosterDetachments } from '@depot/core/utils/roster';
@@ -15,6 +16,7 @@ interface RosterHeaderProps {
 }
 
 const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
+  const { t } = useTranslation('rosters');
   const { current, max } = roster.points;
   const hasCap = typeof max === 'number' && max > 0;
   const isOver = hasCap && current > max;
@@ -42,16 +44,16 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
         <span className={cx('type-stat', pointsColor)} data-testid="points-display">
           {hasCap ? `${current}/${max}` : current}
         </span>
-        <span className="type-label">pts</span>
+        <span className="type-label">{t('units.pointsUnit')}</span>
 
         {hasCap ? (
           isOver ? (
             <span className="ml-auto type-label font-bold text-danger-fg" data-testid="points-over">
-              {current - max} PTS OVER
+              {t('units.over', { points: current - max })}
             </span>
           ) : (
             <span className="ml-auto type-label text-success-fg" data-testid="points-remaining">
-              {max - current} PTS LEFT
+              {t('units.left', { points: max - current })}
             </span>
           )
         ) : null}
@@ -64,7 +66,7 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
           aria-valuenow={current}
           aria-valuemin={0}
           aria-valuemax={max}
-          aria-label="Points used"
+          aria-label={t('units.pointsUsed')}
           data-testid="points-bar"
         >
           <div
@@ -96,7 +98,7 @@ const RosterHeader: FC<RosterHeaderProps> = ({ roster }) => {
           </div>
         ) : null}
         <div className="flex items-baseline gap-1">
-          <span className="type-label">ENH</span>
+          <span className="type-label">{t('units.enhancementsAbbreviation')}</span>
           <span className="font-mono text-sm font-bold text-foreground">
             {roster.enhancements?.length ?? 0}
           </span>

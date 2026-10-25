@@ -143,6 +143,41 @@ const createRoster = (overrides: Partial<Roster> = {}): Roster => ({
 });
 
 describe('roster utils', () => {
+  it('accepts share labels while preserving all source text and wargear options', () => {
+    const roster = createRoster();
+    const original = structuredClone(roster);
+    const labels = {
+      faction: 'Faction',
+      detachment: 'Détachement',
+      points: 'Points',
+      warlord: 'Seigneur de guerre',
+      wargearAbility: 'Capacité d’équipement',
+      enhancement: 'Amélioration',
+      pointsUnit: 'pts'
+    };
+    const text = generateRosterShareText(roster, 'Space Marines', { labels, includeWargear: true });
+    expect(text).toContain('*Détachement:* Gladius Task Force');
+    expect(text).toContain('[Seigneur de guerre] Captain - 10 models (100 pts)');
+    expect(text).toContain('Bolt pistol');
+    expect(text).toContain('[Capacité d’équipement] Stealth Field');
+    expect(text).toContain('[Amélioration] Artificer Armour (25 pts)');
+    const without = generateRosterShareText(roster, undefined, { labels });
+    expect(without).not.toContain('Bolt pistol');
+    expect(without).not.toContain('Stealth Field');
+    expect(without).toContain('[Amélioration]');
+    expect(roster).toEqual(original);
+  });
+
+  it('uses a caller-provided duplicate name with remapped references', () => {
+    const roster = createRoster();
+    const original = structuredClone(roster);
+    const copy = createRosterDuplicate(roster, { name: 'Strike Force (Copie)' });
+    expect(copy.name).toBe('Strike Force (Copie)');
+    expect(copy.warlordUnitId).toBe(copy.units[0].id);
+    expect(copy.enhancements[0].unitId).toBe(copy.units[0].id);
+    expect(copy.units[0].id).not.toBe(roster.units[0].id);
+    expect(roster).toEqual(original);
+  });
   it('builds the roster subtitle from faction and detachment names', () => {
     expect(getRosterSubtitle(createRoster())).toBe('Test • Gladius Task Force');
     expect(getRosterSubtitle(createRoster({ detachments: [] }))).toBe('Test');

@@ -50,13 +50,42 @@ describe('translation loading', () => {
       })
     });
     const { loadTranslation } = await import('./loader');
-    expect(await loadTranslation('fr', 'common')).toEqual(french);
+    expect(await loadTranslation('fr', 'rosters')).toEqual(french);
     vi.mocked(fetch).mockRejectedValue(new TypeError('offline'));
     vi.resetModules();
     const reloaded = await import('./loader');
 
-    expect(await reloaded.loadTranslation('fr', 'common')).toEqual(french);
+    expect(await reloaded.loadTranslation('fr', 'rosters')).toEqual(french);
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('reloads French rosters offline and uses cached English for a missing French key', async () => {
+    const entries = new Map<string, Response>();
+    vi.stubGlobal('caches', {
+      open: async () => ({
+        match: async (url: string) => entries.get(url)?.clone(),
+        put: async (url: string, response: Response) => {
+          entries.set(url, response.clone());
+        }
+      })
+    });
+    vi.mocked(fetch).mockImplementation(async (url) =>
+      Response.json(
+        String(url).includes('/fr/')
+          ? { copyName: '{{name}} (Copie)' }
+          : { copyName: '{{name}} (Copy)', pages: { overview: 'Roster Overview' } }
+      )
+    );
+    const { loadTranslation } = await import('./loader');
+    await Promise.all([loadTranslation('fr', 'rosters'), loadTranslation('en', 'rosters')]);
+    vi.mocked(fetch).mockRejectedValue(new TypeError('offline'));
+    vi.resetModules();
+    const { translationBackend } = await import('./loader');
+    const instance = createInstance().use(translationBackend);
+    await instance.init({ lng: 'fr', fallbackLng: 'en', ns: ['rosters'], defaultNS: 'rosters' });
+    expect(instance.t('copyName', { ns: 'rosters', name: 'Ma liste' })).toBe('Ma liste (Copie)');
+    expect(instance.t('pages.overview', { ns: 'rosters' })).toBe('Roster Overview');
+    expect(fetch).toHaveBeenCalledTimes(4);
   });
 
   it('revalidates cached translations and replaces changed content once per page load', async () => {
@@ -134,7 +163,8 @@ describe('translation loading', () => {
     const { preloadTranslations } = await import('./loader');
     await preloadTranslations('en');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(4);
+    expect(requested).toHaveLength(5);
+    expect(requested.some((url) => url.includes('/rosters.json'))).toBe(true);
     expect(requested.every((url) => url.includes('/en/'))).toBe(true);
     expect(requested.some((url) => url.includes('/settings.json'))).toBe(true);
   });
@@ -143,9 +173,9 @@ describe('translation loading', () => {
     const { preloadTranslations, loadTranslation } = await import('./loader');
     await preloadTranslations('fr');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(8);
+    expect(requested).toHaveLength(10);
     expect(requested.every((url) => /\/(fr|en)\//.test(url))).toBe(true);
     await expect(loadTranslation('de', 'common')).rejects.toThrow();
-    expect(fetch).toHaveBeenCalledTimes(8);
+    expect(fetch).toHaveBeenCalledTimes(10);
   });
 });

@@ -13,7 +13,8 @@ const cachedLanguages = (page: Page) =>
         return data.navigation?.home === 'Accueil' ||
           data.bookmarks === 'Favoris' ||
           data.automaticLanguage === 'Automatique' ||
-          data.browseRules === 'Consulter les règles'
+          data.browseRules === 'Consulter les règles' ||
+          data.copyName === '{{name}} (Copie)'
           ? 'fr'
           : 'en';
       })
@@ -27,7 +28,7 @@ test('prepares English only until French is selected, then updates mounted mobil
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/settings');
   await expect(page.getByLabel('Interface language')).toBeVisible();
-  await expect.poll(() => cachedLanguages(page)).toEqual(['en', 'en', 'en', 'en']);
+  await expect.poll(() => cachedLanguages(page)).toEqual(['en', 'en', 'en', 'en', 'en']);
 
   await page.getByLabel('Interface language').selectOption('fr');
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
@@ -35,7 +36,7 @@ test('prepares English only until French is selected, then updates mounted mobil
   await expect(page.getByLabel('Langue de l’interface')).toHaveValue('fr');
   await expect
     .poll(async () => (await cachedLanguages(page)).sort())
-    .toEqual(['en', 'en', 'en', 'en', 'fr', 'fr', 'fr', 'fr']);
+    .toEqual(['en', 'en', 'en', 'en', 'en', 'fr', 'fr', 'fr', 'fr', 'fr']);
   await page.getByRole('link', { name: 'Armées', exact: true }).click();
   await expect(page).toHaveURL(/\/armies$/);
   await page.getByTestId('armies-tile-collections').click();
@@ -63,7 +64,7 @@ test('prepares English only until French is selected, then updates mounted mobil
 test('preserves French and cached translations across reloads', async ({ page }) => {
   await page.goto('/settings');
   await page.getByLabel('Interface language').selectOption('fr');
-  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(8);
+  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(10);
   await page.reload();
   await expect(page.getByLabel('Langue de l’interface')).toHaveValue('fr');
   await expect(page.getByRole('link', { name: 'Accueil', exact: true })).toBeVisible();
@@ -74,7 +75,7 @@ test('refreshes an outdated cached hero translation without clearing browser sto
 }) => {
   await page.goto('/settings');
   await page.getByLabel('Interface language').selectOption('fr');
-  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(8);
+  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(10);
 
   const seeded = await page.evaluate(async () => {
     const cache = await caches.open('depot-translations');

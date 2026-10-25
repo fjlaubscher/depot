@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 import { Boxes, ClipboardList } from 'lucide-react';
 
@@ -14,6 +15,7 @@ import RosterRow from '@/routes/home/_components/roster-row';
 const PREVIEW_LIMIT = 3;
 
 const ArmiesPage: React.FC = () => {
+  const { t } = useTranslation('rosters');
   const { collections, loading: collectionsLoading } = useCollections();
   const { rosters, loading: rostersLoading } = useRosters();
   const loading = collectionsLoading || rostersLoading;
@@ -22,12 +24,12 @@ const ArmiesPage: React.FC = () => {
   const recentRosters = useMemo(() => takeRecent(rosters, PREVIEW_LIMIT), [rosters]);
 
   return (
-    <AppLayout title="Armies">
+    <AppLayout title={t('pages.armies')}>
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Armies</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('pages.armies')}</h1>
           <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
-            Cabinets, lists, and later crusade
+            {t('pages.armiesSubtitle')}
           </p>
         </div>
 
@@ -40,16 +42,14 @@ const ArmiesPage: React.FC = () => {
                     <Boxes size={16} />
                   </span>
                   <Card.Title as="h2" className="text-base">
-                    Collections
+                    {t('pages.collections')}
                   </Card.Title>
                 </div>
                 <span className="font-mono text-xs font-bold text-accent">
                   {collections.length}
                 </span>
               </div>
-              <Card.Description>
-                Painted inventory and readiness. Open a cabinet, then build a list from it.
-              </Card.Description>
+              <Card.Description>{t('pages.collectionsDescription')}</Card.Description>
             </Card>
           </Link>
 
@@ -61,14 +61,12 @@ const ArmiesPage: React.FC = () => {
                     <ClipboardList size={16} />
                   </span>
                   <Card.Title as="h2" className="text-base">
-                    Rosters
+                    {t('pages.rosters')}
                   </Card.Title>
                 </div>
                 <span className="font-mono text-xs font-bold text-accent">{rosters.length}</span>
               </div>
-              <Card.Description>
-                Matched-play lists, including theorycraft that is not attached to a collection.
-              </Card.Description>
+              <Card.Description>{t('pages.rostersDescription')}</Card.Description>
             </Card>
           </Link>
         </div>
@@ -82,7 +80,7 @@ const ArmiesPage: React.FC = () => {
         {collections.length > 0 ? (
           <section className="flex flex-col gap-1.5" data-testid="armies-recent-collections">
             <SectionHeader
-              title="Recent collections"
+              title={t('pages.recentCollections')}
               count={collections.length}
               viewAllTo="/collections"
               viewAllTestId="armies-view-all-collections"
@@ -98,7 +96,7 @@ const ArmiesPage: React.FC = () => {
         {rosters.length > 0 ? (
           <section className="flex flex-col gap-1.5" data-testid="armies-recent-rosters">
             <SectionHeader
-              title="Recent rosters"
+              title={t('pages.recentRosters')}
               count={rosters.length}
               viewAllTo="/rosters"
               viewAllTestId="armies-view-all-rosters"

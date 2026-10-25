@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -27,9 +29,15 @@ interface Props {
   prefill?: RosterPrefill;
 }
 
-type Errors = { name?: string; faction?: string; detachment?: string; maxPoints?: string };
+type Errors = {
+  name?: ParseKeys<'rosters'>;
+  faction?: ParseKeys<'rosters'>;
+  detachment?: ParseKeys<'rosters'>;
+  maxPoints?: ParseKeys<'rosters'>;
+};
 
 const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) => {
+  const { t } = useTranslation(['rosters', 'common']);
   const navigate = useNavigate();
   const { createRoster } = useRoster();
   const {
@@ -66,12 +74,11 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
     const nextErrors: Errors = {};
     const selectedFactionIndex = factions?.find((f) => f.slug === factionSlug);
 
-    if (!name.trim()) nextErrors.name = 'Please enter a roster name.';
-    if (!factionSlug) nextErrors.faction = 'Please select a faction.';
-    else if (!selectedFactionIndex) nextErrors.faction = 'Selected faction not found.';
-    if (detachmentSlugs.length === 0)
-      nextErrors.detachment = 'Please select at least one detachment.';
-    if (maxPoints <= 0) nextErrors.maxPoints = 'Max points must be greater than 0.';
+    if (!name.trim()) nextErrors.name = 'form.nameRequired';
+    if (!factionSlug) nextErrors.faction = 'form.factionRequired';
+    else if (!selectedFactionIndex) nextErrors.faction = 'form.factionMissing';
+    if (detachmentSlugs.length === 0) nextErrors.detachment = 'form.detachmentRequired';
+    if (maxPoints <= 0) nextErrors.maxPoints = 'form.pointsRequired';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0 || !selectedFactionIndex) return;
@@ -87,7 +94,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       units = rebound.units;
       const note = formatRebindSummaryMessage(rebound.summary);
       if (note) {
-        showToast({ type: 'warning', title: 'Units updated to current data', message: note });
+        showToast({ type: 'warning', title: t('notifications.unitsUpdated'), message: note });
       }
     }
 
@@ -113,14 +120,14 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       className="flex flex-col gap-4"
     >
       {prefillUnits.length > 0 ? (
-        <Alert title={`Prefilling with ${prefillUnits.length} units from your collection.`}>
-          Total of {prefillTotal} points
+        <Alert title={t('form.prefill', { count: prefillUnits.length })}>
+          {t('form.totalPoints', { points: prefillTotal })}
         </Alert>
       ) : null}
 
       <Field data-testid="roster-name-field">
         <label htmlFor="roster-name" className="block text-sm font-medium text-body">
-          Roster Name
+          {t('form.name')}
         </label>
         <input
           data-testid="roster-name-input"
@@ -134,7 +141,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
           }}
           required
         />
-        {errors.name ? <p className="text-sm text-danger-fg">{errors.name}</p> : null}
+        {errors.name ? <p className="text-sm text-danger-fg">{t(errors.name)}</p> : null}
       </Field>
 
       {factionsLoading ? (
@@ -142,17 +149,17 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       ) : (
         <SelectField
           data-testid="faction-field"
-          label="Faction"
+          label={t('form.faction')}
           options={factionOptions}
           value={factionSlug}
           onChange={(e) => {
             setFactionSlug(e.target.value);
             setErrors((prev) => ({ ...prev, faction: undefined, detachment: undefined }));
           }}
-          placeholder="Select a Faction"
+          placeholder={t('form.selectFaction')}
           required
           disabled={!!prefill?.factionSlug}
-          error={errors.faction}
+          error={errors.faction && t(errors.faction)}
         />
       )}
 
@@ -161,7 +168,7 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
       ) : factionSlug && factionDetachments.length > 0 ? (
         <SelectField
           data-testid="detachment-field"
-          label="Detachment"
+          label={t('form.detachment')}
           options={sortByName(factionDetachments).map((detachment) => ({
             value: detachment.slug,
             label: detachment.name
@@ -171,16 +178,14 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
             setDetachmentSlugs(e.target.value ? [e.target.value] : []);
             setErrors((prev) => ({ ...prev, detachment: undefined }));
           }}
-          placeholder="Select a Detachment"
+          placeholder={t('form.selectDetachment')}
           required
-          error={errors.detachment}
+          error={errors.detachment && t(errors.detachment)}
         />
       ) : factionSlug ? (
         <Field>
-          <label className="block text-sm font-medium text-body">Detachment</label>
-          <div className="text-sm text-subtle italic">
-            No detachments available for this faction
-          </div>
+          <label className="block text-sm font-medium text-body">{t('form.detachment')}</label>
+          <div className="text-sm text-subtle italic">{t('form.noDetachments')}</div>
         </Field>
       ) : null}
 
@@ -188,12 +193,12 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
         data-testid="max-points-field"
         value={maxPoints}
         onChange={setMaxPoints}
-        error={errors.maxPoints}
+        error={errors.maxPoints && t(errors.maxPoints)}
       />
 
       <div className="flex justify-end gap-4">
         <Button data-testid="cancel-button" variant="secondary" onClick={onClose}>
-          Cancel
+          {t('common:actions.cancel')}
         </Button>
         <Button
           data-testid="submit-button"
@@ -206,17 +211,25 @@ const CreateRosterForm: React.FC<Omit<Props, 'open'>> = ({ onClose, prefill }) =
             factionLoading
           }
         >
-          Create Roster
+          {t('pages.create')}
         </Button>
       </div>
     </form>
   );
 };
 
-const CreateRosterSheet: React.FC<Props> = ({ open, onClose, prefill }) => (
-  <Sheet open={open} onClose={onClose} title="Create Roster" data-testid="create-roster-sheet">
-    <CreateRosterForm onClose={onClose} prefill={prefill} />
-  </Sheet>
-);
+const CreateRosterSheet: React.FC<Props> = ({ open, onClose, prefill }) => {
+  const { t } = useTranslation('rosters');
+  return (
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title={t('pages.create')}
+      data-testid="create-roster-sheet"
+    >
+      <CreateRosterForm onClose={onClose} prefill={prefill} />
+    </Sheet>
+  );
+};
 
 export default CreateRosterSheet;

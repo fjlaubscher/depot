@@ -5,6 +5,7 @@ import WargearRow from './wargear-row';
 interface WargearSectionProps {
   wargear: depot.Wargear[];
   title: string;
+  dataTestId?: string;
   selectedWargear: depot.Wargear[];
   onSelectionChange: (wargear: depot.Wargear, selected: boolean) => void;
 }
@@ -12,6 +13,7 @@ interface WargearSectionProps {
 const WargearSection: React.FC<WargearSectionProps> = ({
   wargear,
   title,
+  dataTestId,
   selectedWargear,
   onSelectionChange
 }) => {
@@ -20,7 +22,7 @@ const WargearSection: React.FC<WargearSectionProps> = ({
   return (
     <div
       className="flex flex-col gap-1.5"
-      data-testid={`${title.toLowerCase().replace(/\s+/g, '-')}-wargear-section`}
+      data-testid={dataTestId ?? `${title.toLowerCase().replace(/\s+/g, '-')}-wargear-section`}
     >
       {/* Subordinate to the `// WARGEAR` rule above it, so it stays a quiet label. */}
       <h4 className="font-mono text-[9.5px] font-medium uppercase tracking-wide text-subtle">

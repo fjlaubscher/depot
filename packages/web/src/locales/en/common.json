@@ -1,5 +1,11 @@
 {
   "loading": "Loading…",
+  "rebind": {
+    "partial_one": "{{count}} unit partially matched (loadout changes).",
+    "partial_other": "{{count}} units partially matched (loadout changes).",
+    "missing_one": "{{count}} unit not found in the current catalog.",
+    "missing_other": "{{count}} units not found in the current catalog."
+  },
   "navigation": {
     "home": "Home",
     "rules": "Rules",

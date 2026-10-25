@@ -39,10 +39,10 @@ export const remapRosterIds = (roster: Roster): Roster => {
 
 export const createRosterDuplicate = (
   roster: Roster,
-  options: { dataVersion?: string | null } = {}
+  options: { dataVersion?: string | null; name?: string } = {}
 ): Roster => {
   const copy = remapRosterIds(structuredClone(roster));
-  copy.name = `${roster.name} (Copy)`;
+  copy.name = options.name ?? `${roster.name} (Copy)`;
   copy.dataVersion = options.dataVersion ?? roster.dataVersion ?? null;
   copy.points.current = calculateTotalPoints(copy);
   return copy;
@@ -64,8 +64,19 @@ export const getRosterSubtitle = (roster: Roster): string => {
   return factionName && detachmentNames ? `${factionName} • ${detachmentNames}` : factionName;
 };
 
+export interface RosterShareLabels {
+  faction: string;
+  detachment: string;
+  points: string;
+  warlord: string;
+  wargearAbility: string;
+  enhancement: string;
+  pointsUnit: string;
+}
+
 export interface GenerateRosterShareTextOptions {
   includeWargear?: boolean;
+  labels?: RosterShareLabels;
 }
 
 export const generateRosterShareText = (
@@ -74,20 +85,29 @@ export const generateRosterShareText = (
   options: GenerateRosterShareTextOptions = {}
 ): string => {
   const includeWargear = options.includeWargear ?? false;
+  const detachments = getRosterDetachments(roster);
+  const labels = options.labels ?? {
+    faction: 'Faction',
+    detachment: detachments.length === 1 ? 'Detachment' : 'Detachments',
+    points: 'Points',
+    warlord: 'Warlord',
+    wargearAbility: 'Wargear Ability',
+    enhancement: 'Enhancement',
+    pointsUnit: 'pts'
+  };
   const lines: string[] = [];
 
   lines.push(`*${roster.name}*`);
   lines.push('');
 
   if (factionName) {
-    lines.push(`*Faction:* ${factionName}`);
+    lines.push(`*${labels.faction}:* ${factionName}`);
   }
-  const detachments = getRosterDetachments(roster);
   if (detachments.length > 0) {
-    const label = detachments.length === 1 ? 'Detachment' : 'Detachments';
+    const label = labels.detachment;
     lines.push(`*${label}:* ${detachments.map((detachment) => detachment.name).join('; ')}`);
   }
-  lines.push(`*Points:* ${roster.points.current} / ${roster.points.max}`);
+  lines.push(`*${labels.points}:* ${roster.points.current} / ${roster.points.max}`);
   lines.push('');
 
   const sortedUnits = [...roster.units].sort((a, b) =>
@@ -95,9 +115,9 @@ export const generateRosterShareText = (
   );
   sortedUnits.forEach((unit) => {
     const unitCost = parseInt(unit.modelCost.cost, 10) || 0;
-    const warlordPrefix = roster.warlordUnitId === unit.id ? '[Warlord] ' : '';
+    const warlordPrefix = roster.warlordUnitId === unit.id ? `[${labels.warlord}] ` : '';
     const unitName = `${warlordPrefix}${unit.datasheet.name}`.trim();
-    lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} pts)`);
+    lines.push(`- ${unitName} - ${unit.modelCost.description} (${unitCost} ${labels.pointsUnit})`);
 
     if (includeWargear && unit.selectedWargear.length > 0) {
       unit.selectedWargear.forEach((wargear) => {
@@ -107,14 +127,16 @@ export const generateRosterShareText = (
 
     if (includeWargear && unit.selectedWargearAbilities?.length) {
       unit.selectedWargearAbilities.forEach((ability) => {
-        lines.push(`  - [Wargear Ability] ${ability.name}`);
+        lines.push(`  - [${labels.wargearAbility}] ${ability.name}`);
       });
     }
 
     const unitEnhancements = roster.enhancements.filter((e) => e.unitId === unit.id);
     unitEnhancements.forEach(({ enhancement }) => {
       const enhancementCost = parseInt(enhancement.cost, 10) || 0;
-      lines.push(`  - [Enhancement] ${enhancement.name} (${enhancementCost} pts)`);
+      lines.push(
+        `  - [${labels.enhancement}] ${enhancement.name} (${enhancementCost} ${labels.pointsUnit})`
+      );
     });
   });
 

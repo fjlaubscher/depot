@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { RosterProvider, useRoster } from './context';
 import { createMockRoster } from '@/test/mock-data';
+import i18n from '@/i18n';
 
 // Mock offline storage using vi.hoisted for proper scoping
 const mockOfflineStorage = vi.hoisted(() => ({
@@ -95,6 +96,46 @@ const TestWrapper = ({ rosterId, children }: { rosterId?: string; children: Reac
 );
 
 describe('RosterProvider', () => {
+  it('does not write a settled roster again just because the language changes', async () => {
+    mockOfflineStorage.getRoster.mockResolvedValue(createMockRoster());
+    mockOfflineStorage.saveRoster.mockResolvedValue(undefined);
+    render(
+      <TestWrapper rosterId="test">
+        <TestComponent />
+      </TestWrapper>
+    );
+    await waitFor(() => expect(mockOfflineStorage.saveRoster).toHaveBeenCalledTimes(1));
+    await act(() => i18n.changeLanguage('fr'));
+    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledTimes(1);
+  });
+  it('does not save again on language change and reports a delayed save failure in the current language', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockOfflineStorage.getRoster.mockResolvedValue(createMockRoster());
+    let rejectSave!: (error: Error) => void;
+    mockOfflineStorage.saveRoster.mockImplementationOnce(
+      () =>
+        new Promise<void>((_, reject) => {
+          rejectSave = reject;
+        })
+    );
+    render(
+      <TestWrapper rosterId="test">
+        <TestComponent />
+      </TestWrapper>
+    );
+    await waitFor(() => expect(mockOfflineStorage.saveRoster).toHaveBeenCalledTimes(1));
+    await act(() => i18n.changeLanguage('fr'));
+    expect(mockOfflineStorage.saveRoster).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      rejectSave(new Error('disk'));
+    });
+    expect(mockToastContext.showToast).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Les modifications peuvent ne pas être enregistrées. Veuillez réessayer.'
+      })
+    );
+    consoleSpy.mockRestore();
+  });
   beforeEach(() => {
     vi.clearAllMocks();
   });

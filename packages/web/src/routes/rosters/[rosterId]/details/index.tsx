@@ -19,6 +19,7 @@ import DetachmentPicker from '@/routes/rosters/_components/detachment-picker';
 
 const RosterDetailsContent: FC = () => {
   const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation('rosters');
   const { state: roster, updateRosterDetails } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -44,7 +45,9 @@ const RosterDetailsContent: FC = () => {
 
   const isLoading = !roster.id || (!faction && factionLoading);
 
-  const pageTitle = roster.name ? `${roster.name} - Roster Details` : 'Roster Details';
+  const pageTitle = roster.name
+    ? rosterT('pages.detailsTitle', { name: roster.name })
+    : rosterT('pages.detailsDocument');
 
   if (isLoading) {
     return (
@@ -70,8 +73,8 @@ const RosterDetailsContent: FC = () => {
 
     showToast({
       type: 'success',
-      title: 'Roster Updated',
-      message: 'Roster details have been saved.'
+      title: rosterT('notifications.detailsUpdated'),
+      message: rosterT('notifications.detailsSaved')
     });
 
     navigate(`/rosters/${roster.id}/edit`);
@@ -81,12 +84,12 @@ const RosterDetailsContent: FC = () => {
     <AppLayout
       title={pageTitle}
       back={{ to: `/rosters/${roster.id}/edit`, label: roster.name }}
-      heading={{ title: 'Roster details', subtitle: getRosterSubtitle(roster) }}
+      heading={{ title: rosterT('pages.details'), subtitle: getRosterSubtitle(roster) }}
       actions={[
         {
           icon: <Save size={16} />,
           onClick: () => formRef.current?.requestSubmit(),
-          ariaLabel: 'Save roster details',
+          ariaLabel: rosterT('form.save'),
           disabled: saveDisabled
         }
       ]}
@@ -105,7 +108,7 @@ const RosterDetailsContent: FC = () => {
           >
             <Field data-testid="roster-name-field">
               <label htmlFor="roster-name" className="block text-sm font-medium text-body">
-                Roster Name
+                {rosterT('form.name')}
               </label>
               <input
                 id="roster-name"
@@ -113,7 +116,7 @@ const RosterDetailsContent: FC = () => {
                 className="input-base"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Name your roster"
+                placeholder={rosterT('form.namePlaceholder')}
               />
             </Field>
 
@@ -122,10 +125,10 @@ const RosterDetailsContent: FC = () => {
             ) : factionError ? (
               <Alert
                 variant="error"
-                title="Failed to load detachments"
+                title={rosterT('form.detachmentsError')}
                 data-testid="detachment-error"
               >
-                {factionError}
+                {rosterT('form.loadError')}
               </Alert>
             ) : factionDetachments.length > 0 ? (
               <DetachmentPicker
@@ -138,10 +141,10 @@ const RosterDetailsContent: FC = () => {
             ) : (
               <Alert
                 variant="warning"
-                title="No detachments available"
+                title={rosterT('form.noDetachmentsTitle')}
                 data-testid="detachment-empty"
               >
-                No detachments available for this faction.
+                {rosterT('form.noDetachments')}.
               </Alert>
             )}
 
@@ -160,7 +163,7 @@ const RosterDetailsContent: FC = () => {
           onClick={() => navigate(`/rosters/${roster.id}`)}
           data-testid="cancel-roster-details"
         >
-          Cancel
+          {t('actions.cancel')}
         </Button>
       </div>
     </AppLayout>

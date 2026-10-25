@@ -104,7 +104,8 @@ export const useShareAction = ({
           }
         });
         return;
-      } catch {
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         // fall through to clipboard
       }
     }
