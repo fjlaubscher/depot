@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 import { parseWargearKeywords } from '@depot/core/utils/wargear';
@@ -54,6 +55,7 @@ const buildProfileLabel = (weapon: depot.Wargear, profile: depot.WargearProfile)
 };
 
 const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => {
+  const { t } = useTranslation('catalog');
   const rows = useMemo<TableRow[]>(
     () =>
       wargear.flatMap((weapon) =>
@@ -83,8 +85,20 @@ const WargearTable: React.FC<WargearTableProps> = ({ wargear, title, type }) => 
     return null;
   }
 
-  const skillLabel = type === 'Ranged' ? 'BS' : type === 'Melee' ? 'WS' : 'BS/WS';
-  const headers = ['Range', 'A', skillLabel, 'S', 'AP', 'D'];
+  const skillLabel =
+    type === 'Ranged'
+      ? t('stats.ballisticSkill')
+      : type === 'Melee'
+        ? t('stats.weaponSkill')
+        : t('stats.mixedSkill');
+  const headers = [
+    t('stats.range'),
+    t('stats.attacks'),
+    skillLabel,
+    t('stats.strength'),
+    t('stats.armourPenetration'),
+    t('stats.damage')
+  ];
 
   return (
     <table className="w-full table-fixed border-collapse">

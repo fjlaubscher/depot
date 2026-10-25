@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { Shield } from 'lucide-react';
 
@@ -9,18 +10,19 @@ interface ModelStatsRowProps {
 }
 
 const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {
+  const { t } = useTranslation('catalog');
   const normalizedInv = normalizeInvulnerable(model.invSv);
   const showInvulnerable = Boolean(normalizedInv);
 
   return (
     <div className="flex flex-col gap-2">
       <StatsRow title={model.name} subtitle={model.baseSize}>
-        <StatCard label="M" value={model.m} />
-        <StatCard label="T" value={model.t} />
-        <StatCard label="Sv" value={model.sv} />
-        <StatCard label="W" value={model.w} />
-        <StatCard label="Ld" value={model.ld} />
-        <StatCard label="OC" value={model.oc} />
+        <StatCard label={t('stats.movement')} value={model.m} />
+        <StatCard label={t('stats.toughness')} value={model.t} />
+        <StatCard label={t('stats.save')} value={model.sv} />
+        <StatCard label={t('stats.wounds')} value={model.w} />
+        <StatCard label={t('stats.leadership')} value={model.ld} />
+        <StatCard label={t('stats.objectiveControl')} value={model.oc} />
       </StatsRow>
 
       {showInvulnerable ? (
@@ -30,7 +32,7 @@ const ModelStatsRow: React.FC<ModelStatsRowProps> = ({ model }) => {
             data-testid="model-invulnerable-save"
           >
             <Shield size={16} className="text-subtle" />
-            <span className="font-medium">Invulnerable Save</span>{' '}
+            <span className="font-medium">{t('stats.invulnerableSave')}</span>{' '}
             <span className="font-bold text-accent-500">{normalizedInv}</span>
           </div>
           {model.invSvDescr ? (

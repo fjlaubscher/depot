@@ -1,8 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { sortByName } from '@depot/core/utils/common';
 import {
   BATTLEFIELD_ROLES,
-  BATTLEFIELD_ROLE_LABELS,
   CODEX_SLUG,
   type BattlefieldRole,
   type DatasheetListItem,
@@ -63,19 +63,6 @@ const deriveSupplementState = <T extends DatasheetListItem>(
     : (metadata.options.find((option) => option.value === selectedSupplement)?.label ??
       (selectedSupplement && selected !== 'all' ? buildSupplementLabel(selectedSupplement) : null));
 
-  let summary: string | null = null;
-  if (isFiltered && label) {
-    if (selected === CODEX_SLUG) {
-      summary = `${label} (core datasheets): ${filteredActive.length} datasheets`;
-    } else {
-      const shared = filterDatasheetsBySettings(codexDatasheets, filters).length;
-      summary =
-        shared === 0
-          ? `${label}: ${filteredActive.length} datasheets`
-          : `${label}: ${filteredActive.length} datasheets + ${shared} shared core datasheets`;
-    }
-  }
-
   return {
     hasSupplements: metadata.hasSupplements,
     tabs: metadata.hasSupplements ? metadata.options : [],
@@ -86,19 +73,22 @@ const deriveSupplementState = <T extends DatasheetListItem>(
     datasheets: metadata.hasSupplements
       ? filterDatasheetsBySupplement(datasheets, selectedSupplement)
       : datasheets,
-    summary
+    label,
+    sharedCount:
+      selected === CODEX_SLUG ? 0 : filterDatasheetsBySettings(codexDatasheets, filters).length
   };
 };
 
 export const DatasheetBrowser = <T extends DatasheetListItem>({
   datasheets,
   renderDatasheet,
-  searchPlaceholder = 'Search datasheets...',
-  emptyStateMessage = 'No datasheets found.',
+  searchPlaceholder,
+  emptyStateMessage,
   showItemCount = true,
   filters,
   resultsClassName
 }: DatasheetBrowserProps<T>) => {
+  const { t } = useTranslation('catalog');
   const [selectedSupplement, setSelectedSupplement] = useState('all');
   const [selectedRole, setSelectedRole] = useState<RoleTab>('all');
   const [query, setQuery] = useState('');
@@ -179,14 +169,14 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
     }
 
     return [
-      { value: 'all' as const, label: 'All', count: searchedDatasheets.length },
+      { value: 'all' as const, label: t('all'), count: searchedDatasheets.length },
       ...BATTLEFIELD_ROLES.filter((role) => (counts.get(role) ?? 0) > 0).map((role) => ({
         value: role,
-        label: BATTLEFIELD_ROLE_LABELS[role],
+        label: t(`roles.${role}`),
         count: counts.get(role)!
       }))
     ];
-  }, [renderDatasheet, searchedDatasheets]);
+  }, [renderDatasheet, searchedDatasheets, t]);
 
   const visibleDatasheets = useMemo(() => {
     if (!roleTabs || selectedRole === 'all') return searchedDatasheets;
@@ -194,8 +184,8 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
   }, [roleTabs, selectedRole, searchedDatasheets]);
 
   const emptyMessage = debouncedQuery
-    ? 'No datasheets found matching your filters.'
-    : emptyStateMessage;
+    ? t('noDatasheetsMatching')
+    : (emptyStateMessage ?? t('noDatasheets'));
 
   const resultItems = visibleDatasheets.map((datasheet) => (
     <div key={datasheet.slug} id={datasheet.id}>
@@ -215,18 +205,24 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
         ) : null}
 
         <Search
-          label="Search datasheets"
+          label={t('searchDatasheets')}
           value={query}
           onChange={setQuery}
-          placeholder={searchPlaceholder}
+          placeholder={searchPlaceholder ?? t('searchDatasheetsPlaceholder')}
           testId="datasheet-search"
           className="w-full"
           clearable
           clearTestId="datasheet-search-clear"
         />
-        {supplement.summary ? (
+        {supplement.isFiltered && supplement.label ? (
           <span className="text-xs text-subtle" data-testid="supplement-summary">
-            {supplement.summary}
+            {t(supplement.selected === CODEX_SLUG ? 'coreSupplementSummary' : 'supplementSummary', {
+              label: supplement.selected === CODEX_SLUG ? t('noSupplement') : supplement.label,
+              count: supplement.filteredActive.length
+            })}
+            {supplement.sharedCount > 0
+              ? t('sharedCoreCount', { count: supplement.sharedCount })
+              : ''}
           </span>
         ) : null}
         {roleTabs ? (
@@ -234,14 +230,17 @@ export const DatasheetBrowser = <T extends DatasheetListItem>({
             tabs={roleTabs}
             active={selectedRole}
             onChange={setSelectedRole}
-            ariaLabel="Datasheet roles"
+            ariaLabel={t('rolesLabel')}
             testIdPrefix="datasheet-role"
           />
         ) : null}
         {showItemCount ? (
           <span className="text-sm text-subtle">
-            Showing {visibleDatasheets.length} of {filteredBySettings.length} datasheets
-            {supplement.isFiltered ? ` (from ${datasheets.length} total)` : ''}
+            {t('showingDatasheets', {
+              visible: visibleDatasheets.length,
+              count: filteredBySettings.length
+            })}
+            {supplement.isFiltered ? t('fromTotal', { count: datasheets.length }) : ''}
           </span>
         ) : null}
       </div>

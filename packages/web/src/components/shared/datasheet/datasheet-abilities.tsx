@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useState } from 'react';
 import type { depot } from '@depot/core';
 import { cx } from '@/utils/cx';
@@ -21,6 +22,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
   dataTestId,
   className
 }) => {
+  const { t } = useTranslation('catalog');
   const [selectedAbility, setSelectedAbility] = useState<depot.Ability | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -45,7 +47,7 @@ export const DatasheetAbilities: React.FC<DatasheetAbilitiesProps> = ({
     <>
       <TagSection
         title={title}
-        description="Click a tag to view full rules."
+        description={t('abilityHint')}
         spacing="sm"
         className={className}
         data-testid={sectionTestId}

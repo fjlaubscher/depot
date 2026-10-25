@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 
@@ -20,6 +21,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
   datasheet,
   factionDatasheets = []
 }) => {
+  const { t } = useTranslation('catalog');
   const { settings } = useSettingsContext();
   const mergedAbilities = useMemo(() => {
     const { inline, referenced } = categorizeAbilities(datasheet.abilities);
@@ -52,7 +54,7 @@ const DatasheetProfile: React.FC<DatasheetProfileProps> = ({
           <DatasheetHero datasheet={datasheet} />
 
           <DatasheetAbilities
-            title="Abilities"
+            title={t('abilities')}
             abilities={mergedAbilities}
             dataTestId="datasheet-abilities"
           />

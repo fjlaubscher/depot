@@ -20,6 +20,7 @@ import Skeleton from './_components/skeleton';
 
 const DatasheetPage: FC = () => {
   const { t } = useTranslation('common');
+  const { t: tc } = useTranslation('catalog');
   const { factionSlug, datasheetSlug } = useParams<{
     factionSlug: string;
     datasheetSlug: string;
@@ -50,10 +51,10 @@ const DatasheetPage: FC = () => {
 
   if (errorMessage) {
     return (
-      <AppLayout title="Error">
+      <AppLayout title={t('error.label')}>
         <ErrorState
-          title="Failed to Load Datasheet"
-          message="We encountered an error while trying to load this datasheet. This could be due to network issues or the datasheet may not exist."
+          title={tc('errors.datasheetTitle')}
+          message={tc('errors.datasheetMessage')}
           stackTrace={errorMessage}
           data-testid="datasheet-error"
         />
@@ -67,10 +68,10 @@ const DatasheetPage: FC = () => {
 
   if (!faction || !datasheet) {
     return (
-      <AppLayout title="Not Found">
+      <AppLayout title={tc('notFound')}>
         <ErrorState
-          title="Datasheet not found"
-          message="The datasheet you're looking for doesn't exist or may have been removed."
+          title={tc('errors.datasheetNotFound')}
+          message={tc('errors.datasheetMissing')}
           showRetry={false}
           homeUrl={factionSlug ? `/faction/${factionSlug}` : '/'}
           data-testid="datasheet-not-found"
@@ -85,7 +86,7 @@ const DatasheetPage: FC = () => {
   const supplement = datasheet.supplementLabel ?? datasheet.sourceName;
   const eyebrowSuffix =
     supplement && !/^(none|codex)$/i.test(supplement.trim()) ? supplement : undefined;
-  const headingSubtitle = eyebrowSuffix ? `Datasheet · ${eyebrowSuffix}` : 'Datasheet';
+  const headingSubtitle = eyebrowSuffix ? `${tc('datasheet')} · ${eyebrowSuffix}` : tc('datasheet');
 
   return (
     <AppLayout
@@ -101,7 +102,7 @@ const DatasheetPage: FC = () => {
         {
           icon: shareAction.icon,
           onClick: () => shareAction.onClick(),
-          ariaLabel: shareAction.ariaLabel ?? 'Share datasheet',
+          ariaLabel: shareAction.ariaLabel ?? t('share.datasheetLabel'),
           'data-testid': shareAction['data-testid']
         }
       ]}

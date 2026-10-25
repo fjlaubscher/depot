@@ -2,13 +2,19 @@
 
 The web app uses i18next and react-i18next. Catalogues live in
 `src/locales/{language}/{namespace}.json`: `common` for shared interface text,
-`home` for the dashboard and `settings` for preferences. Create other domains
+`home` for the dashboard, `settings` for preferences and `catalog` for catalogue
+screens and shared unit/weapon profiles. Create other domains
 when their screens are translated, rather than creating empty catalogues.
 
 Vite emits separate JSON assets (never inline). The backend in `loader.ts` fetches
 namespaces when components request them and caches successful responses through
 the Cache API, including on the first visit before a service worker controls the
-page. Translation assets are excluded from the PWA global precache. Settings
+page. On each page load, requested namespaces are revalidated over HTTP with
+`cache: 'no-cache'` and successful responses replace the stored version. Cached
+translations are used when the network is unavailable or returns an error.
+Requests are shared within the page, so a namespace is checked only once per
+language until the next reload. Translation assets are excluded from the PWA
+global precache. Settings
 prepare remaining namespaces in the background for **only the current language
 and English fallback**. Other languages are not downloaded until selected.
 

@@ -56,7 +56,46 @@ describe('translation loading', () => {
     const reloaded = await import('./loader');
 
     expect(await reloaded.loadTranslation('fr', 'common')).toEqual(french);
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidates cached translations and replaces changed content once per page load', async () => {
+    let cached = Response.json({ hero: { title: 'Ancien titre' } });
+    const updated = { hero: { title: 'Titre mis à jour' } };
+    const put = vi.fn(async (_url: string, response: Response) => {
+      cached = response.clone();
+    });
+    vi.stubGlobal('caches', {
+      open: async () => ({ match: async () => cached.clone(), put })
+    });
+    vi.mocked(fetch).mockResolvedValue(Response.json(updated));
+    const { loadTranslation } = await import('./loader');
+
+    const results = await Promise.all([
+      loadTranslation('fr', 'home'),
+      loadTranslation('fr', 'home')
+    ]);
+
+    expect(results).toEqual([updated, updated]);
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/fr/home.json'), {
+      cache: 'no-cache'
+    });
+    expect(put).toHaveBeenCalledOnce();
+    expect(await cached.json()).toEqual(updated);
+  });
+
+  it('keeps cached translations when revalidation returns a server error', async () => {
+    const put = vi.fn();
+    vi.stubGlobal('caches', {
+      open: async () => ({ match: async () => Response.json(french), put })
+    });
+    vi.mocked(fetch).mockResolvedValue(new Response('', { status: 503 }));
+    const { loadTranslation } = await import('./loader');
+
+    expect(await loadTranslation('fr', 'common')).toEqual(french);
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(put).not.toHaveBeenCalled();
   });
 
   it('does not cache failed or malformed responses and permits a retry', async () => {
@@ -95,7 +134,7 @@ describe('translation loading', () => {
     const { preloadTranslations } = await import('./loader');
     await preloadTranslations('en');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(3);
+    expect(requested).toHaveLength(4);
     expect(requested.every((url) => url.includes('/en/'))).toBe(true);
     expect(requested.some((url) => url.includes('/settings.json'))).toBe(true);
   });
@@ -104,9 +143,9 @@ describe('translation loading', () => {
     const { preloadTranslations, loadTranslation } = await import('./loader');
     await preloadTranslations('fr');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(6);
+    expect(requested).toHaveLength(8);
     expect(requested.every((url) => /\/(fr|en)\//.test(url))).toBe(true);
     await expect(loadTranslation('de', 'common')).rejects.toThrow();
-    expect(fetch).toHaveBeenCalledTimes(6);
+    expect(fetch).toHaveBeenCalledTimes(8);
   });
 });

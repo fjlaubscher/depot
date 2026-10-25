@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import i18n from '@/i18n';
 import { DatasheetBrowser } from './datasheet-browser';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockDatasheet } from '@/test/mock-data';
@@ -23,6 +24,68 @@ const keyword = (value: string) => [
 ];
 
 describe('DatasheetBrowser', () => {
+  it('keeps search, supplement and role selections when the language changes', async () => {
+    const sheets = [
+      createMockDatasheet({
+        id: 'captain',
+        slug: 'captain',
+        name: 'Captain',
+        keywords: keyword('CHARACTER')
+      }),
+      createMockDatasheet({
+        id: 'intercessor',
+        slug: 'intercessor',
+        name: 'Intercessor Squad',
+        keywords: keyword('BATTLELINE')
+      }),
+      createMockDatasheet({
+        id: 'azrael',
+        slug: 'azrael',
+        name: 'Azrael',
+        isSupplement: true,
+        supplementKey: 'dark-angels',
+        supplementSlug: 'dark-angels',
+        supplementName: 'Dark Angels',
+        keywords: keyword('EPIC HERO')
+      })
+    ];
+    render(<DatasheetBrowser datasheets={sheets} />, { wrapper: TestWrapper });
+    fireEvent.click(screen.getByTestId('supplement-tab-dark-angels'));
+    fireEvent.click(screen.getByTestId('datasheet-role-character'));
+    fireEvent.change(screen.getByTestId('datasheet-search'), { target: { value: 'cap' } });
+    await waitFor(() => expect(screen.getAllByTestId('link-card')).toHaveLength(1));
+
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('datasheet-search')).toHaveValue('cap');
+    expect(screen.getByTestId('datasheet-search')).toHaveAccessibleName(
+      'Rechercher des fiches techniques'
+    );
+    expect(screen.getByTestId('supplement-tab-dark-angels')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+    expect(screen.getByTestId('supplement-tab-dark-angels')).toHaveTextContent('Dark Angels');
+    expect(screen.getByTestId('supplement-summary')).toHaveTextContent(
+      'Dark Angels : 1 fiche technique + 2 fiches de base partagées'
+    );
+    expect(screen.getByTestId('datasheet-role-character')).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('datasheet-role-character')).toHaveTextContent('Personnages');
+    expect(screen.getByTestId('link-card')).toHaveAttribute(
+      'href',
+      '/faction/space-marines/datasheet/captain'
+    );
+
+    fireEvent.change(screen.getByTestId('datasheet-search'), { target: { value: 'absent' } });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Aucune fiche technique ne correspond à vos filtres.')
+      ).toBeInTheDocument()
+    );
+    await act(() => i18n.changeLanguage('en'));
+    expect(screen.getByText('No datasheets found matching your filters.')).toBeInTheDocument();
+    expect(screen.getByTestId('datasheet-search')).toHaveValue('absent');
+  });
+
   const datasheets = [
     createMockDatasheet({
       id: 'captain',

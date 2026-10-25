@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FC } from 'react';
 import type { depot } from '@depot/core';
 
@@ -16,6 +17,7 @@ interface DatasheetHeroProps {
 }
 
 const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, showPoints = true }) => {
+  const { t } = useTranslation('catalog');
   const { keywords, unitComposition, loadout, transport } = datasheet;
   const keywordTags = useMemo(() => {
     const grouped = groupKeywords(keywords);
@@ -34,7 +36,7 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, showPoints = true })
       {datasheet.isSupport ? (
         <TagGroup spacing="sm" data-testid="datasheet-support">
           <Tag variant="secondary" size="sm">
-            Support
+            {t('support')}
           </Tag>
         </TagGroup>
       ) : null}
@@ -49,7 +51,7 @@ const DatasheetHero: FC<DatasheetHeroProps> = ({ datasheet, showPoints = true })
 
       {/* Keywords */}
       {keywordTags.length > 0 ? (
-        <TagSection title="Keywords" spacing="sm">
+        <TagSection title={t('keywords')} spacing="sm">
           {keywordTags.map((keyword, i) => (
             <Tag key={`keyword-${i}`} variant="default" size="sm">
               {keyword}

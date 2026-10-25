@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LinkCard, Tag } from '@/components/ui';
 import type { DatasheetListItem } from '@depot/core/utils/datasheets';
 import {
@@ -19,6 +20,7 @@ const DatasheetListItemCard: FC<DatasheetListItemCardProps> = ({
   datasheet,
   supplementMetadataHasSupplements = false
 }) => {
+  const { t } = useTranslation('catalog');
   const showSupplement = supplementMetadataHasSupplements && isSupplementEntry(datasheet);
   const supplementKey = getSupplementKey(datasheet);
   const points = getListItemPoints(datasheet);
@@ -37,7 +39,7 @@ const DatasheetListItemCard: FC<DatasheetListItemCardProps> = ({
           ) : null}
           {datasheet.isSupport ? (
             <Tag size="sm" variant="secondary">
-              Support
+              {t('support')}
             </Tag>
           ) : null}
           {datasheet.isLegends ? (

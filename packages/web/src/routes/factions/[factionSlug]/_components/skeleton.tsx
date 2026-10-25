@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/layout';
 import { PageHeaderSkeleton, Skeleton, SkeletonCard } from '@/components/ui';
 
 const LoadingSkeleton: React.FC = () => {
+  const { t } = useTranslation('catalog');
   return (
-    <AppLayout title="Loading Faction">
+    <AppLayout title={t('loadingFaction')}>
       <div className="flex flex-col gap-4">
         <PageHeaderSkeleton />
         <div className="border-b border-border-subtle">

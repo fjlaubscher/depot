@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import { Link } from '@/lib/navigation';
 import type { depot } from '@depot/core';
@@ -30,9 +31,9 @@ const formatLeaderName = (slug: string, fallback: string) => {
 };
 
 const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factionDatasheets }) => {
+  const { t } = useTranslation('catalog');
   const { leaderFooter, leaders } = datasheet;
-  const leaderHead =
-    datasheet.leaderHead?.trim() || 'This leader can be attached to the following units.';
+  const leaderHead = datasheet.leaderHead?.trim();
 
   const leaderTargets = useMemo<LeaderTarget[]>(() => {
     if (!leaders.length) {
@@ -71,13 +72,17 @@ const DatasheetLeaderRules: FC<DatasheetLeaderRulesProps> = ({ datasheet, factio
 
   return (
     <CollapsibleSection
-      title="Leader"
+      title={t('leader')}
       defaultExpanded={false}
       className="w-full"
       dataTestId="datasheet-leader-rules"
     >
       <div className="flex flex-col gap-2 text-sm text-body">
-        <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderHead }} />
+        {leaderHead ? (
+          <div className="[&_p]:m-0" dangerouslySetInnerHTML={{ __html: leaderHead }} />
+        ) : (
+          <p>{t('leaderFallback')}</p>
+        )}
 
         <ul className="mt-1 list-disc pl-5">
           {leaderTargets.map((target) => (

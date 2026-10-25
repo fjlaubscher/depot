@@ -25,13 +25,20 @@ export const loadTranslation = async (
       } catch {
         // Cache storage can be disabled; translations must still work online.
       }
-      const response = cached ?? (await fetch(url));
+      let response: Response;
+      try {
+        response = await fetch(url, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`Translation request failed: ${response.status}`);
+      } catch (error) {
+        if (!cached) throw error;
+        response = cached;
+      }
       if (!response.ok) throw new Error(`Translation request failed: ${response.status}`);
       const data: unknown = await response.clone().json();
       if (!data || typeof data !== 'object' || Array.isArray(data)) {
         throw new Error(`Invalid translation: ${language}/${namespace}`);
       }
-      if (cache && !cached) {
+      if (cache && response !== cached) {
         try {
           await cache.put(url, response);
         } catch {

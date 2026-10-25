@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { cx } from '@/utils/cx';
 import Card from '@/components/ui/card';
@@ -10,6 +11,7 @@ interface StratagemCardProps {
 }
 
 const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = [] }) => {
+  const { t } = useTranslation('catalog');
   const turnStyle = getStratagemTurnStyle(stratagem.turn);
 
   return (
@@ -24,7 +26,9 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
         <span className={cx('font-mono text-[17px] leading-none font-bold', turnStyle.cp)}>
           {stratagem.cpCost}
         </span>
-        <span className="mt-0.5 font-mono text-[8px] leading-none font-bold text-subtle">CP</span>
+        <span className="mt-0.5 font-mono text-[8px] leading-none font-bold text-subtle">
+          {t('commandPoints')}
+        </span>
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-2 p-3">
@@ -62,7 +66,7 @@ const StratagemCard: React.FC<StratagemCardProps> = ({ stratagem, unitNames = []
         />
         {unitNames.length > 0 ? (
           <Card.Footer className="flex-col items-start gap-1 text-xs text-subtle">
-            <span className="type-label">Available to:</span>
+            <span className="type-label">{t('availableTo')}</span>
             <span className="text-foreground">{unitNames.join(', ')}</span>
           </Card.Footer>
         ) : null}

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -20,6 +21,7 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
   abilitiesTestId = 'roster-unit-abilities',
   showViewDatasheetLink = false
 }) => {
+  const { t } = useTranslation('catalog');
   const datasheet = unit.datasheet;
   const { inline, referenced } = categorizeAbilities([
     ...datasheet.abilities.filter((ability) => (ability.type ?? '').toLowerCase() !== 'wargear'),
@@ -38,14 +40,14 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
           <DatasheetHero datasheet={datasheet} showPoints={false} />
 
           <DatasheetAbilities
-            title="Abilities"
+            title={t('abilities')}
             abilities={[...referenced, ...inline]}
             dataTestId={abilitiesTestId}
           />
 
           {selectedWargear.length > 0 && (
             <div className="flex flex-col gap-2" data-testid="roster-unit-selected-wargear">
-              <WargearTable wargear={selectedWargear} title="Selected Wargear" type="Mixed" />
+              <WargearTable wargear={selectedWargear} title={t('selectedWargear')} type="Mixed" />
             </div>
           )}
         </div>
@@ -58,7 +60,7 @@ const RosterUnitProfilePanel: FC<RosterUnitProfilePanelProps> = ({
               }`}
               className="inline-flex items-center text-sm text-accent transition-colors hover:text-accent-500"
             >
-              View Full Datasheet →
+              {t('viewFullDatasheet')}
             </Link>
           </div>
         ) : null}

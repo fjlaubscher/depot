@@ -12,7 +12,8 @@ const cachedLanguages = (page: Page) =>
         const data = await (await cache.match(request))!.json();
         return data.navigation?.home === 'Accueil' ||
           data.bookmarks === 'Favoris' ||
-          data.automaticLanguage === 'Automatique'
+          data.automaticLanguage === 'Automatique' ||
+          data.browseRules === 'Consulter les règles'
           ? 'fr'
           : 'en';
       })
@@ -26,7 +27,7 @@ test('prepares English only until French is selected, then updates mounted mobil
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/settings');
   await expect(page.getByLabel('Interface language')).toBeVisible();
-  await expect.poll(() => cachedLanguages(page)).toEqual(['en', 'en', 'en']);
+  await expect.poll(() => cachedLanguages(page)).toEqual(['en', 'en', 'en', 'en']);
 
   await page.getByLabel('Interface language').selectOption('fr');
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
@@ -34,7 +35,7 @@ test('prepares English only until French is selected, then updates mounted mobil
   await expect(page.getByLabel('Langue de l’interface')).toHaveValue('fr');
   await expect
     .poll(async () => (await cachedLanguages(page)).sort())
-    .toEqual(['en', 'en', 'en', 'fr', 'fr', 'fr']);
+    .toEqual(['en', 'en', 'en', 'en', 'fr', 'fr', 'fr', 'fr']);
   await page.getByRole('link', { name: 'Armées', exact: true }).click();
   await expect(page).toHaveURL(/\/armies$/);
   await page.getByTestId('armies-tile-collections').click();
@@ -62,10 +63,44 @@ test('prepares English only until French is selected, then updates mounted mobil
 test('preserves French and cached translations across reloads', async ({ page }) => {
   await page.goto('/settings');
   await page.getByLabel('Interface language').selectOption('fr');
-  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(6);
+  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(8);
   await page.reload();
   await expect(page.getByLabel('Langue de l’interface')).toHaveValue('fr');
   await expect(page.getByRole('link', { name: 'Accueil', exact: true })).toBeVisible();
+});
+
+test('refreshes an outdated cached hero translation without clearing browser storage', async ({
+  page
+}) => {
+  await page.goto('/settings');
+  await page.getByLabel('Interface language').selectOption('fr');
+  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(8);
+
+  const seeded = await page.evaluate(async () => {
+    const cache = await caches.open('depot-translations');
+    for (const request of await cache.keys()) {
+      const data = await (await cache.match(request))!.json();
+      if (data.bookmarks === 'Favoris' && data.hero) {
+        data.hero.title = 'Ancienne traduction du hero';
+        await cache.put(request, Response.json(data));
+        return true;
+      }
+    }
+    return false;
+  });
+  expect(seeded).toBe(true);
+
+  await page.goto('/');
+  await expect(page.getByTestId('home-hero')).toContainText('depot fait peau neuve');
+  expect(
+    await page.evaluate(async () => {
+      const cache = await caches.open('depot-translations');
+      const resources = await Promise.all(
+        (await cache.keys()).map(async (request) => (await cache.match(request))!.json())
+      );
+      return resources.find((data) => data.bookmarks === 'Favoris')?.hero.title;
+    })
+  ).toBe('depot fait peau neuve');
 });
 
 test('keeps French home and settings readable on narrow mobile screens', async ({
@@ -133,7 +168,7 @@ test('reloads in French offline with a production service worker', async ({ page
   test.skip(!process.env.WEB_BASE_URL, 'Requires a production preview with its service worker.');
   await page.goto('/settings');
   await page.getByLabel('Interface language').selectOption('fr');
-  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(6);
+  await expect.poll(async () => (await cachedLanguages(page)).length).toBe(8);
   await page.evaluate(() => navigator.serviceWorker.ready.then(() => true));
   await expect
     .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
@@ -145,7 +180,7 @@ test('reloads in French offline with a production service worker', async ({ page
       await Promise.all(names.map(async (name) => (await caches.open(name)).keys()))
     ).flat();
     return requests
-      .filter((request) => /\/(common|home|settings)-[^/]+\.json/.test(request.url))
+      .filter((request) => /\/(common|home|settings|catalog)-[^/]+\.json/.test(request.url))
       .map((request) => request.url);
   });
   expect(precachedTranslations).toEqual([]);

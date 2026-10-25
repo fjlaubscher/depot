@@ -97,6 +97,31 @@ describe('DatasheetPage', () => {
       `Retour vers ${mockFaction.name}`
     );
     expect(screen.getByRole('link', { name: 'Règles' })).toHaveAttribute('href', '/factions');
+    expect(screen.getByTestId('page-header')).toHaveTextContent('Fiche technique');
+    expect(screen.getByText('Aptitudes')).toBeInTheDocument();
+    expect(screen.getByText('Mots-clés')).toBeInTheDocument();
+    expect(screen.getByText('Équipement et options')).toBeInTheDocument();
+    expect(document.title).toContain(mockFaction.datasheets[0].name);
+  });
+
+  it('translates load errors and missing datasheets on a mounted page', async () => {
+    mocks.mockUseDatasheet.mockReturnValue({
+      data: null,
+      loading: false,
+      error: 'network failure'
+    });
+    const { rerender } = render(<DatasheetPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('datasheet-error')).toHaveTextContent(
+      'Impossible de charger la fiche technique'
+    );
+    expect(document.title).toContain('Erreur');
+    mocks.mockUseDatasheet.mockReturnValue({ data: null, loading: false, error: null });
+    rerender(<DatasheetPage />);
+    expect(screen.getByTestId('datasheet-not-found')).toHaveTextContent(
+      'Fiche technique introuvable'
+    );
+    expect(document.title).toContain('Introuvable');
   });
 
   it('displays source and points info', () => {

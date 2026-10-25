@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
+import i18n from '@/i18n';
 import FactionDetachments from './faction-detachments';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockDetachment } from '@/test/mock-data';
@@ -26,6 +27,36 @@ const detachments = [
 ];
 
 describe('FactionDetachments', () => {
+  it('keeps disposition and search values when translating controls and empty results', async () => {
+    render(<FactionDetachments factionSlug="space-marines" detachments={detachments} />, {
+      wrapper: TestWrapper
+    });
+    fireEvent.change(screen.getByLabelText('Filter by force disposition'), {
+      target: { value: '2' }
+    });
+    fireEvent.change(screen.getByTestId('detachment-search'), { target: { value: 'gladius' } });
+    await waitFor(() => expect(screen.getAllByTestId('detachment-card')).toHaveLength(1));
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByLabelText('Filtrer par disposition de force')).toHaveValue('2');
+    expect(screen.getByTestId('detachment-search')).toHaveValue('gladius');
+    expect(screen.getByTestId('detachment-card')).toHaveTextContent('Gladius Task Force');
+    expect(screen.getByTestId('detachment-card')).toHaveTextContent('Take and Hold');
+    expect(screen.getByTestId('detachment-card')).toHaveAttribute(
+      'href',
+      '/faction/space-marines/detachment/gladius-task-force'
+    );
+    fireEvent.change(screen.getByTestId('detachment-search'), { target: { value: 'absent' } });
+    await waitFor(() =>
+      expect(
+        screen.getByText('Aucun détachement ne correspond à votre recherche.')
+      ).toBeInTheDocument()
+    );
+    await act(() => i18n.changeLanguage('en'));
+    expect(
+      screen.getByText('No detachments found matching your search criteria.')
+    ).toBeInTheDocument();
+  });
+
   it('links each detachment to its page with DP, disposition, boarding and chapter DP meta', () => {
     render(
       <TestWrapper>

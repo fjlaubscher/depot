@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Context hooks
 import { useFactionsContext } from '@/contexts/factions/context';
@@ -23,6 +24,8 @@ import {
 import useDebounce from '@/hooks/use-debounce';
 
 const Factions: React.FC = () => {
+  const { t } = useTranslation('catalog');
+  const { t: common } = useTranslation('common');
   const { factionIndex, loading, error, checkForDataUpdates } = useFactionsContext();
   const { settings } = useSettingsContext();
 
@@ -53,10 +56,10 @@ const Factions: React.FC = () => {
 
   if (error) {
     return (
-      <AppLayout title="Error">
+      <AppLayout title={common('error.label')}>
         <ErrorState
-          title="Failed to Load Factions"
-          message="We encountered an error while trying to load the factions data. This could be due to network issues or server problems."
+          title={t('errors.factionsTitle')}
+          message={t('errors.factionsMessage')}
           stackTrace={error}
         />
       </AppLayout>
@@ -64,12 +67,13 @@ const Factions: React.FC = () => {
   }
 
   return (
-    <AppLayout title="Browse Rules">
+    <AppLayout title={t('browseRules')}>
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Rules</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('rules')}</h1>
           <p className="mt-0.5 font-mono text-[10px] font-medium uppercase text-muted">
-            {totalFactions} factions · {totalAlliances} alliances
+            {t('factionCount', { count: totalFactions })} ·{' '}
+            {t('allianceCount', { count: totalAlliances })}
           </p>
         </div>
 
@@ -79,8 +83,8 @@ const Factions: React.FC = () => {
           clearTestId="faction-search-clear"
         >
           <Search
-            label="Search factions"
-            placeholder={`Search ${totalFactions} factions…`}
+            label={t('searchFactions')}
+            placeholder={t('searchFactionsPlaceholder', { count: totalFactions })}
             value={query}
             onChange={setQuery}
             testId="faction-search"
@@ -100,7 +104,7 @@ const Factions: React.FC = () => {
           </div>
         ) : debouncedQuery ? (
           <div className="text-center py-8">
-            <p className="text-subtle">No factions found matching "{debouncedQuery}"</p>
+            <p className="text-subtle">{t('noFactionsMatching', { query: debouncedQuery })}</p>
           </div>
         ) : null}
       </div>
