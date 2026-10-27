@@ -5,6 +5,7 @@ import type settings from './locales/en/settings.json';
 import type catalog from './locales/en/catalog.json';
 import type rosters from './locales/en/rosters.json';
 import type collections from './locales/en/collections.json';
+import type pages from './locales/en/pages.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -16,6 +17,7 @@ declare module 'i18next' {
       catalog: typeof catalog;
       rosters: typeof rosters;
       collections: typeof collections;
+      pages: typeof pages;
     };
     strictKeyChecks: true;
   }

@@ -3,6 +3,7 @@ import { createInstance } from 'i18next';
 
 const english = { navigation: { home: 'Home' } };
 const french = { navigation: { home: 'Accueil' } };
+const namespaceCount = Object.keys(import.meta.glob('./en/*.json')).length;
 
 describe('translation loading', () => {
   beforeEach(() => {
@@ -163,7 +164,7 @@ describe('translation loading', () => {
     const { preloadTranslations } = await import('./loader');
     await preloadTranslations('en');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(5);
+    expect(requested).toHaveLength(namespaceCount);
     expect(requested.some((url) => url.includes('/rosters.json'))).toBe(true);
     expect(requested.every((url) => url.includes('/en/'))).toBe(true);
     expect(requested.some((url) => url.includes('/settings.json'))).toBe(true);
@@ -173,9 +174,9 @@ describe('translation loading', () => {
     const { preloadTranslations, loadTranslation } = await import('./loader');
     await preloadTranslations('fr');
     const requested = vi.mocked(fetch).mock.calls.map(([url]) => String(url));
-    expect(requested).toHaveLength(10);
+    expect(requested).toHaveLength(namespaceCount * 2);
     expect(requested.every((url) => /\/(fr|en)\//.test(url))).toBe(true);
     await expect(loadTranslation('de', 'common')).rejects.toThrow();
-    expect(fetch).toHaveBeenCalledTimes(10);
+    expect(fetch).toHaveBeenCalledTimes(namespaceCount * 2);
   });
 });
