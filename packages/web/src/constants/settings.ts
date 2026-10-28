@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: Required<depot.Settings> = {
   includeWargearOnExport: true,
   useNativeShare: true,
   theme: 'system',
-  language: 'auto',
+  language: 'auto'
 };
 
 export const mergeSettingsWithDefaults = (
