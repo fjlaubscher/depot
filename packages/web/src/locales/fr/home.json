@@ -6,7 +6,7 @@
   "hero": {
     "edition": "// Maintenant en 11e édition",
     "title": "depot parle français",
-    "description": "Plusieurs langues, le français en premier. Merci à @Marthym (PR #79), première contribution communautaire. Envie d’en traduire une autre ?"
+    "description": "Plusieurs langues, le français en premier. Merci à @Marthym (PR #79), première contribution communautaire. <repo>Envie d’en traduire une autre ?</repo>"
   },
   "recentRosters": "Listes récentes",
   "collections": "Collections",

@@ -6,7 +6,7 @@
   "hero": {
     "edition": "// Now in 11th edition",
     "title": "depot now speaks French",
-    "description": "More languages, French first. Thanks to @Marthym (PR #79), depot's first community contribution. Help translate another?"
+    "description": "More languages, French first. Thanks to @Marthym (PR #79), depot's first community contribution. <repo>Help translate another?</repo>"
   },
   "recentRosters": "Recent rosters",
   "collections": "Collections",

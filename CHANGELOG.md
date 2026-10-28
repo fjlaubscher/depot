@@ -10,14 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The home announcement says depot supports multiple languages, French first,
-  thanks to its first community contribution by @Marthym (PR #79), and invites
-  help translating depot into other languages.
+  thanks to its first community contribution by @Marthym (PR #79). The invite
+  to help translate links to the repository.
+- The Settings language option that follows the device is labeled system
+  (Système in French).
 
 ## [2.3.0] - 2026-10-28
 
 ### Added
 
-- The interface can be shown in French or English, from Settings (Automatic,
+- The interface can be shown in French or English, from Settings (system,
   Français, or English). French is the first translation; English stays the
   fallback, including offline. First community contribution, by @Marthym
   (PR #79).

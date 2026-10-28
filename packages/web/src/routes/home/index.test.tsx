@@ -100,6 +100,10 @@ describe('Home', () => {
 
     expect(screen.getByTestId('home-hero')).toHaveTextContent('depot now speaks French');
     expect(screen.getByTestId('home-hero')).toHaveTextContent('@Marthym');
+    expect(screen.getByRole('link', { name: 'Help translate another?' })).toHaveAttribute(
+      'href',
+      'https://github.com/fjlaubscher/depot'
+    );
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
@@ -212,6 +216,10 @@ describe('Home', () => {
     );
     expect(screen.getByTestId('home-hero')).toHaveTextContent('depot parle français');
     expect(screen.getByTestId('home-hero')).toHaveTextContent('première contribution');
+    expect(screen.getByRole('link', { name: 'Envie d’en traduire une autre ?' })).toHaveAttribute(
+      'href',
+      'https://github.com/fjlaubscher/depot'
+    );
     expect(screen.getByTestId('home-hero')).toHaveTextContent('11e édition');
     expect(screen.getByTestId('rosters-section')).toHaveTextContent('Listes récentes');
     expect(screen.getByTestId('bookmark-card')).toHaveTextContent('My FactionFACTION');

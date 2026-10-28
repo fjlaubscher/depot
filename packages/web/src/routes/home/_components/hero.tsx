@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { getImageUrl } from '@/utils/paths';
 
@@ -28,7 +28,20 @@ const Hero: FC = () => {
         </p>
         <h1 className="text-lg leading-tight font-bold text-white">{t('hero.title')}</h1>
         <p className="max-w-[46ch] text-[12.5px] leading-normal text-white/75">
-          {t('hero.description')}
+          <Trans
+            ns="home"
+            i18nKey="hero.description"
+            components={{
+              repo: (
+                <a
+                  className="text-white underline decoration-white/50 underline-offset-2"
+                  href="https://github.com/fjlaubscher/depot"
+                  target="_blank"
+                  rel="noreferrer"
+                />
+              )
+            }}
+          />
         </p>
       </div>
     </section>
