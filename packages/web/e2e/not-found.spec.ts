@@ -21,3 +21,44 @@ test.describe('Not Found page', () => {
     await expect(page).toHaveURL(/\/$/);
   });
 });
+
+test('translates secondary pages and recovery actions in French at mobile widths', async ({
+  page
+}) => {
+  await page.goto('/settings');
+  await page.setViewportSize({ width: 320, height: 844 });
+  for (const [path, title] of [
+    ['/about', 'About depot'],
+    ['/privacy', 'Privacy Policy'],
+    ['/unknown-route', 'Page Not Found']
+  ]) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+    expect(
+      await page.locator('#app-content').evaluate((node) => node.scrollWidth <= node.clientWidth)
+    ).toBe(true);
+  }
+  await page.goto('/settings');
+  await page.getByLabel('Interface language').selectOption('fr');
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const [path, title] of [
+      ['/about', 'À propos de depot'],
+      ['/privacy', 'Politique de confidentialité'],
+      ['/unknown-route', 'Page introuvable']
+    ]) {
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+      await expect(page).toHaveTitle(new RegExp(title));
+      expect(
+        await page.locator('#app-content').evaluate((node) => node.scrollWidth <= node.clientWidth)
+      ).toBe(true);
+    }
+  }
+  await expect(page.getByTestId('go-home-button')).toHaveText('Retour à l’accueil');
+  await page.getByTestId('go-back-button').click();
+  await expect(page).toHaveURL(/\/privacy$/);
+  await page.goto('/unknown-route');
+  await page.getByTestId('go-home-button').click();
+  await expect(page).toHaveURL(/\/$/);
+});

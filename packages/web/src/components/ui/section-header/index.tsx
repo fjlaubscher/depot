@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 
 interface SectionHeaderProps {
@@ -15,26 +16,29 @@ const SectionHeader: FC<SectionHeaderProps> = ({
   title,
   count,
   viewAllTo,
-  viewAllLabel = 'All →',
+  viewAllLabel,
   viewAllTestId
-}) => (
-  <div className="flex items-center gap-2">
-    <h2 className="type-section shrink-0">
-      <span aria-hidden="true">// </span>
-      {title}
-    </h2>
-    <div className="h-px flex-1 bg-border-subtle" />
-    {count !== undefined && count !== null ? (
-      <span className="type-label" data-testid="section-count">
-        {count}
-      </span>
-    ) : null}
-    {viewAllTo ? (
-      <Link to={viewAllTo} className="type-label hover:text-accent" data-testid={viewAllTestId}>
-        {viewAllLabel}
-      </Link>
-    ) : null}
-  </div>
-);
+}) => {
+  const { t } = useTranslation('common');
+  return (
+    <div className="flex items-center gap-2">
+      <h2 className="type-section shrink-0">
+        <span aria-hidden="true">// </span>
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-border-subtle" />
+      {count !== undefined && count !== null ? (
+        <span className="type-label" data-testid="section-count">
+          {count}
+        </span>
+      ) : null}
+      {viewAllTo ? (
+        <Link to={viewAllTo} className="type-label hover:text-accent" data-testid={viewAllTestId}>
+          {viewAllLabel ?? t('actions.all')}
+        </Link>
+      ) : null}
+    </div>
+  );
+};
 
 export default SectionHeader;

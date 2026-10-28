@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Share2 } from 'lucide-react';
@@ -27,6 +28,8 @@ import FactionDetachments from './_components/faction-detachments';
 type FactionTab = 'datasheets' | 'detachments';
 
 const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
+  const { t } = useTranslation('common');
+  const { t: tc } = useTranslation('catalog');
   const { factionSlug } = useParams<{ factionSlug: string }>();
   const { data: faction, loading, error } = useFaction(factionSlug);
   const { settings } = useSettingsContext();
@@ -48,16 +51,16 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
     showForgeWorld: settings.showForgeWorld ?? false
   };
 
-  const alliance = faction ? getFactionAlliance(faction.id) : '';
+  const alliance = faction ? getFactionAlliance(faction.id).toLowerCase() : '';
   const bookmarkAction = useBookmarkAction(faction ? createFactionBookmark(faction) : undefined);
 
   const shareAction = useShareAction({
     title: faction?.name,
     url: faction ? buildAbsoluteUrl(`/faction/${faction.slug}`) : undefined,
-    ariaLabel: 'Share faction link',
+    ariaLabel: t('share.factionLabel'),
     testId: 'share-faction',
-    copySuccessMessage: 'Faction link copied to clipboard.',
-    shareSuccessMessage: 'Faction link shared.'
+    copySuccessKey: 'share.factionCopied',
+    shareSuccessKey: 'share.factionShared'
   });
 
   useScrollToHash({ enabled: !loading && Boolean(faction) });
@@ -65,10 +68,10 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   // Error State Component
   if (error) {
     return (
-      <AppLayout title="Error">
+      <AppLayout title={t('error.label')}>
         <ErrorState
-          title="Failed to Load Faction"
-          message="We encountered an error while trying to load this faction. This could be due to network issues or the faction may not exist."
+          title={tc('errors.factionTitle')}
+          message={tc('errors.factionMessage')}
           stackTrace={error}
           data-testid="error-state"
         />
@@ -82,40 +85,51 @@ const Faction: React.FC<{ tab?: FactionTab }> = ({ tab = 'datasheets' }) => {
   }
 
   // Main Content
-  const pageTitle = `${faction.name} - Faction Overview`;
+  const pageTitle = tc('factionOverview', { name: faction.name });
+  const allianceLabel =
+    alliance === 'imperium' ||
+    alliance === 'chaos' ||
+    alliance === 'xenos' ||
+    alliance === 'unaligned'
+      ? tc(`alliances.${alliance}`)
+      : alliance;
 
   return (
     <AppLayout
       title={pageTitle}
-      back={{ to: '/factions', label: 'Rules' }}
-      heading={{ title: faction.name, subtitle: alliance }}
+      back={{ to: '/factions', label: t('navigation.rules') }}
+      heading={{ title: faction.name, subtitle: allianceLabel }}
       actions={[
         bookmarkAction,
         {
           icon: shareAction.icon ?? <Share2 size={16} />,
           onClick: () => shareAction.onClick(),
-          ariaLabel: shareAction.ariaLabel ?? 'Share faction',
+          ariaLabel: shareAction.ariaLabel ?? t('share.factionLabel'),
           'data-testid': shareAction['data-testid']
         }
       ]}
     >
       <div className="flex flex-col gap-2">
         <PillTabs
-          ariaLabel="Faction sections"
+          ariaLabel={tc('factionSections')}
           testIdPrefix="faction-tab"
           active={tab}
           onChange={selectTab}
           tabs={[
-            { value: 'datasheets', label: 'Datasheets', count: faction.datasheets.length },
-            { value: 'detachments', label: 'Detachments', count: faction.detachments.length }
+            { value: 'datasheets', label: tc('datasheets'), count: faction.datasheets.length },
+            {
+              value: 'detachments',
+              label: t('navigation.detachments'),
+              count: faction.detachments.length
+            }
           ]}
         />
 
         {!showDetachments ? (
           <DatasheetBrowser
             datasheets={faction.datasheets}
-            searchPlaceholder="Search datasheets by name..."
-            emptyStateMessage="No datasheets found matching your search criteria."
+            searchPlaceholder={tc('searchDatasheetsByName')}
+            emptyStateMessage={tc('noDatasheetsCriteria')}
             showItemCount={false}
             filters={datasheetFilters}
           />

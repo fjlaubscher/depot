@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
 import { dismissInstallBanner, promptInstall, usePwaInstall } from '@/hooks/use-pwa-install';
 import { shouldShowInstallBanner } from '@/lib/pwa-install';
 
 const InstallBanner = () => {
+  const { t } = useTranslation(['home', 'common']);
   const pwa = usePwaInstall();
   const visible = shouldShowInstallBanner({
     hasPrompt: pwa.hasPrompt,
@@ -15,15 +17,16 @@ const InstallBanner = () => {
   return (
     <div
       role="region"
-      aria-label="Install"
+      aria-label={t('common:install.action')}
       data-testid="install-banner"
       className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-border-accent bg-surface-accent px-4 py-3"
     >
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="text-sm leading-snug font-semibold text-foreground">Install depot</p>
+      <div className="flex min-w-0 basis-full flex-col gap-0.5 sm:flex-1">
+        <p className="text-sm leading-snug font-semibold text-foreground">
+          {t('common:install.title')}
+        </p>
         <p className="max-w-[52ch] text-[12.5px] leading-normal text-body">
-          Add it to your home screen and depot opens like an app — full screen, no address bar, and
-          every faction you've downloaded still opens with no signal at the table.
+          {t('installDescription')}
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -35,10 +38,10 @@ const InstallBanner = () => {
             void promptInstall();
           }}
         >
-          Install
+          {t('common:install.action')}
         </Button>
         <Button type="button" size="sm" variant="ghost" onClick={dismissInstallBanner}>
-          Dismiss
+          {t('common:install.dismiss')}
         </Button>
       </div>
     </div>

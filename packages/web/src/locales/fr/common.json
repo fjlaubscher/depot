@@ -1,0 +1,129 @@
+{
+  "loading": "Chargement…",
+  "rebind": {
+    "partial_one": "{{count}} unité partiellement rattachée (équipement modifié).",
+    "partial_other": "{{count}} unités partiellement rattachées (équipement modifié).",
+    "missing_one": "{{count}} unité introuvable dans le catalogue actuel.",
+    "missing_other": "{{count}} unités introuvables dans le catalogue actuel."
+  },
+  "navigation": {
+    "home": "Accueil",
+    "rules": "Règles",
+    "armies": "Armées",
+    "settings": "Paramètres",
+    "about": "À propos",
+    "privacy": "Confidentialité",
+    "collections": "Collections",
+    "collection": "Collection",
+    "rosters": "Listes",
+    "roster": "Liste",
+    "detachments": "Détachements",
+    "primary": "Navigation principale",
+    "breadcrumb": "Fil d’Ariane",
+    "backTo": "Retour vers {{name}}"
+  },
+  "offline": {
+    "title": "Hors ligne",
+    "description": "tout reste accessible · données {{version}}",
+    "unknownVersion": "inconnues"
+  },
+  "actions": {
+    "close": "Fermer",
+    "clear": "Effacer",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "apply": "Appliquer",
+    "import": "Importer",
+    "all": "Tout voir →",
+    "decreaseQuantity": "Diminuer la quantité",
+    "increaseQuantity": "Augmenter la quantité",
+    "decreaseItem": "Diminuer {{name}}",
+    "increaseItem": "Augmenter {{name}}",
+    "duplicateItem": "Dupliquer {{item}}",
+    "editItem": "Modifier {{item}}",
+    "deleteItem": "Supprimer {{item}}",
+    "editRosterDetails": "Modifier les détails de la liste"
+  },
+  "entities": {
+    "roster": "la liste",
+    "collection": "la collection"
+  },
+  "search": {
+    "placeholder": "Rechercher",
+    "clear": "Effacer la recherche"
+  },
+  "tabs": "Onglets",
+  "notification": {
+    "dismiss": "Fermer la notification"
+  },
+  "error": {
+    "label": "Erreur",
+    "title": "Une erreur est survenue",
+    "message": "Une erreur est survenue lors du chargement de ce contenu. Veuillez réessayer.",
+    "technicalDetails": "Afficher les détails techniques",
+    "retry": "Réessayer",
+    "home": "Retour à l’accueil",
+    "applicationTitle": "Erreur de l’application",
+    "applicationMessage": "Une erreur est survenue dans l’application. Actualisez la page ou réessayez plus tard."
+  },
+  "library": {
+    "confirmDelete": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible."
+  },
+  "share": {
+    "label": "Partager le lien",
+    "title": "Partager",
+    "copied": "Copié",
+    "linkCopied": "Lien copié",
+    "shared": "Partagé",
+    "copySuccess": "Lien copié dans le presse-papiers.",
+    "shareSuccess": "Lien partagé.",
+    "unavailable": "Le partage n’est pas disponible sur cet appareil.",
+    "copyFailed": "Échec de la copie",
+    "copyError": "Impossible de copier dans le presse-papiers.",
+    "factionLabel": "Partager le lien de la faction",
+    "factionCopied": "Lien de la faction copié dans le presse-papiers.",
+    "factionShared": "Lien de la faction partagé.",
+    "datasheetLabel": "Partager le lien de la fiche",
+    "datasheetCopied": "Lien de la fiche copié dans le presse-papiers.",
+    "datasheetShared": "Lien de la fiche partagé.",
+    "detachmentLabel": "Partager le lien du détachement",
+    "detachmentCopied": "Lien du détachement copié dans le presse-papiers.",
+    "detachmentShared": "Lien du détachement partagé.",
+    "rosterLabel": "Partager la liste",
+    "copyRosterLabel": "Copier le texte de partage de la liste",
+    "rosterCopied": "Liste copiée dans le presse-papiers.",
+    "rosterShared": "Liste partagée."
+  },
+  "bookmark": {
+    "added": "Ajouté aux favoris",
+    "removed": "Favori supprimé",
+    "addedMessage": "{{name}} ajouté à votre bureau.",
+    "removedMessage": "{{name}} retiré des favoris.",
+    "failed": "Échec de la mise à jour des favoris",
+    "error": "Impossible de mettre à jour les favoris.",
+    "remove": "Retirer des favoris",
+    "add": {
+      "faction": "Ajouter la faction aux favoris",
+      "datasheet": "Ajouter la fiche aux favoris",
+      "detachment": "Ajouter le détachement aux favoris",
+      "item": "Ajouter aux favoris"
+    }
+  },
+  "settingsNotifications": {
+    "saveError": "Impossible d’enregistrer les paramètres.",
+    "cacheCleared": "Cache hors ligne vidé",
+    "cacheClearedMessage": "Les packs de factions et les fiches en cache ont été supprimés.",
+    "cacheError": "Impossible de vider le cache hors ligne."
+  },
+  "install": {
+    "title": "Installer depot",
+    "action": "Installer",
+    "dismiss": "Masquer"
+  },
+  "data": {
+    "updated": "Données de règles mises à jour",
+    "nowOn": "Version actuelle : {{version}}.",
+    "source": "Données Wahapedia",
+    "notSynced": "non synchronisées"
+  }
+}

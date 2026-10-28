@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import i18n from '@/i18n';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { slugify } from '@depot/core/utils/slug';
 
@@ -9,8 +10,11 @@ import { createMockDatasheet, createMockWargearAbility, mockFactionIndex } from 
 import type { depot } from '@depot/core';
 
 vi.mock('@/components/layout', () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="app-layout">{children}</div>
+  default: ({ children, footer }: { children: React.ReactNode; footer?: React.ReactNode }) => (
+    <div data-testid="app-layout">
+      {children}
+      {footer}
+    </div>
   )
 }));
 
@@ -38,7 +42,7 @@ describe('CollectionUnitEditPage', () => {
     mockUseCollection.mockReset();
   });
 
-  it('shows the unit state tag and selected wargear ability tags', () => {
+  it('keeps unsaved state and wargear selections across language changes', async () => {
     const wargearAbility = createMockWargearAbility({
       id: 'wg-ability',
       name: 'Blade Storm',
@@ -67,12 +71,40 @@ describe('CollectionUnitEditPage', () => {
       points: { current: 0 }
     };
 
-    mockUseCollection.mockReturnValue({ collection, loading: false, error: null, save: vi.fn() });
+    const save = vi.fn().mockResolvedValue(undefined);
+    mockUseCollection.mockReturnValue({ collection, loading: false, error: null, save });
 
     render(<CollectionUnitEditPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('collection-unit-state-tag')).toHaveTextContent('Battle Ready');
     const abilityTestId = `wargear-ability-pill-${slugify('Blade Storm')}`;
     expect(screen.getByTestId(abilityTestId)).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.change(screen.getByLabelText('Build state'), { target: { value: 'parade-ready' } });
+    fireEvent.click(screen.getByTestId(abilityTestId));
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByLabelText('État de montage')).toHaveValue('parade-ready');
+    expect(screen.getByTestId('collection-unit-state-tag')).toHaveTextContent('Pour Exposition');
+    expect(screen.getByTestId(abilityTestId)).toHaveAttribute('aria-pressed', 'false');
+    expect(save).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('save-button'));
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        items: [expect.objectContaining({ state: 'parade-ready', selectedWargearAbilities: [] })]
+      })
+    );
+  });
+
+  it('localizes the missing unit error', async () => {
+    mockUseCollection.mockReturnValue({
+      collection: { id: 'collection-1', items: [] },
+      loading: false,
+      error: null,
+      save: vi.fn()
+    });
+    render(<CollectionUnitEditPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('edit-collection-unit-not-found')).toHaveTextContent(
+      'Unité introuvable'
+    );
   });
 });

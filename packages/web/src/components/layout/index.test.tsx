@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import { Pencil } from 'lucide-react';
 
 import { TestWrapper } from '@/test/test-utils';
 import AppLayout from './index';
+import i18n from '@/i18n';
 
 const media = vi.hoisted(() => ({ desktop: false }));
 
@@ -16,8 +17,50 @@ vi.mock('@/components/layout/install-banner', () => ({
 }));
 
 describe('AppLayout', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     media.desktop = false;
+    await i18n.changeLanguage('en');
+  });
+
+  it('updates mounted navigation and back labels without translating data names', async () => {
+    media.desktop = true;
+    render(
+      <TestWrapper>
+        <AppLayout title="Rules" back={{ to: '/collections/rules', label: 'Rules' }}>
+          <p>Intercessor Squad</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByRole('navigation', { name: 'Navigation principale' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Accueil' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Règles' })).toHaveAttribute('href', '/factions');
+    expect(screen.getByRole('link', { name: 'Paramètres' })).toHaveAttribute('href', '/settings');
+    const crumbs = screen.getByRole('navigation', { name: 'Fil d’Ariane' });
+    expect(within(crumbs).getByRole('link', { name: 'Rules' })).toHaveAttribute(
+      'href',
+      '/collections/rules'
+    );
+    expect(screen.getByText('Intercessor Squad')).toBeInTheDocument();
+  });
+
+  it('translates the accessible back action on mobile', async () => {
+    render(
+      <TestWrapper>
+        <AppLayout
+          title="Intercessor Squad"
+          back={{ to: '/faction/space-marines', label: 'Space Marines' }}
+        >
+          <p>content</p>
+        </AppLayout>
+      </TestWrapper>
+    );
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByRole('link', { name: 'Retour vers Space Marines' })).toHaveAttribute(
+      'title',
+      'Retour vers Space Marines'
+    );
   });
 
   it('does not render a crumbs bar on Home', () => {

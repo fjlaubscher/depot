@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import { useNavigate } from '@/lib/navigation';
 import { Trash2, Pencil, Copy } from 'lucide-react';
@@ -37,6 +38,8 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
   onDuplicate,
   'data-testid': testId
 }) => {
+  const { t } = useTranslation('common');
+  const item = noun === 'roster' || noun === 'collection' ? t(`entities.${noun}`) : noun;
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDuplicating, setIsDuplicating] = useState(false);
@@ -55,8 +58,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
 
   const handleDelete = async () => {
     if (isDeleting) return;
-    if (!window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`))
-      return;
+    if (!window.confirm(t('library.confirmDelete', { name }))) return;
     setIsDeleting(true);
     try {
       await onDelete();
@@ -106,7 +108,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
                 event?.stopPropagation();
                 void handleDuplicate();
               },
-              ariaLabel: `Duplicate ${noun}`,
+              ariaLabel: t('actions.duplicateItem', { item }),
               variant: 'secondary',
               disabled: isDuplicating,
               'data-testid': `duplicate-${noun}-button`
@@ -117,7 +119,10 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
                 event?.stopPropagation();
                 navigate(editPath);
               },
-              ariaLabel: noun === 'roster' ? 'Edit roster details' : `Edit ${noun}`,
+              ariaLabel:
+                noun === 'roster'
+                  ? t('actions.editRosterDetails')
+                  : t('actions.editItem', { item }),
               variant: 'primary'
             },
             {
@@ -126,7 +131,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({
                 event?.stopPropagation();
                 void handleDelete();
               },
-              ariaLabel: `Delete ${noun}`,
+              ariaLabel: t('actions.deleteItem', { item }),
               variant: 'danger',
               disabled: isDeleting,
               'data-testid': `delete-${noun}-button`

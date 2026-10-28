@@ -1,4 +1,5 @@
 import React, { useMemo, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import type { depot } from '@depot/core';
 
@@ -22,10 +23,11 @@ import CreateCollectionSheet from './create-collection-sheet';
 type Slots = { toolbar: ReactNode; body: ReactNode };
 
 const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({ children }) => {
+  const { t } = useTranslation(['collections', 'rosters']);
   const { collections, loading, error, refresh } = useCollections();
   const { dataVersion, getDatasheet, getFactionManifest } = useFactionsContext();
   const { showToast } = useToast();
-  const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections]);
+  const snapshot = useMemo(() => getCollectionsSnapshotCopy(collections), [collections, t]);
   const hasSnapshotData = snapshot.items.length > 0;
 
   const hasStaleCollections = Boolean(
@@ -40,15 +42,15 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
       await refresh();
       showToast({
         type: 'success',
-        title: 'Collection deleted',
-        message: 'Entry deleted successfully.'
+        title: t('notifications.deleted'),
+        message: t('notifications.deletedMessage')
       });
     } catch (err) {
       console.error('Failed to delete collection', err);
       showToast({
         type: 'error',
-        title: 'Delete failed',
-        message: 'Could not delete this collection.'
+        title: t('notifications.deleteFailed'),
+        message: t('notifications.deleteError')
       });
     }
   };
@@ -59,7 +61,7 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
       const duplicated: depot.Collection = {
         ...collection,
         id: crypto.randomUUID(),
-        name: `${collection.name} Copy`,
+        name: t('copyName', { name: collection.name }),
         items: collection.items.map((item) => ({ ...item, id: crypto.randomUUID() })),
         dataVersion: currentDataVersion ?? collection.dataVersion ?? null,
         points: { current: calculateCollectionPoints(collection) }
@@ -70,15 +72,15 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
 
       showToast({
         type: 'success',
-        title: 'Duplicated',
-        message: `Created ${duplicated.name}.`
+        title: t('notifications.duplicated'),
+        message: t('notifications.duplicatedMessage', { name: duplicated.name })
       });
     } catch (err) {
       console.error('Failed to duplicate collection', err);
       showToast({
         type: 'error',
-        title: 'Duplicate failed',
-        message: 'Could not duplicate this collection.'
+        title: t('notifications.duplicateFailed'),
+        message: t('notifications.duplicateError')
       });
     }
   };
@@ -101,8 +103,8 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
       console.error('Failed to import collections', err);
       showToast({
         type: 'error',
-        title: 'Import failed',
-        message: 'Could not import the selected files. Please try again.'
+        title: t('import.failed'),
+        message: t('import.error')
       });
     }
   };
@@ -117,11 +119,11 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
       />
       <Button
         onClick={() => setCreateOpen(true)}
-        aria-label="Create collection"
+        aria-label={t('pages.createAction')}
         data-testid="create-collection-button"
       >
         <Plus size={16} />
-        New
+        {t('pages.new', { ns: 'rosters' })}
       </Button>
     </>
   );
@@ -129,15 +131,8 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
   const body = (
     <div className="flex flex-col gap-4">
       {hasStaleCollections ? (
-        <Alert
-          variant="info"
-          title="Existing collections need a refresh"
-          data-testid="stale-collections-notice"
-        >
-          <p className="text-sm">
-            They were built on 10th edition data. Open a collection and hit Refresh to bring it onto
-            11th.
-          </p>
+        <Alert variant="info" title={t('pages.staleLists')} data-testid="stale-collections-notice">
+          <p className="text-sm">{t('pages.staleListsMessage')}</p>
         </Alert>
       ) : null}
       {loading ? (
@@ -145,13 +140,13 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
           <Loader />
         </div>
       ) : error ? (
-        <ErrorState title="Failed to load collections" message={error} />
+        <ErrorState title={t('pages.loadFailed')} message={t('pages.loadError')} />
       ) : collections.length === 0 ? (
         <RosterEmptyState
-          title="No collections yet"
+          title={t('pages.empty')}
           dataTestId="empty-collections"
           action={{
-            label: 'Create collection',
+            label: t('pages.createAction'),
             onClick: () => setCreateOpen(true),
             icon: <Plus size={14} />
           }}
@@ -174,17 +169,17 @@ const CollectionsPanel: React.FC<{ children: (slots: Slots) => ReactNode }> = ({
                   name={collection.name}
                   meta={[
                     collection.faction?.name || collection.factionSlug || collection.factionId,
-                    `${collection.items.length} ${collection.items.length === 1 ? 'unit' : 'units'}`
+                    t('chart.count', { count: collection.items.length })
                   ].join(' · ')}
                   points={calculateCollectionPoints(collection)}
-                  pointsCaption="PTS"
+                  pointsCaption={t('units.pointsCaption', { ns: 'rosters' })}
                   content={
                     <div>
                       <div className="h-1 overflow-hidden rounded-xs bg-surface-soft">
                         <div className="h-full bg-success-fg" style={{ width: `${ready}%` }} />
                       </div>
                       <div className="mt-1 font-mono text-[9px] font-medium text-success-fg">
-                        {ready}% ready
+                        {t('chart.ready', { percent: ready })}
                       </div>
                     </div>
                   }

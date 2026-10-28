@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppLayout from '@/components/layout';
 import Logo from '@/components/logo';
@@ -19,6 +20,8 @@ import CollectionRow from './_components/collection-row';
 const PREVIEW_LIMIT = 3;
 
 const Home: React.FC = () => {
+  const { t, i18n } = useTranslation('home');
+  const number = new Intl.NumberFormat(i18n.resolvedLanguage);
   const { rosters, loading: rostersLoading } = useRosters();
   const { collections, loading: collectionsLoading } = useCollections();
   const { bookmarks, loading: bookmarksLoading } = useBookmarks();
@@ -28,7 +31,7 @@ const Home: React.FC = () => {
   const recentCollections = useMemo(() => takeRecent(collections, PREVIEW_LIMIT), [collections]);
 
   return (
-    <AppLayout title="depot - Offline Warhammer 40,000 Companion">
+    <AppLayout title={t('documentTitle')}>
       <div className="flex flex-col gap-4">
         {/* The desktop rail already carries the brand; this is the mobile header. */}
         <div className="flex items-center gap-2 lg:hidden">
@@ -49,8 +52,12 @@ const Home: React.FC = () => {
         ) : null}
 
         {bookmarks.length > 0 ? (
-          <section className="flex flex-col gap-1.5" data-testid="bookmarks-section">
-            <SectionHeader title="Bookmarks" count={bookmarks.length} />
+          <section
+            className="flex flex-col gap-1.5"
+            data-testid="bookmarks-section"
+            aria-label={t('bookmarkCount', { count: bookmarks.length })}
+          >
+            <SectionHeader title={t('bookmarks')} count={number.format(bookmarks.length)} />
             <div className="-mx-4 flex gap-1 overflow-x-auto px-4" data-testid="bookmark-previews">
               {bookmarks.map((bookmark) => (
                 <BookmarkCard key={bookmark.id} bookmark={bookmark} />
@@ -60,10 +67,14 @@ const Home: React.FC = () => {
         ) : null}
 
         {rosters.length > 0 ? (
-          <section className="flex flex-col gap-1.5" data-testid="rosters-section">
+          <section
+            className="flex flex-col gap-1.5"
+            data-testid="rosters-section"
+            aria-label={t('rosterCount', { count: rosters.length })}
+          >
             <SectionHeader
-              title="Recent rosters"
-              count={rosters.length}
+              title={t('recentRosters')}
+              count={number.format(rosters.length)}
               viewAllTo="/rosters"
               viewAllTestId="view-all-rosters"
             />
@@ -80,10 +91,14 @@ const Home: React.FC = () => {
         ) : null}
 
         {collections.length > 0 ? (
-          <section className="flex flex-col gap-1.5" data-testid="collections-section">
+          <section
+            className="flex flex-col gap-1.5"
+            data-testid="collections-section"
+            aria-label={t('collectionCount', { count: collections.length })}
+          >
             <SectionHeader
-              title="Collections"
-              count={collections.length}
+              title={t('collections')}
+              count={number.format(collections.length)}
               viewAllTo="/collections"
               viewAllTestId="view-all-collections"
             />

@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import i18n from '@/i18n';
+import { promptInstall, dismissInstallBanner } from '@/hooks/use-pwa-install';
 
 import InstallBanner from './install-banner';
 
@@ -49,5 +51,18 @@ describe('InstallBanner', () => {
     mockPwa.hasPrompt = false;
     render(<InstallBanner />);
     expect(screen.queryByTestId('install-banner')).not.toBeInTheDocument();
+  });
+
+  it('updates the region and actions in French without changing installation behavior', async () => {
+    render(<InstallBanner />);
+    await act(async () => {
+      await i18n.changeLanguage('fr');
+    });
+    expect(screen.getByRole('region', { name: 'Installer' })).toHaveTextContent('Installer depot');
+    expect(screen.getByText(/écran d’accueil/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Installer' }));
+    expect(promptInstall).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole('button', { name: 'Masquer' }));
+    expect(dismissInstallBanner).toHaveBeenCalledOnce();
   });
 });

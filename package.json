@@ -2,6 +2,7 @@
   "name": "depot",
   "private": true,
   "scripts": {
+    "check:translations": "node scripts/check-translations.mjs",
     "build": "pnpm -r build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs",
     "start": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start && node scripts/copy-data.mjs && pnpm --filter @depot/web start",
     "refresh-data": "pnpm --filter @depot/core build && pnpm --filter @depot/cli build && pnpm --filter @depot/cli start -- --force-download && node scripts/copy-data.mjs",

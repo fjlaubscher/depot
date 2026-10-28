@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
@@ -8,9 +9,10 @@ interface DetachmentAbilityCardProps {
 }
 
 const DetachmentAbilityCard: React.FC<DetachmentAbilityCardProps> = ({ ability }) => {
+  const { t } = useTranslation('catalog');
   return (
     <Card className="p-4 space-y-2 h-full border-t-2 border-t-border-accent">
-      <p className="type-section">Detachment ability</p>
+      <p className="type-section">{t('detachmentAbility')}</p>
       <div className="flex items-start justify-between gap-2">
         <h3 className="font-bold text-foreground text-base leading-tight">{ability.name}</h3>
         {ability.detachment && (

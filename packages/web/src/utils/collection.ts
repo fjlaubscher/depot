@@ -1,17 +1,17 @@
 import type { depot } from '@depot/core';
-import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/utils/collection';
+import i18n from '@/i18n';
 
 type TagVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 
 /** `bar` sits beside `variant` so a state reads the same on a tag and in the chart. */
 export const COLLECTION_STATE_META: Record<
   depot.CollectionUnitState,
-  { label: string; variant: TagVariant; bar: string }
+  { labelKey: `states.${depot.CollectionUnitState}`; variant: TagVariant; bar: string }
 > = {
-  sprue: { label: 'Sprue', variant: 'danger', bar: 'bg-danger-fg' },
-  built: { label: 'Assembled', variant: 'warning', bar: 'bg-warning-fg' },
-  'battle-ready': { label: 'Battle Ready', variant: 'success', bar: 'bg-success-fg' },
-  'parade-ready': { label: 'Parade Ready', variant: 'secondary', bar: 'bg-info-fg' }
+  sprue: { labelKey: 'states.sprue', variant: 'danger', bar: 'bg-danger-fg' },
+  built: { labelKey: 'states.built', variant: 'warning', bar: 'bg-warning-fg' },
+  'battle-ready': { labelKey: 'states.battle-ready', variant: 'success', bar: 'bg-success-fg' },
+  'parade-ready': { labelKey: 'states.parade-ready', variant: 'secondary', bar: 'bg-info-fg' }
 };
 
 export const getCollectionChartCopy = (
@@ -21,7 +21,10 @@ export const getCollectionChartCopy = (
   const totalUnits = collection.items.length;
 
   return {
-    heading: totalUnits > 0 ? `${totalUnits} unit${totalUnits === 1 ? '' : 's'}` : 'No units yet',
+    heading: i18n.t(totalUnits > 0 ? 'chart.count' : 'chart.noUnits', {
+      ns: 'collections',
+      count: totalUnits
+    }),
     totalUnits
   };
 };
@@ -34,10 +37,12 @@ export const getCollectionsSnapshotCopy = (
 
   const heading =
     totalUnits > 0
-      ? `${totalUnits} unit${totalUnits === 1 ? '' : 's'} across ${collections.length} collection${
-          collections.length === 1 ? '' : 's'
-        }`
-      : 'Start your collection';
+      ? i18n.t(collections.length === 1 ? 'chart.snapshotSingle' : 'chart.snapshotMultiple', {
+          ns: 'collections',
+          count: totalUnits,
+          collections: collections.length
+        })
+      : i18n.t('chart.start', { ns: 'collections' });
 
   return { heading, items, totalUnits };
 };

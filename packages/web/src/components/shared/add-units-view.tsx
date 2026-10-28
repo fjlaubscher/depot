@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useEffect, useState } from 'react';
 
 import AppLayout from '@/components/layout';
@@ -36,6 +37,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
   headerStats,
   onConfirm
 }) => {
+  const { t } = useTranslation('rosters');
   const { settings } = useSettingsContext();
   const {
     data: factionData,
@@ -102,8 +104,8 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
         {headerStats ? <div className="surface-card p-3">{headerStats}</div> : null}
 
         {factionError || datasheetError ? (
-          <Alert variant="error" title="Unable to load datasheets">
-            {datasheetError || factionError}
+          <Alert variant="error" title={t('units.loadError')}>
+            {t('units.loadErrorMessage')}
           </Alert>
         ) : null}
 
@@ -116,7 +118,7 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
               data-testid="datasheet-loading"
             >
               <div className="flex items-center justify-between text-sm text-subtle">
-                <span>Loading datasheets</span>
+                <span>{t('units.loading')}</span>
                 <span>
                   {datasheetProgress.loaded}/{datasheetProgress.total || '.'}
                 </span>
@@ -139,8 +141,8 @@ const AddUnitsView: FC<AddUnitsViewProps> = ({
           ) : (
             <DatasheetBrowser
               datasheets={factionDatasheets}
-              searchPlaceholder="Search by unit name..."
-              emptyStateMessage="No units available for this faction."
+              searchPlaceholder={t('units.search')}
+              emptyStateMessage={t('units.noAvailable')}
               filters={datasheetFilters}
               resultsClassName={hasSelections ? 'pb-28 md:pb-24' : undefined}
               renderDatasheet={(datasheet) => (

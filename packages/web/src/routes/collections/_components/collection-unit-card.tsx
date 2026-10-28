@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MouseEvent } from 'react';
 import { useNavigate } from '@/lib/navigation';
 import { Copy, Maximize2, Minimize2, Trash2 } from 'lucide-react';
@@ -24,6 +25,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
   state,
   dataTestId
 }) => {
+  const { t } = useTranslation(['collections', 'rosters']);
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -43,7 +45,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
           event.stopPropagation();
           onDuplicate(unit);
         }}
-        aria-label="Duplicate unit"
+        aria-label={t('units.duplicate', { ns: 'rosters' })}
         variant="ghost"
         size="sm"
         className="text-info-fg hover:bg-info-surface"
@@ -55,7 +57,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
           event.stopPropagation();
           onRemove(unit.id);
         }}
-        aria-label="Remove unit from collection"
+        aria-label={t('units.remove')}
         variant="ghost"
         size="sm"
         className="text-danger-fg hover:bg-danger-surface"
@@ -64,7 +66,7 @@ const CollectionUnitCard: React.FC<CollectionUnitCardProps> = ({
       </IconButton>
       <IconButton
         onClick={handleToggleExpand}
-        aria-label={isExpanded ? 'Collapse unit details' : 'Expand unit details'}
+        aria-label={t(isExpanded ? 'units.collapse' : 'units.expand')}
         variant="ghost"
         size="sm"
         className="text-subtle hover:text-foreground"

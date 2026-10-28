@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 
@@ -14,16 +15,20 @@ import AddUnitsView from '@/components/shared/add-units-view';
 import { getRosterSubtitle } from '@depot/core/utils/roster';
 
 const AddRosterUnitsView: FC = () => {
+  const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation('rosters');
   const { state: roster, addUnit } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const rosterFactionSlug = roster.faction?.slug ?? roster.factionSlug ?? undefined;
 
-  const pageTitle = roster.id ? `${roster.name} - Add Roster Units` : 'Add Roster Units';
+  const pageTitle = roster.id
+    ? rosterT('units.addTitle', { name: roster.name })
+    : rosterT('units.addDocument');
 
   if (!roster.id) {
     return (
-      <AppLayout title={pageTitle} back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout title={pageTitle} back={{ to: '/rosters', label: t('navigation.rosters') }}>
         <Loader />
       </AppLayout>
     );
@@ -36,10 +41,8 @@ const AddRosterUnitsView: FC = () => {
 
     showToast({
       type: 'success',
-      title: 'Units Added',
-      message: `Added ${selectedUnits.length} unit${
-        selectedUnits.length === 1 ? '' : 's'
-      } to roster`
+      title: rosterT('notifications.unitsAdded'),
+      message: rosterT('notifications.unitsAddedMessage', { count: selectedUnits.length })
     });
 
     navigate(`/rosters/${roster.id}/edit`);
@@ -51,7 +54,7 @@ const AddRosterUnitsView: FC = () => {
       backTo={`/rosters/${roster.id}/edit`}
       backLabel={roster.name}
       documentTitle={pageTitle}
-      title="Add units"
+      title={rosterT('units.add')}
       subtitle={`${roster.name} · ${getRosterSubtitle(roster)}`}
       headerStats={<RosterHeader roster={roster} />}
       onConfirm={handleAddSelectedUnits}

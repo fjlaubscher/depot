@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { sortByName } from '@depot/core/utils/common';
 import { getBattleSize } from '@depot/core/utils/roster-legality';
@@ -22,6 +23,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
   error,
   'data-testid': dataTestId
 }) => {
+  const { t } = useTranslation('rosters');
   const sorted = sortByName(detachments);
   const dpSpent = sorted
     .filter((detachment) => selectedSlugs.includes(detachment.slug))
@@ -40,7 +42,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
   return (
     <Field data-testid={dataTestId}>
       <div className="flex items-center justify-between">
-        <span className="block text-sm font-medium text-body">Detachments</span>
+        <span className="block text-sm font-medium text-body">{t('form.detachments')}</span>
         <span
           className={`text-sm font-semibold ${overCap ? 'text-danger-fg' : 'text-foreground'}`}
           data-testid="detachment-dp-total"
@@ -73,7 +75,7 @@ const DetachmentPicker: FC<DetachmentPickerProps> = ({
                 </Tag>
                 <ToggleSwitch
                   label=""
-                  ariaLabel={`Select ${detachment.name}`}
+                  ariaLabel={t('form.select', { name: detachment.name })}
                   enabled={enabled}
                   onChange={() => toggle(detachment.slug)}
                   size="sm"

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -12,6 +13,8 @@ interface Props {
 }
 
 const RosterRow: FC<Props> = ({ roster, invalid }) => {
+  const { t, i18n } = useTranslation('home');
+  const number = new Intl.NumberFormat(i18n.resolvedLanguage);
   const over = roster.points.current > roster.points.max;
   const detachments = getRosterDetachments(roster);
 
@@ -28,7 +31,7 @@ const RosterRow: FC<Props> = ({ roster, invalid }) => {
           </span>
           {invalid && (
             <span className="shrink-0 rounded-xs border border-danger-border bg-danger-surface px-1 py-0.5 font-mono text-[8.5px] font-bold text-danger-fg">
-              INVALID
+              {t('invalid')}
             </span>
           )}
         </div>
@@ -45,11 +48,11 @@ const RosterRow: FC<Props> = ({ roster, invalid }) => {
             over ? 'text-danger-fg' : 'text-foreground'
           )}
         >
-          {roster.points.current}
-          <span className="text-subtle">/{roster.points.max}</span>
+          {number.format(roster.points.current)}
+          <span className="text-subtle">/{number.format(roster.points.max)}</span>
         </div>
         <div className="mt-0.5 font-mono text-[9px] font-medium text-subtle">
-          EDITED {relativeTime(roster.updatedAt)}
+          {relativeTime(roster.updatedAt, t)}
         </div>
       </div>
     </Link>

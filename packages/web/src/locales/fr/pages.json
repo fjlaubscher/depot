@@ -1,0 +1,47 @@
+{
+  "about": {
+    "title": "À propos de depot",
+    "subtitle": "Un compagnon de listes conçu pour le hobby, utilisable hors ligne",
+    "author": "Je suis Francois — ingénieur logiciel passionné, amateur de figurines depuis toujours et convaincu de l’intérêt des applications gratuites respectueuses de la vie privée. Ma première véritable armée est née d’une boîte Catachan Jungle Fighters Battle Force à l’époque de la 4e édition, et depuis, je bricole des outils pour cet univers sombre. depot existe parce que je voulais entretenir mes compétences techniques en expérimentant de nouvelles technologies web dans une application que j’utilise réellement chaque jour, plutôt que de produire encore un produit bruyant et avide de données. C’est une PWA : je peux ébaucher des listes sur ordinateur ou téléphone, rester hors ligne et profiter d’une expérience paisible.",
+    "whatTitle": "Ce qu’est depot",
+    "what": "Un compagnon de listes gratuit et open source, conçu pour consulter rapidement les fiches techniques, ébaucher des listes simplement et offrir une typographie adaptée aux téléphones. Il reprend les exports de Wahapedia et met tout en cache sur votre appareil pour continuer à fonctionner dans les trains, les avions ou avec un Wi-Fi instable. Une application web uniquement : aucune version pour les boutiques d’applications, aucun compte, aucune publicité.",
+    "contributingTitle": "Contribuer",
+    "contributing": "depot se construit pendant mes soirées libres : les signalements de bugs précis et les suggestions d’améliorations du quotidien sont donc très utiles. Partagez si possible les étapes de reproduction, les détails de votre appareil ou des maquettes. Les pull requests sont les bienvenues : suivez simplement les consignes du dépôt pour garder des modifications propres et accessibles.",
+    "issue": "Signaler un bug ou proposer une fonctionnalité",
+    "repository": "Voir le dépôt GitHub",
+    "social": "Me saluer sur X (@fjlaubscher)",
+    "contact": "Les tickets GitHub sont le meilleur endroit pour les bugs et les demandes. Pour le reste, contactez-moi sur X.",
+    "legalTitle": "Crédits et mentions légales",
+    "legal": "depot n’est ni affilié à Games Workshop Limited, ni approuvé ou parrainé par cette société. Tous les noms, images et marques associés restent la propriété de leurs détenteurs respectifs. Soutenez les publications officielles dès que vous le pouvez.",
+    "data": "Le traitement des données repose sur les exports de Wahapedia. Wahapedia n’est affilié ni à Games Workshop ni à depot ; nous transformons simplement ses CSV publics en JSON utilisable hors ligne pour un usage personnel.",
+    "rights": "Si vous détenez des droits sur un élément référencé dans depot et avez des préoccupations, écrivez à <email>francoisjlaubscher@gmail.com</email> ; je vous répondrai rapidement."
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "subtitle": "Comment depot collecte, stocke et utilise les informations",
+    "overviewTitle": "Présentation",
+    "overview": "depot est un compagnon Warhammer 40,000 open source qui privilégie la confidentialité. Vous pouvez consulter les factions, les fiches techniques et les listes anonymement : l’application ne demande jamais de compte.",
+    "minimum": "Seules les données techniques minimales nécessaires pour servir le site ou corriger les plantages sont traitées, et l’essentiel de ce travail se fait sur votre propre appareil.",
+    "deviceTitle": "Données de l’application sur votre appareil",
+    "device": "Les listes, les préférences, les données de factions en cache et les ressources hors ligne sont conservées dans IndexedDB et le stockage local de votre navigateur. Aucun de ces contenus n’est envoyé à depot ni partagé avec des tiers.",
+    "hostingTitle": "Hébergement et journaux serveur",
+    "hosting": "depot est hébergé sur Cloudflare Pages. Lorsque vous demandez une page, Cloudflare peut enregistrer des informations de diagnostic habituelles — adresse IP, agent utilisateur et horodatage — pour assurer la sécurité du réseau. Ces journaux à courte durée de vie restent dans l’infrastructure de Cloudflare ; depot ne les croise avec aucune autre donnée et ne crée pas de profils utilisateur.",
+    "errorsTitle": "Signalement des erreurs (Sentry)",
+    "errors": "Les rapports de plantage utilisent <sentry>Sentry</sentry>. La télémétrie d’erreur n’est envoyée que si un DSN Sentry est configuré dans l’environnement de déploiement ; les builds locaux sans DSN ne communiquent jamais avec Sentry. Les événements contiennent les traces de pile, les métadonnées du navigateur, la route où l’erreur s’est produite et des informations IP approximatives (pays ou région uniquement). Avec l’offre gratuite de Sentry, les événements expirent automatiquement après environ 90 jours.",
+    "errorPurpose": "Sentry sert uniquement à déboguer les plantages. Aucune donnée de liste, information personnelle identifiable ou donnée de jeu n’est volontairement incluse dans ces envois.",
+    "analyticsTitle": "Mesure d’audience et publicité",
+    "analytics": "depot n’utilise ni tableaux de bord d’analyse d’audience, ni réseaux publicitaires, ni pixels sociaux, ni scripts d’empreinte numérique. Si un outil d’analyse léger et respectueux de la vie privée est ajouté un jour, cette page et les notes de version seront mises à jour avant sa mise en service.",
+    "choicesTitle": "Vos choix",
+    "clear": "Pour effacer les données de l’application, ouvrez les paramètres de votre navigateur pour godepot.dev et supprimez le stockage local et IndexedDB. Cela supprime les listes, les factions en cache et les ressources hors ligne.",
+    "block": "Pour bloquer les rapports de plantage, refusez les requêtes vers <domain>*.ingest.sentry.io</domain> avec un bloqueur de publicités, un filtrage DNS ou un pare-feu.",
+    "updatesTitle": "Mises à jour et contact",
+    "updates": "Lorsque les pratiques de depot en matière de données changent, la date d’entrée en vigueur ci-dessous est mise à jour et le changement est mentionné dans les notes de version. Pour toute question, demande de retrait ou préoccupation concernant la confidentialité, écrivez à <email>francoisjlaubscher@gmail.com</email>.",
+    "effectiveDate": "Date d’entrée en vigueur : 25 novembre 2025"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "La page que vous recherchez a été déplacée, supprimée ou n’existe pas.",
+    "home": "Retour à l’accueil",
+    "back": "Revenir en arrière"
+  }
+}

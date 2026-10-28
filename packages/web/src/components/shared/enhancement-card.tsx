@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import Card from '@/components/ui/card';
 import Tag from '@/components/ui/tag';
@@ -8,6 +9,7 @@ interface EnhancementCardProps {
 }
 
 const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
+  const { t } = useTranslation('catalog');
   return (
     <Card className="p-4 space-y-2 h-full border-l-2 border-l-success-fg">
       <div className="flex items-start justify-between gap-2">
@@ -15,7 +17,7 @@ const EnhancementCard: React.FC<EnhancementCardProps> = ({ enhancement }) => {
           <h3 className="font-bold text-foreground text-base leading-tight">{enhancement.name}</h3>
           {enhancement.upgrade ? (
             <Tag variant="primary" size="sm" className="type-label uppercase">
-              Upgrade
+              {t('upgrade')}
             </Tag>
           ) : null}
         </div>

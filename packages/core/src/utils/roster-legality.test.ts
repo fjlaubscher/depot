@@ -204,6 +204,24 @@ describe('getEligibleEnhancements', () => {
 });
 
 describe('validateRoster', () => {
+  it('omits the display name for enhancements referencing a missing unit', () => {
+    const relic = enhancement({ id: 'relic' });
+    const issues = validateRoster(
+      roster({
+        detachments: [detachment({ id: 'det', enhancements: [relic] })],
+        enhancements: [
+          { enhancement: relic, unitId: 'missing' },
+          { enhancement: relic, unitId: 'missing' }
+        ]
+      })
+    );
+    expect(issues).toContainEqual({
+      code: 'enhancement',
+      unitId: 'missing',
+      reason: 'enhancement-unit-limit',
+      params: { count: 2, limit: 1 }
+    });
+  });
   it('accepts a legal list', () => {
     const leader = unit(captain);
     expect(
@@ -222,6 +240,11 @@ describe('validateRoster', () => {
       })
     );
     expect(issues.map((issue) => issue.code)).toEqual(['points', 'dp', 'detachment', 'warlord']);
+    expect(issues).toContainEqual({
+      code: 'points',
+      reason: 'points-exceeded',
+      params: { current: 2100, max: 2000 }
+    });
   });
 
   it('allows a lone 3 DP detachment at Incursion', () => {
@@ -247,10 +270,10 @@ describe('validateRoster', () => {
       })
     );
     expect(
-      issues.filter((issue) => issue.code === 'unit-limit').map((issue) => issue.message)
+      issues.filter((issue) => issue.code === 'unit-limit').map((issue) => issue.params)
     ).toEqual([
-      'captain: 4 units selected; Strike Force allows 3.',
-      'Hero: 2 units selected; Strike Force allows 1.'
+      { name: 'captain', count: 4, battleSize: 'Strike Force', limit: 3 },
+      { name: 'Hero', count: 2, battleSize: 'Strike Force', limit: 1 }
     ]);
   });
 
@@ -293,14 +316,37 @@ describe('validateRoster', () => {
         ]
       })
     );
-    const messages = issues.map((issue) => issue.message);
-    expect(messages).toContain('Relic is taken 2 times; max 1.');
-    expect(messages).toContain('Foreign is not from a selected detachment.');
-    expect(messages).toContain('Upgrade is taken 4 times; max 3.');
-    expect(messages).toContain('4 enhancements selected; Incursion allows 2.');
-    expect(messages).toContain('captain has 2 enhancements; max 1 per unit.');
-    expect(messages).toContain('Hero is an Epic Hero and cannot take Upgrade.');
-    expect(messages).not.toContain('intercessors is not a Character and cannot take Upgrade.');
+    expect(issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          reason: 'enhancement-repeat-limit',
+          params: { name: 'Relic', count: 2, limit: 1 }
+        }),
+        expect.objectContaining({
+          reason: 'enhancement-outside-detachments',
+          params: { name: 'Foreign' }
+        }),
+        expect.objectContaining({
+          reason: 'enhancement-repeat-limit',
+          params: { name: 'Upgrade', count: 4, limit: 3 }
+        }),
+        expect.objectContaining({
+          reason: 'enhancement-total-limit',
+          params: { count: 4, battleSize: 'Incursion', limit: 2 }
+        }),
+        expect.objectContaining({
+          reason: 'enhancement-unit-limit',
+          unitId: a.id,
+          params: { unitName: 'captain', count: 2, limit: 1 }
+        }),
+        expect.objectContaining({
+          reason: 'enhancement-epic-hero',
+          unitId: hero.id,
+          params: { unitName: 'Hero', enhancementName: 'Upgrade' }
+        })
+      ])
+    );
+    expect(issues.some((issue) => issue.reason === 'enhancement-non-character')).toBe(false);
   });
 
   it('requires every support unit to find its own bodyguard', () => {
@@ -316,8 +362,9 @@ describe('validateRoster', () => {
     const bad = validateRoster(roster({ units: [unit(bodyguard), unit(support), unit(support)] }));
     expect(bad.filter((issue) => issue.code === 'support')).toHaveLength(1);
     const lonely = validateRoster(roster({ units: [unit(support)] }));
-    expect(lonely.filter((issue) => issue.code === 'support')[0].message).toBe(
-      'Painboy is a Support unit with no free bodyguard unit to attach to.'
-    );
+    expect(lonely.filter((issue) => issue.code === 'support')[0]).toMatchObject({
+      reason: 'support-unmatched',
+      params: { name: 'Painboy' }
+    });
   });
 });

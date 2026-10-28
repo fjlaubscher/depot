@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { depot } from '@depot/core';
+import i18n from '@/i18n';
 import {
   formatRebindSummaryMessage,
   rebindRosterUnits,
@@ -42,6 +43,29 @@ const buildDatasheet = (overrides?: Partial<depot.Datasheet>): depot.Datasheet =
 });
 
 describe('refresh-user-data utilities', () => {
+  it.each(['en', 'fr'])(
+    'formats rebind counts in %s without changing the report',
+    async (language) => {
+      await i18n.changeLanguage(language);
+      for (const partial of [0, 1, 2]) {
+        for (const missing of [0, 1, 2]) {
+          const summary = { ok: 3, partial, missing };
+          const parts = [
+            partial &&
+              (language === 'fr'
+                ? `${partial} unité${partial === 1 ? '' : 's'} partiellement rattachée${partial === 1 ? '' : 's'} (équipement modifié).`
+                : `${partial} unit${partial === 1 ? '' : 's'} partially matched (loadout changes).`),
+            missing &&
+              (language === 'fr'
+                ? `${missing} unité${missing === 1 ? '' : 's'} introuvable${missing === 1 ? '' : 's'} dans le catalogue actuel.`
+                : `${missing} unit${missing === 1 ? '' : 's'} not found in the current catalog.`)
+          ].filter(Boolean);
+          expect(formatRebindSummaryMessage(summary)).toBe(parts.join(' ') || null);
+          expect(summary).toEqual({ ok: 3, partial, missing });
+        }
+      }
+    }
+  );
   const baseRoster: depot.Roster = {
     id: 'r1',
     name: 'Test Roster',

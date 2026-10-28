@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import WargearSection from './wargear-section';
 import { separateWargearByType } from '@depot/core/utils/wargear';
@@ -14,6 +15,7 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   selectedWargear,
   onSelectionChange
 }) => {
+  const { t } = useTranslation('rosters');
   const { rangedWargear, meleeWargear, mixedWargear } = useMemo(() => {
     return separateWargearByType(wargear);
   }, [wargear]);
@@ -21,7 +23,7 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
   if (wargear.length === 0) {
     return (
       <div className="text-center py-8" data-testid="no-wargear-available">
-        <p className="text-subtle">No wargear available for this unit.</p>
+        <p className="text-subtle">{t('units.noWargear')}</p>
       </div>
     );
   }
@@ -30,19 +32,22 @@ const WargearSelection: React.FC<WargearSelectionProps> = ({
     <div className="flex flex-col gap-2.5" data-testid="wargear-table">
       <WargearSection
         wargear={rangedWargear}
-        title="Ranged"
+        title={t('units.ranged')}
+        dataTestId="ranged-wargear-section"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={mixedWargear}
-        title="Mixed"
+        title={t('units.mixed')}
+        dataTestId="mixed-wargear-section"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />
       <WargearSection
         wargear={meleeWargear}
-        title="Melee"
+        title={t('units.melee')}
+        dataTestId="melee-wargear-section"
         selectedWargear={selectedWargear}
         onSelectionChange={onSelectionChange}
       />

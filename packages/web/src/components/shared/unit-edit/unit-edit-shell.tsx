@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -52,6 +53,8 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
   afterGrid,
   onSave
 }) => {
+  const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation('rosters');
   const navigate = useNavigate();
   const availableModelCosts = modelCosts ?? modelCostsForOrdinal(unit.datasheet.modelCosts);
 
@@ -104,17 +107,19 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
         <>
           <div className="flex-1" data-testid="unit-edit-points">
             <div className="font-mono text-base leading-none font-bold text-foreground">
-              {currentPoints} PTS
+              {currentPoints} {rosterT('units.pointsCaption')}
             </div>
             <div className="mt-0.5 font-mono text-[9px] font-medium text-success-fg">
-              {delta === 0 ? 'NO CHANGE' : `${delta > 0 ? '+' : ''}${delta} PTS`}
+              {delta === 0
+                ? rosterT('units.noChange')
+                : rosterT('units.delta', { delta: `${delta > 0 ? '+' : ''}${delta}` })}
             </div>
           </div>
           <Button variant="secondary" onClick={() => navigate(backTo)} data-testid="cancel-button">
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button onClick={handleSave} data-testid="save-button">
-            Apply
+            {t('actions.apply')}
           </Button>
         </>
       }
@@ -125,7 +130,7 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
         {/* Unit size — only meaningful when the datasheet offers more than one bracket */}
         {availableModelCosts.length > 1 && (
           <section className="flex flex-col gap-1.5" data-testid="model-cost-section">
-            <SectionHeader title="Unit size" />
+            <SectionHeader title={rosterT('units.size')} />
             <ModelCostSelection
               modelCosts={availableModelCosts}
               selectedModelCost={selectedModelCost || unit.modelCost}
@@ -142,7 +147,7 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
         />
 
         <section className="flex flex-col gap-1.5" data-testid="wargear-section">
-          <SectionHeader title="Wargear" />
+          <SectionHeader title={rosterT('units.wargear')} />
           <WargearSelection
             wargear={unit.datasheet.wargear}
             selectedWargear={selectedWargear}
@@ -152,7 +157,7 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
 
         {wargearAbilities.length > 0 ? (
           <section className="flex flex-col gap-1.5" data-testid="wargear-abilities-section">
-            <SectionHeader title="Wargear abilities" />
+            <SectionHeader title={rosterT('units.wargearAbilities')} />
             <WargearAbilitiesSelection
               abilities={wargearAbilities}
               selected={selectedWargearAbilities}
@@ -162,7 +167,11 @@ const UnitEditShell: React.FC<UnitEditShellProps> = ({
         ) : null}
 
         {shouldShowWargearOptions && (
-          <Alert variant="info" title="Wargear options" data-testid="wargear-options-section">
+          <Alert
+            variant="info"
+            title={rosterT('units.wargearOptions')}
+            data-testid="wargear-options-section"
+          >
             <ul className="space-y-2 list-disc pl-4 text-sm">
               {unit.datasheet.options.map((option, index) => (
                 <li

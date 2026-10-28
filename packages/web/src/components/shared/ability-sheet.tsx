@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import { useTranslation } from 'react-i18next';
 
 import { Sheet, Tag } from '@/components/ui';
 import { formatAbilityName } from '@depot/core/utils/abilities';
@@ -12,8 +13,12 @@ interface AbilitySheetProps {
 
 /** Bottom sheet showing an ability's full rules text. */
 const AbilitySheet: React.FC<AbilitySheetProps> = ({ ability, open, onClose }) => {
+  const { t } = useTranslation('catalog');
   if (!ability) return null;
   const meta = getAbilityTypeMeta(ability.type);
+  const typeLabel = (
+    ['Core', 'Faction', 'Unit', 'Wargear', 'Special', 'Fortification'] as const
+  ).find((label) => label === meta.label);
 
   return (
     <Sheet
@@ -22,7 +27,7 @@ const AbilitySheet: React.FC<AbilitySheetProps> = ({ ability, open, onClose }) =
       title={formatAbilityName(ability)}
       subtitle={
         <Tag variant={meta.variant} size="sm" className="self-start cursor-default">
-          {meta.label}
+          {typeLabel ? t(`abilityTypes.${typeLabel}`) : meta.label}
         </Tag>
       }
       data-testid="ability-sheet"

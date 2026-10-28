@@ -1,4 +1,5 @@
 import React, { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 
 import useRosters from '@/hooks/use-rosters';
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const ListsPanel: React.FC<Props> = ({ children }) => {
+  const { t } = useTranslation('rosters');
   const { rosters, loading, error, deleteRoster, duplicateRoster, refresh } = useRosters();
   const { collections } = useCollections();
   const { showToast } = useToast();
@@ -42,15 +44,15 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
       await deleteRoster(rosterId);
       showToast({
         type: 'success',
-        title: 'Roster Deleted',
-        message: 'The roster has been successfully deleted.'
+        title: t('notifications.deleted'),
+        message: t('notifications.deletedMessage')
       });
     } catch (error) {
       console.error('Failed to delete roster:', error);
       showToast({
         type: 'error',
-        title: 'Delete Failed',
-        message: 'Failed to delete the roster. Please try again.'
+        title: t('notifications.deleteFailed'),
+        message: t('notifications.deleteError')
       });
     }
   };
@@ -60,15 +62,15 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
       const duplicated = await duplicateRoster(roster, dataVersion ?? roster.dataVersion);
       showToast({
         type: 'success',
-        title: 'Roster Duplicated',
-        message: `Created ${duplicated.name}.`
+        title: t('notifications.duplicated'),
+        message: t('notifications.duplicatedMessage', { name: duplicated.name })
       });
     } catch (error) {
       console.error('Failed to duplicate roster:', error);
       showToast({
         type: 'error',
-        title: 'Duplicate Failed',
-        message: 'Could not duplicate the roster. Please try again.'
+        title: t('notifications.duplicateFailed'),
+        message: t('notifications.duplicateError')
       });
     }
   };
@@ -82,8 +84,8 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
       if (!isExportedRoster(parsed) || parsed.version !== 1) {
         showToast({
           type: 'error',
-          title: 'Import failed',
-          message: 'This file does not look like a depot roster export.'
+          title: t('notifications.importFailed'),
+          message: t('notifications.invalidImport')
         });
         return;
       }
@@ -104,15 +106,17 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
       await refresh();
       showToast({
         type: rebindNote ? 'warning' : 'success',
-        title: 'Roster imported',
-        message: [`Imported "${imported.name}".`, rebindNote].filter(Boolean).join(' ')
+        title: t('notifications.imported'),
+        message: [t('notifications.importedMessage', { name: imported.name }), rebindNote]
+          .filter(Boolean)
+          .join(' ')
       });
     } catch (err) {
       console.error('Failed to import roster', err);
       showToast({
         type: 'error',
-        title: 'Import failed',
-        message: 'Could not import this roster. Please check the file and try again.'
+        title: t('notifications.importFailed'),
+        message: t('notifications.importError')
       });
     }
   };
@@ -120,14 +124,13 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
   const toolbar = (
     <>
       <ImportButton
-        label="Import"
         onFilesSelected={handleImportRosterFiles}
         buttonTestId="import-roster-button"
         inputTestId="import-roster-input"
       />
-      <Button onClick={() => setCreateOpen(true)} aria-label="Create new roster">
+      <Button onClick={() => setCreateOpen(true)} aria-label={t('pages.createNew')}>
         <Plus size={16} />
-        New
+        {t('pages.new')}
       </Button>
     </>
   );
@@ -135,15 +138,8 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
   const body = (
     <div className="flex flex-col gap-4">
       {hasStaleRosters ? (
-        <Alert
-          variant="info"
-          title="Existing rosters need a refresh"
-          data-testid="stale-rosters-notice"
-        >
-          <p className="text-sm">
-            They were built on 10th edition data. Open a roster and hit Refresh to bring it onto
-            11th.
-          </p>
+        <Alert variant="info" title={t('pages.staleLists')} data-testid="stale-rosters-notice">
+          <p className="text-sm">{t('pages.staleListsMessage')}</p>
         </Alert>
       ) : null}
       {loading ? (
@@ -151,13 +147,13 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
           <Loader />
         </div>
       ) : error ? (
-        <ErrorState title="Failed to load rosters" message={error} />
+        <ErrorState title={t('pages.loadFailed')} message={t('pages.loadError')} />
       ) : rosters.length === 0 ? (
         <RosterEmptyState
-          title="No rosters yet"
+          title={t('pages.empty')}
           dataTestId="empty-rosters"
           action={{
-            label: 'Create roster',
+            label: t('pages.createAction'),
             onClick: () => setCreateOpen(true),
             icon: <Plus size={14} />
           }}
@@ -181,7 +177,7 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
                   roster.faction?.name,
                   collectionName,
                   detachments.map((d) => d.name).join(', '),
-                  `${roster.units.length} ${roster.units.length === 1 ? 'unit' : 'units'}`
+                  t('units.count', { count: roster.units.length })
                 ]
                   .filter(Boolean)
                   .join(' · ')}
@@ -195,7 +191,7 @@ const ListsPanel: React.FC<Props> = ({ children }) => {
                     <span className="text-subtle">/{roster.points.max}</span>
                   </span>
                 }
-                pointsCaption={invalid ? 'INVALID' : 'PTS'}
+                pointsCaption={t(invalid ? 'units.invalidCaption' : 'units.pointsCaption')}
                 viewPath={`/rosters/${roster.id}`}
                 editPath={`/rosters/${roster.id}/details`}
                 noun="roster"

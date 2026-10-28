@@ -1,4 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
+import i18n from '@/i18n';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mockFaction, toFactionManifest } from '@/test/mock-data';
 import { TestWrapper, setupBrowserMocks } from '@/test/test-utils';
@@ -16,6 +17,26 @@ vi.mock('react-router-dom', async () => {
 const mockedUseFaction = vi.mocked(useFaction);
 
 describe('DetachmentPage', () => {
+  it('translates section labels while retaining detachment rules and navigation', async () => {
+    render(<DetachmentPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('detachment-abilities')).toHaveTextContent(
+      'Aptitudes de détachement'
+    );
+    expect(screen.getByTestId('detachment-abilities')).toHaveTextContent('Combat Doctrines');
+    expect(screen.getByTestId('detachment-enhancements')).toHaveTextContent('Optimisations');
+    expect(screen.getByTestId('detachment-enhancements')).toHaveTextContent('Artificer Armour');
+    expect(screen.getByTestId('detachment-stratagems')).toHaveTextContent('Stratagèmes');
+    expect(screen.getByTestId('mobile-back-button')).toHaveAccessibleName(
+      'Retour vers Détachements'
+    );
+    expect(screen.getByTestId('mobile-back-button')).toHaveAttribute(
+      'href',
+      '/faction/space-marines/detachments'
+    );
+    expect(document.title).toContain('Gladius Task Force');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     setupBrowserMocks();

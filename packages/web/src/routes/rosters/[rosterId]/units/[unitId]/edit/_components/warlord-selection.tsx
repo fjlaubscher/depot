@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { ToggleSwitch } from '@/components/ui';
 
@@ -15,6 +16,7 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
   isWarlord,
   onWarlordChange
 }) => {
+  const { t } = useTranslation('rosters');
   const currentWarlord = roster.units.find((u) => u.id === roster.warlordUnitId);
   // Only the consequence is worth spelling out: nominating steals the title.
   const takesOverFrom =
@@ -26,14 +28,14 @@ const WarlordSelection: React.FC<WarlordSelectionProps> = ({
       data-testid="warlord-selection"
     >
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] leading-tight font-bold text-foreground">Warlord</p>
+        <p className="text-[13px] leading-tight font-bold text-foreground">{t('units.warlord')}</p>
         <p className="mt-0.5 text-[11.5px] leading-snug text-muted">
-          {takesOverFrom ? `Takes the title from ${takesOverFrom}.` : 'One character per army.'}
+          {takesOverFrom ? t('units.takesOver', { name: takesOverFrom }) : t('units.oneCharacter')}
         </p>
       </div>
       <ToggleSwitch
         label=""
-        ariaLabel="Nominate as warlord"
+        ariaLabel={t('units.nominate')}
         enabled={isWarlord}
         onChange={onWarlordChange}
         size="sm"

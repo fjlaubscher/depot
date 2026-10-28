@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cx } from '@/utils/cx';
 import type { depot } from '@depot/core';
 
@@ -38,10 +39,11 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
   selectedEnhancements,
   onEnhancementChange
 }) => {
+  const { t } = useTranslation('rosters');
   if (enhancements.length === 0) {
     return (
       <div className="text-center py-8" data-testid="no-enhancements-available">
-        <p className="text-subtle">No enhancements available for this unit.</p>
+        <p className="text-subtle">{t('units.noEnhancements')}</p>
       </div>
     );
   }
@@ -51,7 +53,7 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
   return (
     <div
       role="radiogroup"
-      aria-label="Enhancement"
+      aria-label={t('units.enhancement')}
       className="flex flex-col gap-1"
       data-testid="enhancement-selection"
     >
@@ -64,7 +66,7 @@ const EnhancementSelection: React.FC<EnhancementSelectionProps> = ({
         data-testid="enhancement-option-none"
       >
         <Radio checked={!selectedId} />
-        <span className="text-[13px] font-bold text-foreground">No enhancement</span>
+        <span className="text-[13px] font-bold text-foreground">{t('units.noEnhancement')}</span>
       </button>
 
       {enhancements.map((enhancement) => {

@@ -1,5 +1,6 @@
 import { useNavigate } from '@/lib/navigation';
 import { Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // UI Components
 import AppLayout from '@/components/layout';
@@ -7,9 +8,10 @@ import Button from '@/components/ui/button';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('pages');
 
   return (
-    <AppLayout title="Page Not Found">
+    <AppLayout title={t('notFound.title')}>
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="max-w-sm text-center">
           <div className="font-mono text-[32px] leading-none font-bold text-hint">404</div>
@@ -18,21 +20,21 @@ const NotFound: React.FC = () => {
             className="mt-2.5 text-base leading-snug font-bold text-foreground"
             data-testid="page-heading"
           >
-            Page Not Found
+            {t('notFound.title')}
           </h1>
           <p className="mt-1 text-[12.5px] leading-normal text-muted">
-            The page you're looking for has been moved, deleted, or doesn't exist.
+            {t('notFound.description')}
           </p>
           <div className="mt-3.5 flex justify-center gap-1">
             <Button variant="secondary" onClick={() => navigate('/')} data-testid="go-home-button">
-              Return home
+              {t('notFound.home')}
             </Button>
             <Button
               variant="secondary"
               onClick={() => window.history.back()}
               data-testid="go-back-button"
             >
-              Go back
+              {t('notFound.back')}
             </Button>
           </div>
         </div>

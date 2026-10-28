@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import i18n from '@/i18n';
+import type { Action } from '@/components/ui/action-group';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { depot } from '@depot/core';
 
@@ -10,14 +12,21 @@ import { createMockRoster, mockFactionIndex } from '@/test/mock-data';
 vi.mock('@/components/layout', () => ({
   default: ({
     children,
-    heading
+    heading,
+    actions
   }: {
     children: ReactNode;
     heading?: { title: string; subtitle?: string; meta?: ReactNode };
+    actions?: Action[];
   }) => (
     <div data-testid="app-layout">
       {heading?.title ? <h1>{heading.title}</h1> : null}
       {heading?.meta}
+      {actions?.map((action, index) => (
+        <button key={index} aria-label={action.ariaLabel} onClick={() => action.onClick()}>
+          {action.ariaLabel}
+        </button>
+      ))}
       {children}
     </div>
   )
@@ -86,6 +95,25 @@ const linkedCollection: depot.Collection = {
 };
 
 describe('RosterPage', () => {
+  it('shares in the language selected after the page was mounted', async () => {
+    mockUseRoster.state = createMockRoster({ warlordUnitId: createMockRoster().units[0].id });
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
+      languages: ['en'],
+      onLine: true,
+      userAgent: navigator.userAgent
+    });
+    render(<RosterPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    fireEvent.click(screen.getByRole('button', { name: 'Copier le texte de partage de la liste' }));
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        expect.stringContaining('[Seigneur de guerre] Captain')
+      )
+    );
+    vi.unstubAllGlobals();
+  });
   beforeEach(() => {
     mockUseRoster.state = createMockRoster();
     mockUseCollections.collections = [];

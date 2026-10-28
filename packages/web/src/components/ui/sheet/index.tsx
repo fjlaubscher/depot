@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 
 import Drawer from '../drawer';
@@ -23,6 +24,7 @@ const Sheet: FC<SheetProps> = ({
   children,
   'data-testid': testId
 }) => {
+  const { t } = useTranslation('common');
   const titleId = `${testId ?? 'sheet'}-title`;
   return (
     <Drawer isOpen={open} onClose={onClose} position="bottom" data-testid={testId}>
@@ -40,7 +42,7 @@ const Sheet: FC<SheetProps> = ({
             {subtitle}
           </div>
           <IconButton
-            aria-label="Close"
+            aria-label={t('actions.close')}
             variant="ghost"
             onClick={onClose}
             data-testid={testId ? `${testId}-close` : undefined}

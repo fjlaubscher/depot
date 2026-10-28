@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Minus, Plus } from 'lucide-react';
 import IconButton from '../icon-button';
 
@@ -18,9 +19,10 @@ const QuantityStepper: FC<QuantityStepperProps> = ({
   onIncrease,
   min = 0,
   size = 'md',
-  decreaseLabel = 'Decrease quantity',
-  increaseLabel = 'Increase quantity'
+  decreaseLabel,
+  increaseLabel
 }) => {
+  const { t } = useTranslation('common');
   const disableDecrease = value <= min;
 
   const iconSize = size === 'sm' ? 14 : 16;
@@ -30,14 +32,19 @@ const QuantityStepper: FC<QuantityStepperProps> = ({
       <IconButton
         size={size}
         variant="ghost"
-        aria-label={decreaseLabel}
+        aria-label={decreaseLabel ?? t('actions.decreaseQuantity')}
         onClick={onDecrease}
         disabled={disableDecrease}
       >
         <Minus size={iconSize} />
       </IconButton>
       <span className="min-w-[2rem] text-center type-stat text-base">{value}</span>
-      <IconButton size={size} variant="ghost" aria-label={increaseLabel} onClick={onIncrease}>
+      <IconButton
+        size={size}
+        variant="ghost"
+        aria-label={increaseLabel ?? t('actions.increaseQuantity')}
+        onClick={onIncrease}
+      >
         <Plus size={iconSize} />
       </IconButton>
     </div>

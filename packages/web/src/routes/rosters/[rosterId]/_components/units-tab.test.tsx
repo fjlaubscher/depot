@@ -1,10 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import i18n from '@/i18n';
 import UnitsTab from './units-tab';
 import { TestWrapper } from '@/test/test-utils';
 import { createMockDatasheet, createMockRoster, createMockRosterUnit } from '@/test/mock-data';
 
 describe('UnitsTab', () => {
+  it('retranslates unit issues and warlord labels without changing source data', async () => {
+    const unit = createMockRosterUnit({
+      datasheet: createMockDatasheet({ name: 'Captain', isSupport: true, leaders: [] })
+    });
+    const roster = createMockRoster({ units: [unit], warlordUnitId: unit.id });
+    render(<UnitsTab roster={roster} />, { wrapper: TestWrapper });
+    expect(screen.getByTestId('unit-issues')).toHaveTextContent('Captain is a Support unit');
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('unit-issues')).toHaveTextContent(
+      'Captain est une unité de Soutien sans garde du corps disponible.'
+    );
+    expect(screen.getByRole('img', { name: 'Seigneur de guerre' })).toBeInTheDocument();
+    expect(screen.getByTestId('unit-invalid-tag')).toHaveTextContent('Non valide');
+    expect(unit.datasheet.name).toBe('Captain');
+  });
   it('renders a flat name-sorted list without role sections', () => {
     const units = [
       createMockRosterUnit({

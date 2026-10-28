@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-
-const formatMb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+import { useTranslation } from 'react-i18next';
 
 /**
  * Browser-reported cache footprint. `estimate()` covers everything this origin
  * stores (IndexedDB + Cache Storage), so it is a total, not a per-kind split.
  */
 const StorageUsage = () => {
+  const { t, i18n } = useTranslation('settings');
   const [estimate, setEstimate] = useState<{ usage: number; quota: number } | null>(null);
 
   useEffect(() => {
@@ -22,12 +22,16 @@ const StorageUsage = () => {
         className="font-mono text-[10px] font-medium uppercase text-hint"
         data-testid="storage-usage"
       >
-        Storage estimate unavailable
+        {t('storage.unavailable')}
       </p>
     );
   }
 
   const percent = estimate.quota > 0 ? Math.min(100, (estimate.usage / estimate.quota) * 100) : 0;
+  const number = new Intl.NumberFormat(i18n.resolvedLanguage, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1
+  });
 
   return (
     <div data-testid="storage-usage">
@@ -37,7 +41,7 @@ const StorageUsage = () => {
         aria-valuenow={Math.round(percent)}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Storage used"
+        aria-label={t('storage.label')}
       >
         <div
           className="h-full bg-accent-600 dark:bg-accent-500"
@@ -45,8 +49,10 @@ const StorageUsage = () => {
         />
       </div>
       <p className="mt-1.5 font-mono text-[10px] font-medium uppercase text-muted">
-        {formatMb(estimate.usage)} used
-        {estimate.quota > 0 ? ` of ${formatMb(estimate.quota)} available` : ''}
+        {t(estimate.quota > 0 ? 'storage.quota' : 'storage.used', {
+          usage: number.format(estimate.usage / 1024 / 1024),
+          quota: number.format(estimate.quota / 1024 / 1024)
+        })}
       </p>
     </div>
   );

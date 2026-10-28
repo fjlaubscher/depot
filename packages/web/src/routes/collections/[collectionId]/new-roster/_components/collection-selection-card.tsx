@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { Button } from '@/components/ui';
@@ -15,6 +16,7 @@ const CollectionSelectionCard: FC<CollectionSelectionCardProps> = ({
   selected,
   onToggle
 }) => {
+  const { t } = useTranslation('collections');
   return (
     <RosterUnitCardCompact
       unit={unit}
@@ -26,7 +28,7 @@ const CollectionSelectionCard: FC<CollectionSelectionCardProps> = ({
       actions={
         // Click bubbles to the card's onClick, which toggles.
         <Button size="sm" variant={selected ? 'secondary' : 'accent'}>
-          {selected ? 'Selected' : 'Add'}
+          {t(selected ? 'roster.selected' : 'roster.add')}
         </Button>
       }
     />

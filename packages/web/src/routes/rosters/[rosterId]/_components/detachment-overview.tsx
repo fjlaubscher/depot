@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { Link } from '@/lib/navigation';
 import DetachmentAbilityCard from '@/components/shared/detachment-ability-card';
@@ -20,6 +21,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
   rosterEnhancements,
   units
 }) => {
+  const { t } = useTranslation('rosters');
   const { abilities, stratagems } = detachment;
 
   const sortedAbilities = useMemo(() => sortByName(abilities), [abilities]);
@@ -35,8 +37,10 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
       .sort((a, b) => a.enhancement.name.localeCompare(b.enhancement.name));
   }, [rosterEnhancements, units]);
 
-  const renderEmpty = (label: string) => (
-    <p className="text-sm text-subtle">No {label} available for this detachment.</p>
+  const renderEmpty = (label: 'abilities' | 'stratagems') => (
+    <p className="text-sm text-subtle">
+      {t(label === 'abilities' ? 'pages.noAbilities' : 'pages.noStratagems')}
+    </p>
   );
 
   return (
@@ -59,7 +63,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
       </div>
       <section className="flex flex-col gap-2" data-testid="detachment-abilities-section">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
-          Detachment Abilities
+          {t('pages.detachmentAbilities')}
         </h3>
         {sortedAbilities.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2">
@@ -75,7 +79,7 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
       {selectedEnhancements.length > 0 ? (
         <section className="flex flex-col gap-2" data-testid="detachment-enhancements-section">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
-            Selected Enhancements
+            {t('pages.selectedEnhancements')}
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
             {selectedEnhancements.map(({ enhancement, unitName, unitId }) => (
@@ -85,7 +89,9 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
               >
                 <EnhancementCard enhancement={enhancement} />
                 {unitName ? (
-                  <span className="text-xs text-subtle">Assigned to {unitName}</span>
+                  <span className="text-xs text-subtle">
+                    {t('pages.assignedTo', { name: unitName })}
+                  </span>
                 ) : null}
               </div>
             ))}
@@ -94,7 +100,9 @@ const DetachmentTab: React.FC<DetachmentTabProps> = ({
       ) : null}
 
       <section className="flex flex-col gap-2" data-testid="detachment-stratagems-section">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-body">Stratagems</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-body">
+          {t('pages.stratagems')}
+        </h3>
         {sortedStratagems.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2">
             {sortedStratagems.map((stratagem) => (

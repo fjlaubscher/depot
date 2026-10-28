@@ -1,21 +1,31 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppLayout from '@/components/layout';
 import CollectionsPanel from '@/routes/collections/_components/collections-panel';
 
-const CollectionsPage: React.FC = () => (
-  <CollectionsPanel>
-    {({ toolbar, body }) => (
-      <AppLayout
-        title="Collections"
-        heading={{ title: 'Collections', subtitle: 'Owned models and paint state' }}
-        crumbs={[{ label: 'Armies', to: '/armies' }, { label: 'Collections' }]}
-        toolbar={toolbar}
-      >
-        {body}
-      </AppLayout>
-    )}
-  </CollectionsPanel>
-);
+const CollectionsPage: React.FC = () => {
+  const { t } = useTranslation(['common', 'collections']);
+  return (
+    <CollectionsPanel>
+      {({ toolbar, body }) => (
+        <AppLayout
+          title={t('navigation.collections')}
+          heading={{
+            title: t('navigation.collections'),
+            subtitle: t('pages.subtitle', { ns: 'collections' })
+          }}
+          crumbs={[
+            { label: t('navigation.armies'), to: '/armies' },
+            { label: t('navigation.collections') }
+          ]}
+          toolbar={toolbar}
+        >
+          {body}
+        </AppLayout>
+      )}
+    </CollectionsPanel>
+  );
+};
 
 export default CollectionsPage;

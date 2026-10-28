@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 import { SelectField } from '@/components/ui';
 import { formatModelCostOptions } from '@depot/core/utils/model-costs';
@@ -14,22 +15,25 @@ const ModelCostSelection: React.FC<ModelCostSelectionProps> = ({
   modelCosts,
   selectedModelCost,
   onModelCostChange
-}) => (
-  <SelectField
-    // The "Unit size" section rule sits directly above, so a label would repeat it.
-    aria-label="Unit size"
-    value={selectedModelCost?.line || ''}
-    onChange={(event) => {
-      const selectedCost = modelCosts.find((cost) => cost.line === event.target.value);
-      if (selectedCost) onModelCostChange(selectedCost);
-    }}
-    options={formatModelCostOptions(modelCosts).map(({ cost, label }) => ({
-      value: cost.line,
-      label
-    }))}
-    placeholder="Select unit size"
-    data-testid="model-cost-select"
-  />
-);
+}) => {
+  const { t } = useTranslation('rosters');
+  return (
+    <SelectField
+      // The "Unit size" section rule sits directly above, so a label would repeat it.
+      aria-label={t('units.size')}
+      value={selectedModelCost?.line || ''}
+      onChange={(event) => {
+        const selectedCost = modelCosts.find((cost) => cost.line === event.target.value);
+        if (selectedCost) onModelCostChange(selectedCost);
+      }}
+      options={formatModelCostOptions(modelCosts).map(({ cost, label }) => ({
+        value: cost.line,
+        label
+      }))}
+      placeholder={t('units.selectSize')}
+      data-testid="model-cost-select"
+    />
+  );
+};
 
 export default ModelCostSelection;

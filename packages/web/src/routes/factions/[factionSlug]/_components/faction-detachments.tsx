@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 // UI Components
@@ -22,6 +23,7 @@ const dispositionOf = (detachment: depot.Detachment): string =>
   detachment.forceDisposition || detachment.type;
 
 const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, detachments }) => {
+  const { t } = useTranslation('catalog');
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce<string>(query, 100);
 
@@ -34,7 +36,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
     value,
     onChange,
     options
-  } = useSelect(dispositions, 'All force dispositions');
+  } = useSelect(dispositions, t('allDispositions'));
 
   const filtered = useMemo(() => {
     const needle = debouncedQuery.trim().toLowerCase();
@@ -50,7 +52,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
   if (detachments.length === 0) {
     return (
       <div className="py-12 text-center text-subtle" data-testid="faction-detachments">
-        No detachments available for this faction.
+        {t('noDetachments')}
       </div>
     );
   }
@@ -65,8 +67,8 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
         }}
       >
         <Search
-          label="Search detachments"
-          placeholder={`Search ${detachments.length} detachments…`}
+          label={t('searchDetachments')}
+          placeholder={t('searchDetachmentsPlaceholder', { count: detachments.length })}
           value={query}
           onChange={setQuery}
           testId="detachment-search"
@@ -74,7 +76,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
         <SelectField
           name="disposition"
           value={value}
-          aria-label="Filter by force disposition"
+          aria-label={t('filterDisposition')}
           onChange={(e) => onChange(Number(e.target.value))}
           options={options}
         />
@@ -99,9 +101,7 @@ const FactionDetachments: React.FC<FactionDetachmentsProps> = ({ factionSlug, de
       </Grid>
 
       {filtered.length === 0 ? (
-        <div className="py-12 text-center text-subtle">
-          No detachments found matching your search criteria.
-        </div>
+        <div className="py-12 text-center text-subtle">{t('noDetachmentsMatching')}</div>
       ) : null}
     </div>
   );

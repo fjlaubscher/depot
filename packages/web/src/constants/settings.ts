@@ -7,7 +7,8 @@ export const DEFAULT_SETTINGS: Required<depot.Settings> = {
   showFluff: true,
   includeWargearOnExport: true,
   useNativeShare: true,
-  theme: 'system'
+  theme: 'system',
+  language: 'auto'
 };
 
 export const mergeSettingsWithDefaults = (

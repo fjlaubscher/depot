@@ -1,4 +1,5 @@
 import type { depot } from '@depot/core';
+import i18n from '@/i18n';
 import {
   applyCollectionRebind,
   matchDatasheetSummary,
@@ -192,12 +193,12 @@ export const formatRebindSummaryMessage = (summary: RebindSummary): string | nul
 
   const parts: string[] = [];
   if (partial > 0) {
-    parts.push(`${partial} unit${partial === 1 ? '' : 's'} partially matched (loadout changes)`);
+    parts.push(i18n.t('rebind.partial', { count: partial }));
   }
   if (missing > 0) {
-    parts.push(`${missing} unit${missing === 1 ? '' : 's'} not found in the current catalog`);
+    parts.push(i18n.t('rebind.missing', { count: missing }));
   }
-  return parts.join('. ') + '.';
+  return parts.join(' ');
 };
 
 export interface Catalog {

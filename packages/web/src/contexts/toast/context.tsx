@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { createContext, useCallback, useContext, useState } from 'react';
+import type { ParseKeys } from 'i18next';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -8,6 +9,11 @@ export interface Toast {
   title: string;
   message?: string;
   type: ToastType;
+  translation?: {
+    title: ParseKeys<'common'>;
+    message?: ParseKeys<'common'>;
+    values?: Record<string, string | number>;
+  };
 }
 
 export interface ToastContextType {

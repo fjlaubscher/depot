@@ -1,4 +1,5 @@
 import { useState, useEffect, Children } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FC, ReactNode, HTMLAttributes } from 'react';
 import { cx } from '@/utils/cx';
 
@@ -22,6 +23,7 @@ const Tabs: FC<TabsProps> = ({
   tabTestIdPrefix,
   ...props
 }) => {
+  const { t } = useTranslation('common');
   const [activeTab, setActiveTab] = useState(active);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ const Tabs: FC<TabsProps> = ({
   return (
     <div className={cx('w-full flex flex-col gap-4', className)} {...props}>
       <div className="border-b border-border-subtle">
-        <nav className="flex gap-4 overflow-x-auto" aria-label="Tabs">
+        <nav className="flex gap-4 overflow-x-auto" aria-label={t('tabs')}>
           {validTabs.map((tab, index) => (
             <button
               key={`tab-${index}`}

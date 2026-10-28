@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import { Plus } from 'lucide-react';
@@ -24,6 +25,7 @@ type CollectionDatasheetListItem = depot.Datasheet & {
 };
 
 const CollectionNewRoster: React.FC = () => {
+  const { t } = useTranslation(['collections', 'rosters']);
   const { collectionId } = useParams<{ collectionId: string }>();
   const navigate = useNavigate();
   const { settings } = useSettingsContext();
@@ -33,8 +35,8 @@ const CollectionNewRoster: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const pageTitle = collection
-    ? `${collection.name} - Build Roster`
-    : 'Build Roster from Collection';
+    ? t('roster.title', { name: collection.name })
+    : t('roster.document');
   useDocumentTitle(pageTitle);
 
   useEffect(() => {
@@ -129,7 +131,7 @@ const CollectionNewRoster: React.FC = () => {
   };
 
   const subtitle = collection
-    ? `${collection.items.length} units - ${
+    ? `${t('chart.count', { count: collection.items.length })} - ${
         collection.faction?.name || collection.factionSlug || collection.factionId
       }`
     : undefined;
@@ -147,8 +149,8 @@ const CollectionNewRoster: React.FC = () => {
   if (error || !collection) {
     return (
       <AppLayout title={pageTitle}>
-        <Alert variant="error" title="Unable to load collection">
-          {error || 'Collection not found'}
+        <Alert variant="error" title={t('pages.loadCollectionFailed')}>
+          {t(error ? 'pages.collectionError' : 'pages.notFound')}
         </Alert>
       </AppLayout>
     );
@@ -158,15 +160,15 @@ const CollectionNewRoster: React.FC = () => {
     <AppLayout
       title={pageTitle}
       back={{ to: `/collections/${collection.id}`, label: collection.name }}
-      heading={{ title: 'Build roster', subtitle: `${collection.name} · ${subtitle}` }}
+      heading={{ title: t('roster.heading'), subtitle: `${collection.name} · ${subtitle}` }}
     >
       <div className="flex flex-col gap-3">
         {collection.items.length === 0 ? (
           <RosterEmptyState
-            title="No units in this collection"
+            title={t('pages.emptyUnits')}
             dataTestId="empty-collection-state"
             action={{
-              label: 'Add units',
+              label: t('units.add', { ns: 'rosters' }),
               onClick: () => navigate(`/collections/${collection.id}/add-units`),
               icon: <Plus size={14} />
             }}
@@ -175,8 +177,8 @@ const CollectionNewRoster: React.FC = () => {
           <div className="flex flex-col gap-4">
             <DatasheetBrowser<CollectionDatasheetListItem>
               datasheets={collectionDatasheets}
-              searchPlaceholder="Search collection units..."
-              emptyStateMessage="No units match your filters."
+              searchPlaceholder={t('roster.search')}
+              emptyStateMessage={t('roster.empty')}
               filters={datasheetFilters}
               showItemCount={false}
               resultsClassName={hasSelections ? 'pb-28 md:pb-24' : undefined}
@@ -207,7 +209,7 @@ const CollectionNewRoster: React.FC = () => {
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         prefill={{
-          name: `${collection.name} roster`,
+          name: t('roster.name', { name: collection.name }),
           factionSlug: collection.factionSlug ?? collection.factionId,
           units: selectedRosterUnits,
           collectionId: collection.id

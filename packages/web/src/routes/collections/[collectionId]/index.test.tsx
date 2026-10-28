@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import i18n from '@/i18n';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { depot } from '@depot/core';
 
@@ -7,6 +8,21 @@ import CollectionPage from './index';
 import { TestWrapper } from '@/test/test-utils';
 import { mockDatasheet, mockFactionIndex } from '@/test/mock-data';
 import type { Action } from '@/components/ui/action-group';
+
+const showToast = vi.hoisted(() => vi.fn());
+vi.mock('@/contexts/toast/context', async () => ({
+  ...(await vi.importActual('@/contexts/toast/context')),
+  useToast: () => ({ showToast })
+}));
+vi.mock('@/utils/file', () => ({ downloadFile: vi.fn() }));
+vi.mock('@/contexts/factions/context', async () => ({
+  ...(await vi.importActual('@/contexts/factions/context')),
+  useFactionsContext: () => ({
+    dataVersion: 'current',
+    getDatasheet: async () => mockDatasheet,
+    getFactionManifest: async () => null
+  })
+}));
 
 vi.mock('@/components/layout', () => ({
   default: ({
@@ -94,6 +110,42 @@ const collection: depot.Collection = {
 };
 
 describe('CollectionPage', () => {
+  it('localizes stale warnings, refresh and export notifications', async () => {
+    const save = vi.fn().mockResolvedValue(undefined);
+    mockUseCollection.mockReturnValue({ collection, loading: false, error: null, save });
+    render(<CollectionPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByText('Cette collection utilise des données anciennes')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('refresh-collection-data'));
+    await waitFor(() =>
+      expect(showToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Collection actualisée' })
+      )
+    );
+    expect(save).toHaveBeenCalledWith(
+      expect.objectContaining({ dataVersion: 'current', name: collection.name })
+    );
+    fireEvent.click(screen.getByTestId('export-collection-button'));
+    expect(showToast).toHaveBeenCalledWith({ type: 'success', title: 'Collection exportée' });
+  });
+  it('keeps the persisted state filter and units when translating without saving', async () => {
+    const save = vi.fn();
+    mockUseCollection.mockReturnValue({ collection, loading: false, error: null, save });
+    render(<CollectionPage />, { wrapper: TestWrapper });
+    fireEvent.click(screen.getByTestId('collection-state-filter-battle-ready'));
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('collection-state-filter-battle-ready')).toHaveTextContent(
+      'Prêt à jouer'
+    );
+    expect(screen.getByTestId('collection-unit-card')).toHaveTextContent('Captain');
+    expect(localStorage.getItem('depot:tag-selection:collection-state-filter')).toContain(
+      'battle-ready'
+    );
+    expect(screen.getByTestId('add-collection-units-button')).toHaveTextContent(
+      'Ajouter des unités'
+    );
+    expect(save).not.toHaveBeenCalled();
+  });
   beforeEach(() => {
     mockNavigate.mockClear();
     mockUseCollection.mockReset();

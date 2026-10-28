@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cx } from '@/utils/cx';
 import { CODEX_SLUG } from '@depot/core/utils/datasheets';
 import {
@@ -26,6 +27,7 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
   onChange,
   className
 }) => {
+  const { t } = useTranslation('catalog');
   if (tabs.length <= 1) {
     return null;
   }
@@ -33,11 +35,11 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
   return (
     <div
       role="tablist"
-      aria-label="Datasheet supplements"
+      aria-label={t('supplementsLabel')}
       data-testid="supplement-tabs"
       className={cx('flex flex-col gap-2', className)}
     >
-      <span className="text-sm font-medium text-muted">Supplements</span>
+      <span className="text-sm font-medium text-muted">{t('supplements')}</span>
       <div className="flex gap-2 overflow-x-auto pb-1">
         {tabs.map((tab) => {
           const isActive = tab.value === activeValue;
@@ -63,7 +65,13 @@ export const DatasheetSupplementTabs: FC<DatasheetSupplementTabsProps> = ({
                 isActive ? activeClass : inactiveClass
               )}
             >
-              <span>{tab.label}</span>
+              <span>
+                {tab.value === 'all'
+                  ? t('all')
+                  : tab.value === CODEX_SLUG
+                    ? t('noSupplement')
+                    : tab.label}
+              </span>
               <span
                 className={cx(
                   'inline-flex items-center justify-center rounded-xs px-1.5 py-0.5 font-mono text-xs font-bold',

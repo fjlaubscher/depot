@@ -1,0 +1,55 @@
+{
+  "language": "Langue de l’interface",
+  "automaticLanguage": "Automatique",
+  "documentTitle": "Paramètres et préférences",
+  "title": "Paramètres",
+  "appearance": "Apparence",
+  "theme": {
+    "label": "Thème",
+    "light": "Clair",
+    "system": "Système",
+    "dark": "Sombre"
+  },
+  "installDescription": "Installez depot pour l’utiliser hors ligne.",
+  "factions": "Factions",
+  "forgeWorld": {
+    "title": "Unités Forge World",
+    "description": "Afficher les fiches et règles Forge World"
+  },
+  "legends": {
+    "title": "Unités Legends",
+    "description": "Afficher les anciennes fiches Legends"
+  },
+  "unaligned": {
+    "title": "Factions non alignées",
+    "description": "Afficher les factions sans allégeance particulière"
+  },
+  "fluff": {
+    "title": "Afficher les textes d’ambiance",
+    "description": "Afficher les récits et le contexte de l’univers. À désactiver si vous êtes un hérétique qui ne s’intéresse qu’aux chiffres."
+  },
+  "sharing": "Partage",
+  "wargear": {
+    "title": "Partager les équipements",
+    "description": "Inclure les équipements sélectionnés lors du partage des listes"
+  },
+  "nativeShare": {
+    "title": "Utiliser le partage du système",
+    "description": "Utiliser le menu de partage de l’appareil s’il est disponible ; sinon, copier dans le presse-papiers"
+  },
+  "offline": {
+    "title": "Données hors ligne",
+    "factionOnly": "faction uniquement",
+    "datasheetCount_one": "{{count, number}} fiche",
+    "datasheetCount_other": "{{count, number}} fiches",
+    "clear": "Vider le cache hors ligne",
+    "description": "Supprime les packs de factions et les fiches en cache. Les listes, collections et favoris sont conservés. Les données des factions sont remises en cache au fil de la navigation.",
+    "empty": "Aucune donnée en cache pour le moment. Consultez une faction pour la rendre accessible hors ligne."
+  },
+  "storage": {
+    "unavailable": "Estimation du stockage indisponible",
+    "label": "Stockage utilisé",
+    "used": "{{usage}} Mo utilisés",
+    "quota": "{{usage}} Mo utilisés sur {{quota}} Mo disponibles"
+  }
+}

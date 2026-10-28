@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 import { IconButton } from '@/components/ui';
@@ -26,6 +27,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
   enhancementName,
   issues
 }) => {
+  const { t } = useTranslation('rosters');
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -38,7 +40,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
           e.stopPropagation();
           onDuplicate(unit);
         }}
-        aria-label="Duplicate unit"
+        aria-label={t('units.duplicate')}
         variant="ghost"
         size="sm"
         className="text-info-fg hover:bg-info-surface"
@@ -50,7 +52,7 @@ const RosterUnitCardEdit: FC<RosterUnitCardEditProps> = ({
           e.stopPropagation();
           onRemove(unit.id);
         }}
-        aria-label="Remove unit from roster"
+        aria-label={t('units.remove')}
         variant="ghost"
         size="sm"
         className="text-danger-fg hover:bg-danger-surface"

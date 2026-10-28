@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { depot } from '@depot/core';
 import {
@@ -13,6 +13,7 @@ import {
   setupBrowserMocks
 } from '@/test/test-utils';
 import DatasheetPage from './index';
+import i18n from '@/i18n';
 
 // Mock dependencies
 vi.mock('@/hooks/use-faction');
@@ -57,6 +58,7 @@ describe('DatasheetPage', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    await i18n.changeLanguage('en');
     setupBrowserMocks();
 
     // Setup default successful state
@@ -78,6 +80,48 @@ describe('DatasheetPage', () => {
     render(<DatasheetPage />, { wrapper: TestWrapper });
 
     expect(screen.getByTestId('page-header')).toBeInTheDocument();
+  });
+
+  it('updates shared actions while keeping the faction and datasheet names', async () => {
+    render(<DatasheetPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(
+      screen.getByRole('button', { name: 'Partager le lien de la fiche' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Ajouter la fiche aux favoris' })
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('page-header')).toHaveTextContent(mockFaction.datasheets[0].name);
+    expect(screen.getByTestId('mobile-back-button')).toHaveAttribute(
+      'aria-label',
+      `Retour vers ${mockFaction.name}`
+    );
+    expect(screen.getByRole('link', { name: 'Règles' })).toHaveAttribute('href', '/factions');
+    expect(screen.getByTestId('page-header')).toHaveTextContent('Fiche technique');
+    expect(screen.getByText('Aptitudes')).toBeInTheDocument();
+    expect(screen.getByText('Mots-clés')).toBeInTheDocument();
+    expect(screen.getByText('Équipement et options')).toBeInTheDocument();
+    expect(document.title).toContain(mockFaction.datasheets[0].name);
+  });
+
+  it('translates load errors and missing datasheets on a mounted page', async () => {
+    mocks.mockUseDatasheet.mockReturnValue({
+      data: null,
+      loading: false,
+      error: 'network failure'
+    });
+    const { rerender } = render(<DatasheetPage />, { wrapper: TestWrapper });
+    await act(() => i18n.changeLanguage('fr'));
+    expect(screen.getByTestId('datasheet-error')).toHaveTextContent(
+      'Impossible de charger la fiche technique'
+    );
+    expect(document.title).toContain('Erreur');
+    mocks.mockUseDatasheet.mockReturnValue({ data: null, loading: false, error: null });
+    rerender(<DatasheetPage />);
+    expect(screen.getByTestId('datasheet-not-found')).toHaveTextContent(
+      'Fiche technique introuvable'
+    );
+    expect(document.title).toContain('Introuvable');
   });
 
   it('displays source and points info', () => {

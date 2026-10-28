@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/layout';
 import { Skeleton as UISkeleton } from '@/components/ui';
 
@@ -11,8 +12,9 @@ const PillRow: React.FC = () => (
 );
 
 const DatasheetSkeleton: React.FC = () => {
+  const { t } = useTranslation('catalog');
   return (
-    <AppLayout title="Loading Datasheet">
+    <AppLayout title={t('loadingDatasheet')}>
       <div className="flex flex-col gap-4" data-testid="datasheet-loader">
         <UISkeleton width="70%" height={28} className="rounded-sm" />
         <UISkeleton width="45%" height={14} className="rounded-sm" />

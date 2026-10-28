@@ -1,0 +1,47 @@
+{
+  "about": {
+    "title": "About depot",
+    "subtitle": "An offline-first roster companion built for hobby tinkering",
+    "author": "I'm Francois — a passionate software engineer, lifelong hobbyist, and believer in free, privacy-respecting apps. My first proper army came out of a Catachan Jungle Fighters Battle Force back in 4th edition, and I've been tinkering with tools for the grimdark ever since. depot exists because I wanted to keep my tech skills sharp by experimenting with new web technologies in an app I actually use every day instead of churning out yet another loud, data-hungry product. It runs as a PWA so I can sketch lists on a desktop or a phone, stay offline, and keep the experience feeling calm.",
+    "whatTitle": "What depot is",
+    "what": "A free, open-source list companion built around fast datasheet browsing, lightweight roster sketching, and typography tuned for phones. It mirrors Wahapedia exports and caches everything on your device, so it keeps working on trains, planes, or spotty Wi-Fi. Web app only—no app-store builds, no logins, no ads.",
+    "contributingTitle": "Contributing",
+    "contributing": "depot lives on spare-evening energy, so thoughtful bug reports and gentle quality-of-life suggestions are incredibly helpful. Please share repro steps, device details, or mockups whenever you can. Pull requests are welcome—just follow the repo guidelines to keep changes tidy and accessible.",
+    "issue": "Create an issue or feature request",
+    "repository": "View the GitHub repository",
+    "social": "Say hi on X (@fjlaubscher)",
+    "contact": "GitHub issues are the best place for bugs and requests. For anything else, X is the way to reach me.",
+    "legalTitle": "Credits & Legal",
+    "legal": "depot is not affiliated with, endorsed by, or sponsored by Games Workshop Limited. All related names, imagery, and trademarks remain the property of their respective owners. Please support the official publications whenever you can.",
+    "data": "The data pipeline is powered by Wahapedia exports. Wahapedia is unaffiliated with Games Workshop and unaffiliated with depot; we simply transform its public CSVs into offline JSON for personal use.",
+    "rights": "If you hold rights to any material referenced in depot and have concerns, email <email>francoisjlaubscher@gmail.com</email>, and I'll respond quickly."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "How depot collects, stores, and uses information",
+    "overviewTitle": "Overview",
+    "overview": "depot is a privacy-first, open-source Warhammer 40,000 companion. You can browse factions, datasheets, and rosters anonymously—the app never asks for a login.",
+    "minimum": "Only the minimum technical data required to serve the site or fix crashes is processed, and most of that work happens on your own device.",
+    "deviceTitle": "Application data on your device",
+    "device": "Rosters, preferences, cached faction data, and any offline assets live inside your browser's IndexedDB and local storage. None of this content is uploaded back to depot or shared with third parties.",
+    "hostingTitle": "Hosting & server logs",
+    "hosting": "depot is hosted on Cloudflare Pages. When you request a page, Cloudflare may log standard diagnostic details—IP address, user-agent, and timestamps—to keep the network safe. These short-lived logs stay inside Cloudflare's infrastructure; depot does not combine them with any other data or build user profiles.",
+    "errorsTitle": "Error reporting (Sentry)",
+    "errors": "Crash reports are powered by <sentry>Sentry</sentry>. Error telemetry is only sent when a Sentry DSN is configured in the deployment environment; local builds without a DSN never talk to Sentry. Events contain stack traces, browser metadata, the route where the error occurred, and coarse IP information (for country/region only). On Sentry's free plan, events automatically expire after roughly 90 days.",
+    "errorPurpose": "Sentry is used strictly to debug crashes. No roster data, PII, or gameplay content is intentionally included in those payloads.",
+    "analyticsTitle": "Analytics & advertising",
+    "analytics": "depot does not run analytics dashboards, ad networks, social pixels, or fingerprinting scripts. If a lightweight, privacy-respecting analytics tool is ever added, this page and the release notes will be updated before it ships.",
+    "choicesTitle": "Your choices",
+    "clear": "To clear app data, open your browser settings for godepot.dev and delete local storage/IndexedDB. This removes rosters, cached factions, and offline assets.",
+    "block": "To block crash reports, deny requests to <domain>*.ingest.sentry.io</domain> with an ad blocker, DNS sinkhole, or firewall.",
+    "updatesTitle": "Updates & contact",
+    "updates": "When depot's data practices change, the effective date below will be updated and the change will be mentioned in release notes. For questions, takedown requests, or privacy concerns, email <email>francoisjlaubscher@gmail.com</email>.",
+    "effectiveDate": "Effective date: November 25, 2025"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for has been moved, deleted, or doesn't exist.",
+    "home": "Return home",
+    "back": "Go back"
+  }
+}

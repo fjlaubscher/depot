@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { Button, QuantityStepper, Drawer } from '@/components/ui';
@@ -34,13 +35,15 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
   isOpen,
   onOpenChange
 }) => {
+  const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation('rosters');
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   if (selectedUnitsCount === 0) {
     return null;
   }
 
-  const summary = `${selectedUnitsCount} unit${selectedUnitsCount === 1 ? '' : 's'} • ${totalPoints} pts`;
+  const summary = rosterT('units.selection', { count: selectedUnitsCount, points: totalPoints });
 
   return (
     <>
@@ -52,12 +55,12 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
       >
         <span className="flex flex-col text-left md:flex-row md:items-center md:gap-2">
           <span className="text-xs font-semibold uppercase tracking-wide text-accent-ink md:text-sm">
-            Review Selection
+            {rosterT('units.reviewSelection')}
           </span>
           <span className="text-lg font-semibold text-accent-ink md:text-sm">{summary}</span>
         </span>
         <span className="text-sm font-medium text-accent-ink underline underline-offset-4 md:hidden">
-          Review
+          {rosterT('units.review')}
         </span>
       </button>
 
@@ -73,7 +76,7 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-bold text-foreground">Selection Summary</h2>
+              <h2 className="text-lg font-bold text-foreground">{rosterT('units.summary')}</h2>
               <p className="text-sm text-info-fg">{summary}</p>
             </div>
             <button
@@ -81,13 +84,13 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
               className="cursor-pointer rounded-sm px-3 min-h-11 text-sm font-medium text-info-fg transition hover:bg-info-surface focus-ring-info"
               onClick={() => onOpenChange(false)}
             >
-              Close
+              {t('actions.close')}
             </button>
           </div>
 
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-2">
             {groups.map(({ datasheet, modelCost, count }) => {
-              const subtitleParts = [`${modelCost.cost} pts`];
+              const subtitleParts = [`${modelCost.cost} ${rosterT('units.pointsUnit')}`];
               if (modelCost.description && modelCost.description !== datasheet.name) {
                 subtitleParts.push(modelCost.description);
               }
@@ -107,8 +110,8 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
                     value={count}
                     onDecrease={() => onDecrement(datasheet, modelCost)}
                     onIncrease={() => onIncrement(datasheet, modelCost)}
-                    decreaseLabel={`Decrease ${datasheet.name}`}
-                    increaseLabel={`Increase ${datasheet.name}`}
+                    decreaseLabel={t('actions.decreaseItem', { name: datasheet.name })}
+                    increaseLabel={t('actions.increaseItem', { name: datasheet.name })}
                   />
                 </div>
               );
@@ -116,13 +119,15 @@ const SelectionSummary: FC<SelectionSummaryProps> = ({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm font-medium text-info-fg">Total: {totalPoints} pts</span>
+            <span className="text-sm font-medium text-info-fg">
+              {rosterT('units.total', { points: totalPoints })}
+            </span>
             <div className="flex gap-2">
               <Button size="sm" variant="secondary" onClick={onClear}>
-                Clear
+                {t('actions.clear')}
               </Button>
               <Button size="sm" onClick={onConfirm}>
-                Confirm
+                {t('actions.confirm')}
               </Button>
             </div>
           </div>

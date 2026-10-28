@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ChangeEvent, FC } from 'react';
 import { Upload } from 'lucide-react';
 
@@ -13,12 +14,13 @@ type ImportButtonProps = {
 };
 
 const ImportButton: FC<ImportButtonProps> = ({
-  label = 'Import',
+  label,
   multiple = false,
   onFilesSelected,
   buttonTestId = 'import-button',
   inputTestId = 'import-input'
 }) => {
+  const { t } = useTranslation('common');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +39,7 @@ const ImportButton: FC<ImportButtonProps> = ({
         data-testid={buttonTestId}
       >
         <Upload size={16} />
-        {label}
+        {label ?? t('actions.import')}
       </Button>
       <input
         ref={fileInputRef}

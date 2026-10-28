@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import type { depot } from '@depot/core';
 import useRosters from './use-rosters';
+import i18n from '@/i18n';
 import { createMockRoster, mockDatasheet, mockDetachment, mockRoster } from '@/test/mock-data';
 
 // Mock offline storage using vi.hoisted for proper scoping
@@ -26,6 +27,23 @@ vi.mock('@/contexts/factions/context', () => ({
 }));
 
 describe('useRosters', () => {
+  it('names a new duplicate in the current language without renaming it later', async () => {
+    const source = createMockRoster({ name: 'Ma liste d’essai' });
+    mockOfflineStorage.getAllRosters.mockResolvedValue([source]);
+    mockOfflineStorage.saveRoster.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useRosters());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await act(() => i18n.changeLanguage('fr'));
+    let copy!: depot.Roster;
+    await act(async () => {
+      copy = await result.current.duplicateRoster(source);
+    });
+    expect(copy.name).toBe('Ma liste d’essai (Copie)');
+    expect(copy.id).not.toBe(source.id);
+    await act(() => i18n.changeLanguage('en'));
+    expect(copy.name).toBe('Ma liste d’essai (Copie)');
+    expect(source.name).toBe('Ma liste d’essai');
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     mockCatalog.getDatasheet.mockResolvedValue(mockDatasheet);

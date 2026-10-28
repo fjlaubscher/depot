@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import type { FC } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from '@/lib/navigation';
 import { Copy, Download, Pencil, Share2, RefreshCw } from 'lucide-react';
 import { RosterProvider } from '@/contexts/roster/context';
@@ -32,6 +33,8 @@ import StratagemsTab from './_components/stratagems-tab';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 
 const RosterView: FC = () => {
+  const { t } = useTranslation('common');
+  const { t: rosterT, i18n } = useTranslation('rosters');
   const { state: roster, setRoster } = useRoster();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -69,12 +72,12 @@ const RosterView: FC = () => {
       `roster-${safeSlug(roster.name)}-${roster.id}.json`,
       JSON.stringify(payload, null, 2)
     );
-    showToast({ title: 'Roster exported', type: 'success' });
+    showToast({ title: rosterT('notifications.exported'), type: 'success' });
   };
 
   const shareText = useMemo(
     () => generateRosterShareText(roster, factionName, { includeWargear: includeWargearOnExport }),
-    [factionName, includeWargearOnExport, roster]
+    [factionName, includeWargearOnExport, roster, i18n.resolvedLanguage]
   );
 
   const rosterVersion = roster.dataVersion ?? null;
@@ -86,8 +89,8 @@ const RosterView: FC = () => {
     if (!currentDataVersion) {
       showToast({
         type: 'warning',
-        title: 'No data version detected',
-        message: 'Unable to refresh because the current data version is unknown.'
+        title: rosterT('notifications.noVersion'),
+        message: rosterT('notifications.noVersionMessage')
       });
       return;
     }
@@ -104,17 +107,17 @@ const RosterView: FC = () => {
       setRoster(result.roster);
       const rebindNote = formatRebindSummaryMessage(result.summary);
       showToast({
-        title: 'Roster updated',
+        title: rosterT('notifications.updated'),
         message: rebindNote
-          ? `Refreshed with the latest data. ${rebindNote}`
-          : 'Refreshed with the latest Wahapedia data.',
+          ? `${rosterT('notifications.refreshed')} ${rebindNote}`
+          : rosterT('notifications.refreshedWahapedia'),
         type: rebindNote ? 'warning' : 'success'
       });
     } catch (error) {
       console.error('Failed to refresh roster data', error);
       showToast({
-        title: 'Refresh failed',
-        message: 'Could not refresh with the latest data.',
+        title: rosterT('notifications.refreshFailed'),
+        message: rosterT('notifications.refreshError'),
         type: 'error'
       });
     } finally {
@@ -126,18 +129,23 @@ const RosterView: FC = () => {
     title: roster.name,
     text: shareText,
     icon: canUseNativeShare ? <Share2 size={16} /> : <Copy size={16} />,
-    ariaLabel: canUseNativeShare ? 'Share roster' : 'Copy roster share text',
+    ariaLabel: canUseNativeShare ? t('share.rosterLabel') : t('share.copyRosterLabel'),
     testId: 'share-roster-button',
-    copySuccessMessage: 'Roster copied to clipboard.',
-    shareSuccessMessage: 'Roster shared.'
+    copySuccessKey: 'share.rosterCopied',
+    shareSuccessKey: 'share.rosterShared'
   });
 
-  const pageTitle = roster.name ? `${roster.name} - Roster Overview` : 'Roster Overview';
+  const pageTitle = roster.name
+    ? rosterT('pages.overviewTitle', { name: roster.name })
+    : rosterT('pages.overview');
   useScrollToHash({ enabled: Boolean(roster.id) });
 
   if (!roster.id) {
     return (
-      <AppLayout title="Roster Overview" back={{ to: '/rosters', label: 'Rosters' }}>
+      <AppLayout
+        title={rosterT('pages.overview')}
+        back={{ to: '/rosters', label: t('navigation.rosters') }}
+      >
         <Loader />
       </AppLayout>
     );
@@ -149,9 +157,9 @@ const RosterView: FC = () => {
 
   const detachments = getRosterDetachments(roster);
   const tabs = [
-    { label: 'Units', panel: <UnitsTab key="units" roster={roster} /> },
+    { label: rosterT('pages.units'), panel: <UnitsTab key="units" roster={roster} /> },
     ...detachments.map((detachment) => ({
-      label: detachments.length === 1 ? 'Detachment' : detachment.name,
+      label: detachments.length === 1 ? rosterT('pages.detachment') : detachment.name,
       panel: (
         <DetachmentTab
           key={`detachment-${detachment.id}`}
@@ -165,7 +173,7 @@ const RosterView: FC = () => {
       )
     })),
     {
-      label: 'Stratagems',
+      label: rosterT('pages.stratagems'),
       panel: (
         <StratagemsTab
           key="stratagems"
@@ -182,10 +190,10 @@ const RosterView: FC = () => {
   return (
     <AppLayout
       title={pageTitle}
-      back={{ to: '/rosters', label: 'Rosters' }}
+      back={{ to: '/rosters', label: t('navigation.rosters') }}
       crumbs={[
-        { label: 'Armies', to: '/armies' },
-        { label: 'Rosters', to: '/rosters' },
+        { label: t('navigation.armies'), to: '/armies' },
+        { label: t('navigation.rosters'), to: '/rosters' },
         { label: roster.name }
       ]}
       heading={{
@@ -197,7 +205,7 @@ const RosterView: FC = () => {
             className="pointer-events-auto relative z-10 mt-0.5 truncate text-xs font-medium text-muted hover:text-foreground"
             data-testid="roster-collection-link"
           >
-            Collection · {linkedCollection.name}
+            {rosterT('pages.collection', { name: linkedCollection.name })}
           </Link>
         ) : undefined
       }}
@@ -205,13 +213,13 @@ const RosterView: FC = () => {
         {
           icon: <Pencil size={16} />,
           onClick: () => navigate(`/rosters/${roster.id}/edit`),
-          ariaLabel: 'Edit roster units',
+          ariaLabel: rosterT('pages.editUnits'),
           'data-testid': 'manage-units-button'
         },
         {
           icon: shareAction.icon,
           onClick: () => shareAction.onClick(),
-          ariaLabel: shareAction.ariaLabel ?? 'Share roster',
+          ariaLabel: shareAction.ariaLabel ?? t('share.rosterLabel'),
           'data-testid': 'share-roster-button'
         }
       ]}
@@ -223,7 +231,7 @@ const RosterView: FC = () => {
           data-testid="export-button"
         >
           <Download size={16} />
-          Export JSON
+          {rosterT('pages.export')}
         </Button>
       }
     >
@@ -233,11 +241,9 @@ const RosterView: FC = () => {
         </div>
 
         {isRosterStale ? (
-          <Alert variant="warning" title="Roster uses older data" className="gap-2">
+          <Alert variant="warning" title={rosterT('pages.stale')} className="gap-2">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm text-muted">
-                Refresh to pull the latest Wahapedia data into this roster.
-              </span>
+              <span className="text-sm text-muted">{rosterT('pages.staleMessage')}</span>
               <Button
                 variant="secondary"
                 onClick={() => void handleRefreshRosterData()}
@@ -246,7 +252,7 @@ const RosterView: FC = () => {
                 className="inline-flex items-center gap-2"
               >
                 <RefreshCw className="h-4 w-4" />
-                {refreshingRoster ? 'Refreshing…' : 'Refresh with latest data'}
+                {rosterT(refreshingRoster ? 'pages.refreshing' : 'pages.refresh')}
               </Button>
             </div>
           </Alert>

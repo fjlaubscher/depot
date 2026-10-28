@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -20,6 +21,7 @@ import { modelCostsForOrdinal } from '@depot/core/utils/model-costs';
 
 /** Keyed by unit id by the caller, so state initialises once per unit. */
 const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
+  const { t } = useTranslation(['rosters', 'catalog']);
   const {
     state: roster,
     updateUnitWargear,
@@ -78,8 +80,8 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
 
       showToast({
         type: 'success',
-        title: 'Unit Updated',
-        message: 'Unit configuration has been saved successfully.'
+        title: t('notifications.unitUpdated'),
+        message: t('notifications.unitSaved')
       });
 
       navigate(`/rosters/${roster.id}/edit${unitHash}`);
@@ -87,14 +89,14 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
       console.error('Failed to save unit changes:', error);
       showToast({
         type: 'error',
-        title: 'Save Failed',
-        message: 'Failed to save unit changes. Please try again.'
+        title: t('notifications.unitSaveFailed'),
+        message: t('notifications.unitSaveError')
       });
     }
   };
 
-  const subtitle = `Loadout · ${factionName || roster.name}`;
-  const documentTitle = `${unit.datasheet.name} - Edit Roster Unit`;
+  const subtitle = t('units.loadout', { name: factionName || roster.name });
+  const documentTitle = t('units.editTitle', { name: unit.datasheet.name });
 
   return (
     <UnitEditShell
@@ -113,7 +115,7 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
         <>
           {character || eligibleEnhancements.length > 0 ? (
             <section className="flex flex-col gap-1.5" data-testid="enhancement-section">
-              <SectionHeader title={character ? 'Enhancement' : 'Upgrade'} />
+              <SectionHeader title={character ? t('units.enhancement') : t('catalog:upgrade')} />
               <EnhancementSelection
                 enhancements={eligibleEnhancements}
                 selectedEnhancements={selectedEnhancements}
@@ -124,7 +126,7 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
 
           {character ? (
             <section className="flex flex-col gap-1.5" data-testid="warlord-section">
-              <SectionHeader title="Warlord" />
+              <SectionHeader title={t('units.warlord')} />
               <WarlordSelection
                 unit={unit}
                 roster={roster}
@@ -141,6 +143,8 @@ const EditRosterUnitForm: React.FC<{ unit: depot.RosterUnit }> = ({ unit }) => {
 };
 
 const EditRosterUnitView: React.FC = () => {
+  const { t } = useTranslation('common');
+  const { t: rosterT } = useTranslation('rosters');
   const { state: roster } = useRoster();
   const { rosterId, unitId } = useParams<{ rosterId: string; unitId: string }>();
   const unit = roster.units.find((u) => u.id === unitId);
@@ -149,8 +153,8 @@ const EditRosterUnitView: React.FC = () => {
   if (!roster.id) {
     return (
       <AppLayout
-        title="Edit Roster Unit"
-        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+        title={rosterT('units.editDocument')}
+        back={{ to: `/rosters/${rosterId}/edit`, label: t('navigation.roster') }}
       >
         <div className="flex flex-col gap-4" data-testid="edit-unit-loading">
           <PageHeaderSkeleton />
@@ -165,12 +169,12 @@ const EditRosterUnitView: React.FC = () => {
   if (!unit) {
     return (
       <AppLayout
-        title="Edit Roster Unit"
-        back={{ to: `/rosters/${rosterId}/edit`, label: 'Roster' }}
+        title={rosterT('units.editDocument')}
+        back={{ to: `/rosters/${rosterId}/edit`, label: t('navigation.roster') }}
       >
         <ErrorState
-          title="Unit Not Found"
-          message="The unit you're trying to edit could not be found."
+          title={rosterT('units.notFound')}
+          message={rosterT('units.notFoundMessage')}
           showRetry={false}
           homeUrl={`/rosters/${rosterId}/edit`}
           data-testid="edit-unit-not-found"

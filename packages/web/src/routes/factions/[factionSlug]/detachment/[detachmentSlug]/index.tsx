@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 // components
@@ -30,6 +31,8 @@ const Section: FC<{
 );
 
 const DetachmentPage: FC = () => {
+  const { t } = useTranslation('common');
+  const { t: tc } = useTranslation('catalog');
   const { factionSlug, detachmentSlug } = useParams<{
     factionSlug: string;
     detachmentSlug: string;
@@ -51,18 +54,18 @@ const DetachmentPage: FC = () => {
       faction && detachment
         ? buildAbsoluteUrl(`/faction/${faction.slug}/detachment/${detachment.slug}`)
         : undefined,
-    ariaLabel: 'Share detachment link',
+    ariaLabel: t('share.detachmentLabel'),
     testId: 'share-detachment',
-    copySuccessMessage: 'Detachment link copied to clipboard.',
-    shareSuccessMessage: 'Detachment link shared.'
+    copySuccessKey: 'share.detachmentCopied',
+    shareSuccessKey: 'share.detachmentShared'
   });
 
   if (error) {
     return (
-      <AppLayout title="Error">
+      <AppLayout title={t('error.label')}>
         <ErrorState
-          title="Failed to Load Detachment"
-          message="We encountered an error while trying to load this detachment. This could be due to network issues or the faction may not exist."
+          title={tc('errors.detachmentTitle')}
+          message={tc('errors.detachmentMessage')}
           stackTrace={error}
           data-testid="detachment-error"
         />
@@ -72,7 +75,7 @@ const DetachmentPage: FC = () => {
 
   if (loading) {
     return (
-      <AppLayout title="Loading Detachment">
+      <AppLayout title={tc('loadingDetachment')}>
         <div className="flex flex-col gap-4" data-testid="detachment-loader">
           <PageHeaderSkeleton />
           <Grid>
@@ -87,10 +90,10 @@ const DetachmentPage: FC = () => {
 
   if (!faction || !detachment) {
     return (
-      <AppLayout title="Not Found">
+      <AppLayout title={tc('notFound')}>
         <ErrorState
-          title="Detachment not found"
-          message="The detachment you're looking for doesn't exist or may have been removed."
+          title={tc('errors.detachmentNotFound')}
+          message={tc('errors.detachmentMissing')}
           showRetry={false}
           homeUrl={factionSlug ? `/faction/${factionSlug}/detachments` : '/'}
           data-testid="detachment-not-found"
@@ -111,11 +114,11 @@ const DetachmentPage: FC = () => {
   return (
     <AppLayout
       title={`${detachment.name} - ${faction.name}`}
-      back={{ to: backPath, label: 'Detachments' }}
+      back={{ to: backPath, label: t('navigation.detachments') }}
       crumbs={[
-        { label: 'Rules', to: '/factions' },
+        { label: t('navigation.rules'), to: '/factions' },
         { label: faction.name, to: `/faction/${faction.slug}` },
-        { label: 'Detachments', to: `/faction/${faction.slug}/detachments` }
+        { label: t('navigation.detachments'), to: `/faction/${faction.slug}/detachments` }
       ]}
       heading={{ title: detachment.name, subtitle: headingSubtitle || undefined }}
       actions={[
@@ -123,7 +126,7 @@ const DetachmentPage: FC = () => {
         {
           icon: shareAction.icon,
           onClick: () => shareAction.onClick(),
-          ariaLabel: shareAction.ariaLabel ?? 'Share detachment',
+          ariaLabel: shareAction.ariaLabel ?? t('share.detachmentLabel'),
           'data-testid': shareAction['data-testid']
         }
       ]}
@@ -140,7 +143,7 @@ const DetachmentPage: FC = () => {
         {abilities.length > 0 ? (
           <Section
             count={abilities.length}
-            title="Detachment Abilities"
+            title={tc('detachmentAbilities')}
             testId="detachment-abilities"
           >
             <Grid cols={2}>
@@ -154,7 +157,7 @@ const DetachmentPage: FC = () => {
         {enhancements.length > 0 ? (
           <Section
             count={enhancements.length}
-            title="Enhancements"
+            title={tc('enhancements')}
             testId="detachment-enhancements"
           >
             <Grid cols={2}>
@@ -166,7 +169,11 @@ const DetachmentPage: FC = () => {
         ) : null}
 
         {stratagems.length > 0 ? (
-          <Section count={stratagems.length} title="Stratagems" testId="detachment-stratagems">
+          <Section
+            count={stratagems.length}
+            title={tc('stratagems')}
+            testId="detachment-stratagems"
+          >
             <Grid cols={2}>
               {stratagems.map((stratagem) => (
                 <StratagemCard key={stratagem.id} stratagem={stratagem} />

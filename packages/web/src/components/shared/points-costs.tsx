@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { Tag, TagGroup } from '@/components/ui';
@@ -20,6 +21,7 @@ export const PointsCosts: FC<PointsCostsProps> = ({
   fallbackName,
   'data-testid': testId
 }) => {
+  const { t } = useTranslation('catalog');
   const groups = groupModelCostsBySection(costs);
   if (groups.length === 0) return null;
 
@@ -35,7 +37,7 @@ export const PointsCosts: FC<PointsCostsProps> = ({
           <TagGroup spacing="sm" className="flex-wrap">
             {group.costs.map((cost) => (
               <Tag key={`${cost.datasheetId}-${cost.line}`} variant="primary" size="sm">
-                {cost.description || fallbackName || 'Unit'} · {cost.cost} pts
+                {cost.description || fallbackName || t('unit')} · {cost.cost} pts
               </Tag>
             ))}
           </TagGroup>

@@ -1,6 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeAll, beforeEach, vi } from 'vitest';
+import i18n from './i18n';
+
+const translations = import.meta.glob('./locales/*/*.json', { eager: true, import: 'default' });
+for (const [path, resources] of Object.entries(translations)) {
+  const [, , language, file] = path.split('/');
+  i18n.addResourceBundle(language, file.replace('.json', ''), resources);
+}
 
 beforeAll(() => {
   if (!import.meta.env.VITE_APP_VERSION) {
@@ -79,8 +86,9 @@ Object.defineProperty(global, 'indexedDB', {
 });
 
 // Setup and cleanup for each test
-beforeEach(() => {
+beforeEach(async () => {
   vi.clearAllMocks();
+  await i18n.changeLanguage('en');
 });
 
 afterEach(() => {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
 
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const { t } = useTranslation(['collections', 'common', 'rosters']);
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { factionIndex: factions, loading: factionsLoading, dataVersion } = useFactionsContext();
@@ -29,8 +31,8 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
     if (!name.trim() || !faction) {
       showToast({
         type: 'error',
-        title: 'Missing Info',
-        message: 'Please provide a name and select a faction.'
+        title: t('form.missingInfo'),
+        message: t('form.required')
       });
       return;
     }
@@ -52,7 +54,11 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
       navigate(`/collections/${collection.id}`);
     } catch (error) {
       console.error('Failed to create collection', error);
-      showToast({ type: 'error', title: 'Error', message: 'Could not create collection.' });
+      showToast({
+        type: 'error',
+        title: t('error.label', { ns: 'common' }),
+        message: t('notifications.createError')
+      });
     }
   };
 
@@ -60,7 +66,7 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
     <form className="flex flex-col gap-4" onSubmit={(e) => void handleSubmit(e)}>
       <Field>
         <label htmlFor="collection-name" className="block text-sm font-medium text-body">
-          Name
+          {t('form.name')}
         </label>
         <input
           id="collection-name"
@@ -69,7 +75,7 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
           value={name}
           data-testid="collection-name-input"
           onChange={(e) => setName(e.target.value)}
-          placeholder="My Collection"
+          placeholder={t('form.namePlaceholder')}
           required
         />
       </Field>
@@ -78,29 +84,32 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
         <FieldSkeleton />
       ) : (
         <SelectField
-          label="Faction"
+          label={t('form.faction', { ns: 'rosters' })}
           data-testid="collection-faction-field"
           options={factionOptions}
           value={factionSlug}
           onChange={(e) => {
             setFactionSlug(e.target.value);
-            setName((prev) => prev || (e.target.value ? `${e.target.value} collection` : ''));
+            setName(
+              (prev) =>
+                prev || (e.target.value ? t('form.defaultName', { name: e.target.value }) : '')
+            );
           }}
-          placeholder="Select a Faction"
+          placeholder={t('form.selectFaction', { ns: 'rosters' })}
           required
         />
       )}
 
       <div className="flex justify-end gap-4">
         <Button variant="secondary" onClick={onClose}>
-          Cancel
+          {t('actions.cancel', { ns: 'common' })}
         </Button>
         <Button
           type="submit"
           disabled={!name || !factionSlug || factionsLoading}
           data-testid="create-collection-submit"
         >
-          Create
+          {t('form.create')}
         </Button>
       </div>
     </form>
@@ -108,15 +117,18 @@ const CreateCollectionForm: React.FC<{ onClose: () => void }> = ({ onClose }) =>
 };
 
 /** Bottom sheet for creating a collection; navigates to the new collection on success. */
-const CreateCollectionSheet: React.FC<Props> = ({ open, onClose }) => (
-  <Sheet
-    open={open}
-    onClose={onClose}
-    title="Create Collection"
-    data-testid="create-collection-sheet"
-  >
-    <CreateCollectionForm onClose={onClose} />
-  </Sheet>
-);
+const CreateCollectionSheet: React.FC<Props> = ({ open, onClose }) => {
+  const { t } = useTranslation('collections');
+  return (
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title={t('pages.create')}
+      data-testid="create-collection-sheet"
+    >
+      <CreateCollectionForm onClose={onClose} />
+    </Sheet>
+  );
+};
 
 export default CreateCollectionSheet;

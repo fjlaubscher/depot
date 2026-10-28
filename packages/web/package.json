@@ -21,9 +21,11 @@
   "dependencies": {
     "@depot/core": "workspace:*",
     "@sentry/react": "^10.69.0",
+    "i18next": "^26.5.3",
     "lucide-react": "^1.28.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-i18next": "^17.1.0",
     "react-router-dom": "^7.18.2"
   },
   "devDependencies": {

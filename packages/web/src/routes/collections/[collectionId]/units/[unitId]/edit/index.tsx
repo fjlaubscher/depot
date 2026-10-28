@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from '@/lib/navigation';
 import type { depot } from '@depot/core';
@@ -19,17 +20,17 @@ import { COLLECTION_UNIT_STATES } from '@depot/core/utils/collection';
 import { COLLECTION_STATE_META } from '@/utils/collection';
 import useCollection from '@/hooks/use-collection';
 
-const stateOptions = COLLECTION_UNIT_STATES.map((value) => ({
-  value,
-  label: COLLECTION_STATE_META[value].label
-}));
-
 /** Keyed by unit id by the caller, so state initialises once per unit. */
 const CollectionUnitEditForm: React.FC<{
   collection: depot.Collection;
   unit: depot.CollectionUnit;
   save: (collection: depot.Collection) => Promise<void>;
 }> = ({ collection, unit, save }) => {
+  const { t } = useTranslation(['collections', 'rosters']);
+  const stateOptions = COLLECTION_UNIT_STATES.map((value) => ({
+    value,
+    label: t(COLLECTION_STATE_META[value].labelKey)
+  }));
   const navigate = useNavigate();
   const [state, setState] = useState<depot.CollectionUnitState>(unit.state ?? 'sprue');
   const stateMeta = COLLECTION_STATE_META[state] ?? COLLECTION_STATE_META.sprue;
@@ -63,19 +64,17 @@ const CollectionUnitEditForm: React.FC<{
       unit={unit}
       testId="edit-collection-unit-form"
       backTo={`/collections/${collection.id}${unitHash}`}
-      documentTitle={`${unit.datasheet.name} - Edit Collection Unit`}
+      documentTitle={t('units.editTitle', { name: unit.datasheet.name })}
       backLabel={collection.name}
       title={unit.datasheet.name}
-      subtitle={`Loadout · ${collection.name}`}
+      subtitle={t('units.loadout', { ns: 'rosters', name: collection.name })}
       beforeModelCost={
         <Card data-testid="unit-state-section">
           <div className="flex flex-col gap-3">
-            <h3 className="text-lg font-semibold text-foreground">State</h3>
-            <p className="text-sm text-muted">
-              Track your build progress from sprue to parade-ready glory.
-            </p>
+            <h3 className="text-lg font-semibold text-foreground">{t('units.state')}</h3>
+            <p className="text-sm text-muted">{t('units.stateDescription')}</p>
             <SelectField
-              label="Build state"
+              label={t('units.buildState')}
               options={stateOptions}
               value={state}
               onChange={(e) => setState(e.target.value as depot.CollectionUnitState)}
@@ -85,7 +84,7 @@ const CollectionUnitEditForm: React.FC<{
               className="mt-3 self-start"
               data-testid="collection-unit-state-tag"
             >
-              {stateMeta.label}
+              {t(stateMeta.labelKey)}
             </Tag>
           </div>
         </Card>
@@ -96,15 +95,19 @@ const CollectionUnitEditForm: React.FC<{
 };
 
 const CollectionUnitEditView: React.FC = () => {
+  const { t } = useTranslation(['collections', 'common', 'rosters']);
   const { collectionId, unitId } = useParams<{ collectionId: string; unitId: string }>();
   const { collection, loading, error, save } = useCollection(collectionId);
   const unit = collection?.items.find((item) => item.id === unitId);
 
-  const back = { to: `/collections/${collectionId}`, label: 'Collection' };
+  const back = {
+    to: `/collections/${collectionId}`,
+    label: t('navigation.collection', { ns: 'common' })
+  };
 
   if (loading) {
     return (
-      <AppLayout title="Edit Collection Unit" back={back}>
+      <AppLayout title={t('units.editDocument')} back={back}>
         <div className="flex flex-col gap-4" data-testid="edit-collection-unit-loading">
           <PageHeaderSkeleton />
           <SkeletonCard />
@@ -116,9 +119,9 @@ const CollectionUnitEditView: React.FC = () => {
 
   if (error || !collection) {
     return (
-      <AppLayout title="Edit Collection Unit" back={back}>
-        <Alert variant="error" title="Unable to load collection">
-          {error || 'Collection not found'}
+      <AppLayout title={t('units.editDocument')} back={back}>
+        <Alert variant="error" title={t('pages.loadCollectionFailed')}>
+          {t(error ? 'pages.collectionError' : 'pages.notFound')}
         </Alert>
       </AppLayout>
     );
@@ -126,10 +129,10 @@ const CollectionUnitEditView: React.FC = () => {
 
   if (!unit) {
     return (
-      <AppLayout title="Edit Collection Unit" back={back}>
+      <AppLayout title={t('units.editDocument')} back={back}>
         <ErrorState
-          title="Unit Not Found"
-          message="The unit you're trying to edit could not be found."
+          title={t('units.notFound', { ns: 'rosters' })}
+          message={t('units.notFoundMessage', { ns: 'rosters' })}
           showRetry={false}
           homeUrl={`/collections/${collectionId}`}
           data-testid="edit-collection-unit-not-found"

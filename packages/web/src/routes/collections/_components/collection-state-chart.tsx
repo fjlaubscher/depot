@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { depot } from '@depot/core';
 
 import { COLLECTION_UNIT_STATES, getCollectionStateCounts } from '@depot/core/utils/collection';
@@ -10,6 +11,7 @@ type CollectionStateChartProps = {
 };
 
 const CollectionStateChart: React.FC<CollectionStateChartProps> = ({ items, heading }) => {
+  const { t } = useTranslation('collections');
   const totals = getCollectionStateCounts(items);
   const totalUnits = items.length;
 
@@ -22,13 +24,13 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({ items, head
       {totalUnits > 0 ? (
         <div className="flex flex-col gap-1">
           {COLLECTION_UNIT_STATES.map((state) => {
-            const { label, bar } = COLLECTION_STATE_META[state];
+            const { labelKey, bar } = COLLECTION_STATE_META[state];
             const percent = Math.round((totals[state] / totalUnits) * 100);
 
             return (
               <div key={`bar-${state}`} className="flex items-center gap-2">
-                <span className="w-[86px] shrink-0 font-mono text-[9.5px] font-medium uppercase text-muted">
-                  {label}
+                <span className="w-[100px] shrink-0 font-mono text-[9.5px] font-medium uppercase text-muted">
+                  {t(labelKey)}
                 </span>
                 {/* The track keeps every row the same length, so an empty state still reads as zero. */}
                 <div className="h-2 flex-1 overflow-hidden rounded-xs bg-surface-soft">
@@ -42,9 +44,7 @@ const CollectionStateChart: React.FC<CollectionStateChartProps> = ({ items, head
           })}
         </div>
       ) : (
-        <p className="py-4 text-center text-sm text-subtle">
-          Add units to see a build-state breakdown.
-        </p>
+        <p className="py-4 text-center text-sm text-subtle">{t('chart.empty')}</p>
       )}
     </div>
   );
