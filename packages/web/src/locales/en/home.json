@@ -5,8 +5,8 @@
   "documentTitle": "depot - Offline Warhammer 40,000 Companion",
   "hero": {
     "edition": "// Now in 11th edition",
-    "title": "depot has a new look",
-    "description": "Rebuilt for reading rules at the table — denser, faster, and still fully offline. Crusade features are on the way."
+    "title": "depot now speaks French",
+    "description": "More languages, French first. Thanks to @Marthym (PR #79), depot's first community contribution. Help translate another?"
   },
   "recentRosters": "Recent rosters",
   "collections": "Collections",

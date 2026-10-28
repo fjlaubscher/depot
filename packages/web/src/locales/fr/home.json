@@ -5,8 +5,8 @@
   "documentTitle": "depot - Compagnon Warhammer 40,000 hors ligne",
   "hero": {
     "edition": "// Maintenant en 11e édition",
-    "title": "depot fait peau neuve",
-    "description": "Repensé pour consulter les règles à la table de jeu : plus dense, plus rapide et toujours entièrement accessible hors ligne. Les fonctionnalités de Croisade arrivent bientôt."
+    "title": "depot parle français",
+    "description": "Plusieurs langues, le français en premier. Merci à @Marthym (PR #79), première contribution communautaire. Envie d’en traduire une autre ?"
   },
   "recentRosters": "Listes récentes",
   "collections": "Collections",

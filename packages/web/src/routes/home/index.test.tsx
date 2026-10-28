@@ -98,7 +98,8 @@ describe('Home', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot has a new look');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot now speaks French');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('@Marthym');
     expect(screen.queryByTestId('bookmarks-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('rosters-section')).not.toBeInTheDocument();
     expect(screen.queryByTestId('collections-section')).not.toBeInTheDocument();
@@ -209,7 +210,8 @@ describe('Home', () => {
       'data-title',
       'depot - Compagnon Warhammer 40,000 hors ligne'
     );
-    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot fait peau neuve');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('depot parle français');
+    expect(screen.getByTestId('home-hero')).toHaveTextContent('première contribution');
     expect(screen.getByTestId('home-hero')).toHaveTextContent('11e édition');
     expect(screen.getByTestId('rosters-section')).toHaveTextContent('Listes récentes');
     expect(screen.getByTestId('bookmark-card')).toHaveTextContent('My FactionFACTION');

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The home announcement says depot supports multiple languages, French first,
+  thanks to its first community contribution by @Marthym (PR #79), and invites
+  help translating depot into other languages.
+
+## [2.3.0] - 2026-10-28
+
+### Added
+
+- The interface can be shown in French or English, from Settings (Automatic,
+  Français, or English). French is the first translation; English stays the
+  fallback, including offline. First community contribution, by @Marthym
+  (PR #79).
+
 ## [2.2.0] - 2026-08-23
 
 ### Added
