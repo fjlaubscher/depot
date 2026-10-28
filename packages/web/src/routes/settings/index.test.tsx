@@ -44,13 +44,13 @@ describe('Settings language', () => {
       within(select)
         .getAllByRole('option')
         .map((option) => option.textContent)
-    ).toEqual(['Automatic', 'Français', 'English']);
+    ).toEqual(['System', 'Français', 'English']);
     select.focus();
     expect(select).toHaveFocus();
 
     fireEvent.change(select, { target: { value: 'fr' } });
     await screen.findByRole('combobox', { name: 'Langue de l’interface' });
-    expect(within(select).getByRole('option', { name: 'Automatique' })).toBeInTheDocument();
+    expect(within(select).getByRole('option', { name: 'Système' })).toBeInTheDocument();
     expect(document.documentElement.lang).toBe('fr');
     await waitFor(() => expect(document.title).toBe('Paramètres et préférences | depot'));
     expect(screen.getByRole('heading', { name: 'Paramètres' })).toBeInTheDocument();

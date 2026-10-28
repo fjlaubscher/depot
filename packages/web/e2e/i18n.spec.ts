@@ -160,7 +160,7 @@ test('refreshes an outdated cached hero translation without clearing browser sto
   expect(seeded).toBe(true);
 
   await page.goto('/');
-  await expect(page.getByTestId('home-hero')).toContainText('depot fait peau neuve');
+  await expect(page.getByTestId('home-hero')).toContainText('depot parle français');
   expect(
     await page.evaluate(async () => {
       const cache = await caches.open('depot-translations');
@@ -169,7 +169,7 @@ test('refreshes an outdated cached hero translation without clearing browser sto
       );
       return resources.find((data) => data.bookmarks === 'Favoris')?.hero.title;
     })
-  ).toBe('depot fait peau neuve');
+  ).toBe('depot parle français');
 });
 
 test('keeps French home and settings readable on narrow mobile screens', async ({
@@ -205,7 +205,7 @@ test('keeps French home and settings readable on narrow mobile screens', async (
   await page.getByRole('link', { name: 'Accueil', exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page).toHaveTitle('depot - Compagnon Warhammer 40,000 hors ligne');
-  await expect(page.getByTestId('home-hero')).toContainText('depot fait peau neuve');
+  await expect(page.getByTestId('home-hero')).toContainText('depot parle français');
   await expect(page.getByTestId('roster-preview-card')).toContainText(rosterName);
   await expect(page.getByTestId('roster-preview-card')).toContainText('MODIFIÉE À L’INSTANT');
   await expect(page.getByTestId('rosters-section')).toContainText('Listes récentes');

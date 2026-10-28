@@ -4,7 +4,8 @@ test.describe('Home', () => {
   test('shows the hero when no local data', async ({ page }) => {
     await page.goto('/');
 
-    await expect(page.getByTestId('home-hero')).toContainText('depot has a new look');
+    await expect(page.getByTestId('home-hero')).toContainText('depot now speaks French');
+    await expect(page.getByTestId('home-hero')).toContainText('@Marthym');
     await expect(page.getByTestId('bookmarks-section')).toHaveCount(0);
     await expect(page.getByTestId('rosters-section')).toHaveCount(0);
     await expect(page.getByTestId('collections-section')).toHaveCount(0);
