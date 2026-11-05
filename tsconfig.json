@@ -3,6 +3,7 @@
   "files": [],
   "references": [
     { "path": "./packages/core" },
+    { "path": "./packages/sync" },
     { "path": "./packages/cli" },
     { "path": "./packages/web" }
   ]

@@ -16,6 +16,9 @@ importers:
       '@depot/core':
         specifier: workspace:*
         version: link:packages/core
+      '@depot/sync':
+        specifier: workspace:*
+        version: link:packages/sync
     devDependencies:
       prettier:
         specifier: ^3.9.6
@@ -57,6 +60,31 @@ importers:
 
   packages/core:
     devDependencies:
+      prettier:
+        specifier: ^3.9.6
+        version: 3.9.6
+      rimraf:
+        specifier: ^6.1.3
+        version: 6.1.3
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.0(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.90.0)(terser@5.48.0))
+
+  packages/sync:
+    dependencies:
+      '@depot/core':
+        specifier: workspace:*
+        version: link:../core
+      jose:
+        specifier: 6.2.14
+        version: 6.2.14
+    devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
@@ -2583,6 +2611,9 @@ packages:
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
+
+  jose@6.2.14:
+    resolution: {integrity: sha512-3JasLuki1NRLQvY4wCoC37KZk4qxoBx2k2aFqLxT84IezqW0bkJKnNtxnZj/Fu1xsQivoc/lytxaRHJoGLjJ1A==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -6051,6 +6082,8 @@ snapshots:
       picocolors: 1.1.1
 
   jiti@2.7.0: {}
+
+  jose@6.2.14: {}
 
   js-tokens@4.0.0: {}
 

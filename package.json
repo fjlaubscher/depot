@@ -13,7 +13,7 @@
     "typecheck": "pnpm --filter @depot/core build && pnpm -r typecheck",
     "test": "pnpm -r test",
     "dev": "pnpm --filter @depot/web dev",
-    "dev:wrangler": "pnpm --filter @depot/web build && wrangler pages dev packages/web/dist"
+    "dev:wrangler": "pnpm --filter @depot/core build && pnpm --filter @depot/sync build && pnpm --filter @depot/web build && wrangler pages dev packages/web/dist --port 8788 --compatibility-date=2026-08-06"
   },
   "devDependencies": {
     "prettier": "^3.9.6",
@@ -34,6 +34,7 @@
     }
   },
   "dependencies": {
-    "@depot/core": "workspace:*"
+    "@depot/core": "workspace:*",
+    "@depot/sync": "workspace:*"
   }
 }

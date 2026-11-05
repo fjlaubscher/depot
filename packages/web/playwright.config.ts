@@ -23,10 +23,12 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] }
     }
   ],
-  webServer: {
-    command: `pnpm --filter @depot/web dev -- --host --port ${PORT}`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000
-  }
+  webServer: process.env.WEB_BASE_URL
+    ? undefined
+    : {
+        command: `pnpm --filter @depot/web dev -- --host --port ${PORT}`,
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000
+      }
 });

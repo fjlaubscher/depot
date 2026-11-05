@@ -72,3 +72,23 @@ Guidance for working in the `depot` monorepo (pnpm workspace with core, CLI, and
 - Hooks: `use-` prefix with kebab-case
 - Utils/Constants: kebab-case
 - Types: kebab-case with `.ts` extension
+
+## Sous-agents
+
+### Stratégie de délégation
+
+- Ne pas déléguer les tâches triviales ou entièrement localisées.
+- Ne pas lancer plusieurs agents pour analyser le même périmètre sans justification.
+- Privilégier un seul sous-agent spécialisé par tâche indépendante.
+- Utiliser le niveau de raisonnement défini dans le TOML de chaque agent.
+- Ne pas déléguer si le coût de coordination dépasse le bénéfice attendu.
+
+### Sélection des agents
+
+- `reviewer` : revue générale des modifications non triviales.
+- `code-explorer` : localisation de fichiers, symboles, appels et dépendances.
+- `docs-researcher` : vérification des comportements dans les documentations officielles.
+- `frontend-reviewer` : React, Next.js, TypeScript, Payload UI, SEO technique.
+- `security-reviewer` : authentification, autorisations, paiements, secrets et vulnérabilités.
+- `architecture-reviewer` : architecture Medusa, contrats API et impacts inter-repo.
+- `debug-investigator` : bugs complexes, analyse causale et régressions difficiles.
