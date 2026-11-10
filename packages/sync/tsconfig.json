@@ -1,0 +1,7 @@
+{
+  "extends": "../core/tsconfig.json",
+  "compilerOptions": { "lib": ["ES2023", "DOM"], "rootDir": "src", "outDir": "dist" },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
+  "references": [{ "path": "../core" }]
+}

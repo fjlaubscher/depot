@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => {
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        navigateFallbackDenylist: [/^\/api\/sync(?:\/|\?|$)/],
         // Languages are cached on demand, never as part of the global precache.
         globIgnores: ['**/*.json']
       },
